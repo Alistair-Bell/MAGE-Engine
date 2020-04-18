@@ -62,6 +62,13 @@ void mageVector4Initialise(Vector4 *vector4, const float value1, const float val
 	vector4->z = value3;
 	vector4->w = value4;
 }
+void mageVector4InitialiseVector2(Vector4 *vector4, const Vector2 *left, const Vector2 *right)
+{
+	vector4->x = left->x;
+	vector4->y = left->y;
+	vector4->z = right->x;
+	vector4->w = right->y;
+}
 void mageVector4Add(Vector4 *left, const Vector4 *right)
 {
 	left->x += right->x;

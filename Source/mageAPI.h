@@ -6,14 +6,8 @@
 
 #include "mageCore.h"
 
-#include <assert.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdint.h>
-#include <GLFW/glfw3.h>
-
 /* Typedefs for integers */
+
 typedef unsigned char byte;
 typedef char sint8;
 typedef unsigned char uint8;
@@ -24,27 +18,48 @@ typedef unsigned int uint32;
 typedef long sint64;
 typedef unsigned long uint64;
 
+/* Engine related defines */ 
+
+typedef struct MAGE_RESIZABLE_LIST_STRUCT
+{
+	/* Pointer array to the elements stored */
+	void **Elements;
+	/* Count of all of the elements stored */
+	uint32 Quantity;
+	/* Size of each element in bytes */
+	uint32 ElementSize;
+
+} mageResizableList;
+
+/* Allocates the memory for the struct */
+extern void *mageResizableListAllocate();
+/* Initialises the list populating the members of the struct */
+extern void mageResizableListInitialise(mageResizableList *resizableList, const uint32 size);
+/* Pushes an element in the array resizing its memory */
+extern void mageResizableListPush(mageResizableList *resizableList, void *item);
+/* Pops the last element pushed onto the array */
+extern void mageResizableListPop(mageResizableList *resizableList, void (*freeMethod)(void* item));
+/* Destroys the resizable list and a function handlers its memory */
+extern void mageResizableListDestroy(mageResizableList *resizableList, void (*freeMethod)(void* item));
+/* Basic memory handler for the resizable list methods */
+extern void mageResizableListBasicDestroyHandler(void *item);
+
 
 /* Memory struct for debugging leaks */
 typedef struct MAGE_MEMORY_STRUCT
 {
 	/* Location to the memory that was allocated */
 	void *Location;
-	
 	/* Line that the memroy was allocated from */
 	uint32 Line;
-
 	/* File in which the memory was called from */
 	const char *File;	
-
 	/* Size in bytes */ 
 	uint32 Size;
-
 	/* Whether it has been freed */ 
 	uint8 Freed;
 
 } mageMemoryDebugPackage;
-
 
 /* Allows debuging for malloc function calls */
 extern void *mageMallocDebug(const uint64 size, const char *file, const uint32 line);
@@ -56,15 +71,22 @@ extern void *mageReallocDebug(void *memory, const uint64 size, const char *file,
 #ifdef __MAGE_MEMORY_DEBUG__
 	#define malloc(s) mageMallocDebug(s, __FILE__, __LINE__);
 	#define calloc(m, s) mageCallocDebug(m, s, __FILE__, __LINE__);
-	#define realloc(m, s) mageReallocDebuge(m, s, __FILE__, __LINE__);
+	#define realloc(m, s) mageReallocDebug(m, s, __FILE__, __LINE__);
 #endif
+
+/* Window related functions */
 
 typedef struct MAGE_WINDOW_STRUCT
 {
+	/* Width of the window */
 	sint32 Width;
+	/* Height of the window */
 	sint32 Height;
+	/* Title of the window */
 	const char *Title;
+	/* Instaniated GLFW context */
 	GLFWwindow *Context;
+	/* Whether the window is running */
 	uint8 Running;	
 } mageWindow;
 
@@ -151,6 +173,8 @@ typedef struct MAGE_VECTOR4_STRUCT
 
 /* Intitalises the vector4 based on the values passed */
 extern void mageVector4Initialise(Vector4 *vector4, const float value1, const float value2, const float value3, const float value4);
+/* Initialses the vector4 by using values passed in from two vector2's */
+extern void mageVector4InitialiseVector2(Vector4 *vector4, const Vector2 *left, const Vector2 *right);
 /* Adds the right vector4 to the left vector4 */
 extern void mageVector4Add(Vector4 *left, const Vector4 *right);
 /* Subtracts the right vector4 to the left vector4 */
@@ -161,7 +185,7 @@ extern void mageVector4Multiply(Vector4 *left, const Vector4 *right);
 extern void mageVector4Divide(Vector4 *left, const Vector4 *right);
 
 /* Stores sixteen floats using column majoring for opengl */
-typedef struct MAGE_MATRIX4X4
+typedef struct MAGE_MATRIX4X4_STRUCT
 {
 	float Elements[16];
 
@@ -172,8 +196,12 @@ extern void mageMatrixInitialise(Matrix4x4 *matrix, const Vector4 *row0, const V
 /* Multiplies the right matrix4x4 to the left matrix4x4 */
 extern void mageMatrixMultiply(Matrix4x4 *left, const Matrix4x4 *right);
 
+/* Graphics related functions */
 
+typedef struct MAGE_RENDERER_STRUCT
+{
 
+} mageRenderer;
 
 
 
