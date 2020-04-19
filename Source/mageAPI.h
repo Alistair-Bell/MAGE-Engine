@@ -52,38 +52,6 @@ extern void mageFileReadContents(const char *file, char *buffer, const uint8 rea
 /* Dumps the contents of the buffer into the file allowing the file to be cleaned or not pushing the return value to the integer passed in*/
 extern void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success);
 
-
-
-
-/* Memory struct for debugging leaks */
-typedef struct MAGE_MEMORY_STRUCT
-{
-	/* Location to the memory that was allocated */
-	void *Location;
-	/* Line that the memroy was allocated from */
-	uint32 Line;
-	/* File in which the memory was called from */
-	const char *File;	
-	/* Size in bytes */ 
-	uint32 Size;
-	/* Whether it has been freed */ 
-	uint8 Freed;
-
-} mageMemoryDebugPackage;
-
-/* Allows debuging for malloc function calls */
-extern void *mageMallocDebug(const uint64 size, const char *file, const uint32 line);
-/* Allows debuging for the calloc function calls */
-extern void *mageCallocDebug(const uint64 items, const uint64 size, const char *file, const uint32 line);
-/* Allows debuging for the realloc function calls */
-extern void *mageReallocDebug(void *memory, const uint64 size, const char *file, const uint32 line);
-
-#ifdef __MAGE_MEMORY_DEBUG__
-	#define malloc(s) mageMallocDebug(s, __FILE__, __LINE__)
-	#define calloc(m, s) mageCallocDebug(m, s, __FILE__, __LINE__)
-	#define realloc(m, s) mageReallocDebug(m, s, __FILE__, __LINE__)
-#endif
-
 /* Window related functions */
 
 typedef struct MAGE_WINDOW_STRUCT
