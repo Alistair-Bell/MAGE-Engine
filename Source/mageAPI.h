@@ -52,6 +52,8 @@ extern void mageFileReadContents(const char *file, char *buffer, const uint8 rea
 /* Dumps the contents of the buffer into the file allowing the file to be cleaned or not pushing the return value to the integer passed in*/
 extern void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success);
 
+
+
 /* Window related functions */
 
 typedef struct MAGE_WINDOW_STRUCT
@@ -188,8 +190,7 @@ extern void mageGLClearError();
 /* OpenGL call wrapper */
 extern void mageGLLogError(const char *function, const char *file, const sint32 line);
 
-
-
+/* OpenGL buffers */ 
 
 typedef struct MAGE_BUFFER_STRUCT
 {
@@ -232,6 +233,29 @@ extern void mageIndexBufferBind(mageIndexBuffer *buffer);
 extern void mageIndexBufferUnBind(mageIndexBuffer *buffer); 
 /* Destroys the index buffer freeing the memory */  
 extern void mageIndexBufferDestroy(mageIndexBuffer *buffer, void (*freeMethod)(void *item)); 
+
+typedef struct MAGE_VERTEX_ARRAY_STRUCT
+{
+	/* Buffer `reference` used by opengl */
+	uint32 ID;
+
+	/* List of the buffers stored */
+	mageResizableList *Buffers;
+
+} mageVertexArray;
+
+/* Allocates the memroy for the vertex array */
+extern void *mageVertexArrayAllocate();
+/* Initialses the vertex array */
+extern void mageVertexArrayInitialise(mageVertexArray *vertexArray);
+/* Pushes the buffer to the list */
+extern void mageVertexArrayPush(mageVertexArray *vertexArray, mageBuffer *buffer);
+/* Binds the vertex array */
+extern void mageVertexArrayBind(mageVertexArray *vertexArray);
+/* Unbinds the vertex array */
+extern void mageVertexArrayUnBind(mageVertexArray *vertexArray);
+/* Destroys the vertex array and the buffers stored freeing the memory */
+extern void mageVertexArrayDestroy(mageVertexArray *vertexArray, void (*freeMethod)(void *item));
 
 
 /* Graphics related functions */
