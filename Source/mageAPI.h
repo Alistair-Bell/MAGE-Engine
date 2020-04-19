@@ -44,6 +44,16 @@ extern void mageResizableListDestroy(mageResizableList *resizableList, void (*fr
 /* Basic memory handler for the resizable list methods */
 extern void mageResizableListBasicDestroyHandler(void *item);
 
+/* File utilities */
+
+
+/* Dumps the file contents into the buffer allowing for the buffer to be reallocated pushing the return value to the integer passed in */
+extern void mageFileReadContents(const char *file, char *buffer, const uint8 reallocatable, uint8 *success);
+/* Dumps the contents of the buffer into the file allowing the file to be cleaned or not pushing the return value to the integer passed in*/
+extern void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success);
+
+
+
 
 /* Memory struct for debugging leaks */
 typedef struct MAGE_MEMORY_STRUCT
@@ -69,9 +79,9 @@ extern void *mageCallocDebug(const uint64 items, const uint64 size, const char *
 extern void *mageReallocDebug(void *memory, const uint64 size, const char *file, const uint32 line);
 
 #ifdef __MAGE_MEMORY_DEBUG__
-	#define malloc(s) mageMallocDebug(s, __FILE__, __LINE__);
-	#define calloc(m, s) mageCallocDebug(m, s, __FILE__, __LINE__);
-	#define realloc(m, s) mageReallocDebug(m, s, __FILE__, __LINE__);
+	#define malloc(s) mageMallocDebug(s, __FILE__, __LINE__)
+	#define calloc(m, s) mageCallocDebug(m, s, __FILE__, __LINE__)
+	#define realloc(m, s) mageReallocDebug(m, s, __FILE__, __LINE__)
 #endif
 
 /* Window related functions */
@@ -130,18 +140,18 @@ typedef struct MAGE_VECTOR2_STRUCT
 	float x;
 	float y;
 
-} Vector2;
+} mageVector2;
 
 /* Intitalises the vector2 based on the values passed */
-extern void mageVector2Initialise(Vector2 *vector2, const float value1, const float value2);
+extern void mageVector2Initialise(mageVector2 *vector2, const float value1, const float value2);
 /* Adds the right vector2 to the left vector2 */
-extern void mageVector2Add(Vector2 *left, const Vector2 *right);
+extern void mageVector2Add(mageVector2 *left, const mageVector2 *right);
 /* Subtracts the right vector2 to the left vector2 */
-extern void mageVector2Subtract(Vector2 *left, const Vector2 *right);
+extern void mageVector2Subtract(mageVector2 *left, const mageVector2 *right);
 /* Multiplies the right vector2 to the left vector2 */
-extern void mageVector2Multiply(Vector2 *left, const Vector2 *right);
+extern void magemageVector2Multiply(mageVector2 *left, const mageVector2 *right);
 /* Divides the right vector2 to the left vector2 */ 
-extern void mageVector2Divide(Vector2 *left, const Vector2 *right);
+extern void mageVector2Divide(mageVector2 *left, const mageVector2 *right);
 
 typedef struct MAGE_VECTOR3_STRUCT
 {
@@ -149,18 +159,18 @@ typedef struct MAGE_VECTOR3_STRUCT
 	float y;
 	float z;	
 
-} Vector3;
+} mageVector3;
 
 /* Intitalises the vector3 based on the values passed */
-extern void mageVector3Initialise(Vector3 *vector3, const float value1, const float value2, const float value3);
+extern void mageVector3Initialise(mageVector3 *vector3, const float value1, const float value2, const float value3);
 /* Adds the right vector3 to the left vector3 */
-extern void mageVector3Add(Vector3 *left, const Vector3 *right);
+extern void mageVector3Add(mageVector3 *left, const mageVector3 *right);
 /* Subtracts the right vector3 to the left vector3 */
-extern void mageVector3Subtract(Vector3 *left, const Vector3 *right);
+extern void mageVector3Subtract(mageVector3 *left, const mageVector3 *right);
 /* Multiplies the right vector3 to the left vector3 */
-extern void mageVector3Multiply(Vector3 *left, const Vector3 *right);
+extern void mageVector3Multiply(mageVector3 *left, const mageVector3 *right);
 /* Divides the right vector3 to the left vector3 */ 
-extern void mageVector3Divide(Vector3 *left, const Vector3 *right);
+extern void mageVector3Divide(mageVector3 *left, const mageVector3 *right);
 
 typedef struct MAGE_VECTOR4_STRUCT
 {
@@ -169,45 +179,147 @@ typedef struct MAGE_VECTOR4_STRUCT
 	float z;
 	float w;	
 
-} Vector4;
+} mageVector4;
 
 /* Intitalises the vector4 based on the values passed */
-extern void mageVector4Initialise(Vector4 *vector4, const float value1, const float value2, const float value3, const float value4);
+extern void mageVector4Initialise(mageVector4 *vector4, const float value1, const float value2, const float value3, const float value4);
 /* Initialses the vector4 by using values passed in from two vector2's */
-extern void mageVector4InitialiseVector2(Vector4 *vector4, const Vector2 *left, const Vector2 *right);
+extern void mageVector4InitialisemageVector2(mageVector4 *vector4, const mageVector2 *left, const mageVector2 *right);
 /* Adds the right vector4 to the left vector4 */
-extern void mageVector4Add(Vector4 *left, const Vector4 *right);
+extern void mageVector4Add(mageVector4 *left, const mageVector4 *right);
 /* Subtracts the right vector4 to the left vector4 */
-extern void mageVector4Subtract(Vector4 *left, const Vector4 *right);
+extern void mageVector4Subtract(mageVector4 *left, const mageVector4 *right);
 /* Multiplies the right vector4 to the left vector4 */
-extern void mageVector4Multiply(Vector4 *left, const Vector4 *right);
+extern void mageVector4Multiply(mageVector4 *left, const mageVector4 *right);
 /* Divides the right vector4 to the left vector4 */ 
-extern void mageVector4Divide(Vector4 *left, const Vector4 *right);
+extern void mageVector4Divide(mageVector4 *left, const mageVector4 *right);
 
 /* Stores sixteen floats using column majoring for opengl */
 typedef struct MAGE_MATRIX4X4_STRUCT
 {
 	float Elements[16];
 
-} Matrix4x4;
+} mageMatrix4x4;
 
 /* Initialses a matrix using four vector4's */
-extern void mageMatrixInitialise(Matrix4x4 *matrix, const Vector4 *row0, const Vector4 *row1, const Vector4 *row2, const Vector4 *row3);
+extern void mageMatrixInitialise(mageMatrix4x4 *matrix, const mageVector4 *row0, const mageVector4 *row1, const mageVector4 *row2, const mageVector4 *row3);
 /* Multiplies the right matrix4x4 to the left matrix4x4 */
-extern void mageMatrixMultiply(Matrix4x4 *left, const Matrix4x4 *right);
+extern void mageMatrixMultiply(mageMatrix4x4 *left, const mageMatrix4x4 *right);
+
+
+/* OpenGL related functions */
+
+#ifdef __MAGE_OPENGL_
+	#define GLCall(x) mageGLClearError();\
+		x;\
+		mageGLLogError(#x, __FILE__, __LINE__);
+#endif
+
+/* OpenGL debugging function */
+extern void mageGLClearError();
+/* OpenGL call wrapper */
+extern void mageGLLogError(const char *function, const char *file, const sint32 line);
+
+
+
+
+typedef struct MAGE_BUFFER_STRUCT
+{
+	/* Buffer `reference` used by opengl */
+	uint32 ID;
+	
+	/* Count of the buffer components */
+	uint32 ComponentCount;
+
+} mageBuffer;
+
+/* Allocates the memory for the buffer */
+extern void *mageBufferAllocate();
+/* Initialses the buffer suppling the values and the counts required by opengl */
+extern void mageBufferInitialise(mageBuffer *buffer, const float *data, const uint32 quantity, const uint32 componentCount);
+/* Binds the buffer */
+extern void mageBufferBind(mageBuffer *buffer);
+/* Unbinds the buffer */
+extern void mageBufferUnbind(mageBuffer *buffer);
+/* Destroys the buffer freeing the memory */
+extern void mageBufferDestroy(mageBuffer *buffer, void (*freeMethod)(void *item));
+
+typedef struct MAGE_INDEX_BUFFER_STRUCT
+{
+	/* Index buffer `reference` used by opengl */
+	uint32 ID;
+	
+	/* Count of the index buffer components */
+	uint32 ComponentCount;
+
+} mageIndexBuffer;
+
+/* Allocates the memroy for the index buffer */
+extern void *mageIndexBufferAllocate();
+/* Initialses the buffer suppling the values and the counts required by opengl */
+extern void mageIndexBufferInitialise(mageIndexBuffer *buffer, const uint32 *data, const uint32 quantity);
+/* Binds the index buffer */
+extern void mageIndexBufferBind(mageIndexBuffer *buffer);
+/* Unbinds the index buffer */
+extern void mageIndexBufferUnBind(mageIndexBuffer *buffer); 
+/* Destroys the index buffer freeing the memory */  
+extern void mageIndexBufferDestroy(mageIndexBuffer *buffer, void (*freeMethod)(void *item)); 
+
 
 /* Graphics related functions */
 
+typedef struct MAGE_RENDERABLE_STRUCT
+{
+	mageVector3 Scale;
+	mageVector3 Position;
+	
+
+} mageRenderable;
+
+/* Allocates the memory for the renderable */
+extern void *mageRenderableAllocate();
+/* Intitalises the renderable suppling a scale position */
+extern void mageRenderableInitialse(mageRenderable *renderable, const mageVector3 scale, const mageVector3 position);
+/* Destroys the renderable freeing the memory */
+extern void mageRenderableDestroy(mageRenderable *renderable, void (*freeMethod)(void *item));
+
+/* Renderer related functions */
+
 typedef struct MAGE_RENDERER_STRUCT
 {
+	mageResizableList *PipeLine;
+	uint8 Flushable;
+	void (*FreeMethod)(void *item);
 
 } mageRenderer;
 
+/* Allocates the memory for the renderer */
+extern void *mageRendererAllocate();
+/* Initialses the renderer allowing the list not to be flushed after render */
+extern void mageRendererInitialises(mageRenderer *renderer, void (*freeMethod)(void *item), const uint8 flushContents);
+/* Destroys the renderer freeing the memory */
+extern void mageRendererDestroy(mageRenderer *renderer);
+/* Render function overriden depending on the api used */
+extern void mageRender2D(mageRenderer *renderer); 
 
+#ifdef __MAGE_OPENGL_
+	#define mageRender2D(x) { mageRenderOpenGL2D(x); }
+#elif
+	#define mageRender2D(x) { mageRenderVulkan2D(x); }
+#elif
+	#define mageRender2D(x) { mageRenderDirextX2D(x); }
+#else
+	#error Undefined Rendering API
+#endif
 
-
-
-
+/* Pushes a renderable to the pipeline */
+extern void mageRenderPush(mageRenderer *renderer, mageRenderable *renderable);
+/* Renderers 2D renderables using opengl */
+extern void mageRenderOpenGL2D(mageRenderer *renderer);
+/* Renderers 2D renderables using vulkan */
+extern void mageRenderVulkan2D(mageRenderer *renderer);
+/* Renderers 2D renderables using directx */
+extern void mageRenderDirextX2D(mageRenderer *renderer);
 
 
 
@@ -215,3 +327,4 @@ typedef struct MAGE_RENDERER_STRUCT
 
 
 #endif
+

@@ -1,103 +1,103 @@
 #include "mageAPI.h"
 
-void mageVector2Initialise(Vector2 *vector2, const float value1, const float value2)
+void mageVector2Initialise(mageVector2 *vector2, const float value1, const float value2)
 {
 	vector2->x = value1;
 	vector2->y = value2;
 }
-void mageVector2Add(Vector2 *left, const Vector2 *right)
+void mageVector2Add(mageVector2 *left, const mageVector2 *right)
 {
 	left->x += right->x;
 	left->y += right->y;
 }
-void mageVector2Subtract(Vector2 *left, const Vector2 *right)
+void mageVector2Subtract(mageVector2 *left, const mageVector2 *right)
 {
 	left->x -= right->x;
 	left->y -= right->y;
 }
-void mageVector2Multiply(Vector2 *left, const Vector2 *right)
+void mageVector2Multiply(mageVector2 *left, const mageVector2 *right)
 {
 	left->x *= right->x;
 	left->y *= right->y;
 }
-void mageVector2Divide(Vector2 *left, const Vector2 *right)
+void mageVector2Divide(mageVector2 *left, const mageVector2 *right)
 {
 	left->x /= right->x;
 	left->y /= right->y;
 }
-void mageVector3Initialise(Vector3 *vector3, const float value1, const float value2, const float value3)
+void mageVector3Initialise(mageVector3 *vector3, const float value1, const float value2, const float value3)
 {
 	vector3->x = value1;
 	vector3->y = value2;
 	vector3->z = value3;
 }
-void mageVector3Add(Vector3 *left, const Vector3 *right)
+void mageVector3Add(mageVector3 *left, const mageVector3 *right)
 {
 	left->x += right->x;
 	left->y += right->y;
 	left->z += right->z;
 }
-void mageVector3Subtract(Vector3 *left, const Vector3 *right)
+void mageVector3Subtract(mageVector3 *left, const mageVector3 *right)
 {
 	left->x -= right->x;
 	left->y -= right->y;
 	left->z -= right->z;
 }
-void mageVector3Multiply(Vector3 *left, const Vector3 *right)
+void mageVector3Multiply(mageVector3 *left, const mageVector3 *right)
 {
 	left->x *= right->x;
 	left->y *= right->y;
 	left->z *= right->z;
 }
-void mageVector3Divide(Vector3 *left, const Vector3 *right)
+void mageVector3Divide(mageVector3 *left, const mageVector3 *right)
 {
 	left->x /= right->x;
 	left->y /= right->y;
 	left->z /= right->z;
 }
-void mageVector4Initialise(Vector4 *vector4, const float value1, const float value2, const float value3, const float value4)
+void mageVector4Initialise(mageVector4 *vector4, const float value1, const float value2, const float value3, const float value4)
 {
 	vector4->x = value1;
 	vector4->y = value2;
 	vector4->z = value3;
 	vector4->w = value4;
 }
-void mageVector4InitialiseVector2(Vector4 *vector4, const Vector2 *left, const Vector2 *right)
+void mageVector4InitialiseVector2(mageVector4 *vector4, const mageVector2 *left, const mageVector2 *right)
 {
 	vector4->x = left->x;
 	vector4->y = left->y;
 	vector4->z = right->x;
 	vector4->w = right->y;
 }
-void mageVector4Add(Vector4 *left, const Vector4 *right)
+void mageVector4Add(mageVector4 *left, const mageVector4 *right)
 {
 	left->x += right->x;
 	left->y += right->y;
 	left->z += right->z;
 	left->w += right->w;
 }
-void mageVector4Subtract(Vector4 *left, const Vector4 *right)
+void mageVector4Subtract(mageVector4 *left, const mageVector4 *right)
 {
 	left->x -= right->x;
 	left->y -= right->y;
 	left->z -= right->z;	
 	left->w -= right->w;
 }
-void mageVector4Multiply(Vector4 *left, const Vector4 *right)
+void mageVector4Multiply(mageVector4 *left, const mageVector4 *right)
 {
 	left->x *= right->x;
 	left->y *= right->y;
 	left->z *= right->z;
 	left->w *= right->w;
 }
-void mageVector4Divide(Vector4 *left, const Vector4 *right)
+void mageVector4Divide(mageVector4 *left, const mageVector4 *right)
 {
 	left->x /= right->x;
 	left->y /= right->y;
 	left->z /= right->z;
 	left->w /= right->w;
 }
-void mageMatrixInitialise(Matrix4x4 *matrix, const Vector4 *row0, const Vector4 *row1, const Vector4 *row2, const Vector4 *row3)
+void mageMatrixInitialise(mageMatrix4x4 *matrix, const mageVector4 *row0, const mageVector4 *row1, const mageVector4 *row2, const mageVector4 *row3)
 {
 	matrix->Elements[0] = row0->x;
 	matrix->Elements[1] = row1->x;
@@ -120,7 +120,7 @@ void mageMatrixInitialise(Matrix4x4 *matrix, const Vector4 *row0, const Vector4 
 	matrix->Elements[15] = row3->w;
 
 }
-void mageMatrixMultiply(Matrix4x4 *left, const Matrix4x4 *right)
+void mageMatrixMultiply(mageMatrix4x4 *left, const mageMatrix4x4 *right)
 {
 	float data[16];
 	uint8 row;

@@ -8,7 +8,7 @@ BIN_DIR = $(BF_DIR)/bin
 LIB_DIR = $(BF_DIR)/lib
 OBJ_DIR = $(BF_DIR)/obj
 TARGET = mage
-OBJS = mageMain.o mageMemoryDebug.o mageWindow.o mageInput.o mageMaths.o mageGeneric.o 
+OBJS = mageMain.o mageMemoryDebug.o mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageBuffers.o
 
 all: $(TARGET)
 
@@ -33,6 +33,11 @@ mageMaths.o: Source/mageAPI.h Source/mageMaths.c
 mageGeneric.o: Source/mageAPI.h Source/mageGeneric.c
 	$(CMP) $(CST) $(FLAGS) -c Source/mageGeneric.c -o $(OBJ_DIR)/mageGeneric.o
 
+mageRenderer.o: Source/mageAPI.h Source/mageRenderer.c
+	$(CMP) $(CST) $(FLAGS) -c Source/mageRenderer.c -o $(OBJ_DIR)/mageRenderer.o
+
+mageBuffers.o: Source/mageAPI.h Source/mageBuffers.c
+	$(CMP) $(CST) $(FLAGS) -c Source/mageBuffers.c -o $(OBJ_DIR)/mageBuffers.o
 
 clean:
 	rm $(OBJ_DIR)/*.* $(BIN_DIR)/$(TARGET)

@@ -1,4 +1,5 @@
 #include "mageAPI.h"
+#include <string.h>
 
 void *mageResizableListAllocate()
 {
@@ -35,11 +36,79 @@ void mageResizableListDestroy(mageResizableList *resizableList, void (*freeMetho
 	uint32 i;
 	for (i = 0; i < resizableList->Quantity - 1; i++)
 	{	
-		freeMethod(resizableList->Elements[i]); 
+		if (resizableList->Elements[i] != NULL)	
+			freeMethod(resizableList->Elements[i]); 
 	}
 	freeMethod(resizableList);
 }
 void mageResizableListBasicDestroyHandler(void *item)
 {
 	/* TODO */ 
+}
+
+
+void mageFileReadContents(const char *file, char *buffer, const uint8 reallocatable, uint8 *success)
+{
+	FILE *f = fopen(file, "rt");
+	if (f == NULL)
+	{
+		if (success != NULL)
+			*success = 0;	
+		return;
+	}
+    fseek(f, 0, SEEK_END);
+    uint64 length = ftell(f);	
+	char *foo = malloc(sizeof(char) * (length + 1));
+	memset(foo, 0, length + 1);
+    fseek(f, 0, SEEK_SET);
+    fread(foo, 1, length, f);
+    fclose(f);
+	
+	if (reallocatable)
+	{
+		buffer = realloc(buffer, sizeof(foo));
+	}
+	strcpy(buffer, foo);
+	free(foo);
+	if (success != NULL)
+		*success = 1;
+}
+void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success)
+{
+	FILE *f;
+	switch(clean)
+	{
+		case 0:
+			f = fopen(file, "w");
+		default:
+			f = fopen(file, "w+");
+	}
+	if (f == NULL)
+	{
+		if (success != NULL)
+			*success = 0;	
+		return;
+	}
+	fprintf(f, "%s", buffer);
+	fclose(f);
+
+	if (success != NULL)
+		*success = 1;
+
+}
+void mageGLClearError()
+{
+	#ifdef __MAGE_OPENGL_
+		while (glGetError() != GL_NO_ERROR);
+	#endif
+}
+void mageGLLogError(const char *function, const char *file, const sint32 line)
+{
+	#ifdef __MAGE_OPENGL_
+		GLenum error;
+		while ((error = glGetError()))
+		{
+			printf("[OpenGL error] -> %u\n", error);
+		}
+	#endif
 }
