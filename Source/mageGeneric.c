@@ -1,5 +1,14 @@
 #include "mageAPI.h"
-#include <string.h>
+
+void mageFreeMethod(void *item)
+{
+	free(item);
+}
+void mageTryDumpSuccess(uint8 contents, uint8 *state)
+{
+	if (state != NULL)
+		*state = contents;
+}
 
 void *mageResizableListAllocate()
 {
@@ -15,35 +24,20 @@ void mageResizableListPush(mageResizableList *resizableList, void *item)
 	resizableList->Quantity++;
 	resizableList->Elements = realloc(resizableList->Elements, resizableList->ElementSize * resizableList->Quantity);
 	resizableList->Elements[resizableList->Quantity - 1] = item;
-
 }
-void mageResizableListPop(mageResizableList *resizableList, void (*freeMethod)(void* item))
-{
-	if (freeMethod == NULL)
-		freeMethod = free;
+void mageResizableListPop(mageResizableList *resizableList, void *buffer, const uint8 reallocatable)
+{	
+	if (reallocatable)
+		buffer = realloc(buffer, resizableList->ElementSize);
 	
-	if (0 < resizableList->Quantity)
-	{
-		freeMethod(resizableList->Elements[resizableList->Quantity - 1]);
-		resizableList->Quantity--;	
-	}		
+	memcpy(buffer, resizableList->Elements[resizableList->Quantity - 1], resizableList->ElementSize);
+	mageFreeMethod(resizableList->Elements[resizableList->Quantity - 1]);
+	resizableList->Quantity--;
+	resizableList->Elements = realloc(resizableList->Elements, resizableList->ElementSize * resizableList->Quantity);
 }
-void mageResizableListDestroy(mageResizableList *resizableList, void (*freeMethod)(void* item))
+void mageResizableListDestroy(mageResizableList *resizableList)
 {
-	if (freeMethod == NULL)
-		freeMethod = free;
-		
-	uint32 i;
-	for (i = 0; i < resizableList->Quantity - 1; i++)
-	{	
-		if (resizableList->Elements[i] != NULL)	
-			freeMethod(resizableList->Elements[i]); 
-	}
-	freeMethod(resizableList);
-}
-void mageResizableListBasicDestroyHandler(void *item)
-{
-	/* TODO */ 
+	
 }
 
 
@@ -52,8 +46,7 @@ void mageFileReadContents(const char *file, char *buffer, const uint8 reallocata
 	FILE *f = fopen(file, "rt");
 	if (f == NULL)
 	{
-		if (success != NULL)
-			*success = 0;	
+		mageTryDumpSuccess(0, success);	
 		return;
 	}
     fseek(f, 0, SEEK_END);
@@ -70,8 +63,7 @@ void mageFileReadContents(const char *file, char *buffer, const uint8 reallocata
 	}
 	strcpy(buffer, foo);
 	free(foo);
-	if (success != NULL)
-		*success = 1;
+	mageTryDumpSuccess(1, success);
 }
 void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success)
 {
@@ -85,26 +77,24 @@ void mageFileDumpContents(const char *file, const char *buffer, const uint8 clea
 	}
 	if (f == NULL)
 	{
-		if (success != NULL)
-			*success = 0;	
+		mageTryDumpSuccess(0, success);
 		return;
 	}
 	fprintf(f, "%s", buffer);
 	fclose(f);
 
-	if (success != NULL)
-		*success = 1;
+	mageTryDumpSuccess(1, success);
 
 }
 void mageGLClearError()
 {
-	#ifdef __MAGE_OPENGL_
+	#ifdef MAGE_OPENGL
 		while (glGetError() != GL_NO_ERROR);
 	#endif
 }
 void mageGLLogError(const char *function, const char *file, const sint32 line)
 {
-	#ifdef __MAGE_OPENGL_
+	#ifdef MAGE_OPENGL
 		GLenum error;
 		while ((error = glGetError()))
 		{

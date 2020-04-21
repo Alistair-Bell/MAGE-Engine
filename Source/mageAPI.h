@@ -20,6 +20,13 @@ typedef unsigned long uint64;
 
 /* Engine related defines */ 
 
+/* Own implimentation of the free() method */ 
+extern void mageFreeMethod(void *item);
+/* Tries to dump the data to the pointer checking for memory size and if the pointer is null*/
+extern void mageTryDumpSuccess(uint8 contents, uint8 *state);
+
+
+
 typedef struct MAGE_RESIZABLE_LIST_STRUCT
 {
 	/* Pointer array to the elements stored */
@@ -37,12 +44,10 @@ extern void *mageResizableListAllocate();
 extern void mageResizableListInitialise(mageResizableList *resizableList, const uint32 size);
 /* Pushes an element in the array resizing its memory */
 extern void mageResizableListPush(mageResizableList *resizableList, void *item);
-/* Pops the last element pushed onto the array */
-extern void mageResizableListPop(mageResizableList *resizableList, void (*freeMethod)(void* item));
+/* Pops the last element pushed onto the array allowing the client to handle the memory */
+extern void mageResizableListPop(mageResizableList *resizableList, void *buffer, const uint8 reallocatable);
 /* Destroys the resizable list and a function handlers its memory */
-extern void mageResizableListDestroy(mageResizableList *resizableList, void (*freeMethod)(void* item));
-/* Basic memory handler for the resizable list methods */
-extern void mageResizableListBasicDestroyHandler(void *item);
+extern void mageResizableListDestroy(mageResizableList *resizableList);
 
 /* File utilities */
 
@@ -71,11 +76,13 @@ typedef struct MAGE_WINDOW_STRUCT
 } mageWindow;
 
 /* Allocates the space for the window */ 
-extern void mageWindowAllocate(mageWindow *window);
+extern void *mageWindowAllocate();
 /* Initialises the window */
-extern uint8 mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title);
+extern void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title, uint8 *success);
 /* Swaps the glfw window's buffers */
 extern void mageWindowSwapBuffers(mageWindow *window);
+/* Updates the viewport */
+extern void mageWindowResizeCallback(GLFWwindow *window, sint32 xResolution, sint32 yResolution);
 /* Frees itself and the members */
 extern void mageWindowDestroy(mageWindow *window); 
 
@@ -179,10 +186,10 @@ extern void mageMatrixMultiply(mageMatrix4x4 *left, const mageMatrix4x4 *right);
 
 /* OpenGL related functions */
 
-#ifdef __MAGE_OPENGL_
+#ifdef MAGE_OPENGL
 	#define GLCall(x) mageGLClearError();\
 		x;\
-		mageGLLogError(#x, __FILE__, __LINE__);
+		mageGLLogError(#x, __FILE__, __LINE__ );
 #endif
 
 /* OpenGL debugging function */
@@ -211,7 +218,7 @@ extern void mageBufferBind(mageBuffer *buffer);
 /* Unbinds the buffer */
 extern void mageBufferUnbind(mageBuffer *buffer);
 /* Destroys the buffer freeing the memory */
-extern void mageBufferDestroy(mageBuffer *buffer, void (*freeMethod)(void *item));
+extern void mageBufferDestroy(mageBuffer *buffer);
 
 typedef struct MAGE_INDEX_BUFFER_STRUCT
 {
@@ -226,13 +233,13 @@ typedef struct MAGE_INDEX_BUFFER_STRUCT
 /* Allocates the memroy for the index buffer */
 extern void *mageIndexBufferAllocate();
 /* Initialses the buffer suppling the values and the counts required by opengl */
-extern void mageIndexBufferInitialise(mageIndexBuffer *buffer, const uint32 *data, const uint32 quantity);
+extern void mageIndexBufferInitialise(mageIndexBuffer *buffer, const uint16 *data, const uint32 quantity);
 /* Binds the index buffer */
 extern void mageIndexBufferBind(mageIndexBuffer *buffer);
 /* Unbinds the index buffer */
 extern void mageIndexBufferUnBind(mageIndexBuffer *buffer); 
 /* Destroys the index buffer freeing the memory */  
-extern void mageIndexBufferDestroy(mageIndexBuffer *buffer, void (*freeMethod)(void *item)); 
+extern void mageIndexBufferDestroy(mageIndexBuffer *buffer); 
 
 typedef struct MAGE_VERTEX_ARRAY_STRUCT
 {
@@ -249,31 +256,79 @@ extern void *mageVertexArrayAllocate();
 /* Initialses the vertex array */
 extern void mageVertexArrayInitialise(mageVertexArray *vertexArray);
 /* Pushes the buffer to the list */
-extern void mageVertexArrayPush(mageVertexArray *vertexArray, mageBuffer *buffer);
+extern void mageVertexArrayPush(mageVertexArray *vertexArray, mageBuffer *buffer, const uint32 index);
 /* Binds the vertex array */
 extern void mageVertexArrayBind(mageVertexArray *vertexArray);
 /* Unbinds the vertex array */
 extern void mageVertexArrayUnBind(mageVertexArray *vertexArray);
 /* Destroys the vertex array and the buffers stored freeing the memory */
-extern void mageVertexArrayDestroy(mageVertexArray *vertexArray, void (*freeMethod)(void *item));
+extern void mageVertexArrayDestroy(mageVertexArray *vertexArray);
 
+/* Shader functions */
 
-/* Graphics related functions */
+typedef struct MAGE_SHADER_STRUCT
+{
+	/* Type of the shader */ 
+	uint32 Type;
+
+	/* Path to the file where the shader lives */
+	const char *Path;
+
+	/* Shader `reference` used by opengl */
+	uint32 ID;
+
+} mageShader;
+
+/* Allocates the memroy for the shader */
+extern void *mageShaderAllocate();
+/* Initialses the shader */
+extern void mageShaderInitialise(mageShader *shader, const char *file, const uint32 type);
+/* Compiles the shader pushing the return value to the integer passed in */
+extern void mageShaderCompile(mageShader *shader, uint8 *success);
+/* Allows the shader to be used */
+extern void mageShaderEnable(mageShader *shader);
+/* Disables the shader from being used till reactivated */
+extern void mageShaderDisable(mageShader *shader);
+/* Recompiles the shader then enabling it pushing the return value to the integer passed in */
+extern void mageShaderRecompile(mageShader *shader, uint8 *success);
+/* Gets the unifom location of a uniform pushing the index to the integer passed in */
+extern void mageShaderGetUniformLocation(mageShader *shader, const char *uniformName, uint32 *index);
+/* Pushes a floating point number to a uniform */
+extern void mageShaderSetUniformFloat(mageShader *shader, const char *uniformName, const float pushing);
+/* Pushes a integer number to a uniform */
+extern void mageShaderSetUniformInteger(mageShader *shader, const char *uniformName, const int pushing);
+/* Pushes two floats to a uniform wrapped in a vector2 */
+extern void mageShaderSetUniform2Floats(mageShader *shader, const char *uniformName, const mageVector2 *floats);
+/* Pushes three floats to a uniform wrapped in a vector3 */
+extern void mageShaderSetUniform3Floats(mageShader *shader, const char *uniformName, const mageVector3 *floats);
+/* Pushes four floats to a uniform wrapped in a vector4 */
+extern void mageShaderSetUniform4Floats(mageShader *shader, const char *uniformName, const mageVector4 *floats);
+/* Pushes a matrix (four * four) (mageMatrix4x4) to a uniform */
+extern void mageShaderSetUnformMatrix4x4(mageShader *shader, const char *uniformName, const mageMatrix4x4 *matrix);
+/* Destroys the shader program and the shader freeing memory */
+extern void mageShaderDestroy(mageShader *shader); 
 
 typedef struct MAGE_RENDERABLE_STRUCT
 {
+	/* How the renderable will scale */
 	mageVector3 Scale;
+	/* Position in the scene */
 	mageVector3 Position;
-	
+	/* Shaders attached */
+	mageResizableList *Shaders;
+	/* Index buffer object for the renderer */
+	mageIndexBuffer *IndexBufferObject;
+	/* Vertex array object for the renderer*/
+	mageVertexArray *VertexArrayObject;
 
 } mageRenderable;
 
 /* Allocates the memory for the renderable */
 extern void *mageRenderableAllocate();
 /* Intitalises the renderable suppling a scale position */
-extern void mageRenderableInitialse(mageRenderable *renderable, const mageVector3 scale, const mageVector3 position);
+extern void mageRenderableInitialse(mageRenderable *renderable, mageVector3 scale, mageVector3 position);
 /* Destroys the renderable freeing the memory */
-extern void mageRenderableDestroy(mageRenderable *renderable, void (*freeMethod)(void *item));
+extern void mageRenderableDestroy(mageRenderable *renderable);
 
 /* Renderer related functions */
 
@@ -281,41 +336,19 @@ typedef struct MAGE_RENDERER_STRUCT
 {
 	mageResizableList *PipeLine;
 	uint8 Flushable;
-	void (*FreeMethod)(void *item);
-
+	
 } mageRenderer;
 
 /* Allocates the memory for the renderer */
 extern void *mageRendererAllocate();
 /* Initialses the renderer allowing the list not to be flushed after render */
-extern void mageRendererInitialises(mageRenderer *renderer, void (*freeMethod)(void *item), const uint8 flushContents);
+extern void mageRendererInitialises(mageRenderer *renderer, const uint8 flushContents);
 /* Destroys the renderer freeing the memory */
 extern void mageRendererDestroy(mageRenderer *renderer);
-/* Render function overriden depending on the api used */
+/* Render function handled depending on the api used */
 extern void mageRender2D(mageRenderer *renderer); 
-
-#ifdef __MAGE_OPENGL_
-	#define mageRender2D(x) { mageRenderOpenGL2D(x); }
-#elif
-	#define mageRender2D(x) { mageRenderVulkan2D(x); }
-#elif
-	#define mageRender2D(x) { mageRenderDirextX2D(x); }
-#else
-	#error Undefined Rendering API
-#endif
-
-/* Pushes a renderable to the pipeline */
-extern void mageRenderPush(mageRenderer *renderer, mageRenderable *renderable);
-/* Renderers 2D renderables using opengl */
-extern void mageRenderOpenGL2D(mageRenderer *renderer);
-/* Renderers 2D renderables using vulkan */
-extern void mageRenderVulkan2D(mageRenderer *renderer);
-/* Renderers 2D renderables using directx */
-extern void mageRenderDirextX2D(mageRenderer *renderer);
-
-
-
-
+/* Clears the screen */
+extern void mageRendererClear(mageRenderer *renderer);
 
 
 #endif

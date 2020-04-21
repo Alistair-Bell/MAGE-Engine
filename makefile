@@ -1,14 +1,14 @@
 CMP = clang
 CST = -std=c89
 FLAGS = -g -Wall
-LIBS = -lGL -lGLEW -lglfw3 -ldl -lm -lopenal -lpthread 
+LIBS = -lvulkan_radeon -lglfw3 -ldl -lm -lopenal -lpthread 
 LIB_TYPE = -shared
 BF_DIR = build
 BIN_DIR = $(BF_DIR)/bin
 LIB_DIR = $(BF_DIR)/lib
 OBJ_DIR = $(BF_DIR)/obj
 TARGET = mage
-OBJS = mageMain.o mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageBuffers.o
+OBJS = mageMain.o mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageBuffers.o mageShaders.o
 
 all: $(TARGET)
 
@@ -35,6 +35,9 @@ mageRenderer.o: Source/mageAPI.h Source/mageRenderer.c
 
 mageBuffers.o: Source/mageAPI.h Source/mageBuffers.c
 	$(CMP) $(CST) $(FLAGS) -c Source/mageBuffers.c -o $(OBJ_DIR)/mageBuffers.o
+
+mageShaders.o: Source/mageAPI.h Source/mageShaders.c
+	$(CMP) $(CST) $(FLAGS) -c Source/mageShaders.c -o $(OBJ_DIR)/mageShaders.o
 
 clean:
 	rm $(OBJ_DIR)/*.* $(BIN_DIR)/$(TARGET)

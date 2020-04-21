@@ -1,14 +1,15 @@
 #include "mageAPI.h"
+#include <GLFW/glfw3.h>
 
-void mageWindowAllocate(mageWindow *window)
+void *mageWindowAllocate()
 {
-	window = malloc(sizeof(*window));
+	return malloc(sizeof(struct MAGE_WINDOW_STRUCT));
 }
-uint8 mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title)
+void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title, uint8 *success)
 {
 	if (!glfwInit())
 	{
-		return -1;
+		mageTryDumpSuccess(0, success);
 	}	
 
 	window->Height = yResolution;
@@ -22,36 +23,30 @@ uint8 mageWindowInitialise(mageWindow *window, const sint32 xResolution, const s
 	if (window->Context == NULL)
 	{
 		glfwTerminate();
-		printf("GLFW window context failed to initialise!\n");
-		return 0;
+		mageTryDumpSuccess(0, success);
 	}
 	glfwMakeContextCurrent(window->Context);
-	printf("GLFW context has been created!\n");
-
-#ifdef __MAGE_OPENGL__
-
-	// Opengl rendering mode requires glew to initialise to be used
-	// http://glew.sourceforge.net/
-
-	if (glewInit() != GLEW_OK)
-	{
-		printf("GLEW has failed to initialse!\n");
-		return 0;
-	}
-	printf("GLEW has succesfully initialise!\n");
-#endif
-
-	printf("MAGE window has succesfully initialsed\n");
+	glfwSetWindowSizeCallback(window->Context, mageWindowResizeCallback);
 	
-	return 1;
+#ifdef MAGE_OPENGL_
+	glewExperimental = GL_TRUE
+	if (glewInit() != GLEW_OK)
+		mageTryDumpSuccess(0, success);
+#endif
+	mageTryDumpSuccess(1, success);
 }
 void mageWindowSwapBuffers(mageWindow *window)
 {
 	glfwSwapBuffers(window->Context);
 }
-
+void mageWindowResizeCallback(GLFWwindow *window, sint32 xResolution, sint32 yResolution)
+{
+	#ifdef MAGE_OPENGL_
+		GLCall(glViewport(0, 0, xResolution, yResolution));
+	#endif
+}
 void mageWindowDestroy(mageWindow *window)
 {
 	glfwTerminate();
-	free(window);
+	mageFreeMethod(window);
 }
