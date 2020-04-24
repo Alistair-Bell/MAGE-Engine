@@ -383,7 +383,7 @@ extern void mageSystemEnvironmentDestroy(mageSystemEnvironment *system);
     #define MAGE_KEYCODE_RIGHTCONTROL SDLK_RCTRL 
     #define MAGE_KEYCODE_RIGHTALT SDLK_RALT
     #define MAGE_KEYCODE_RIGHTSUPER SDLK_RGUI 
-#elif defined(MAGE_GLFw)
+#elif defined(MAGE_GLFW)
 	#define MAGE_KEYCODE_SPACE  32
 	#define MAGE_KEYCODE_APOSTROPHE  39
 	#define MAGE_KEYCODE_COMMA  44 
