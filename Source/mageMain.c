@@ -12,14 +12,16 @@ int main(void)
 	{
 		while (SDL_PollEvent(&window->Events))
 		{
-			switch (window->Events.type)
+			if (window->Events.type == SDL_QUIT) window->Running = 0;
+			else if (window->Events.type == SDL_KEYDOWN)
 			{
-			case SDL_QUIT:  
-				window->Running = 0;
-				break;
+				switch (window->Events.key.keysym.sym)
+				{
+				
+				}
 			}
-
 		}		
+		
 	}
 	mageWindowDestroy(window);
 	mageLogReset();

@@ -51,7 +51,7 @@ void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, c
 	sprintf(bar, "[Log %s %s][%s : %d] : %s", userString, modeString, file, line, str);
 
 	printf("%s", bar);
-	mageFileDumpContents("Logs/mage.log", bar, 1, NULL); 
+	mageFileDumpContents("Logs/mage.log", bar, 0, NULL); 
 
 	mageFreeMethod(bar);
 }
