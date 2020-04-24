@@ -1,5 +1,9 @@
 #include "mageAPI.h"
 
+void *mageVector2Allocate()
+{
+	return malloc(sizeof(struct MAGE_VECTOR2_STRUCT));
+}
 void mageVector2Initialise(mageVector2 *vector2, const float value1, const float value2)
 {
 	vector2->x = value1;
@@ -24,6 +28,14 @@ void mageVector2Divide(mageVector2 *left, const mageVector2 *right)
 {
 	left->x /= right->x;
 	left->y /= right->y;
+}
+void mageVector2Destroy(mageVector2 *vector)
+{
+	mageFreeMethod(vector);
+}
+void *mageVector3Allocate()
+{
+	return malloc(sizeof(struct MAGE_VECTOR3_STRUCT));
 }
 void mageVector3Initialise(mageVector3 *vector3, const float value1, const float value2, const float value3)
 {
@@ -54,6 +66,10 @@ void mageVector3Divide(mageVector3 *left, const mageVector3 *right)
 	left->x /= right->x;
 	left->y /= right->y;
 	left->z /= right->z;
+}
+void mageVector3Destroy(mageVector3 *vector)
+{
+	mageFreeMethod(vector);
 }
 void mageVector4Initialise(mageVector4 *vector4, const float value1, const float value2, const float value3, const float value4)
 {
@@ -97,67 +113,7 @@ void mageVector4Divide(mageVector4 *left, const mageVector4 *right)
 	left->z /= right->z;
 	left->w /= right->w;
 }
-void mageMatrixInitialise(mageMatrix4x4 *matrix, const mageVector4 *row0, const mageVector4 *row1, const mageVector4 *row2, const mageVector4 *row3)
+void mageVector4Destroy(mageVector4 *vector)
 {
-	matrix->Elements[0] = row0->x;
-	matrix->Elements[1] = row1->x;
-	matrix->Elements[2] = row2->x;
-	matrix->Elements[3] = row3->x;
-
-	matrix->Elements[4] = row0->y;
-	matrix->Elements[5] = row1->y;
-	matrix->Elements[6] = row2->y;
-	matrix->Elements[7] = row3->y;
-
-	matrix->Elements[8] = row0->z;
-	matrix->Elements[9] = row1->z;
-	matrix->Elements[10] = row2->z;
-	matrix->Elements[11] = row3->z;
-
-	matrix->Elements[12] = row0->w;
-	matrix->Elements[13] = row1->w;
-	matrix->Elements[14] = row2->w;
-	matrix->Elements[15] = row3->w;
-
+	mageFreeMethod(vector);
 }
-void mageMatrixMultiply(mageMatrix4x4 *left, const mageMatrix4x4 *right)
-{
-	float data[16];
-	uint8 row;
-	uint8 col;
-	uint8 e;
-
-    for (row = 0; row < 4; row++)
-	{
-		for (col = 0; col < 4; col++)
-		{
-			float sum = 0.0f;
-			for (e = 0; e < 4; e++)
-			{
-				sum += left->Elements[e + row * 4] * right->Elements[col + e * 4];
-			}
-			data[col + row * 4] = sum;
-		}
-	}
-	memcpy(left->Elements, data, 4 * 4 * sizeof(float));
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

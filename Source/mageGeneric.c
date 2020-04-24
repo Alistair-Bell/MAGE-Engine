@@ -4,11 +4,62 @@ void mageFreeMethod(void *item)
 {
 	free(item);
 }
-void mageTryDumpSuccess(uint8 contents, uint8 *state)
+void mageTryDumpSuccess(uint8 contents, void *state)
 {
-	if (state != NULL)
-		*state = contents;
+	if (state != NULL && sizeof(*state) <= 1)
+		state = contents;
+		return;	
+	MAGE_LOG_CLIENT_WARNING("Passsd in contents is less than 8 bits in size", NULL);
+
 }
+void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, const char *file, const char *format, ...)
+{
+	char modeString[8];
+	char userString[10];
+	switch (severity)
+	{
+	case MAGE_LOG_INFORM: 
+		printf("%s", "\x1b[32m");
+		strcpy(modeString, "Inform");
+		break;
+	case MAGE_LOG_WARNING: 
+		printf("%s", "\x1b[33m");
+		strcpy(modeString, "Warning");
+		break;
+	case MAGE_LOG_ERROR: 
+		printf("%s", "\x1b[35m"); 
+		strcpy(modeString, "Error");
+		break;
+	case MAGE_LOG_FATAL_ERROR: 
+		printf("%s", "\x1b[31m");
+		strcpy(modeString, "Fatal");
+		break;
+	}
+	switch (user)
+	{
+	case MAGE_LOG_CORE: strcpy(userString, "core"); break;
+	case MAGE_LOG_CLIENT: strcpy(userString, "client"); break;
+	}
+	
+	char str[256];
+	va_list args;
+    va_start(args, format);
+    vsprintf(str, format, args);
+	va_end(args);
+
+	char *bar = malloc(128);
+	sprintf(bar, "[Log %s %s][%s : %d] : %s", userString, modeString, file, line, str);
+
+	printf("%s", bar);
+	mageFileDumpContents("Logs/mage.log", bar, 1, NULL); 
+
+	mageFreeMethod(bar);
+}
+void mageLogReset()
+{
+	printf("%s", "\x1b[0m");
+}
+
 
 void *mageResizableListAllocate()
 {
@@ -37,7 +88,7 @@ void mageResizableListPop(mageResizableList *resizableList, void *buffer, const 
 }
 void mageResizableListDestroy(mageResizableList *resizableList)
 {
-	
+	mageFreeMethod(resizableList);	
 }
 
 
@@ -80,25 +131,11 @@ void mageFileDumpContents(const char *file, const char *buffer, const uint8 clea
 		mageTryDumpSuccess(0, success);
 		return;
 	}
+	fprintf(f, "\n");
 	fprintf(f, "%s", buffer);
 	fclose(f);
 
 	mageTryDumpSuccess(1, success);
 
 }
-void mageGLClearError()
-{
-	#ifdef MAGE_OPENGL
-		while (glGetError() != GL_NO_ERROR);
-	#endif
-}
-void mageGLLogError(const char *function, const char *file, const sint32 line)
-{
-	#ifdef MAGE_OPENGL
-		GLenum error;
-		while ((error = glGetError()))
-		{
-			printf("[OpenGL error] -> %u\n", error);
-		}
-	#endif
-}
+
