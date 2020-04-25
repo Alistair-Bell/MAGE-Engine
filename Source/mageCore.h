@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h> 
+#include <math.h>
 
 #if defined(MAGE_VULKAN) && defined(MAGE_GLFW)
 	#define GLFW_INCLUDE_VULKAN

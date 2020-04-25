@@ -801,6 +801,127 @@ extern void mageVector4Divide(mageVector4 *left, const mageVector4 *right);
 extern void mageVector4Destroy(mageVector4 *vector);
 
 /*!
+	@brief Stores 16 floating point numbers
+	@brief When writing shaders in GLSL matrix4x4 is called mat4
+	@warning This implimentation uses column majoring
+	@see https://en.wikipedia.org/wiki/Row-_and_column-major_order
+*/
+typedef struct MAGE_MATRIX4X4
+{
+	/*!
+		@brief Stores 16 floats
+	*/
+	float Elements[16];
+
+} mageMatrix4x4;
+
+/*! 
+	@brief Allocates a block of memory for the matrix
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/ 
+extern void *mageMatrix4x4Allocate();
+/*!
+	@brief Sets all the matrix's elements to 0.0f 	
+	@param matrix A pointer to a instance of a matrix
+	@return Nothing
+*/
+extern void mageMatrix4x4Default(mageMatrix4x4 *matrix);
+/*!
+	@brief Initialises the matrix based on 4 vector4s
+	@param matrix A pointer to a instance of a matrix
+	@param column0 A pointer to a insatnce of a vector4 which the matrix's 0 index row will be set to.
+				   Elements[0] = column0.x | Elements[4] = column0.y Elements[8] = column0.z | Elements[12] = column0.w
+	@param column1 A pointer to a insatnce of a vector4 which the matrix's 1 index row will be set to.
+				   Elements[1] = column1.x | Elements[5] = column1.y Elements[9] = column1.z | Elements[13] = column1.w
+	@param column2 A pointer to a insatnce of a vector4 which the matrix's 2 index row will be set to.
+				   Elements[2] = column1.x | Elements[6] = column1.y Elements[10] = column1.z | Elements[14] = column1.w
+	@param column3 A pointer to a insatnce of a vector4 which the matrix's 3 index row will be set to.
+				   Elements[3] = column1.x | Elements[7] = column1.y Elements[11] = column1.z | Elements[15] = column1.w
+	@return Nothing
+*/
+extern void mageMatrix4x4InitialiseVector4(mageMatrix4x4 *matrix, const mageVector4 *column0, const mageVector4 *column1, const mageVector4 *column2, const mageVector4 *column3);
+/*!
+	@brief Initialises the matrix based on passing in a set number of floats
+	@param matrix A pointer to a instance of a matrix
+	@param elements A array of floating points
+	@param count Count of the amount of floats being passed in
+	@return Nothing
+*/
+extern void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8 count);
+/*! 
+	@brief Initialises the matrix using a diagonal
+	@param matrix A pointer to a instance of a matrix
+	@param diagonal Sets the diagonal elements to the value passed in
+	@return Nothing
+*/
+extern void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal);
+/*!
+`	@brief Multiplies the left matrix by the right matrix
+	@param matrix A pointer to a instance of a matrix
+	@return Nothing
+*/
+extern void mageMatrix4x4Multiply(mageMatrix4x4 *left, const mageMatrix4x4 *right);
+/*!
+	@brief Applies a perspective matrix to the matrix
+	@param matrix A pointer to a instance of a matrix
+	@param fov The angle the rays get cas
+	@param aspectRatio The aspect ratio of the screen 
+	@param near The nearest plane to clip
+	@param far The furthest plane to clip
+	@return Nothing
+	@see https://en.wikipedia.org/wiki/3D_projection
+*/
+extern void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, const float aspectRatio, const float near, const float far);
+/*!
+	@brief Applies a orthographic matrix to the matrix
+	@param matrix A pointer to a instance of a matrix
+	@param left The leftmost plane
+	@param right The rightmost plane
+	@param bottom The bottommost plane
+	@param top The topmost plan
+	@param near The nearest plane included to the start of the projection
+	@param far The furthest plane included to the start of the projection
+	@return Nothing
+	@see https://en.wikipedia.org/wiki/3D_projection
+*/
+extern void mageMatrix4x4Orthographic(mageMatrix4x4 *matrix, const float left, const float right, const float bottom, const float top, const float near, const float far);
+/*!
+
+*/
+extern void mageMatrix4x4Translation(mageMatrix4x4 *matrix, const mageVector3 *translation);
+/*!
+	@brief Rotates a matrix using a axis and angle
+	@param matrix A pointer to a instance of a matrix
+	@param angle The angle of rotation
+	@param axis Axis to be used for rotation
+	@return Nothing
+*/
+extern void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, const mageVector3 *axis);
+/*!
+	@brief Scales a matrix using 3 floats (vector3)
+	@param matrix A pointer to a instance of a matrix
+	@param axis The scale the matrix will be applying
+	@return Nothing
+*/
+extern void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale);
+/*!
+	@brief Destroys the matrix freeing itelsf
+	@param matrix A pointer to a instance of a matrix
+	@return Nothing
+	@warning If the matrix is not allocated on the heap then do not call this method
+*/
+extern void mageMatrix4x4Destroy(mageMatrix4x4 *matrix);
+/*!
+	@brief Converts degrees into radians
+	@param degrees The degrees to convert to radians
+	@param result A pointer to where the result will be dumped
+*/
+extern void mageToRadians(const float degrees, float *result);
+
+
+
+/*!
 	@brief Object that renders and is pushed to the renderer pipeline
 */
 typedef struct MAGE_RENDERABLE_STRUCT
