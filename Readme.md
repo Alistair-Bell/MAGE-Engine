@@ -10,7 +10,7 @@ This engine is being developed currently on linux (fedora 5.5.17-200) so **MACOS
 
 Using and IDE is not required but can be useful when looking at runtime memory and performance.
 
-- `c++ compiler (clang / g++ / MVSC) | To compile the code`
+- `c89 compiler (clang / gcc / MVSC) | To compile the code`
 - `Make or mingw32-make | Build system`
 - `Vulkan | Graphics rendering`
 - `GLSL version: 4.50 | Shaders`

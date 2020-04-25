@@ -858,7 +858,8 @@ extern void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *ele
 extern void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal);
 /*!
 `	@brief Multiplies the left matrix by the right matrix
-	@param matrix A pointer to a instance of a matrix
+	@param left A pointer to a instance of a matrix which will be modified
+	@param right A pointer to a instance of a matrix which will divide the left
 	@return Nothing
 */
 extern void mageMatrix4x4Multiply(mageMatrix4x4 *left, const mageMatrix4x4 *right);
@@ -887,7 +888,10 @@ extern void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, con
 */
 extern void mageMatrix4x4Orthographic(mageMatrix4x4 *matrix, const float left, const float right, const float bottom, const float top, const float near, const float far);
 /*!
-
+	@brief Translates the matrix
+	@param matrix A pointer to a instance of a matrix
+	@param translation The translation to be applied
+	@return Nothing
 */
 extern void mageMatrix4x4Translation(mageMatrix4x4 *matrix, const mageVector3 *translation);
 /*!
@@ -901,7 +905,7 @@ extern void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, cons
 /*!
 	@brief Scales a matrix using 3 floats (vector3)
 	@param matrix A pointer to a instance of a matrix
-	@param axis The scale the matrix will be applying
+	@param scale The scale the matrix will be applying
 	@return Nothing
 */
 extern void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale);
