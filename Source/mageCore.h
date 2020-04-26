@@ -3,7 +3,6 @@
 
 #define MAGE_VULKAN
 #define MAGE_DEBUG
-#define MAGE_SDL2 
 
 #if defined(MAGE_DIRECTX)
 	/* Includes the directx api headers and related extensions */

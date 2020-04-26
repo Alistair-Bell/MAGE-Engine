@@ -1,7 +1,7 @@
 CMP = clang
 CST = -std=c89
 FLAGS = -g -Wall
-LIBS = -lvulkan -lSDL2 -ldl -lm -lopenal -lpthread 
+LIBS = -lvulkan -lglfw3 -ldl -lm -lopenal -lpthread 
 LIB_TYPE = -shared
 BF_DIR = build
 BIN_DIR = $(BF_DIR)/bin

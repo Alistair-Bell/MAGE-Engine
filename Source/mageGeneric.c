@@ -4,7 +4,7 @@ void mageFreeMethod(void *item)
 {
 	free(item);
 }
-void mageTryDumpSuccess(uint8 contents, void *state)
+void mageTryDumpSuccess(uint64 contents, void *state)
 {
 	if (state != NULL && sizeof(*state) <= 1)
 		state = contents;
@@ -18,27 +18,27 @@ void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, c
 	char userString[10];
 	switch (severity)
 	{
-	case MAGE_LOG_INFORM: 
+	case MAGE_LOG_MODE_INFORM: 
 		printf("%s", "\x1b[32m");
 		strcpy(modeString, "Inform");
 		break;
-	case MAGE_LOG_WARNING: 
+	case MAGE_LOG_MODE_WARNING: 
 		printf("%s", "\x1b[33m");
 		strcpy(modeString, "Warning");
 		break;
-	case MAGE_LOG_ERROR: 
+	case MAGE_LOG_MODE_ERROR: 
 		printf("%s", "\x1b[35m"); 
 		strcpy(modeString, "Error");
 		break;
-	case MAGE_LOG_FATAL_ERROR: 
+	case MAGE_LOG_MODE_FATAL_ERROR: 
 		printf("%s", "\x1b[31m");
 		strcpy(modeString, "Fatal");
 		break;
 	}
 	switch (user)
 	{
-	case MAGE_LOG_CORE: strcpy(userString, "core"); break;
-	case MAGE_LOG_CLIENT: strcpy(userString, "client"); break;
+	case MAGE_LOG_USER_CORE: strcpy(userString, "core"); break;
+	case MAGE_LOG_USER_CLIENT: strcpy(userString, "client"); break;
 	}
 	
 	char str[256];
@@ -69,26 +69,107 @@ void mageResizableListInitialise(mageResizableList *resizableList, const uint32 
 {
 	resizableList->Quantity = 0;
 	resizableList->ElementSize = size;
+	resizableList->Elements = calloc(1, size);
 }
 void mageResizableListPush(mageResizableList *resizableList, void *item)
 {
 	resizableList->Quantity++;
+	void *buffer = malloc(resizableList->ElementSize);
+	memcpy(buffer, item, resizableList->ElementSize);
 	resizableList->Elements = realloc(resizableList->Elements, resizableList->ElementSize * resizableList->Quantity);
-	resizableList->Elements[resizableList->Quantity - 1] = item;
+	resizableList->Elements[resizableList->Quantity - 1] = buffer;
 }
-void mageResizableListPop(mageResizableList *resizableList, void *buffer, const uint8 reallocatable)
+void mageResizableListPop(mageResizableList *resizableList)
 {	
-	if (reallocatable)
-		buffer = realloc(buffer, resizableList->ElementSize);
-	
-	memcpy(buffer, resizableList->Elements[resizableList->Quantity - 1], resizableList->ElementSize);
 	mageFreeMethod(resizableList->Elements[resizableList->Quantity - 1]);
 	resizableList->Quantity--;
 	resizableList->Elements = realloc(resizableList->Elements, resizableList->ElementSize * resizableList->Quantity);
 }
+void mageResizableListFreeElements(mageResizableList *resizableList)
+{
+	uint32 i;
+	for (i = 0; i < resizableList->Quantity - 1; i++)
+	{
+		mageFreeMethod(resizableList->Elements[i]);
+	}
+}
 void mageResizableListDestroy(mageResizableList *resizableList)
 {
+	mageResizableListFreeElements(resizableList);
 	mageFreeMethod(resizableList);	
+}
+void *magePairAllocate()
+{
+	return malloc(sizeof(struct MAGE_PAIR_STRUCT));
+}
+void magePairInitialise(magePair *pair, const uint32 firstSize, const uint32 secondSize)
+{
+	pair->First = malloc(sizeof(firstSize));
+	pair->Second = malloc(sizeof(secondSize));
+
+	pair->Firstize = firstSize;
+	pair->SecondSize = secondSize;
+}
+void magePairSetFirst(magePair *pair, void *item)
+{
+	memcpy(pair->First, item, pair->Firstize);
+}
+void magePairSetSecond(magePair *pair, void *item)
+{
+	memcpy(pair->Second, item, pair->SecondSize);
+}
+void magePairSetBoth(magePair *pair, void *first, void *second)
+{
+	magePairSetFirst(pair, first);
+	magePairSetSecond(pair, second);
+}
+void magePairGetFist(magePair *pair, void *buffer, uint8 reallocatable)
+{
+	if (reallocatable)
+		buffer = realloc(buffer, pair->Firstize);
+	memcpy(buffer, pair->First, pair->Firstize);
+}
+void magePairGetSecond(magePair *pair, void *buffer, uint8 reallocatable)
+{
+	if (reallocatable)
+		buffer = realloc(buffer, pair->SecondSize);
+	memcpy(buffer, pair->Second, pair->SecondSize);
+}
+void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8 reallocatable)
+{
+	magePairGetFist(pair, buffer1, reallocatable);
+	magePairGetSecond(pair, buffer2, reallocatable);
+}
+void magePairFree(magePair *pair)
+{
+	mageFreeMethod(pair->First);
+	mageFreeMethod(pair->Second);
+}
+void magePairDestroy(magePair *pair)
+{
+	magePairFree(pair);
+	mageFreeMethod(pair);
+}
+void *mageDictionaryAllocate()
+{
+	return malloc(sizeof(struct MAGE_DICTIONARY_STRUCT));
+}
+void mageDictionaryInitialise(mageDictionary *dictionary)
+{
+	dictionary->Elements = mageResizableListAllocate();
+	mageResizableListInitialise(dictionary->Elements, sizeof(struct MAGE_PAIR_STRUCT));
+}
+void mageDictionaryPush(mageDictionary *dictionary, magePair *pair)
+{	
+	mageResizableListPush(dictionary->Elements, pair);
+}
+void mageDictionaryPop(mageDictionary *dictionary)
+{
+	mageResizableListPop(dictionary->Elements);
+}
+void mageDictionaryFetch(mageDictionary *dictionary, magePair *buffer)
+{
+	memcpy(buffer, dictionary->Elements->Elements[dictionary->Elements->Quantity - 1], sizeof(*buffer));
 }
 
 
@@ -121,7 +202,7 @@ void mageFileDumpContents(const char *file, const char *buffer, const uint8 clea
 	FILE *f;
 	switch(clean)
 	{
-		case 0:
+		case 1:
 			f = fopen(file, "w");
 		default:
 			f = fopen(file, "w+");
@@ -131,7 +212,6 @@ void mageFileDumpContents(const char *file, const char *buffer, const uint8 clea
 		mageTryDumpSuccess(0, success);
 		return;
 	}
-	fprintf(f, "\n");
 	fprintf(f, "%s", buffer);
 	fclose(f);
 

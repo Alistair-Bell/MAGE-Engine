@@ -4,7 +4,9 @@ void mageGetMousePosition(mageWindow *window, double *x, double *y)
 {
 	
 	#if defined(MAGE_SDL2)
-	
+		mageGetMousePositionX(window, x);
+		mageGetMousePositionY(window, y);
+
 	#elif defined(MAGE_GLFW)
 		glfwGetCursorPos(window->Context, x, y);
 	#endif
@@ -12,7 +14,7 @@ void mageGetMousePosition(mageWindow *window, double *x, double *y)
 void mageGetMousePositionX(mageWindow *window, double *x)
 {
 	#if defined(MAGE_SDL2)
-		
+		*x = window->Events.motion.x;
 	#elif defined(MAGE_GLFW)
 		glfwGetCursorPos(window->Context, x, NULL);
 	#endif
@@ -20,48 +22,31 @@ void mageGetMousePositionX(mageWindow *window, double *x)
 void mageGetMousePositionY(mageWindow *window, double *y)
 {
 	#if defined(MAGE_SDL2)
-	
+		*y = window->Events.motion.y;
 	#elif defined(MAGE_GLFW)
 		glfwGetCursorPos(window->Context, NULL, y);
 	#endif
 }
-void mageGetMouseButtonStates(mageWindow *window, sint32 *left, sint32 *right)
-{
-	sint32 foo, bar;
-	
-	#if defined(MAGE_SDL2)
-	
-	#elif defined(MAGE_GLFW)
-		foo = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_LEFT);
-		bar = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_RIGHT); 
-	#endif
-	
-	mageTryDumpSuccess(foo, left);
-	mageTryDumpSuccess(bar, right);
-	
-}
 void mageGetMouseButtonLeftClick(mageWindow *window, uint8 *state)
 {
-	sint32 value;
 	uint8 is;
 	#if defined(MAGE_SDL2)
-	
+		
 	#elif defined(MAGE_GLFW)
-		mageGetMouseButtonStates(window, &value, NULL);
-		is = (value == GLFW_PRESS);
+		uint8 foo = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_LEFT);
+		is = (foo == GLFW_PRESS);
 	#endif
 	
 	mageTryDumpSuccess(is, state);
 }
 void mageGetMouseButtonRightClick(mageWindow *window, uint8 *state)
 {
-	sint32 value;
 	uint8 is;
 	#if defined(MAGE_SDL2)
-	
+		
 	#elif defined(MAGE_GLFW)
-		mageGetMouseButtonStates(window, NULL, &value);
-		is = (value == GLFW_PRESS);
+		uint8 foo = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_RIGHT);
+		is = (foo == GLFW_PRESS);
 	#endif
 
 	mageTryDumpSuccess(is, state);

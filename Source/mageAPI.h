@@ -21,18 +21,18 @@ typedef unsigned long uint64;
 */
 extern void mageFreeMethod(void *item);
 /* Tries to dump the data to the pointer checking for memory size and if the pointer is null*/
-extern void mageTryDumpSuccess(uint8 contents, void *state);
+extern void mageTryDumpSuccess(uint64 contents, void *state);
 
 /* Logging methods */
 
 /* Logging macros for the type of the logs */
-#define MAGE_LOG_INFORM 0
-#define MAGE_LOG_WARNING 1  
-#define MAGE_LOG_ERROR 2
-#define MAGE_LOG_FATAL_ERROR 3
+#define MAGE_LOG_MODE_INFORM 0
+#define MAGE_LOG_MODE_WARNING 1  
+#define MAGE_LOG_MODE_ERROR 2
+#define MAGE_LOG_MODE_FATAL_ERROR 3
 /* Logging macros for the location of the log */
-#define MAGE_LOG_CORE 0
-#define MAGE_LOG_CLIENT 1
+#define MAGE_LOG_USER_CORE 0
+#define MAGE_LOG_USER_CLIENT 1
 
 /*!
 	@brief Logs to the console and writes to an output
@@ -42,12 +42,12 @@ extern void mageTryDumpSuccess(uint8 contents, void *state);
 	@param file File where it is being called from
 	@param format Formatting using the printf style
 	@param ... Values for the formatting 
-	@returns Nothing
+	@return Nothing
 */
 extern void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, const char *file, const char *format, ...);
 /*!
 	@brief Resets the color of the console
-	@returns Nothing 
+	@return Nothing 
 */
 extern void mageLogReset();
 
@@ -55,15 +55,15 @@ extern void mageLogReset();
 
 
 #if defined(MAGE_DEBUG)
-	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_CORE, MAGE_LOG_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_CORE, MAGE_LOG_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_CORE, MAGE_LOG_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_CORE, MAGE_LOG_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
 	
-	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_CLIENT, MAGE_LOG_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_CLIENT, MAGE_LOG_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_CLIENT, MAGE_LOG_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_CLIENT, MAGE_LOG_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
@@ -123,12 +123,15 @@ extern void mageResizableListPush(mageResizableList *resizableList, void *item);
 /*!
 	@brief Pops the last element pushed onto the array allowing the client to handle the memory 
 	@param resizableList A pointer to a instance of a resizable list
-	@param buffer A pointer to a block of memory where the popped item will be moved to for handling
-	@param reallocatable If true the program will resize the buffer to prevent overflow
 	@return Nothing
-	@warning Passing an unallocated buffer will cause a segmentation fault even if reallocatable is enabled
 */
-extern void mageResizableListPop(mageResizableList *resizableList, void *buffer, const uint8 reallocatable);
+extern void mageResizableListPop(mageResizableList *resizableList);
+/*! 
+	@brief Frees all the elements
+	@param resizableList A pointer to a instance of a resizable list
+	@return Nothing
+*/
+extern void mageResizableListFreeElements(mageResizableList *resizableList);
 /*! 
 	@brief Destroys the resizable list freeing itelsf
 	@param resizableList A pointer to a instance of a resizable list
@@ -136,6 +139,165 @@ extern void mageResizableListPop(mageResizableList *resizableList, void *buffer,
 	@warning If the array not allocated on the heap then do not call this method
 */
 extern void mageResizableListDestroy(mageResizableList *resizableList);
+
+/*!
+	@brief Stores a pair of values
+*/
+typedef struct MAGE_PAIR_STRUCT
+{
+	/*!
+		@brief A pointer to the first value stored
+	*/
+	void *First;	
+	/*!
+		@brief A pointer to the second value stored
+	*/
+	void *Second;
+	/*!
+		@brief The size of the first value in bytes
+	*/
+	uint32 Firstize;
+	/*!
+		@brief The size of the first value in bytes
+	*/
+	uint32 SecondSize;
+
+} magePair;
+
+/*! 
+	@brief Allocates a block of memory for the pair
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/
+extern void *magePairAllocate();
+/*! 
+	@brief Initialises the pair populating the members
+	@param pair A pointer to a instance of a pair
+	@param firstSize Size of the first value in bytes
+	@param secondSize Size of the second value in bytes
+	@return Nothing
+*/
+extern void magePairInitialise(magePair *pair, const uint32 firstSize, const uint32 secondSize);
+/*! 
+	@brief Sets the first value in the pair
+	@param pair A pointer to a instance of a pair
+	@param item The item that will be pushed to the first value		
+	@return Nothing
+*/
+extern void magePairSetFirst(magePair *pair, void *item);
+/*! 
+	@brief Sets the second value in the pair
+	@param pair A pointer to a instance of a pair
+	@param item The item that will be pushed to the second value	
+	@return Nothing
+	@warning If the item passed in is bigger than the size specified then problems will occur	
+*/
+extern void magePairSetSecond(magePair *pair, void *item);
+/*! 
+	@brief Sets both values in the pair
+	@param pair A pointer to a instance of a pair
+	@param first The item that will be pushed to the first value	
+	@param second The item that will be pushed to the second value	
+	@return Nothing
+*/
+extern void magePairSetBoth(magePair *pair, void *first, void *second);
+/*! 
+	@brief Gets the first value copying it into the buffer
+	@param pair A pointer to a instance of a pair
+	@param buffer Pointer to a block of memory where the contents will be dumped
+	@param reallocatable If true the program will resize the buffer to prevent overflow
+	@return Nothing
+	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
+*/
+extern void magePairGetFist(magePair *pair, void *buffer, uint8 reallocatable);
+/*! 
+	@brief Gets the second value copying it into the buffer
+	@param pair A pointer to a instance of a pair
+	@param buffer Pointer to a block of memory where the contents will be dumped
+	@param reallocatable If true the program will resize the buffer to prevent overflow
+	@return Nothing
+	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
+*/
+extern void magePairGetSecond(magePair *pair, void *buffer, uint8 reallocatable);
+/*! 
+	@brief Sets both values in the pair
+	@param pair A pointer to a instance of a pair
+	@param buffer1 Pointer to a block of memory where the contents of first will be dumped
+	@param buffer2 Pointer to a block of memory where the contents of second will be dumped	
+	@param reallocatable If true the program will resize the buffer to prevent overflow
+	@return Nothing
+	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
+*/
+extern void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8 reallocatable);
+/*!
+	@brief Frees the first and second item
+	@param pair A pointer to a instance of a pair
+	@return Nothing
+*/
+extern void magePairFree(magePair *pair);
+/*! 
+	@brief Destroys the pair freeing itelsf
+	@param pair A pointer to a instance of a pair
+	@return Nothing
+	@warning If the array not allocated on the heap then do not call this method
+*/
+extern void magePairDestroy(magePair *pair);
+
+/*!
+	@brief Stores a list of pairs
+	@see magePair
+*/
+typedef struct MAGE_DICTIONARY_STRUCT
+{
+	/*!
+		@brief List of all all the pairs being stored
+	*/
+	mageResizableList *Elements;
+	
+} mageDictionary;
+
+/*! 
+	@brief Allocates a block of memory for the dictionary
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/
+extern void *mageDictionaryAllocate();
+/*! 
+	@brief Initialises the dictionary
+	@param dictionary A pointer to a instance of a dictionary
+	@return Nothing
+*/
+extern void mageDictionaryInitialise(mageDictionary *dictionary);
+/*! 
+	@brief Pushes a pair to the dictionary
+	@param dictionary A pointer to a instance of a dictionary
+	@param pair A pointer to the pair to be pushed
+	@return Nothing
+*/
+extern void mageDictionaryPush(mageDictionary *dictionary, magePair *pair);
+/*!
+	@brief Pops the last pair pushed
+	@param dictionary A pointer to a instance of a dictionary
+	@return Nothing
+*/
+extern void mageDictionaryPop(mageDictionary *dictionary);
+/*!
+	@brief Dumps a copy of the first pair in the list
+	@param dictionary A pointer to a instance of a dictionary
+	@param buffer Where the coppy will be dumped
+	@return Nothing
+*/
+extern void mageDictionaryFetch(mageDictionary *dictionary, magePair *buffer);
+/*!
+	@brief Dumps a copy of the pair specified by index in the list to the buffer
+	@param dictionary A pointer to a instance of a dictionary
+	@param buffer Where the coppy will be dumped
+	@return Nothing
+	@warning Passing an invalid index will cause a memory error
+*/
+
+
+
 /*!
 	@brief Reads the files contents dumping the contents into the buffer passed int
 	@param file Path to the file 
@@ -524,14 +686,6 @@ extern void mageGetMousePositionX(mageWindow *window, double *x);
 	@return Nothing
 */
 extern void mageGetMousePositionY(mageWindow *window, double *y);
-/*! 
-	@brief Gets the mouse's left and right button states
-	@param window A pointer to a instance of a window
-	@param left A pointer to where the left button state will be dumped 
-	@param right A pointer to where the right button state will be dumped 
-	@return Nothing
-*/
-extern void mageGetMouseButtonStates(mageWindow *window, sint32 *left, sint32 *right);
 /*! 
 	@brief Gets whether the left mouse button is being clicked
 	@param window A pointer to a instance of a window
