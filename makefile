@@ -15,25 +15,24 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CMP) $(CST) $(FLAGS) -o $(BIN_DIR)/$(TARGET) $(OBJ_DIR)/*.* $(LIBS)
 
-mageMain.o: Source/mageMain.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageMain.c -o $(OBJ_DIR)/mageMain.o
+mageMain.o: Core/mageMain.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageMain.c -o $(OBJ_DIR)/mageMain.o
 
-mageWindow.o: Source/mageAPI.h Source/mageWindow.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageWindow.c -o $(OBJ_DIR)/mageWindow.o
+mageWindow.o: Core/mageAPI.h Core/mageWindow.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageWindow.c -o $(OBJ_DIR)/mageWindow.o
 
-mageInput.o: Source/mageAPI.h Source/mageInput.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageInput.c -o $(OBJ_DIR)/mageInput.o
+mageInput.o: Core/mageAPI.h Core/mageInput.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageInput.c -o $(OBJ_DIR)/mageInput.o
 
-mageMaths.o: Source/mageAPI.h Source/mageMaths.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageMaths.c -o $(OBJ_DIR)/mageMaths.o
+mageMaths.o: Core/mageAPI.h Core/mageMaths.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageMaths.c -o $(OBJ_DIR)/mageMaths.o
 
-mageGeneric.o: Source/mageAPI.h Source/mageGeneric.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageGeneric.c -o $(OBJ_DIR)/mageGeneric.o
+mageGeneric.o: Core/mageAPI.h Core/mageGeneric.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageGeneric.c -o $(OBJ_DIR)/mageGeneric.o
 
-mageRenderer.o: Source/mageAPI.h Source/mageRenderer.c
-	$(CMP) $(CST) $(FLAGS) -c Source/mageRenderer.c -o $(OBJ_DIR)/mageRenderer.o
-
-
+mageRenderer.o: Core/mageAPI.h Core/mageRenderer.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageRenderer.c -o $(OBJ_DIR)/mageRenderer.o
+	
 clean:
 	rm $(OBJ_DIR)/*.* $(BIN_DIR)/$(TARGET)
 

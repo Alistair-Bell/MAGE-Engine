@@ -47,23 +47,25 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 		if (!glfwInit())
 		{
 			mageTryDumpSuccess(0, success);
+			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
 			return;
 		}	
 		window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
-
 
 		if (window->Context == NULL)
 		{
 			glfwTerminate();
 			mageTryDumpSuccess(0, success);
+			MAGE_LOG_CORE_FATAL_ERROR("GLFW context has failed to create\n", NULL);
 			return;
 		}
+		
+		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
+		
 		glfwMakeContextCurrent(window->Context);
 		glfwSetWindowSizeCallback(window->Context, mageWindowResizeCallback);
 	
 	#endif
-
-
 	
 	mageTryDumpSuccess(1, success);
 }

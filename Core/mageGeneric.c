@@ -4,13 +4,11 @@ void mageFreeMethod(void *item)
 {
 	free(item);
 }
-void mageTryDumpSuccess(uint64 contents, void *state)
+void mageTryDumpSuccess(uint8 contents, uint8 *state)
 {
-	if (state != NULL && sizeof(*state) <= 1)
-		state = contents;
+	if (state != NULL)
+		*state = contents;
 		return;	
-	MAGE_LOG_CLIENT_WARNING("Passsd in contents is less than 8 bits in size", NULL);
-
 }
 void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, const char *file, const char *format, ...)
 {
@@ -107,12 +105,12 @@ void magePairInitialise(magePair *pair, const uint32 firstSize, const uint32 sec
 	pair->First = malloc(sizeof(firstSize));
 	pair->Second = malloc(sizeof(secondSize));
 
-	pair->Firstize = firstSize;
+	pair->FirstSize = firstSize;
 	pair->SecondSize = secondSize;
 }
 void magePairSetFirst(magePair *pair, void *item)
 {
-	memcpy(pair->First, item, pair->Firstize);
+	memcpy(pair->First, item, pair->FirstSize);
 }
 void magePairSetSecond(magePair *pair, void *item)
 {
@@ -126,8 +124,8 @@ void magePairSetBoth(magePair *pair, void *first, void *second)
 void magePairGetFist(magePair *pair, void *buffer, uint8 reallocatable)
 {
 	if (reallocatable)
-		buffer = realloc(buffer, pair->Firstize);
-	memcpy(buffer, pair->First, pair->Firstize);
+		buffer = realloc(buffer, pair->FirstSize);
+	memcpy(buffer, pair->First, pair->FirstSize);
 }
 void magePairGetSecond(magePair *pair, void *buffer, uint8 reallocatable)
 {
@@ -139,6 +137,21 @@ void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8 realloc
 {
 	magePairGetFist(pair, buffer1, reallocatable);
 	magePairGetSecond(pair, buffer2, reallocatable);
+}
+void magePairResizeFirst(magePair *pair, const uint32 newSize)
+{
+	pair->First = realloc(pair->First, newSize);
+	pair->FirstSize = newSize;
+}
+void magePairResizeSecond(magePair *pair, const uint32 newSize)
+{
+	pair->First = realloc(pair->Second, newSize);
+	pair->SecondSize = newSize;
+}
+void magePairResizeBoth(magePair *pair, const uint32 newFirstSize, const uint32 newSecondSize)
+{
+	magePairResizeFirst(pair, newFirstSize);
+	magePairResizeSecond(pair, newSecondSize);
 }
 void magePairFree(magePair *pair)
 {
@@ -171,8 +184,10 @@ void mageDictionaryFetch(mageDictionary *dictionary, magePair *buffer)
 {
 	memcpy(buffer, dictionary->Elements->Elements[dictionary->Elements->Quantity - 1], sizeof(*buffer));
 }
-
-
+void mageDictionaryFetchIndex(mageDictionary *dictionary, magePair *buffer, const uint32 index)
+{
+	memcpy(buffer, dictionary->Elements->Elements[index], sizeof(*buffer));
+}
 void mageFileReadContents(const char *file, char *buffer, const uint8 reallocatable, uint8 *success)
 {
 	FILE *f = fopen(file, "rt");

@@ -12,6 +12,12 @@ typedef unsigned int uint32;
 typedef long sint64;
 typedef unsigned long uint64;
 
+#ifdef MAGE_PERCISE_FLOATS
+	typedef float double;
+#endif
+
+
+
 
 /*! 
 	@brief Free method used by the destory methods throughout the API
@@ -20,17 +26,19 @@ typedef unsigned long uint64;
 	@warning When overriding the method using a macro still call free() or leaks will occur
 */
 extern void mageFreeMethod(void *item);
-/* Tries to dump the data to the pointer checking for memory size and if the pointer is null*/
-extern void mageTryDumpSuccess(uint64 contents, void *state);
+/*!
+	@brief Tries to dump the contents into a pointer passed in
+	@param contents The contents to dump in
+	@param state The block of memory to dump the contents to
+*/
+void mageTryDumpSuccess(uint8 contents, uint8 *state);
 
-/* Logging methods */
 
-/* Logging macros for the type of the logs */
 #define MAGE_LOG_MODE_INFORM 0
 #define MAGE_LOG_MODE_WARNING 1  
 #define MAGE_LOG_MODE_ERROR 2
 #define MAGE_LOG_MODE_FATAL_ERROR 3
-/* Logging macros for the location of the log */
+
 #define MAGE_LOG_USER_CORE 0
 #define MAGE_LOG_USER_CLIENT 1
 
@@ -51,19 +59,16 @@ extern void mageLogMessage(const uint8 user, const uint8 severity, const uint32 
 */
 extern void mageLogReset();
 
-
-
-
 #if defined(MAGE_DEBUG)
 	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__); 
 	
 	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__);
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
@@ -73,6 +78,7 @@ extern void mageLogReset();
 	#define MAGE_LOG_CLIENT_WARNING(x, ...)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...)
 	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...)
+
 #endif
 
 
@@ -156,7 +162,7 @@ typedef struct MAGE_PAIR_STRUCT
 	/*!
 		@brief The size of the first value in bytes
 	*/
-	uint32 Firstize;
+	uint32 FirstSize;
 	/*!
 		@brief The size of the first value in bytes
 	*/
@@ -230,6 +236,28 @@ extern void magePairGetSecond(magePair *pair, void *buffer, uint8 reallocatable)
 */
 extern void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8 reallocatable);
 /*!
+	@brief Resizes the memory buffer of the pair's first buffer
+	@param pair A pointer to a instance of a pair
+	@param newSize The new size of the buffer
+	@return Nothing
+*/
+extern void magePairResizeFirst(magePair *pair, const uint32 newSize);
+/*!
+	@brief Resizes the memory buffer of the pair's second buffer
+	@param pair A pointer to a instance of a pair
+	@param newSize The new size of the buffer
+	@return Nothing
+*/
+extern void magePairResizeSecond(magePair *pair, const uint32 newSize);
+/*!
+	@brief Resizes the memory buffer of the both pair's value buffers
+	@param pair A pointer to a instance of a pair
+	@param newFirstSize The new size of the first buffer
+	@param newSecondSize The new size of the second buffer
+	@return Nothing
+*/
+extern void magePairResizeBoth(magePair *pair, const uint32 newFirstSize, const uint32 newSecondSize);
+/*!
 	@brief Frees the first and second item
 	@param pair A pointer to a instance of a pair
 	@return Nothing
@@ -292,10 +320,11 @@ extern void mageDictionaryFetch(mageDictionary *dictionary, magePair *buffer);
 	@brief Dumps a copy of the pair specified by index in the list to the buffer
 	@param dictionary A pointer to a instance of a dictionary
 	@param buffer Where the coppy will be dumped
+	@param index The index in the list of pairs
 	@return Nothing
 	@warning Passing an invalid index will cause a memory error
 */
-
+extern void mageDictionaryFetchIndex(mageDictionary *dictionary, magePair *buffer, const uint32 index);
 
 
 /*!
@@ -409,6 +438,10 @@ typedef struct MAGE_SYSTEM_ENVIRONMENT_STRUCT
 		@brief Count of the GPU's within the system
 	*/
 	uint32 GPUCount;
+	/*!
+		@brief The index for the graphics family
+	*/
+	uint32 GraphicsFamilyIndex;
 	
 
 } mageSystemEnvironment;
@@ -1077,8 +1110,6 @@ extern void mageMatrix4x4Destroy(mageMatrix4x4 *matrix);
 */
 extern void mageToRadians(const float degrees, float *result);
 
-
-
 /*!
 	@brief Object that renders and is pushed to the renderer pipeline
 */
@@ -1118,6 +1149,89 @@ extern void mageRenderableInitialse(mageRenderable *renderable, mageVector3 scal
 extern void mageRenderableDestroy(mageRenderable *renderable);
 
 /*!
+	@brief Handles the vulkan setup 
+*/
+typedef struct MAGE_VULKAN_HANDLER_STRUCT
+{
+#if defined(MAGE_VULKAN)
+	
+	/*!
+		@brief The count of the GPU's within the system
+	*/
+	uint32 GPUCount;
+	/*!
+		@brief Count of extensions stored
+	*/
+	uint32 ExtensionsCount;
+	/*!
+		@brief Vulkan instance object
+	*/
+	VkInstance VulkanInstance;
+	/*!
+		@brief Instance of a physical device
+	*/
+	VkPhysicalDevice GPU;
+	/*!
+		@brief The properties of the graphics card
+	*/
+	VkPhysicalDeviceProperties GPUProperties;
+	
+	/*!
+		@brief An array of available extensions
+	*/
+	char **Extensions;
+
+#endif
+
+} mageVulkanHandler;
+
+/*! 
+	@brief Allocates a block of memory for the vulkan handler
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/ 
+extern void *mageVulkanHandlerAllocate();
+/*!
+	@brief Initialises vulkan
+	@param vulkanHandler A pointer to a instance of a handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+	@warning If the devices fail the renderer will terminate
+*/
+extern void mageVulkanHandlerInitialise(mageVulkanHandler *vulkanHandler, uint8 *success);
+/*!
+	@brief Gets the valid extensions and dumps them into the handlers extension buffer
+	@param vulkanHandler A pointer to a instance of a handler
+	@return Nothing
+*/
+extern void mageVulkanHandlerGetExtensions(mageVulkanHandler *vulkanHandler);
+/*!
+	@brief Gets the GPU of the computer and sets the physical device  
+	@param vulkanHandler A pointer to a instance of a handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+*/
+extern void mageVulkanHandlerGetGPU(mageVulkanHandler *vulkanHandler, uint8 *success);
+/*!
+	@brief Initialises the vulkan instance
+	@param vulkanHandler A pointer to a instance of a handler
+	@param applicationInfo The info the application will use to create the instance
+	@param success A pointer where the success of the function will be dumped
+	@warning The instanceCreateInfo->pApplicationInfo must be previously set to to point to the application info
+	@return Nothing
+*/
+extern void mageVulkanHandlerVulkanInstanceInitialise(mageVulkanHandler *vulkanHandler, const VkInstanceCreateInfo instanceInfo, uint8 *success);
+/*!
+	@brief Frees the members without destroying the handler
+	@param vulkanHandler A pointer to a instance of a handler
+	@return Nothing
+	@warning Do not call if handler has not been initialised
+*/
+extern void mageVulkanHandlerFree(mageVulkanHandler *vulkanHandler);
+
+
+
+/*!
 	@brief Renderer that renders objects pushed into the pipeline
 */
 typedef struct MAGE_RENDERER_STRUCT
@@ -1140,8 +1254,12 @@ typedef struct MAGE_RENDERER_STRUCT
 			@brief Vulkan Device object
 		*/
 		VkDevice VulkanDevice;
+		/*!
+			@brief Physical device for the rendering
+		*/
+		VkPhysicalDevice GPU;
+	
 	#endif
-
 
 } mageRenderer;
 
@@ -1179,6 +1297,8 @@ extern void mageRendererDeviceDestroy(mageRenderer *renderer);
 	@warning If the renderer is not allocated on the heap then do not call this method
 */
 extern void mageRendererDestroy(mageRenderer *renderer);
+
+
 
 
 
