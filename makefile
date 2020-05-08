@@ -1,7 +1,7 @@
 CMP = clang
 CST = -std=c89
-FLAGS = -g -Wall
-LIBS = -lvulkan -lglfw3 -ldl -lm -lopenal -lpthread 
+FLAGS = -g -Wall 
+LIBS = -lvulkan -lglfw3 -lX11 -ldl -lm -lopenal -lpthread -lvulkan_radeon
 LIB_TYPE = -shared
 BF_DIR = build
 BIN_DIR = $(BF_DIR)/bin
@@ -35,4 +35,3 @@ mageRenderer.o: Core/mageAPI.h Core/mageRenderer.c
 	
 clean:
 	rm $(OBJ_DIR)/*.* $(BIN_DIR)/$(TARGET)
-

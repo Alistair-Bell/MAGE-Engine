@@ -16,7 +16,9 @@
         "string": "c",
         "vector": "c",
         "iterator": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "random": "c",
+        "algorithm": "c"
     },
     "python.pythonPath": "/bin/python3.7"
 }

@@ -1,15 +1,13 @@
 #include "mageAPI.h"
 
-static mageVulkanHandler vulkan;
+static mageVulkanHandler hand;
 
 int main(void)
 {
-	mageVulkanHandlerInitialise(&vulkan, NULL);
-	
-	MAGE_LOG_CLIENT_INFORM("[%s]\n", vulkan.GPUProperties.deviceName);
-	
-	
-	mageVulkanHandlerFree(&vulkan);
+	uint8 flag;
+	mageVulkanHandlerInitialise(&hand, &flag);	
+
+
+
 	mageLogReset();
 }
-

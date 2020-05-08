@@ -63,12 +63,12 @@ extern void mageLogReset();
 	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__); 
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
 	
 	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__);
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
@@ -1153,36 +1153,70 @@ extern void mageRenderableDestroy(mageRenderable *renderable);
 */
 typedef struct MAGE_VULKAN_HANDLER_STRUCT
 {
-#if defined(MAGE_VULKAN)
-	
-	/*!
-		@brief The count of the GPU's within the system
-	*/
-	uint32 GPUCount;
-	/*!
-		@brief Count of extensions stored
-	*/
-	uint32 ExtensionsCount;
-	/*!
-		@brief Vulkan instance object
-	*/
-	VkInstance VulkanInstance;
-	/*!
-		@brief Instance of a physical device
-	*/
-	VkPhysicalDevice GPU;
-	/*!
-		@brief The properties of the graphics card
-	*/
-	VkPhysicalDeviceProperties GPUProperties;
-	
-	/*!
-		@brief An array of available extensions
-	*/
-	char **Extensions;
+	#if defined(MAGE_VULKAN)
+		
+		/*!
+			@brief The count of the GPU's within the system
+		*/
+		uint32 GPUCount;
+		/*!
+			@brief Count of extensions stored
+		*/
+		uint32 InstanceExtensionsCount;
+		/*!
+			@brief Count of GPU extensions stored
+		*/
+		uint32 GPUExtensionsCount;
+		/*!
+			@brief Index of the GPU being used
+		*/
+		uint32 GPUIndex;
+		/*!
+			@brief Index of the family graphics
+		*/
+		uint32 GPUFamilyIndex;
+		/*!
+			@brief The layer count of the instance
+		*/
+		uint32 InstanceLayerCount;
+		/*!
+			@brief The layer count of the instance
+		*/
+		uint32 PhysicalLayerCount;
+		/*!
+			@brief Vulkan instance object
+		*/
+		VkInstance VulkanInstance;
+		/*!
+			@brief Device used by vulkan
+		*/
+		VkDevice VulkanDevice;
+		/*!
+			@brief Instance of a physical device
+		*/
+		VkPhysicalDevice GPU;
+		/*!
+			@brief The properties of the graphics card
+		*/
+		VkPhysicalDeviceProperties GPUProperties;
+		/*!
+			@brief Array of the instance layer properties
+		*/
+		VkLayerProperties *InstanceLayerProperties;
+		/*!
+			@brief Array of the instance layer properties
+		*/
+		VkLayerProperties *PhysicalDeviceLayerProperties;
+		/*!
+			@brief An array of available instance extensions
+		*/
+		char **InstanceExtensions;
+		/*!
+			@brief An array of available device extensions
+		*/
+		char **GPUExtensions;
 
-#endif
-
+	#endif
 } mageVulkanHandler;
 
 /*! 
@@ -1200,11 +1234,11 @@ extern void *mageVulkanHandlerAllocate();
 */
 extern void mageVulkanHandlerInitialise(mageVulkanHandler *vulkanHandler, uint8 *success);
 /*!
-	@brief Gets the valid extensions and dumps them into the handlers extension buffer
+	@brief Gets the valid instance extensions and dumps them into the handlers extension buffer
 	@param vulkanHandler A pointer to a instance of a handler
 	@return Nothing
 */
-extern void mageVulkanHandlerGetExtensions(mageVulkanHandler *vulkanHandler);
+extern void mageVulkanHandlerGetInstanceExtensions(mageVulkanHandler *vulkanHandler);
 /*!
 	@brief Gets the GPU of the computer and sets the physical device  
 	@param vulkanHandler A pointer to a instance of a handler
@@ -1212,6 +1246,33 @@ extern void mageVulkanHandlerGetExtensions(mageVulkanHandler *vulkanHandler);
 	@return Nothing
 */
 extern void mageVulkanHandlerGetGPU(mageVulkanHandler *vulkanHandler, uint8 *success);
+/*!
+	@brief Gets GPU extensions
+	@param vulkanHandler A pointer to a instance of a handler
+	@return Nothing
+*/
+extern void mageVulkanHandlerGetGPUExtensions(mageVulkanHandler *vulkanHandler);
+/*!
+	@brief Gets the layer properties of the instance
+	@param vulkanHandler A pointer to a instance of a handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+*/
+extern void mageVulkanHandlerGetLayerProperties(mageVulkanHandler *vulkanHandler, uint8 *success);
+/*!
+	@brief Gets the layer properties of the physical device
+	@param vulkanHandler A pointer to a instance of a handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+*/
+extern void mageVulkanHandlerGetPhysicalLayerProperties(mageVulkanHandler *vulkanHandler, uint8 *success);
+/*!
+	@brief Initialises the physical device
+	@param vulkanHandler A pointer to a instance of a handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+*/
+extern void mageVulkanHandlerGPUInitialise(mageVulkanHandler *vulkanHandler, uint8 *success);
 /*!
 	@brief Initialises the vulkan instance
 	@param vulkanHandler A pointer to a instance of a handler
@@ -1240,25 +1301,13 @@ typedef struct MAGE_RENDERER_STRUCT
 		@brief Pipline where objects are pushed rendered
 	*/
 	mageResizableList *PipeLine;
-	/*!
-		@brief Environment object that stores what hardware the renderer can use
-	*/
-	mageSystemEnvironment Environment;
 
 	#if defined(MAGE_VULKAN)
 		/*!
-			@brief Vulkan instance object
+			@brief Handler for the vulkan setup
 		*/
-		VkInstance VulkanInstance;
-		/*!
-			@brief Vulkan Device object
-		*/
-		VkDevice VulkanDevice;
-		/*!
-			@brief Physical device for the rendering
-		*/
-		VkPhysicalDevice GPU;
-	
+		mageVulkanHandler VulkanHandler;
+
 	#endif
 
 } mageRenderer;
@@ -1270,26 +1319,12 @@ typedef struct MAGE_RENDERER_STRUCT
 */ 
 extern void *mageRendererAllocate();
 /*!
-	@brief Initialises the devices for vulkan to be used
-	@param renderer A pointer to a instance of a renderer
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-	@warning If the devices fail the renderer will terminate
-*/
-extern void mageRendererDeviceInitialise(mageRenderer *renderer, uint8 *success);
-/*!
 	@brief Initialises the renderer
 	@param renderer A pointer to a instance of a renderer
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 */
-extern void mageRendererInitialise(mageRenderer *renderer, uint8 *success);
-/*!
-	@brief Destroys the vulkan devices
-	@param renderer A pointer to a instance of a renderer
-	@return Nothing
-*/
-extern void mageRendererDeviceDestroy(mageRenderer *renderer);
+extern void mageRendererInitialise(mageRenderer *renderer, uint8 *success);;
 /*!
 	@brief Destroys the renderer freeing itelsf
 	@param renderer A pointer to a instance of a renderer
