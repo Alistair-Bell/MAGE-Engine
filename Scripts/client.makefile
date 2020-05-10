@@ -1,0 +1,20 @@
+CMP = clang
+CST = -std=c89
+FLAGS = -Wall -Werror -O3 
+LIB_DIR = -L./build/lib/mage
+LIBS = $(LIB_DIR) -lvulkan -lglfw3 -lX11 -ldl -lm -lopenal -lpthread 
+BF_DIR = build
+BIN_DIR = $(BF_DIR)/bin
+OBJ_DIR = $(BF_DIR)/obj
+TARGET = Client
+OBJS = clientMain.o
+
+.PHONY: all
+all: $(TARGET)
+
+
+$(TARGET): $(OBJS)
+	$(CMP) $(CST) $(FLAGS) -o $(BIN_DIR)/$(TARGET) $(OBJ_DIR)/*.* $(LIBS)
+
+clientMain.o: Client/ClientMain.c
+	$(CMP) $(CST) $(FLAGS) -c Client/ClientMain.c -o $(OBJ_DIR)/clientMain.o

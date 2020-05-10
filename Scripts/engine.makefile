@@ -1,22 +1,19 @@
 CMP = clang
 CST = -std=c89
-FLAGS = -g -Wall -Werror
-LIBS = -lvulkan -lglfw3 -lX11 -ldl -lm -lopenal -lpthread -lvulkan_radeon
-LIB_TYPE = -shared
+FLAGS = -Wall -Werror -O3 -fPIC
+LD_FLAGS = -shared
 BF_DIR = build
-BIN_DIR = $(BF_DIR)/bin
 LIB_DIR = $(BF_DIR)/lib
 OBJ_DIR = $(BF_DIR)/obj
-TARGET = mage
-OBJS = mageMain.o mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o 
+TARGET = mage.so
+OBJS = mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o 
 
+.PHONY: all
 all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CMP) $(CST) $(FLAGS) -o $(BIN_DIR)/$(TARGET) $(OBJ_DIR)/*.* $(LIBS)
 
-mageMain.o: Core/mageMain.c
-	$(CMP) $(CST) $(FLAGS) -c Core/mageMain.c -o $(OBJ_DIR)/mageMain.o
+$(TARGET): $(OBJS)
+	$(CMP) $(CST) $(LD_FLAGS) -o $(LIB_DIR)/$(TARGET) $(OBJ_DIR)/*.* 
 
 mageWindow.o: Core/mageAPI.h Core/mageWindow.c
 	$(CMP) $(CST) $(FLAGS) -c Core/mageWindow.c -o $(OBJ_DIR)/mageWindow.o
@@ -34,4 +31,4 @@ mageRenderer.o: Core/mageAPI.h Core/mageRenderer.c
 	$(CMP) $(CST) $(FLAGS) -c Core/mageRenderer.c -o $(OBJ_DIR)/mageRenderer.o
 	
 clean:
-	rm $(OBJ_DIR)/*.* $(BIN_DIR)/$(TARGET)
+	rm $(OBJ_DIR)/*.*
