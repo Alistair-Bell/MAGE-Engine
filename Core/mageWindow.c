@@ -50,6 +50,17 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
 			return;
 		}	
+		
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    	
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+
+		#if  defined(MAGE_VULKAN)
+
+
+		#endif
+
 		window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
 
 		if (window->Context == NULL)
@@ -62,9 +73,7 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 		
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 		
-		glfwMakeContextCurrent(window->Context);
-		glfwSetWindowSizeCallback(window->Context, mageWindowResizeCallback);
-	
+		glfwMakeContextCurrent(window->Context);	
 	#endif
 	
 	mageTryDumpSuccess(1, success);
@@ -76,18 +85,25 @@ void mageWindowSwapBuffers(mageWindow *window)
 	#elif defined(MAGE_GLFW)
 		glfwSwapBuffers(window->Context);
 	#endif
-	
 }
-#if defined(MAGE_GLFW)
-	void mageWindowResizeCallback(GLFWwindow *window, sint32 xResolution, sint32 yResolution)
-	{
+void mageWindowTerminate(mageWindow *window)
+{
+	#if defined(MAGE_GLFW)
+		glfwDestroyWindow(window->Context);
+		glfwTerminate();
+	#elif defined(MAGE_SDL2)
+		SDL_DestroyWindow(window->Context);	
+		SDL_Quit();
+	#endif	
 
-	}
-#endif
+	MAGE_LOG_CORE_INFORM("Window has been terminated\n", NULL);
+
+}
+
 void mageWindowDestroy(mageWindow *window)
 {
 	#if defined(MAGE_GLFW)
-		glfwTerminate();
+		
 	#elif defined(MAGE_SDL2)
 		SDL_DestroyWindow(window->Context);	
 		SDL_Quit();

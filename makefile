@@ -1,6 +1,6 @@
 CMP = clang
 CST = -std=c89
-FLAGS = -g -Wall 
+FLAGS = -g -Wall -Werror
 LIBS = -lvulkan -lglfw3 -lX11 -ldl -lm -lopenal -lpthread -lvulkan_radeon
 LIB_TYPE = -shared
 BF_DIR = build

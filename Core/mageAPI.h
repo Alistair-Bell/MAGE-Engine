@@ -348,423 +348,6 @@ extern void mageFileReadContents(const char *file, char *buffer, const uint8 rea
 extern void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success);
 
 
-/*!
-	@brief Window context used by the engine to render to
-	@brief The window can either use SDL2 or GLFW3 as its framework
-*/
-typedef struct MAGE_WINDOW_STRUCT
-{
-	/*!
-		@brief Width of the window context
-	*/
-	sint32 Width;
-	/*!
-		@brief Height of the window context
-	*/
-	sint32 Height;
-	/*!
-		@brief Title of the window context
-	*/
-	const char *Title;
-	
-	#if defined(MAGE_SDL2)
-		/*!
-			@brief Window context using the SDL2 framework
-		*/
-		SDL_Window *Context;
-		/*!
-			@brief SDL2 event poller context
-		*/
-		SDL_Event Events;
-	#elif defined(MAGE_GLFW)
-		/*! 
-			@brief Window context using the GLFW3 framework
-		*/		
-		GLFWwindow *Context;
-	#endif
-	
-	/*!
-		@brief A flag whether the window is running
-	*/
-	uint8 Running;	
-} mageWindow;
-
-/*! 
-	@brief Allocates a block of memory for the game window
-	@return Void pointer to the block of memory allocated
-	@warning The pointer has not been type casted
-*/ 
-extern void *mageWindowAllocate();
-/*! 
-	@brief Initialises the game window populating its members
-	@param window A pointer to a instance of a window
-	@param xResolution Width of the window created
-	@param yResolution Height of thw window created
-	@param title Title of the window
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-	@warning The window will not be constructed if the libraries fail to be initialsied
-*/
-extern void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title, uint8 *success);
-/*!
-	@brief Swaps the buffers of the window
-	@param window A pointer to a instance of a window
-	@return Nothing
-*/
-extern void mageWindowSwapBuffers(mageWindow *window);
-
-#if defined(MAGE_GLFW)
-	/*!
-		@brief Updates the viewport for rendering
-		@return Nothing
-	*/
-	extern void mageWindowResizeCallback(GLFWwindow *window, sint32 xResolution, sint32 yResolution);
-#endif
-/*! 
-	@brief Destroys the resizable list freeing itelsf
-	@param window A pointer to a instance of a window
-	@return Nothing
-	@warning If the window not allocated on the heap then do not call this method
-*/
-extern void mageWindowDestroy(mageWindow *window); 
-
-
-/*! 
-	@brief A struct containing system infomation used by the renderer
-*/
-typedef struct MAGE_SYSTEM_ENVIRONMENT_STRUCT
-{
-	/*!
-		@brief Count of the GPU's within the system
-	*/
-	uint32 GPUCount;
-	/*!
-		@brief The index for the graphics family
-	*/
-	uint32 GraphicsFamilyIndex;
-	
-
-} mageSystemEnvironment;
-
-/*! 
-	@brief Allocates a block of memory for the system environments
-	@return Void pointer to the block of memory allocated
-	@warning The pointer has not been type casted
-*/ 
-extern void *mageSystemEnvironmentAllocate();
-/*! 
-	@brief Destroys the system environment freeing itelsf
-	@param system A pointer to a instance of a system environment
-	@return Nothing
-	@warning If the system environments not allocated on the heap then do not call this method
-*/
-extern void mageSystemEnvironmentDestroy(mageSystemEnvironment *system);
-
-
-#if defined(MAGE_SDL2)
-    #define MAGE_KEYCODE_SPACE SDLK_SPACE  
-    #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE  
-    #define MAGE_KEYCODE_COMMA SDLK_COMMA   
-    #define MAGE_KEYCODE_MINUS SDLK_MINUS   
-    #define MAGE_KEYCODE_PERIOD SDLK_PERIOD   
-    #define MAGE_KEYCODE_SLASH SDLK_BACKSLASH  
-    #define MAGE_KEYCODE_D0 SDLK_0  
-    #define MAGE_KEYCODE_D1 SDLK_1  
-    #define MAGE_KEYCODE_D2 SDLK_2   
-    #define MAGE_KEYCODE_D3 SDLK_3  
-    #define MAGE_KEYCODE_D4 SDLK_4  
-    #define MAGE_KEYCODE_D5 SDLK_5  
-    #define MAGE_KEYCODE_D6 SDLK_6
-    #define MAGE_KEYCODE_D7 SDLK_7  
-    #define MAGE_KEYCODE_D8 SDLK_8 
-    #define MAGE_KEYCODE_D9 SDLK_9   
-    #define MAGE_KEYCODE_SEMICOLON SDLK_SEMICOLON   
-    #define MAGE_KEYCODE_EQUAL SDLK_EQUALS
-    #define MAGE_KEYCODE_A SDLK_a  
-    #define MAGE_KEYCODE_B SDLK_b
-    #define MAGE_KEYCODE_C SDLK_c
-    #define MAGE_KEYCODE_D SDLK_d
-    #define MAGE_KEYCODE_E SDLK_e
-    #define MAGE_KEYCODE_F SDLK_f
-    #define MAGE_KEYCODE_G SDLK_g
-    #define MAGE_KEYCODE_H SDLK_h 
-    #define MAGE_KEYCODE_I SDLK_i 
-    #define MAGE_KEYCODE_J SDLK_j 
-    #define MAGE_KEYCODE_K SDLK_k 
-    #define MAGE_KEYCODE_L SDLK_l 
-    #define MAGE_KEYCODE_M SDLK_m 
-    #define MAGE_KEYCODE_N SDLK_n 
-    #define MAGE_KEYCODE_O SDLK_o   
-    #define MAGE_KEYCODE_P SDLK_p   
-    #define MAGE_KEYCODE_Q SDLK_q   
-    #define MAGE_KEYCODE_R SDLK_r   
-    #define MAGE_KEYCODE_S SDLK_s   
-    #define MAGE_KEYCODE_T SDLK_t   
-    #define MAGE_KEYCODE_U SDLK_u   
-    #define MAGE_KEYCODE_V SDLK_v   
-    #define MAGE_KEYCODE_W SDLK_w   
-    #define MAGE_KEYCODE_X SDLK_x   
-    #define MAGE_KEYCODE_Y SDLK_y   
-    #define MAGE_KEYCODE_Z SDLK_z   
-    #define MAGE_KEYCODE_LEFTBRACKET SDLK_LEFTBRACKET   
-    #define MAGE_KEYCODE_BACKSLASH SDLK_SLASH
-    #define MAGE_KEYCODE_RIGHTBRAC SDLK_RIGHTBRACKET 
-    #define MAGE_KEYCODE_GRAVEACC SDLK_BACKQUOTE
-    #define MAGE_KEYCODE_ESCAPE SDLK_ESCAPE  
-    #define MAGE_KEYCODE_ENTER SDLK_RETURN  
-    #define MAGE_KEYCODE_TAB SDLK_TAB
-    #define MAGE_KEYCODE_BACKSPACE SDLK_BACKSPACE 
-    #define MAGE_KEYCODE_INSERT SDLK_INSERT  
-    #define MAGE_KEYCODE_DELETE SDLK_DELETE 
-    #define MAGE_KEYCODE_RIGHT SDLK_RIGHT
-    #define MAGE_KEYCODE_LEFT SDLK_LEFT 
-    #define MAGE_KEYCODE_DOWN SDLK_DOWN  
-    #define MAGE_KEYCODE_UP SDLK_UP
-    #define MAGE_KEYCODE_PAGEUP SDLK_PAGEUP
-    #define MAGE_KEYCODE_PAGEDOWN SDLK_PAGEDOWN 
-    #define MAGE_KEYCODE_HOME SDLK_HOME
-    #define MAGE_KEYCODE_END SDLK_END  
-    #define MAGE_KEYCODE_CAPSLOCK SDLK_CAPSLOCK 
-    #define MAGE_KEYCODE_SCROLLLOCK SDLK_SCROLLLOCK  
-    #define MAGE_KEYCODE_NUMLOCK SDLK_NUMLOCKCLEAR 
-    #define MAGE_KEYCODE_PRINTSCREEN SDLK_PRINTSCREEN  
-    #define MAGE_KEYCODE_PAUSE SDLK_PAUSE   
-    #define MAGE_KEYCODE_F1 SDLK_F1
-    #define MAGE_KEYCODE_F2 SDLK_F2
-    #define MAGE_KEYCODE_F3 SDLK_F3
-    #define MAGE_KEYCODE_F4 SDLK_F4 
-    #define MAGE_KEYCODE_F5 SDLK_F5
-    #define MAGE_KEYCODE_F6 SDLK_F6
-    #define MAGE_KEYCODE_F7 SDLK_F7
-    #define MAGE_KEYCODE_F8 SDLK_F8
-    #define MAGE_KEYCODE_F9 SDLK_F9 
-    #define MAGE_KEYCODE_F10 SDLK_F10   
-    #define MAGE_KEYCODE_F11 SDLK_F11
-    #define MAGE_KEYCODE_F12 SDLK_F12  
-    #define MAGE_KEYCODE_F13 SDLK_F13
-    #define MAGE_KEYCODE_F14 SDLK_F14
-    #define MAGE_KEYCODE_F15 SDLK_F15
-    #define MAGE_KEYCODE_F16 SDLK_F16
-    #define MAGE_KEYCODE_F17 SDLK_F17
-    #define MAGE_KEYCODE_F18 SDLK_F18 
-    #define MAGE_KEYCODE_F19 SDLK_F19 
-    #define MAGE_KEYCODE_F20 SDLK_F20   
-    #define MAGE_KEYCODE_F21 SDLK_F21  
-    #define MAGE_KEYCODE_F22 SDLK_F22   
-    #define MAGE_KEYCODE_F23 SDLK_F23  
-    #define MAGE_KEYCODE_F24 SDLK_F24     
-    #define MAGE_KEYCODE_KP0 SDLK_KP_0
-    #define MAGE_KEYCODE_KP1 SDLK_KP_1   
-    #define MAGE_KEYCODE_KP2 SDLK_KP_2  
-    #define MAGE_KEYCODE_KP3 SDLK_KP_3   
-    #define MAGE_KEYCODE_KP4 SDLK_KP_4   
-    #define MAGE_KEYCODE_KP5 SDLK_KP_5   
-    #define MAGE_KEYCODE_KP6 SDLK_KP_6  
-    #define MAGE_KEYCODE_KP7 SDLK_KP_7
-    #define MAGE_KEYCODE_KP8 SDLK_KP_8  
-    #define MAGE_KEYCODE_KP9 SDLK_KP_9   
-    #define MAGE_KEYCODE_KPDECIMAL SDLK_KP_DECIMAL  
-    #define MAGE_KEYCODE_KPDIVIDE SDLK_KP_DIVIDE 
-    #define MAGE_KEYCODE_KPMULTIPLY SDLK_KP_MULTIPLY
-    #define MAGE_KEYCODE_KPSUBTRACT SDLK_KP_MINUS
-    #define MAGE_KEYCODE_KPADD SDLK_KP_PLUS
-    #define MAGE_KEYCODE_KPENTER SDLK_KP_ENTER 
-    #define MAGE_KEYCODE_KPEQUAL SDLK_KP_EQUALS
-    #define MAGE_KEYCODE_LEFTSHIFT SDLK_LSHIFT  
-    #define MAGE_KEYCODE_LEFTCONTROL SDLK_LCTRL   
-    #define MAGE_KEYCODE_LEFTALT SDLK_LALT 
-    #define MAGE_KEYCODE_LEFTSUPER SDLK_LGUI  
-    #define MAGE_KEYCODE_RIGHTSHIFT SDLK_RSHIFT  
-    #define MAGE_KEYCODE_RIGHTCONTROL SDLK_RCTRL 
-    #define MAGE_KEYCODE_RIGHTALT SDLK_RALT
-    #define MAGE_KEYCODE_RIGHTSUPER SDLK_RGUI 
-#elif defined(MAGE_GLFW)
-	#define MAGE_KEYCODE_SPACE  32
-	#define MAGE_KEYCODE_APOSTROPHE  39
-	#define MAGE_KEYCODE_COMMA  44 
-	#define MAGE_KEYCODE_MINUS  45 
-	#define MAGE_KEYCODE_PERIOD  46
-	#define MAGE_KEYCODE_SLASH  47
-	#define MAGE_KEYCODE_D0  48 
-	#define MAGE_KEYCODE_D1  49 
-	#define MAGE_KEYCODE_D2  50 
-	#define MAGE_KEYCODE_D3  51 
-	#define MAGE_KEYCODE_D4  52 
-	#define MAGE_KEYCODE_D5  53 
-	#define MAGE_KEYCODE_D6  54
-	#define MAGE_KEYCODE_D7  55 
-	#define MAGE_KEYCODE_D8  56 
-	#define MAGE_KEYCODE_D9  57 
-	#define MAGE_KEYCODE_SEMICOLON  59 
-	#define MAGE_KEYCODE_EQUAL  61 
-	#define MAGE_KEYCODE_A  65
-	#define MAGE_KEYCODE_B  66
-	#define MAGE_KEYCODE_C  67
-	#define MAGE_KEYCODE_D  68
-	#define MAGE_KEYCODE_E  69
-	#define MAGE_KEYCODE_F  70
-	#define MAGE_KEYCODE_G  71
-	#define MAGE_KEYCODE_H  72
-	#define MAGE_KEYCODE_I  73
-	#define MAGE_KEYCODE_J  74
-	#define MAGE_KEYCODE_K  75
-	#define MAGE_KEYCODE_L  76
-	#define MAGE_KEYCODE_M  77
-	#define MAGE_KEYCODE_N  78
-	#define MAGE_KEYCODE_O  79
-	#define MAGE_KEYCODE_P  80
-	#define MAGE_KEYCODE_Q  81
-	#define MAGE_KEYCODE_R  82
-	#define MAGE_KEYCODE_S  83
-	#define MAGE_KEYCODE_T  84
-	#define MAGE_KEYCODE_U  85
-	#define MAGE_KEYCODE_V  86
-	#define MAGE_KEYCODE_W  87
-	#define MAGE_KEYCODE_X  88
-	#define MAGE_KEYCODE_Y  89
-	#define MAGE_KEYCODE_Z  90
-	#define MAGE_KEYCODE_LEFTBRACKET  91 
-	#define MAGE_KEYCODE_BACKSLASH  92
-	#define MAGE_KEYCODE_RIGHTBRACKET
-	#define MAGE_KEYCODE_GRAVEACCENT
-	#define MAGE_KEYCODE_ESCAPE  256
-	#define MAGE_KEYCODE_ENTER  257
-	#define MAGE_KEYCODE_TAB  258
-	#define MAGE_KEYCODE_BACKSPACE  259
-	#define MAGE_KEYCODE_INSERT 260
-	#define MAGE_KEYCODE_DELETE 261
-	#define MAGE_KEYCODE_RIGHT  262
-	#define MAGE_KEYCODE_LEFT 263
-	#define MAGE_KEYCODE_DOWN 264
-	#define MAGE_KEYCODE_UP 265
-	#define MAGE_KEYCODE_PAGEUP 266
-	#define MAGE_KEYCODE_PAGEDOWN 267
-	#define MAGE_KEYCODE_HOME 268
-	#define MAGE_KEYCODE_END 269
-	#define MAGE_KEYCODE_CAPSLOCK 280
-	#define MAGE_KEYCODE_SCROLLLOCK 281
-	#define MAGE_KEYCODE_NUMLOCK  282
-	#define MAGE_KEYCODE_PRINTSCREEN  283
-	#define MAGE_KEYCODE_PAUSE  284
-	#define MAGE_KEYCODE_F1 290
-	#define MAGE_KEYCODE_F2 291
-	#define MAGE_KEYCODE_F3 292
-	#define MAGE_KEYCODE_F4 293
-	#define MAGE_KEYCODE_F5 294
-	#define MAGE_KEYCODE_F6 295
-	#define MAGE_KEYCODE_F7 296
-	#define MAGE_KEYCODE_F8 297
-	#define MAGE_KEYCODE_F9 298
-	#define MAGE_KEYCODE_F10  299
-	#define MAGE_KEYCODE_F11  300
-	#define MAGE_KEYCODE_F12  301
-	#define MAGE_KEYCODE_F13  302
-	#define MAGE_KEYCODE_F14  303
-	#define MAGE_KEYCODE_F15  304
-	#define MAGE_KEYCODE_F16  305
-	#define MAGE_KEYCODE_F17  306
-	#define MAGE_KEYCODE_F18  307
-	#define MAGE_KEYCODE_F19  308
-	#define MAGE_KEYCODE_F20  309
-	#define MAGE_KEYCODE_F21  310
-	#define MAGE_KEYCODE_F22  311
-	#define MAGE_KEYCODE_F23  312
-	#define MAGE_KEYCODE_F24  313
-	#define MAGE_KEYCODE_KP0  320
-	#define MAGE_KEYCODE_KP1  321
-	#define MAGE_KEYCODE_KP2  322
-	#define MAGE_KEYCODE_KP3  323
-	#define MAGE_KEYCODE_KP4  324
-	#define MAGE_KEYCODE_KP5  325
-	#define MAGE_KEYCODE_KP6  326
-	#define MAGE_KEYCODE_KP7  327
-	#define MAGE_KEYCODE_KP8  328
-	#define MAGE_KEYCODE_KP9  329
-	#define MAGE_KEYCODE_KPDECIMAL  330
-	#define MAGE_KEYCODE_KPDIVIDE 331
-	#define MAGE_KEYCODE_KPMULTIPLY 332
-	#define MAGE_KEYCODE_KPSUBTRACT 333
-	#define MAGE_KEYCODE_KPADD  334
-	#define MAGE_KEYCODE_KPENTER  335
-	#define MAGE_KEYCODE_KPEQUAL  336
-	#define MAGE_KEYCODE_LEFTSHIFT  340
-	#define MAGE_KEYCODE_LEFTCONTROL  341
-	#define MAGE_KEYCODE_LEFTALT  342
-	#define MAGE_KEYCODE_LEFTSUPER  343
-	#define MAGE_KEYCODE_RIGHTSHIFT 344
-	#define MAGE_KEYCODE_RIGHTCONTROL 345
-	#define MAGE_KEYCODE_RIGHTALT 346
-	#define MAGE_KEYCODE_RIGHTSUPER 347
-#endif
-
-/*! 
-	@brief Gets the mouse's x and y coordinates 
-	@param window A pointer to a instance of a window
-	@param x A pointer to where the x coordinate will be dumped 
-	@param y A pointer to where the x coordinate will be dumped 
-	@return Nothing
-*/
-extern void mageGetMousePosition(mageWindow *window, double *x, double *y);
-/*! 
-	@brief Gets the mouse's x coordinate 
-	@param window A pointer to a instance of a window
-	@param x A pointer to where the x coordinate will be dumped 
-	@return Nothing
-*/
-extern void mageGetMousePositionX(mageWindow *window, double *x);
-/*! 
-	@brief Gets the mouse's y coordinate 
-	@param window A pointer to a instance of a window
-	@param y A pointer to where the y coordinate will be dumped 
-	@return Nothing
-*/
-extern void mageGetMousePositionY(mageWindow *window, double *y);
-/*! 
-	@brief Gets whether the left mouse button is being clicked
-	@param window A pointer to a instance of a window
-	@param state A pointer to whether its true will be dumped 
-	@return Nothing
-*/
-extern void mageGetMouseButtonLeftClick(mageWindow *window, uint8 *state);
-/*! 
-	@brief Gets whether the right mouse button is being clicked
-	@param window A pointer to a instance of a window
-	@param state A pointer to whether its true will be dumped 
-	@return Nothing
-*/
-extern void mageGetMouseButtonRightClick(mageWindow *window, uint8 *state);
-/*! 
-	@brief Gets whether the mouse is inside the window context
-	@param window A pointer to a instance of a window
-	@param state A pointer to whether its true will be dumped 
-	@return Nothing
-*/
-extern void mageGetMouseInsideContext(mageWindow *window, uint8 *state);
-/*! 
-	@brief Sets the mouse x and y to a specific location
-	@param window A pointer to a instance of a window
-	@param x Location the mouses x coordinate will be set at
-	@param y Location the mouses y coordinate will be set at
-	@return Nothing
-*/
-extern void mageSetMousePosition(mageWindow *window, const double x, const double y);
-/*! 
-	@brief Gets whether the key is being pressed down
-	@param window A pointer to a instance of a window
-	@param key A keycode for the key that is being tested
-	@param state A pointer to whether its true will be dumped 
-	@return Nothing
-*/
-extern void mageGetKeyDown(mageWindow *window, const sint32 key, uint8 *state);
-/*! 
-	@brief Gets whether the key is not being pressed down
-	@param window A pointer to a instance of a window
-	@param key A keycode for the key that is being tested
-	@param state A pointer to whether its true will be dumped 
-	@return Nothing
-*/
-extern void mageGetKeyNotDown(mageWindow *window, const sint32 key, uint8 *state);
-
 /*! 
 	@brief Stores 2 floats within the struct
 */
@@ -1109,6 +692,390 @@ extern void mageMatrix4x4Destroy(mageMatrix4x4 *matrix);
 	@param result A pointer to where the result will be dumped
 */
 extern void mageToRadians(const float degrees, float *result);
+/*!
+	@brief Window context used by the engine to render to
+	@brief The window can either use SDL2 or GLFW3 as its framework
+*/
+typedef struct MAGE_WINDOW_STRUCT
+{
+	/*!
+		@brief Width of the window context
+	*/
+	sint32 Width;
+	/*!
+		@brief Height of the window context
+	*/
+	sint32 Height;
+	/*!
+		@brief Title of the window context
+	*/
+	const char *Title;
+	
+	#if defined(MAGE_SDL2)
+		/*!
+			@brief Window context using the SDL2 framework
+		*/
+		SDL_Window *Context;
+		/*!
+			@brief SDL2 event poller context
+		*/
+		SDL_Event Events;
+	#elif defined(MAGE_GLFW)
+		/*! 
+			@brief Window context using the GLFW3 framework
+		*/		
+		GLFWwindow *Context;
+		/*!
+			@brief Renderer used by the application
+		*/
+	#endif
+	
+	/*!
+		@brief A flag whether the window is running
+	*/
+	uint8 Running;	
+} mageWindow;
+
+/*! 
+	@brief Allocates a block of memory for the game window
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/ 
+extern void *mageWindowAllocate();
+/*! 
+	@brief Initialises the game window populating its members
+	@param window A pointer to a instance of a window
+	@param xResolution Width of the window created
+	@param yResolution Height of thw window created
+	@param title Title of the window
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+	@warning The window will not be constructed if the libraries fail to be initialsied
+*/
+extern void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title, uint8 *success);
+/*!
+	@brief Swaps the buffers of the window
+	@param window A pointer to a instance of a window
+	@return Nothing
+*/
+extern void mageWindowSwapBuffers(mageWindow *window);
+/*!
+	@brief Terminates the window API
+	@param window A pointer to a instance of a window
+	@return Nothing
+*/
+extern void mageWindowTerminate(mageWindow *window);
+/*! 
+	@brief Destroys the resizable list freeing itelsf
+	@param window A pointer to a instance of a window
+	@return Nothing
+	@warning If the window not allocated on the heap then do not call this method
+*/
+extern void mageWindowDestroy(mageWindow *window); 
+
+#if defined(MAGE_SDL2)
+    #define MAGE_KEYCODE_SPACE SDLK_SPACE  
+    #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE  
+    #define MAGE_KEYCODE_COMMA SDLK_COMMA   
+    #define MAGE_KEYCODE_MINUS SDLK_MINUS   
+    #define MAGE_KEYCODE_PERIOD SDLK_PERIOD   
+    #define MAGE_KEYCODE_SLASH SDLK_BACKSLASH  
+    #define MAGE_KEYCODE_D0 SDLK_0  
+    #define MAGE_KEYCODE_D1 SDLK_1  
+    #define MAGE_KEYCODE_D2 SDLK_2   
+    #define MAGE_KEYCODE_D3 SDLK_3  
+    #define MAGE_KEYCODE_D4 SDLK_4  
+    #define MAGE_KEYCODE_D5 SDLK_5  
+    #define MAGE_KEYCODE_D6 SDLK_6
+    #define MAGE_KEYCODE_D7 SDLK_7  
+    #define MAGE_KEYCODE_D8 SDLK_8 
+    #define MAGE_KEYCODE_D9 SDLK_9   
+    #define MAGE_KEYCODE_SEMICOLON SDLK_SEMICOLON   
+    #define MAGE_KEYCODE_EQUAL SDLK_EQUALS
+    #define MAGE_KEYCODE_A SDLK_a  
+    #define MAGE_KEYCODE_B SDLK_b
+    #define MAGE_KEYCODE_C SDLK_c
+    #define MAGE_KEYCODE_D SDLK_d
+    #define MAGE_KEYCODE_E SDLK_e
+    #define MAGE_KEYCODE_F SDLK_f
+    #define MAGE_KEYCODE_G SDLK_g
+    #define MAGE_KEYCODE_H SDLK_h 
+    #define MAGE_KEYCODE_I SDLK_i 
+    #define MAGE_KEYCODE_J SDLK_j 
+    #define MAGE_KEYCODE_K SDLK_k 
+    #define MAGE_KEYCODE_L SDLK_l 
+    #define MAGE_KEYCODE_M SDLK_m 
+    #define MAGE_KEYCODE_N SDLK_n 
+    #define MAGE_KEYCODE_O SDLK_o   
+    #define MAGE_KEYCODE_P SDLK_p   
+    #define MAGE_KEYCODE_Q SDLK_q   
+    #define MAGE_KEYCODE_R SDLK_r   
+    #define MAGE_KEYCODE_S SDLK_s   
+    #define MAGE_KEYCODE_T SDLK_t   
+    #define MAGE_KEYCODE_U SDLK_u   
+    #define MAGE_KEYCODE_V SDLK_v   
+    #define MAGE_KEYCODE_W SDLK_w   
+    #define MAGE_KEYCODE_X SDLK_x   
+    #define MAGE_KEYCODE_Y SDLK_y   
+    #define MAGE_KEYCODE_Z SDLK_z   
+    #define MAGE_KEYCODE_LEFTBRACKET SDLK_LEFTBRACKET   
+    #define MAGE_KEYCODE_BACKSLASH SDLK_SLASH
+    #define MAGE_KEYCODE_RIGHTBRAC SDLK_RIGHTBRACKET 
+    #define MAGE_KEYCODE_GRAVEACC SDLK_BACKQUOTE
+    #define MAGE_KEYCODE_ESCAPE SDLK_ESCAPE  
+    #define MAGE_KEYCODE_ENTER SDLK_RETURN  
+    #define MAGE_KEYCODE_TAB SDLK_TAB
+    #define MAGE_KEYCODE_BACKSPACE SDLK_BACKSPACE 
+    #define MAGE_KEYCODE_INSERT SDLK_INSERT  
+    #define MAGE_KEYCODE_DELETE SDLK_DELETE 
+    #define MAGE_KEYCODE_RIGHT SDLK_RIGHT
+    #define MAGE_KEYCODE_LEFT SDLK_LEFT 
+    #define MAGE_KEYCODE_DOWN SDLK_DOWN  
+    #define MAGE_KEYCODE_UP SDLK_UP
+    #define MAGE_KEYCODE_PAGEUP SDLK_PAGEUP
+    #define MAGE_KEYCODE_PAGEDOWN SDLK_PAGEDOWN 
+    #define MAGE_KEYCODE_HOME SDLK_HOME
+    #define MAGE_KEYCODE_END SDLK_END  
+    #define MAGE_KEYCODE_CAPSLOCK SDLK_CAPSLOCK 
+    #define MAGE_KEYCODE_SCROLLLOCK SDLK_SCROLLLOCK  
+    #define MAGE_KEYCODE_NUMLOCK SDLK_NUMLOCKCLEAR 
+    #define MAGE_KEYCODE_PRINTSCREEN SDLK_PRINTSCREEN  
+    #define MAGE_KEYCODE_PAUSE SDLK_PAUSE   
+    #define MAGE_KEYCODE_F1 SDLK_F1
+    #define MAGE_KEYCODE_F2 SDLK_F2
+    #define MAGE_KEYCODE_F3 SDLK_F3
+    #define MAGE_KEYCODE_F4 SDLK_F4 
+    #define MAGE_KEYCODE_F5 SDLK_F5
+    #define MAGE_KEYCODE_F6 SDLK_F6
+    #define MAGE_KEYCODE_F7 SDLK_F7
+    #define MAGE_KEYCODE_F8 SDLK_F8
+    #define MAGE_KEYCODE_F9 SDLK_F9 
+    #define MAGE_KEYCODE_F10 SDLK_F10   
+    #define MAGE_KEYCODE_F11 SDLK_F11
+    #define MAGE_KEYCODE_F12 SDLK_F12  
+    #define MAGE_KEYCODE_F13 SDLK_F13
+    #define MAGE_KEYCODE_F14 SDLK_F14
+    #define MAGE_KEYCODE_F15 SDLK_F15
+    #define MAGE_KEYCODE_F16 SDLK_F16
+    #define MAGE_KEYCODE_F17 SDLK_F17
+    #define MAGE_KEYCODE_F18 SDLK_F18 
+    #define MAGE_KEYCODE_F19 SDLK_F19 
+    #define MAGE_KEYCODE_F20 SDLK_F20   
+    #define MAGE_KEYCODE_F21 SDLK_F21  
+    #define MAGE_KEYCODE_F22 SDLK_F22   
+    #define MAGE_KEYCODE_F23 SDLK_F23  
+    #define MAGE_KEYCODE_F24 SDLK_F24     
+    #define MAGE_KEYCODE_KP0 SDLK_KP_0
+    #define MAGE_KEYCODE_KP1 SDLK_KP_1   
+    #define MAGE_KEYCODE_KP2 SDLK_KP_2  
+    #define MAGE_KEYCODE_KP3 SDLK_KP_3   
+    #define MAGE_KEYCODE_KP4 SDLK_KP_4   
+    #define MAGE_KEYCODE_KP5 SDLK_KP_5   
+    #define MAGE_KEYCODE_KP6 SDLK_KP_6  
+    #define MAGE_KEYCODE_KP7 SDLK_KP_7
+    #define MAGE_KEYCODE_KP8 SDLK_KP_8  
+    #define MAGE_KEYCODE_KP9 SDLK_KP_9   
+    #define MAGE_KEYCODE_KPDECIMAL SDLK_KP_DECIMAL  
+    #define MAGE_KEYCODE_KPDIVIDE SDLK_KP_DIVIDE 
+    #define MAGE_KEYCODE_KPMULTIPLY SDLK_KP_MULTIPLY
+    #define MAGE_KEYCODE_KPSUBTRACT SDLK_KP_MINUS
+    #define MAGE_KEYCODE_KPADD SDLK_KP_PLUS
+    #define MAGE_KEYCODE_KPENTER SDLK_KP_ENTER 
+    #define MAGE_KEYCODE_KPEQUAL SDLK_KP_EQUALS
+    #define MAGE_KEYCODE_LEFTSHIFT SDLK_LSHIFT  
+    #define MAGE_KEYCODE_LEFTCONTROL SDLK_LCTRL   
+    #define MAGE_KEYCODE_LEFTALT SDLK_LALT 
+    #define MAGE_KEYCODE_LEFTSUPER SDLK_LGUI  
+    #define MAGE_KEYCODE_RIGHTSHIFT SDLK_RSHIFT  
+    #define MAGE_KEYCODE_RIGHTCONTROL SDLK_RCTRL 
+    #define MAGE_KEYCODE_RIGHTALT SDLK_RALT
+    #define MAGE_KEYCODE_RIGHTSUPER SDLK_RGUI 
+#elif defined(MAGE_GLFW)
+	#define MAGE_KEYCODE_SPACE  32
+	#define MAGE_KEYCODE_APOSTROPHE  39
+	#define MAGE_KEYCODE_COMMA  44 
+	#define MAGE_KEYCODE_MINUS  45 
+	#define MAGE_KEYCODE_PERIOD  46
+	#define MAGE_KEYCODE_SLASH  47
+	#define MAGE_KEYCODE_D0  48 
+	#define MAGE_KEYCODE_D1  49 
+	#define MAGE_KEYCODE_D2  50 
+	#define MAGE_KEYCODE_D3  51 
+	#define MAGE_KEYCODE_D4  52 
+	#define MAGE_KEYCODE_D5  53 
+	#define MAGE_KEYCODE_D6  54
+	#define MAGE_KEYCODE_D7  55 
+	#define MAGE_KEYCODE_D8  56 
+	#define MAGE_KEYCODE_D9  57 
+	#define MAGE_KEYCODE_SEMICOLON  59 
+	#define MAGE_KEYCODE_EQUAL  61 
+	#define MAGE_KEYCODE_A  65
+	#define MAGE_KEYCODE_B  66
+	#define MAGE_KEYCODE_C  67
+	#define MAGE_KEYCODE_D  68
+	#define MAGE_KEYCODE_E  69
+	#define MAGE_KEYCODE_F  70
+	#define MAGE_KEYCODE_G  71
+	#define MAGE_KEYCODE_H  72
+	#define MAGE_KEYCODE_I  73
+	#define MAGE_KEYCODE_J  74
+	#define MAGE_KEYCODE_K  75
+	#define MAGE_KEYCODE_L  76
+	#define MAGE_KEYCODE_M  77
+	#define MAGE_KEYCODE_N  78
+	#define MAGE_KEYCODE_O  79
+	#define MAGE_KEYCODE_P  80
+	#define MAGE_KEYCODE_Q  81
+	#define MAGE_KEYCODE_R  82
+	#define MAGE_KEYCODE_S  83
+	#define MAGE_KEYCODE_T  84
+	#define MAGE_KEYCODE_U  85
+	#define MAGE_KEYCODE_V  86
+	#define MAGE_KEYCODE_W  87
+	#define MAGE_KEYCODE_X  88
+	#define MAGE_KEYCODE_Y  89
+	#define MAGE_KEYCODE_Z  90
+	#define MAGE_KEYCODE_LEFTBRACKET  91 
+	#define MAGE_KEYCODE_BACKSLASH  92
+	#define MAGE_KEYCODE_RIGHTBRACKET
+	#define MAGE_KEYCODE_GRAVEACCENT
+	#define MAGE_KEYCODE_ESCAPE  256
+	#define MAGE_KEYCODE_ENTER  257
+	#define MAGE_KEYCODE_TAB  258
+	#define MAGE_KEYCODE_BACKSPACE  259
+	#define MAGE_KEYCODE_INSERT 260
+	#define MAGE_KEYCODE_DELETE 261
+	#define MAGE_KEYCODE_RIGHT  262
+	#define MAGE_KEYCODE_LEFT 263
+	#define MAGE_KEYCODE_DOWN 264
+	#define MAGE_KEYCODE_UP 265
+	#define MAGE_KEYCODE_PAGEUP 266
+	#define MAGE_KEYCODE_PAGEDOWN 267
+	#define MAGE_KEYCODE_HOME 268
+	#define MAGE_KEYCODE_END 269
+	#define MAGE_KEYCODE_CAPSLOCK 280
+	#define MAGE_KEYCODE_SCROLLLOCK 281
+	#define MAGE_KEYCODE_NUMLOCK  282
+	#define MAGE_KEYCODE_PRINTSCREEN  283
+	#define MAGE_KEYCODE_PAUSE  284
+	#define MAGE_KEYCODE_F1 290
+	#define MAGE_KEYCODE_F2 291
+	#define MAGE_KEYCODE_F3 292
+	#define MAGE_KEYCODE_F4 293
+	#define MAGE_KEYCODE_F5 294
+	#define MAGE_KEYCODE_F6 295
+	#define MAGE_KEYCODE_F7 296
+	#define MAGE_KEYCODE_F8 297
+	#define MAGE_KEYCODE_F9 298
+	#define MAGE_KEYCODE_F10  299
+	#define MAGE_KEYCODE_F11  300
+	#define MAGE_KEYCODE_F12  301
+	#define MAGE_KEYCODE_F13  302
+	#define MAGE_KEYCODE_F14  303
+	#define MAGE_KEYCODE_F15  304
+	#define MAGE_KEYCODE_F16  305
+	#define MAGE_KEYCODE_F17  306
+	#define MAGE_KEYCODE_F18  307
+	#define MAGE_KEYCODE_F19  308
+	#define MAGE_KEYCODE_F20  309
+	#define MAGE_KEYCODE_F21  310
+	#define MAGE_KEYCODE_F22  311
+	#define MAGE_KEYCODE_F23  312
+	#define MAGE_KEYCODE_F24  313
+	#define MAGE_KEYCODE_KP0  320
+	#define MAGE_KEYCODE_KP1  321
+	#define MAGE_KEYCODE_KP2  322
+	#define MAGE_KEYCODE_KP3  323
+	#define MAGE_KEYCODE_KP4  324
+	#define MAGE_KEYCODE_KP5  325
+	#define MAGE_KEYCODE_KP6  326
+	#define MAGE_KEYCODE_KP7  327
+	#define MAGE_KEYCODE_KP8  328
+	#define MAGE_KEYCODE_KP9  329
+	#define MAGE_KEYCODE_KPDECIMAL  330
+	#define MAGE_KEYCODE_KPDIVIDE 331
+	#define MAGE_KEYCODE_KPMULTIPLY 332
+	#define MAGE_KEYCODE_KPSUBTRACT 333
+	#define MAGE_KEYCODE_KPADD  334
+	#define MAGE_KEYCODE_KPENTER  335
+	#define MAGE_KEYCODE_KPEQUAL  336
+	#define MAGE_KEYCODE_LEFTSHIFT  340
+	#define MAGE_KEYCODE_LEFTCONTROL  341
+	#define MAGE_KEYCODE_LEFTALT  342
+	#define MAGE_KEYCODE_LEFTSUPER  343
+	#define MAGE_KEYCODE_RIGHTSHIFT 344
+	#define MAGE_KEYCODE_RIGHTCONTROL 345
+	#define MAGE_KEYCODE_RIGHTALT 346
+	#define MAGE_KEYCODE_RIGHTSUPER 347
+#endif
+
+/*! 
+	@brief Gets the mouse's x and y coordinates 
+	@param window A pointer to a instance of a window
+	@param x A pointer to where the x coordinate will be dumped 
+	@param y A pointer to where the x coordinate will be dumped 
+	@return Nothing
+*/
+extern void mageGetMousePosition(mageWindow *window, double *x, double *y);
+/*! 
+	@brief Gets the mouse's x coordinate 
+	@param window A pointer to a instance of a window
+	@param x A pointer to where the x coordinate will be dumped 
+	@return Nothing
+*/
+extern void mageGetMousePositionX(mageWindow *window, double *x);
+/*! 
+	@brief Gets the mouse's y coordinate 
+	@param window A pointer to a instance of a window
+	@param y A pointer to where the y coordinate will be dumped 
+	@return Nothing
+*/
+extern void mageGetMousePositionY(mageWindow *window, double *y);
+/*! 
+	@brief Gets whether the left mouse button is being clicked
+	@param window A pointer to a instance of a window
+	@param state A pointer to whether its true will be dumped 
+	@return Nothing
+*/
+extern void mageGetMouseButtonLeftClick(mageWindow *window, uint8 *state);
+/*! 
+	@brief Gets whether the right mouse button is being clicked
+	@param window A pointer to a instance of a window
+	@param state A pointer to whether its true will be dumped 
+	@return Nothing
+*/
+extern void mageGetMouseButtonRightClick(mageWindow *window, uint8 *state);
+/*! 
+	@brief Gets whether the mouse is inside the window context
+	@param window A pointer to a instance of a window
+	@param state A pointer to whether its true will be dumped 
+	@return Nothing
+*/
+extern void mageGetMouseInsideContext(mageWindow *window, uint8 *state);
+/*! 
+	@brief Sets the mouse x and y to a specific location
+	@param window A pointer to a instance of a window
+	@param x Location the mouses x coordinate will be set at
+	@param y Location the mouses y coordinate will be set at
+	@return Nothing
+*/
+extern void mageSetMousePosition(mageWindow *window, const double x, const double y);
+/*! 
+	@brief Gets whether the key is being pressed down
+	@param window A pointer to a instance of a window
+	@param key A keycode for the key that is being tested
+	@param state A pointer to whether its true will be dumped 
+	@return Nothing
+*/
+extern void mageGetKeyDown(mageWindow *window, const sint32 key, uint8 *state);
+/*! 
+	@brief Gets whether the key is not being pressed down
+	@param window A pointer to a instance of a window
+	@param key A keycode for the key that is being tested
+	@param state A pointer to whether its true will be dumped 
+	@return Nothing
+*/
+extern void mageGetKeyNotDown(mageWindow *window, const sint32 key, uint8 *state);
 
 /*!
 	@brief Object that renders and is pushed to the renderer pipeline
@@ -1125,7 +1092,6 @@ typedef struct MAGE_RENDERABLE_STRUCT
 	mageVector3 Position;
 
 } mageRenderable;
-
 /*! 
 	@brief Allocates a block of memory for the renderable
 	@return Void pointer to the block of memory allocated
@@ -1149,147 +1115,38 @@ extern void mageRenderableInitialse(mageRenderable *renderable, mageVector3 scal
 extern void mageRenderableDestroy(mageRenderable *renderable);
 
 /*!
-	@brief Handles the vulkan setup 
+	@brief Hanldes vulkan stuff
 */
 typedef struct MAGE_VULKAN_HANDLER_STRUCT
 {
 	#if defined(MAGE_VULKAN)
-		
-		/*!
-			@brief The count of the GPU's within the system
-		*/
-		uint32 GPUCount;
-		/*!
-			@brief Count of extensions stored
-		*/
-		uint32 InstanceExtensionsCount;
-		/*!
-			@brief Count of GPU extensions stored
-		*/
-		uint32 GPUExtensionsCount;
-		/*!
-			@brief Index of the GPU being used
-		*/
-		uint32 GPUIndex;
-		/*!
-			@brief Index of the family graphics
-		*/
-		uint32 GPUFamilyIndex;
-		/*!
-			@brief The layer count of the instance
-		*/
-		uint32 InstanceLayerCount;
-		/*!
-			@brief The layer count of the instance
-		*/
-		uint32 PhysicalLayerCount;
-		/*!
-			@brief Vulkan instance object
-		*/
-		VkInstance VulkanInstance;
-		/*!
-			@brief Device used by vulkan
-		*/
-		VkDevice VulkanDevice;
-		/*!
-			@brief Instance of a physical device
-		*/
-		VkPhysicalDevice GPU;
-		/*!
-			@brief The properties of the graphics card
-		*/
-		VkPhysicalDeviceProperties GPUProperties;
-		/*!
-			@brief Array of the instance layer properties
-		*/
-		VkLayerProperties *InstanceLayerProperties;
-		/*!
-			@brief Array of the instance layer properties
-		*/
-		VkLayerProperties *PhysicalDeviceLayerProperties;
-		/*!
-			@brief An array of available instance extensions
-		*/
-		char **InstanceExtensions;
-		/*!
-			@brief An array of available device extensions
-		*/
-		char **GPUExtensions;
+
+		VkDevice Device;
+
+		VkPhysicalDevice PhysicalDevice;
+
+		VkInstance Instance;
+
+		uint32 GraphicsFamilyIndex;
 
 	#endif
+
 } mageVulkanHandler;
 
 /*! 
-	@brief Allocates a block of memory for the vulkan handler
+	@brief Allocates a block of memory for the handler
 	@return Void pointer to the block of memory allocated
 	@warning The pointer has not been type casted
-*/ 
+*/
 extern void *mageVulkanHandlerAllocate();
 /*!
-	@brief Initialises vulkan
-	@param vulkanHandler A pointer to a instance of a handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-	@warning If the devices fail the renderer will terminate
-*/
-extern void mageVulkanHandlerInitialise(mageVulkanHandler *vulkanHandler, uint8 *success);
-/*!
-	@brief Gets the valid instance extensions and dumps them into the handlers extension buffer
-	@param vulkanHandler A pointer to a instance of a handler
-	@return Nothing
-*/
-extern void mageVulkanHandlerGetInstanceExtensions(mageVulkanHandler *vulkanHandler);
-/*!
-	@brief Gets the GPU of the computer and sets the physical device  
-	@param vulkanHandler A pointer to a instance of a handler
+	@brief Destroys the renderer freeing itelsf
+	@param handler A pointer to a instance of a vulkan handler
+	@param window A pointer to a instance of a window
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 */
-extern void mageVulkanHandlerGetGPU(mageVulkanHandler *vulkanHandler, uint8 *success);
-/*!
-	@brief Gets GPU extensions
-	@param vulkanHandler A pointer to a instance of a handler
-	@return Nothing
-*/
-extern void mageVulkanHandlerGetGPUExtensions(mageVulkanHandler *vulkanHandler);
-/*!
-	@brief Gets the layer properties of the instance
-	@param vulkanHandler A pointer to a instance of a handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-*/
-extern void mageVulkanHandlerGetLayerProperties(mageVulkanHandler *vulkanHandler, uint8 *success);
-/*!
-	@brief Gets the layer properties of the physical device
-	@param vulkanHandler A pointer to a instance of a handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-*/
-extern void mageVulkanHandlerGetPhysicalLayerProperties(mageVulkanHandler *vulkanHandler, uint8 *success);
-/*!
-	@brief Initialises the physical device
-	@param vulkanHandler A pointer to a instance of a handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-*/
-extern void mageVulkanHandlerGPUInitialise(mageVulkanHandler *vulkanHandler, uint8 *success);
-/*!
-	@brief Initialises the vulkan instance
-	@param vulkanHandler A pointer to a instance of a handler
-	@param applicationInfo The info the application will use to create the instance
-	@param success A pointer where the success of the function will be dumped
-	@warning The instanceCreateInfo->pApplicationInfo must be previously set to to point to the application info
-	@return Nothing
-*/
-extern void mageVulkanHandlerVulkanInstanceInitialise(mageVulkanHandler *vulkanHandler, const VkInstanceCreateInfo instanceInfo, uint8 *success);
-/*!
-	@brief Frees the members without destroying the handler
-	@param vulkanHandler A pointer to a instance of a handler
-	@return Nothing
-	@warning Do not call if handler has not been initialised
-*/
-extern void mageVulkanHandlerFree(mageVulkanHandler *vulkanHandler);
-
+extern void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
 
 
 /*!
@@ -1297,17 +1154,13 @@ extern void mageVulkanHandlerFree(mageVulkanHandler *vulkanHandler);
 */
 typedef struct MAGE_RENDERER_STRUCT
 {
-	/*!
-		@brief Pipline where objects are pushed rendered
-	*/
-	mageResizableList *PipeLine;
-
 	#if defined(MAGE_VULKAN)
+
 		/*!
 			@brief Handler for the vulkan setup
 		*/
-		mageVulkanHandler VulkanHandler;
-
+		mageVulkanHandler Handler;
+	
 	#endif
 
 } mageRenderer;
@@ -1321,10 +1174,11 @@ extern void *mageRendererAllocate();
 /*!
 	@brief Initialises the renderer
 	@param renderer A pointer to a instance of a renderer
+	@param window A pointer to a instance of a window
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 */
-extern void mageRendererInitialise(mageRenderer *renderer, uint8 *success);;
+extern void mageRendererInitialise(mageRenderer *renderer,  mageWindow *window, uint8 *success);
 /*!
 	@brief Destroys the renderer freeing itelsf
 	@param renderer A pointer to a instance of a renderer
