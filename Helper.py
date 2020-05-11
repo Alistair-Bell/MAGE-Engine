@@ -42,7 +42,7 @@ def Main():
                     os.system(Arguments[x][1])                
         
         if found <= 0:
-            print("Argument(s) not recognised %s!", sys.argv[1 : len(sys.argv)])
+            print("Argument(s) not recognised %s!" % (sys.argv[1 : len(sys.argv)]))
             DisplayArguments()
 
 

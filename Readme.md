@@ -20,11 +20,12 @@ Firstly you will need to obtain the source code for mage. To do this clone the g
 
  >`git clone https://github.com/MTECGamesStudio/MAGE-Engine`
 
-Then run the makefile doing.
+Then run the python `Helper.py` script doing.
 
-> `make` or `make install`
+> **linux** `python Helper.py -bd -ca` 
+this builds the client and engine
 
-The engine builds into an executable so edit Source/mageMain.c
+The engine builds into an dynamic library, either link to that or use the Client folder for your project
 
 ## The End Goal
 The goal for MAGE is for a high performance 2D renderer that can be built for 
