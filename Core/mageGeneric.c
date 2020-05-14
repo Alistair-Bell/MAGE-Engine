@@ -7,7 +7,7 @@ void mageFreeMethod(void *item)
 void mageTryDumpSuccess(uint8 contents, uint8 *state)
 {
 	if (state != NULL)
-		*state = contents;
+		memcpy(state, &contents, sizeof(*state));
 		return;	
 }
 void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, const char *file, const char *format, ...)

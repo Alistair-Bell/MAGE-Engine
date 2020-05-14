@@ -56,7 +56,7 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 
-		#if  defined(MAGE_VULKAN)
+		#if defined(MAGE_VULKAN)
 
 
 		#endif
@@ -74,6 +74,10 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 		
 		glfwMakeContextCurrent(window->Context);	
+
+
+
+
 	#endif
 	
 	mageTryDumpSuccess(1, success);

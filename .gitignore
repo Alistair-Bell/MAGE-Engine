@@ -1,4 +1,4 @@
-build
+build/*
 Documentation
 Logs
 .vscode

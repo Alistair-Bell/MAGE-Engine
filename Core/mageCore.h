@@ -18,6 +18,9 @@
 	#include <SDL2/SDL.h>
 #else
 	#define MAGE_GLFW
+	#if defined(MAGE_VULKAN) 
+		#define GLFW_INCLUDE_VULKAN
+	#endif
 	#include <GLFW/glfw3.h>
 #endif
 
@@ -29,10 +32,7 @@
 #include <stdarg.h> 
 #include <math.h>
 
-#if defined(MAGE_VULKAN) && defined(MAGE_GLFW)
-	#define GLFW_INCLUDE_VULKAN
-
-#elif defined(MAGE_SDL2) && defined(MAGE_VULKAN)
+#if defined(MAGE_SDL2) && defined(MAGE_VULKAN)
 	#include <SDL2/SDL_vulkan.h>
 #endif
 

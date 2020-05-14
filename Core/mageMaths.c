@@ -150,12 +150,7 @@ void mageMatrix4x4InitialiseVector4(mageMatrix4x4 *matrix, const mageVector4 *co
 }
 void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8 count)
 {		
-	uint8 i;
 	mageMatrix4x4Default(matrix);
-	for (i = 0; i < count; i++)
-	{
-		matrix->Elements[i] = 0;
-	}
 	memcpy(matrix->Elements, elements, sizeof(float) * count);
 }
 void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal)
@@ -166,7 +161,7 @@ void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal
 	matrix->Elements[2 + 2 * 4] = diagonal;
 	matrix->Elements[3 + 3 * 4] = diagonal;
 }
-void mageMatrix4x4Multiply(mageMatrix4x4 *left, const mageMatrix4x4 *right)
+void mageMatrix4x4Multiply(const mageMatrix4x4 *left, const mageMatrix4x4 *right, mageMatrix4x4 *result)
 {
 	uint8 row, col, e;
 	float data[16];
@@ -182,7 +177,7 @@ void mageMatrix4x4Multiply(mageMatrix4x4 *left, const mageMatrix4x4 *right)
 			data[col + row * 4] = sum;
 		}
 	}
-	memcpy(left->Elements, data, 16 * sizeof(float));
+	memcpy(result->Elements, data, 16 * sizeof(float));
 }
 void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, const float aspectRatio, const float near, const float far)
 {
@@ -203,7 +198,7 @@ void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, const floa
 	result.Elements[3 + 2 * 4] = -1.0f;
 	result.Elements[2 + 3 * 4] = c;
 	
-	memcpy(matrix, &result, sizeof(struct MAGE_MATRIX4X4));
+	memcpy(matrix->Elements, result.Elements, sizeof(float) * 16);
 }
 void mageMatrix4x4Orthographic(mageMatrix4x4 *matrix, const float left, const float right, const float bottom, const float top, const float near, const float far)
 {
@@ -218,7 +213,7 @@ void mageMatrix4x4Orthographic(mageMatrix4x4 *matrix, const float left, const fl
 	result.Elements[1 + 3 * 4] = 2.0f / (bottom + top) / (bottom - top);
 	result.Elements[2 + 3 * 4] = 2.0f / (far + near) / (far - near);
 
-	memcpy(matrix, &result, sizeof(struct MAGE_MATRIX4X4));
+	memcpy(matrix->Elements, result.Elements, sizeof(float) * 16);
 }
 void mageMatrix4x4Translation(mageMatrix4x4 *matrix, const mageVector3 *translation)
 {
@@ -228,7 +223,7 @@ void mageMatrix4x4Translation(mageMatrix4x4 *matrix, const mageVector3 *translat
 	result.Elements[0 + 3 * 4] = translation->x;
 	result.Elements[1 + 3 * 4] = translation->y;
 	result.Elements[2 + 3 * 4] = translation->z;
-	memcpy(matrix, &result, sizeof(struct MAGE_MATRIX4X4));
+	memcpy(matrix->Elements, result.Elements, sizeof(float) * 16);
 }
 void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, const mageVector3 *axis)
 {
@@ -258,7 +253,7 @@ void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, const mageV
 	result.Elements[2 + 1 * 4] = y * z * omc - x * s;
 	result.Elements[2 + 2 * 4] = z * z * omc + c;
 	
-	memcpy(matrix, &result, sizeof(struct MAGE_MATRIX4X4));
+	memcpy(matrix->Elements, result.Elements, sizeof(float) * 16);
 }
 void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale)
 {
@@ -270,6 +265,136 @@ void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale)
 	result.Elements[2 + 2 * 4] = scale->z;
 	memcpy(matrix, &result, sizeof(struct MAGE_MATRIX4X4));
 }
+void mageMatrix4x4Invert(mageMatrix4x4 *matrix)
+{
+	register float foo[16];
+	register mageMatrix4x4 bar;
+
+
+	foo[0] = bar.Elements[5] * bar.Elements[10] * bar.Elements[15] -
+		bar.Elements[5] * bar.Elements[11] * bar.Elements[14] -
+		bar.Elements[9] * bar.Elements[6] * bar.Elements[15] +
+		bar.Elements[9] * bar.Elements[7] * bar.Elements[14] +
+		bar.Elements[13] * bar.Elements[6] * bar.Elements[11] -
+		bar.Elements[13] * bar.Elements[7] * bar.Elements[10];
+
+	foo[4] = -bar.Elements[4] * bar.Elements[10] * bar.Elements[15] +
+		bar.Elements[4] * bar.Elements[11] * bar.Elements[14] +
+		bar.Elements[8] * bar.Elements[6] * bar.Elements[15] -
+		bar.Elements[8] * bar.Elements[7] * bar.Elements[14] -
+		bar.Elements[12] * bar.Elements[6] * bar.Elements[11] +
+		bar.Elements[12] * bar.Elements[7] * bar.Elements[10];
+
+	foo[8] = bar.Elements[4] * bar.Elements[9] * bar.Elements[15] -
+		bar.Elements[4] * bar.Elements[11] * bar.Elements[13] -
+		bar.Elements[8] * bar.Elements[5] * bar.Elements[15] +
+		bar.Elements[8] * bar.Elements[7] * bar.Elements[13] +
+		bar.Elements[12] * bar.Elements[5] * bar.Elements[11] -
+		bar.Elements[12] * bar.Elements[7] * bar.Elements[9];
+
+	foo[12] = -bar.Elements[4] * bar.Elements[9] * bar.Elements[14] +
+		bar.Elements[4] * bar.Elements[10] * bar.Elements[13] +
+		bar.Elements[8] * bar.Elements[5] * bar.Elements[14] -
+		bar.Elements[8] * bar.Elements[6] * bar.Elements[13] -
+		bar.Elements[12] * bar.Elements[5] * bar.Elements[10] +
+		bar.Elements[12] * bar.Elements[6] * bar.Elements[9];
+
+	foo[1] = -bar.Elements[1] * bar.Elements[10] * bar.Elements[15] +
+		bar.Elements[1] * bar.Elements[11] * bar.Elements[14] +
+		bar.Elements[9] * bar.Elements[2] * bar.Elements[15] -
+		bar.Elements[9] * bar.Elements[3] * bar.Elements[14] -
+		bar.Elements[13] * bar.Elements[2] * bar.Elements[11] +
+		bar.Elements[13] * bar.Elements[3] * bar.Elements[10];
+
+	foo[5] = bar.Elements[0] * bar.Elements[10] * bar.Elements[15] -
+		bar.Elements[0] * bar.Elements[11] * bar.Elements[14] -
+		bar.Elements[8] * bar.Elements[2] * bar.Elements[15] +
+		bar.Elements[8] * bar.Elements[3] * bar.Elements[14] +
+		bar.Elements[12] * bar.Elements[2] * bar.Elements[11] -
+		bar.Elements[12] * bar.Elements[3] * bar.Elements[10];
+
+	foo[9] = -bar.Elements[0] * bar.Elements[9] * bar.Elements[15] +
+		bar.Elements[0] * bar.Elements[11] * bar.Elements[13] +
+		bar.Elements[8] * bar.Elements[1] * bar.Elements[15] -
+		bar.Elements[8] * bar.Elements[3] * bar.Elements[13] -
+		bar.Elements[12] * bar.Elements[1] * bar.Elements[11] +
+		bar.Elements[12] * bar.Elements[3] * bar.Elements[9];
+
+	foo[13] = bar.Elements[0] * bar.Elements[9] * bar.Elements[14] -
+		bar.Elements[0] * bar.Elements[10] * bar.Elements[13] -
+		bar.Elements[8] * bar.Elements[1] * bar.Elements[14] +
+		bar.Elements[8] * bar.Elements[2] * bar.Elements[13] +
+		bar.Elements[12] * bar.Elements[1] * bar.Elements[10] -
+		bar.Elements[12] * bar.Elements[2] * bar.Elements[9];
+
+	foo[2] = bar.Elements[1] * bar.Elements[6] * bar.Elements[15] -
+		bar.Elements[1] * bar.Elements[7] * bar.Elements[14] -
+		bar.Elements[5] * bar.Elements[2] * bar.Elements[15] +
+		bar.Elements[5] * bar.Elements[3] * bar.Elements[14] +
+		bar.Elements[13] * bar.Elements[2] * bar.Elements[7] -
+		bar.Elements[13] * bar.Elements[3] * bar.Elements[6];
+
+	foo[6] = -bar.Elements[0] * bar.Elements[6] * bar.Elements[15] +
+		bar.Elements[0] * bar.Elements[7] * bar.Elements[14] +
+		bar.Elements[4] * bar.Elements[2] * bar.Elements[15] -
+		bar.Elements[4] * bar.Elements[3] * bar.Elements[14] -
+		bar.Elements[12] * bar.Elements[2] * bar.Elements[7] +
+		bar.Elements[12] * bar.Elements[3] * bar.Elements[6];
+
+	foo[10] = bar.Elements[0] * bar.Elements[5] * bar.Elements[15] -
+		bar.Elements[0] * bar.Elements[7] * bar.Elements[13] -
+		bar.Elements[4] * bar.Elements[1] * bar.Elements[15] +
+		bar.Elements[4] * bar.Elements[3] * bar.Elements[13] +
+		bar.Elements[12] * bar.Elements[1] * bar.Elements[7] -
+		bar.Elements[12] * bar.Elements[3] * bar.Elements[5];
+
+	foo[14] = -bar.Elements[0] * bar.Elements[5] * bar.Elements[14] +
+		bar.Elements[0] * bar.Elements[6] * bar.Elements[13] +
+		bar.Elements[4] * bar.Elements[1] * bar.Elements[14] -
+		bar.Elements[4] * bar.Elements[2] * bar.Elements[13] -
+		bar.Elements[12] * bar.Elements[1] * bar.Elements[6] +
+		bar.Elements[12] * bar.Elements[2] * bar.Elements[5];
+
+	foo[3] = -bar.Elements[1] * bar.Elements[6] * bar.Elements[11] +
+		bar.Elements[1] * bar.Elements[7] * bar.Elements[10] +
+		bar.Elements[5] * bar.Elements[2] * bar.Elements[11] -
+		bar.Elements[5] * bar.Elements[3] * bar.Elements[10] -
+		bar.Elements[9] * bar.Elements[2] * bar.Elements[7] +
+		bar.Elements[9] * bar.Elements[3] * bar.Elements[6];
+
+	foo[7] = bar.Elements[0] * bar.Elements[6] * bar.Elements[11] -
+		bar.Elements[0] * bar.Elements[7] * bar.Elements[10] -
+		bar.Elements[4] * bar.Elements[2] * bar.Elements[11] +
+		bar.Elements[4] * bar.Elements[3] * bar.Elements[10] +
+		bar.Elements[8] * bar.Elements[2] * bar.Elements[7] -
+		bar.Elements[8] * bar.Elements[3] * bar.Elements[6];
+
+	foo[11] = -bar.Elements[0] * bar.Elements[5] * bar.Elements[11] +
+		bar.Elements[0] * bar.Elements[7] * bar.Elements[9] +
+		bar.Elements[4] * bar.Elements[1] * bar.Elements[11] -
+		bar.Elements[4] * bar.Elements[3] * bar.Elements[9] -
+		bar.Elements[8] * bar.Elements[1] * bar.Elements[7] +
+		bar.Elements[8] * bar.Elements[3] * bar.Elements[5];
+
+	foo[15] = bar.Elements[0] * bar.Elements[5] * bar.Elements[10] -
+		bar.Elements[0] * bar.Elements[6] * bar.Elements[9] -
+		bar.Elements[4] * bar.Elements[1] * bar.Elements[10] +
+		bar.Elements[4] * bar.Elements[2] * bar.Elements[9] +
+		bar.Elements[8] * bar.Elements[1] * bar.Elements[6] -
+		bar.Elements[8] * bar.Elements[2] * bar.Elements[5];
+
+	float determinant = bar.Elements[0] * foo[0] + bar.Elements[1] * foo[4] + bar.Elements[2] * foo[8] + bar.Elements[3] * foo[12];
+	determinant = 1.0f / determinant;
+
+	uint8 i;
+
+	for (i = 0; i < 16; i++)
+		bar.Elements[i] = foo[i] * determinant;
+
+	memcpy(matrix->Elements, bar.Elements, sizeof(float) * 16);
+}
+
+
 void mageMatrix4x4Destroy(mageMatrix4x4 *matrix)
 {
 	mageFreeMethod(matrix);

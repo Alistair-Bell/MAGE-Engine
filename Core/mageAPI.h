@@ -3,13 +3,13 @@
 
 #include "mageCore.h"
 
-typedef char sint8;
+typedef signed char sint8;
 typedef unsigned char uint8;
-typedef short sint16;
+typedef signed short sint16;
 typedef unsigned short uint16;
-typedef int sint32;
+typedef signed int sint32;
 typedef unsigned int uint32;
-typedef long sint64;
+typedef signed long sint64;
 typedef unsigned long uint64;
 
 #ifdef MAGE_PERCISE_FLOATS
@@ -80,7 +80,6 @@ extern void mageLogReset();
 	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...)
 
 #endif
-
 
 
 /*!
@@ -414,7 +413,6 @@ extern void mageVector2Divide(mageVector2 *left, const mageVector2 *right);
 */
 extern void mageVector2Destroy(mageVector2 *vector);
 
-
 /*! 
 	@brief Stores 3 floats within the struct
 */
@@ -628,11 +626,12 @@ extern void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *ele
 extern void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal);
 /*!
 `	@brief Multiplies the left matrix by the right matrix
-	@param left A pointer to a instance of a matrix which will be modified
-	@param right A pointer to a instance of a matrix which will divide the left
+	@param left The left matrix
+	@param right The right matrix
+	@param result The result where the calculation will be dumped
 	@return Nothing
 */
-extern void mageMatrix4x4Multiply(mageMatrix4x4 *left, const mageMatrix4x4 *right);
+extern void mageMatrix4x4Multiply(const mageMatrix4x4 *left, const mageMatrix4x4 *right, mageMatrix4x4 *result);
 /*!
 	@brief Applies a perspective matrix to the matrix
 	@param matrix A pointer to a instance of a matrix
@@ -679,6 +678,12 @@ extern void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, cons
 	@return Nothing
 */
 extern void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale);
+/*!
+	@brief Inverts using matrix maths
+	@param matrix A pointer to a instance of a matrix
+	@return Nothing
+*/
+extern void mageMatrix4x4Invert(mageMatrix4x4 *matrix);
 /*!
 	@brief Destroys the matrix freeing itelsf
 	@param matrix A pointer to a instance of a matrix
@@ -734,6 +739,7 @@ typedef struct MAGE_WINDOW_STRUCT
 		@brief A flag whether the window is running
 	*/
 	uint8 Running;	
+
 } mageWindow;
 
 /*! 
@@ -1187,12 +1193,165 @@ extern void mageRendererInitialise(mageRenderer *renderer,  mageWindow *window, 
 */
 extern void mageRendererDestroy(mageRenderer *renderer);
 
+/*!
+	@brief The bit of the type of the camera (0 = orthographic | 1 = perspective)
+*/
+#define MAGE_CAMERA_BIT_TYPE 0
+/*!
+	@brief The bit whether the camera is the master one (0 = extra camera | 1 = main camera)
+*/
+#define MAGE_CAMERA_BIT_MASTER 1
+/*!
+	@brief The bit whether it is static in the x axis (0 = not fixed | 1 = fixed)
+*/
+#define MAGE_CAMERA_BIT_STATIC_X 2
+/*!
+	@brief The bit whether it is static in the y axis (0 = not fixed | 1 = fixed)
+*/
+#define MAGE_CAMERA_BIT_STATIC_Y 3
+/*!
+	@brief The bit whether it is static in the z axis (0 = not fixed | 1 = fixed)
+*/
+#define MAGE_CAMERA_BIT_STATIC_Z 4
+/*!
+	@brief The bit whether it is staticly fixed in the rotation (0 = not fixed | 1 = fixed)
+*/
+#define MAGE_CAMERA_BIT_STATIC_ROTATION 5
+/*!
+	@brief The bit whether the override method is being used (0 = defualt | 1 = overriden)
+*/
+#define MAGE_CAMERA_BIT_UPDATE_OVERRIDE 6
+/*!
+	@brief The bit whether the camera is on (0 = off | 1 = on)
+*/
+#define MAGE_CAMERA_BIT_TOGGLE 7
+
+/*!
+	@brief Camera used for the scene
+*/
+typedef struct MAGE_CAMERA_STRUCT
+{
+	/*!
+		@brief The flags of the camera
+	*/
+	uint8 Flags;
+	/*!
+		@brief The position within the world
+	 */
+	mageVector3 Position;
+	/*!
+		@brief The projection matrix of the camera 
+	*/
+	mageMatrix4x4 ProjectionMatrix;
+	/*!
+		@brief The view matrix of the camera 
+	*/
+	mageMatrix4x4 ViewMatrix;
+	/*!
+		@brief The view projection matrix of the camera 
+	*/
+	mageMatrix4x4 ViewProjectionMatrix;
+	/*!
+		@brief Rotation the camera is at
+	*/
+	float Rotation;
+
+} mageCamera;
+
+/*! 
+	@brief Allocates a block of memory for the camera
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/ 
+extern void *mageCameraAllocate();
+/*!
+	@brief Initialises the camera for use
+	@param camera A pointer to a instance of a camera
+	@param position The position within the world
+	@param rotation Rotation of the camera
+	@param flags The flags 
+*/
+extern void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8 flags);
+/*! 
+	@brief Calculates the projection for the matrix
+	@param camera A pointer to a instance of a camera
+	@param left Left value used for the view calculations
+	@param right Right value used for the view calculations
+	@param bottom Bottom value used for the view calculations
+	@param top Top value used for the view calculations
+	@return Nothing
+*/ 
+extern void mageCameraOrthographicSetProjection(mageCamera *camera, const float left, const float right, const float bottom, const float top);
+/*!
+	@brief recalculates the projection for the matrix
+	@param camera A pointer to a instance of a camera
+	@return Nothing
+*/
+extern void mageCameraOrthographicRecalculateViewMatrix(mageCamera *camera);
+/*!
+	@brief Gets the value of the bit using the index provided
+	@param camera A pointer to a instance of a camera
+	@param bit The index of the bit being retrieved
+	@param value Where the value of the bit will be dumped
+	@return Nothing
+	@warning Passing in an invalid bit will cause a possible wrong result
+*/
+extern void mageCameraGetFlag(mageCamera *camera, const uint8 bit, uint8 *value);
+/*!
+	@brief Sets the camera flag using the index provided
+	@param camera A pointer to a instance of a camera
+	@param bit The index of the bit being retrieved
+	@param value Where the value of the bit will be dumped
+	@return Nothing
+	@warning Passing in an invalid bit will still cause a bit to be changed
+	@warning Passing in a number greater that 1 through value will cause errors
+*/
+extern void mageCameraSetFlag(mageCamera *camera, const uint8 bit, uint8 value);
+
+/*!
+	@brief Scene stores all objects cameras and renderers
+*/
+typedef struct MAGE_SCENE_STRUCT
+{
+	/*!
+		@brief The cameras used in the scene
+	*/	
+	mageResizableList *Cameras;
+	/*!
+		@brief Pointer to the main camera of the scene
+	*/
+	mageCamera *MasterCamera;
 
 
+} mageScene;
 
-
-
-
+/*! 
+	@brief Allocates a block of memory for the scene
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+*/ 
+extern void *mageSceneAllocate();
+/*!
+	@brief Initialises the scene
+	@param scene A pointer to a instance of a scene
+	@return Nothing
+*/
+extern void mageSceneInitialise(mageScene *scene);
+/*!
+	@brief Binds the master camera to the scene
+	@param scene A pointer to a instance of a scene
+	@param camera A pointer to a instance of a camera
+	@return Nothing
+*/
+extern void mageSceneBindMasterCamera(mageScene *scene, mageCamera *camera);
+/*!
+	@brief Adds a camera to the scene
+	@param scene A pointer to a instance of a scene
+	@param cameras A pointer to an array of instances of a camera
+	@param count The count of cameras to push
+	@return Nothing
+*/
+extern void mageScenePushCameras(mageScene *scene, mageCamera **cameras);
 
 #endif
 

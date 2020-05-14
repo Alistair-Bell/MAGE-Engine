@@ -5,8 +5,8 @@ LD_FLAGS = -shared
 BF_DIR = build
 LIB_DIR = $(BF_DIR)/lib
 OBJ_DIR = $(BF_DIR)/obj/Core
-TARGET = libmage.a
-OBJS = mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o 
+TARGET = libmageCore.a
+OBJS = mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageScene.o
 
 .PHONY: all
 all: $(TARGET)
@@ -29,6 +29,9 @@ mageGeneric.o: Core/mageAPI.h Core/mageGeneric.c
 
 mageRenderer.o: Core/mageAPI.h Core/mageRenderer.c
 	$(CMP) $(CST) $(FLAGS) -c Core/mageRenderer.c -o $(OBJ_DIR)/mageRenderer.o
-	
+
+mageScene.o: Core/mageAPI.h Core/mageScene.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageScene.c -o $(OBJ_DIR)/mageScene.o
+
 clean:
-	rm $(OBJ_DIR)/*.o && rm $(LIB_DIR)/*.so
+	rm $(OBJ_DIR)/*.o && rm $(LIB_DIR)/*.a
