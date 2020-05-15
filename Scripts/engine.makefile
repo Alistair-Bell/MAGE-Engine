@@ -1,6 +1,6 @@
 CMP = clang
 CST = -std=c89
-FLAGS = -Wall -Werror -O3 -fPIC
+FLAGS = -g -Wall -Werror -O3 -fPIC
 LD_FLAGS = -shared
 BF_DIR = build
 LIB_DIR = $(BF_DIR)/lib
