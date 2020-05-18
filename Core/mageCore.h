@@ -1,10 +1,7 @@
 #ifndef __MAGE_CORE__
 #define __MAGE_CORE__
 
-#define MAGE_VULKAN
-#define MAGE_DEBUG
-
-#if defined(MAGE_DIRECTX)
+#if defined (MAGE_DIRECTX)
 	/*!************************ 
 		Includes the directx api headers and related extensions 
 	**************************/
@@ -17,23 +14,178 @@
 #endif
 
 /*!************************
-	Allows for support on platforms without glfw (switch?) 
+	Allows for support on platforms without glfw 
 **************************/
 
-#if defined(MAGE_SDL2)
+#if defined (MAGE_SDL2)
 	#include <SDL2/SDL.h>
 
-	#if defined(MAGE_VULKAN) 
+	#if defined (MAGE_VULKAN) 
 		#include <SDL2/SDL_vulkan.h>
 	#endif
 
 #else
 	#define MAGE_GLFW
-	#if defined(MAGE_VULKAN) 
+	#if defined (MAGE_VULKAN) 
 		#define GLFW_INCLUDE_VULKAN
 	#endif
 	#include <GLFW/glfw3.h>
 #endif
+
+
+/*!************************
+	Platform checking 
+**************************/
+
+
+/*!************************
+	Checking if using linux platforms 
+**************************/
+#if defined (__linux__)
+	#define MAGE_PLATFORM_LINUX
+	
+	/*!************************
+		Checking if it is android linux as android uses the linux kernel
+	**************************/
+	#if defined (__ANDROID__)
+		#undef MAGE_PLATFORM_LINUX
+		#define MAGE_PLATFORM_ANDROID_LINUX
+	#endif
+
+/*!************************
+	Checking if using one of the apple platforms
+**************************/
+#elif defined (__APPLE__)
+	#include <TargetConditionals.h>
+
+	#if TARGET_OS_IPHONE == 1
+		/*!************************
+			Identified the platform as the mobile IOS platform
+		**************************/
+		#define MAGE_PLATFORM_IOS
+	#elif TARGET_OS_MAC == 1
+		/*!************************
+			Identified the platform as the desktop MACOS
+		**************************/
+		#define MAGE_PLATFORM_MACOS
+	#else
+		#error "Unknown Apple platform!"
+	#endif
+
+/*!************************
+	Checking if using a windows platform 
+**************************/
+#elif defined(_WIN32) 
+	#define MAGE_PLATFORM_WINDOWS_32
+	
+	/*!************************
+		Checking if using a 64 bit windows as _WIN32 flags for either 32 or 64 bit systems
+	**************************/
+	#if defined(_WIN64)
+		#undef MAGE_PLATFORM_WINDOWS_32
+		#define MAGE_PLATFORM_WINDOWS_64
+	#endif
+
+	/*!************************
+		Including the native windows API
+	**************************/
+	#include <Windows.h>
+
+#else
+	#error "Undefined platform MAGE currently supports Windows, Apple OS's and Linux"
+#endif 
+
+
+/*!************************
+	Compiler checking 
+**************************/
+
+
+/*!************************
+	Checking if the microsoft visual studio compiler is being used
+**************************/
+#if defined(_MSC_VER)
+	#define MAGE_COMPILER_MVS
+
+/*!************************
+	Checking if using the gcc or gcc for c++ compiler
+**************************/
+#elif defined(__GNUC__)	|| defined(__GNUG__)
+	#define MAGE_COMPILER_GCC
+	
+/*!************************
+	Checking if using the clang compiler 
+**************************/
+#elif defined(__clang__)
+	#define MAGE_COMPILER_CLANG
+
+/*!************************
+	Checking if mingw compiler 
+**************************/
+#elif defined(__MINGW32__)
+	#define MAGE_COMPILER_MINGW_32
+
+	/*!************************
+		Checking if using a 64 bit compiler as the 32 flag is still flagged
+	**************************/
+	#if defined(__MINGW64__)
+		#undef MAGE_COMPILER_MINGW_32
+		#define MAGE_COMPILER_MINGW_64
+	#endif
+#endif
+
+
+/*!************************
+	DLL building check
+**************************/
+
+
+/*!************************
+	Checking if exporting DLL
+**************************/
+#if defined(MAGE_PLATFORM_WINDOWS_32) || defined(MAGE_PLATFORM_WINDOWS_64)
+
+	#if defined(MAGE_CORE)
+		
+		/*!************************
+			If its the core then it will be exporting to the dll 
+		**************************/
+		#define MAGE_API __declspec(dllexport)
+	#else
+		
+		/*!************************
+			If its the core then it will be importing the dll 
+		**************************/
+		#define MAGE_API __declspec(dllimport)
+	#endif
+#else
+	/*!************************
+		Prefix used to for core methods and stuff for dll export use
+	**************************/
+	#define MAGE_API
+#endif
+
+
+
+
+/*!************************
+	@brief Using vulkan rendering mode
+**************************/
+#define MAGE_VULKAN
+/*!************************
+	@brief Using a debug mode with logging
+**************************/
+#define MAGE_DEBUG
+/*!************************
+	@brief Core to say this is being called from the core library so do dll export
+**************************/
+#define MAGE_CORE
+
+
+
+/*!************************
+	C standard includes 
+**************************/
 
 #include <assert.h>
 #include <stdlib.h>
@@ -43,6 +195,7 @@
 #include <stdarg.h> 
 #include <math.h>
 #include <time.h>
+#include <signal.h> 
 
 
 
@@ -71,18 +224,27 @@
 **************************/
 #define MAGE_LOG_USER_CLIENT 1
 
-#if defined(MAGE_DEBUG)
+#if defined (MAGE_DEBUG)
+
+	#define MAGE_VALIDATION_LAYERS 1
+
+	#if defined(MAGE_COMPILER_MVS)
+		#define MAGE_DEBUG_BREAK __debugbreak()
+	#elif defined(MAGE_PLATFORM_LINUX)
+		#define MAGE_DEBUG_BREAK raise(SIGABRT)
+	#else
+		#define MAGE_DEBUG_BREAK
+	#endif
+
 	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__); MAGE_DEBUG_BREAK
 	
 	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, __LINE__, __FILE__, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__)
-
-	#define MAGE_VALIDATION_LAYERS 1
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FILE__, x, __VA_ARGS__); MAGE_DEBUG_BREAK
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
@@ -92,12 +254,11 @@
 	#define MAGE_LOG_CLIENT_WARNING(x, ...)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...)
 	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...)
-
 	#define MAGE_VALIDATION_LAYERS 0
-
+	#define MAGE_DEBUG_BREAK
 #endif
 
-#if defined(MAGE_SDL2)
+#if defined (MAGE_SDL2)
     #define MAGE_KEYCODE_SPACE SDLK_SPACE  
     #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE  
     #define MAGE_KEYCODE_COMMA SDLK_COMMA   
@@ -333,6 +494,7 @@
 	#define MAGE_KEYCODE_RIGHTSUPER 347
 #endif
 
+
 /*!************************
 	@brief Event type none
 **************************/
@@ -417,23 +579,6 @@
 	@brief Event catagory mouse
 **************************/
 #define MAGE_EVENT_CATAGORY_MOUSE 7
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /*!************************
 	@brief The bit of the type of the camera (0 = orthographic | 1 = perspective)
 **************************/

@@ -87,16 +87,18 @@ void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, c
     vsprintf(str, format, args);
 	va_end(args);
 
-	char *bar = malloc(128);
-	sprintf(bar, "[Log %s %s][%s : %d] : %s", userString, modeString, file, line, str);
+	char bar[128];
+	sprintf(bar, "[Log %s %s][%s : %d]", userString, modeString, file, line);
+
 
 	printf("%s", bar);
-	mageFileDumpContents("Logs/mage.log", bar, 0, NULL); 
+	printf(" %s", str);
 
-	mageFreeMethod(bar);
+	mageFileDumpContents("Logs/mage.log", bar, 0, NULL); 
 }
 void mageLogReset()
 {
+	
 	printf("%s", "\x1b[0m");
 }
 

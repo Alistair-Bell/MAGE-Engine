@@ -1,15 +1,13 @@
 #include "../Core/mageAPI.h"
 
-mageApplication app;
-mageApplicationProps props;
-
-#define LOG(...) printf(__VA_ARGS__)
-
+static mageApplication app;
+static mageApplicationProps props;
+static uint8 flag;
 
 int main(int32 argc, char **args)
 {   
-    mageEngineInitialise(NULL);
-
+    mageEngineInitialise(&flag);
+    
     props.Height = 720;
     props.Width = 1080;
     props.Name = "Hello World";
