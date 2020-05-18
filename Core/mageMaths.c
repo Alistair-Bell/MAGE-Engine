@@ -267,9 +267,10 @@ void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale)
 }
 void mageMatrix4x4Invert(mageMatrix4x4 *matrix)
 {
-	register float foo[16];
-	register mageMatrix4x4 bar;
+	float foo[16];
+	mageMatrix4x4 bar;
 
+	mageMatrix4x4Default(&bar);
 
 	foo[0] = bar.Elements[5] * bar.Elements[10] * bar.Elements[15] -
 		bar.Elements[5] * bar.Elements[11] * bar.Elements[14] -

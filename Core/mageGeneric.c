@@ -1,5 +1,47 @@
 #include "mageAPI.h"
 
+void mageEngineInitialise(uint8 *success)
+{
+	#if defined(MAGE_DEBUG)
+		mageFileDumpContents("Logs/mage.log", "", 1, NULL);
+		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
+	#endif
+
+	#if defined(MAGE_SDL2)
+		const uint32 flag = SDL_Init(SDL_INIT_EVERYTHING);
+			
+		if (flag != 0)
+		{
+			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s.\n", SDL_GetError());
+			mageTryDumpSuccess(0, success);
+			return;
+		}
+
+		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything.\n", NULL);
+
+	#endif
+
+	#if defined(MAGE_GLFW)
+
+		if (!glfwInit())
+		{
+			mageTryDumpSuccess(0, success);
+			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
+			return;
+		}	
+
+		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
+
+	#endif
+	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
+
+
+}
+
+void *mageAllocationMethod(const uint64 size)
+{
+	return malloc(size);
+}
 void mageFreeMethod(void *item)
 {
 	free(item);
@@ -215,12 +257,13 @@ void mageFileReadContents(const char *file, char *buffer, const uint8 reallocata
 void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success)
 {
 	FILE *f;
+	
 	switch(clean)
 	{
 		case 1:
 			f = fopen(file, "w");
 		default:
-			f = fopen(file, "w+");
+			f = fopen(file, "a");
 	}
 	if (f == NULL)
 	{

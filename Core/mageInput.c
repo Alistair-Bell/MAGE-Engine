@@ -53,7 +53,7 @@ void mageGetMouseButtonRightClick(mageWindow *window, uint8 *state)
 }
 void mageGetMouseInsideContext(mageWindow *window, uint8 *state)
 {
-	sint32 is;
+	int32 is;
 	#if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
@@ -70,7 +70,7 @@ void mageSetMousePosition(mageWindow *window, const double x, const double y)
 		glfwSetCursorPos(window->Context, x, y);
 	#endif
 }
-void mageGetKeyDown(mageWindow *window, const sint32 key, uint8 *state)
+void mageGetKeyDown(mageWindow *window, const int32 key, uint8 *state)
 {
 	uint32 value;
 	uint8 is;
@@ -84,7 +84,7 @@ void mageGetKeyDown(mageWindow *window, const sint32 key, uint8 *state)
 	
 	mageTryDumpSuccess(is, state);
 }
-void mageGetKeyNotDown(mageWindow *window, const sint32 key, uint8 *state)
+void mageGetKeyNotDown(mageWindow *window, const int32 key, uint8 *state)
 {
 	uint32 value;
 	uint8 is;

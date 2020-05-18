@@ -5,7 +5,7 @@ void *mageWindowAllocate()
 {
 	return malloc(sizeof(struct MAGE_WINDOW_STRUCT));
 }
-void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const sint32 yResolution, const char *title, uint8 *success)
+void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int32 yResolution, const char *title, uint8 *success)
 {
 
 	window->Height = yResolution;
@@ -43,13 +43,6 @@ void mageWindowInitialise(mageWindow *window, const sint32 xResolution, const si
 	#elif defined(MAGE_GLFW)
 		
 		MAGE_LOG_CORE_INFORM("Using GLFW as window mode\n", NULL);
-
-		if (!glfwInit())
-		{
-			mageTryDumpSuccess(0, success);
-			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
-			return;
-		}	
 		
 		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     	

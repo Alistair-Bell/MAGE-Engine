@@ -8,6 +8,7 @@ void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window,
 {
     #if defined(MAGE_VULKAN)
         {
+        
             /*
                 Creating instance
             */
@@ -24,10 +25,9 @@ void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window,
             createInformation.pNext = NULL;
             createInformation.flags = 0;
             createInformation.pApplicationInfo = &applicationInformation;
-            createInformation.enabledExtensionCount = 0;
+            createInformation.enabledExtensionCount = 1;
             createInformation.enabledLayerCount = 0;
             createInformation.ppEnabledLayerNames = NULL;
-            
             
             #if defined(MAGE_GLFW)
 
@@ -66,7 +66,7 @@ void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window,
             VkPhysicalDevice *devices = calloc(count, sizeof(VkPhysicalDevice));
             vkEnumeratePhysicalDevices(handler->Instance, &count, devices);
 
-            handler->PhysicalDevice = devices[count - 1];
+            handler->PhysicalDevice = devices[1];
 
             mageFreeMethod(devices);
         }
@@ -90,7 +90,12 @@ void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window,
                 mageTryDumpSuccess(0, success);
                 return;
             }
-            MAGE_LOG_CORE_INFORM("GPU is suitable found [%s]\n", deviceProperties.deviceName);
+            handler->PhysicalProperties = deviceProperties;
+
+            MAGE_LOG_CORE_INFORM("GPU is suitable, using [%s]\n", deviceProperties.deviceName);
+        }
+        {
+            vkGetPhysicalDeviceMemoryProperties(handler->PhysicalDevice, &handler->MemoryProperties);
         }
         {
             /*
@@ -120,26 +125,43 @@ void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window,
 
             mageFreeMethod(family);      
         }
-        float *queuePriorities = calloc(1, sizeof(float));
-        queuePriorities[0] = 1.0f;
+        {
 
-        VkDeviceQueueCreateInfo deviceQueueCreateInformation;
-        deviceQueueCreateInformation.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-        deviceQueueCreateInformation.queueFamilyIndex = handler->GraphicsFamilyIndex;       
-        deviceQueueCreateInformation.queueCount = 1;
-        deviceQueueCreateInformation.pQueuePriorities = queuePriorities;
+            
+            VkResult result = vkCreateDevice(handler->PhysicalDevice,
+                  &(VkDeviceCreateInfo) {
+                     .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+                     .queueCreateInfoCount = 1,
+                     .pQueueCreateInfos = &(VkDeviceQueueCreateInfo) {
+                        .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+                        .queueFamilyIndex = 0,
+                        .queueCount = 1,
+                        .pQueuePriorities = (float []) { 1.0f },
+                     },
+                     .enabledExtensionCount = 1,
+                     .ppEnabledExtensionNames = (const char * const []) {
+                        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+                     },
+                  },
+                  NULL,
+                  &handler->Device);
 
-        VkDeviceCreateInfo deviceCreateInformation;
-        deviceCreateInformation.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        deviceCreateInformation.queueCreateInfoCount = 1;
-        deviceCreateInformation.pQueueCreateInfos = &deviceQueueCreateInformation;
+            if (result != VK_SUCCESS)
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Vulkan device has failed to be created\n", NULL);
+                mageTryDumpSuccess(0, success);
+                return;
+            }
 
+            MAGE_LOG_CORE_INFORM("Vulkan device has been created\n", NULL);
+        }
+        {
+            vkGetDeviceQueue(handler->Device, 0, 0, &handler->GraphicsQueue);
+        }
 
-
-       /* VkResult result = vkCreateDevice(handler->PhysicalDevice, &deviceCreateInformation, NULL, &handler->Device);
-         */
 
     #endif
+    mageTryDumpSuccess(1, success);
 }
 void *mageRendererAllocate()
 {

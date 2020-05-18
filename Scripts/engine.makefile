@@ -6,7 +6,7 @@ BF_DIR = build
 LIB_DIR = $(BF_DIR)/lib
 OBJ_DIR = $(BF_DIR)/obj/Core
 TARGET = libmageCore.a
-OBJS = mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageScene.o
+OBJS = mageWindow.o mageInput.o mageMaths.o mageGeneric.o mageRenderer.o mageScene.o mageApplication.o
 
 .PHONY: all
 all: $(TARGET)
@@ -32,6 +32,9 @@ mageRenderer.o: Core/mageAPI.h Core/mageRenderer.c
 
 mageScene.o: Core/mageAPI.h Core/mageScene.c
 	$(CMP) $(CST) $(FLAGS) -c Core/mageScene.c -o $(OBJ_DIR)/mageScene.o
+
+mageApplication.o: Core/mageAPI.h Core/mageApplication.c
+	$(CMP) $(CST) $(FLAGS) -c Core/mageApplication.c -o $(OBJ_DIR)/mageApplication.o
 
 clean:
 	rm $(OBJ_DIR)/*.o && rm $(LIB_DIR)/*.a
