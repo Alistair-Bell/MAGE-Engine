@@ -4,14 +4,18 @@ static mageApplication app;
 static mageApplicationProps props;
 static uint8 flag;
 
+
+
+
 int main(int32 argc, char **args)
 {   
     mageEngineInitialise(&flag);
-    
+
     props.Height = 720;
     props.Width = 1080;
     props.Name = "Hello World";
     props.Version = 1.0;
+
 
     mageApplicationInitialise(&app, &props, NULL);
 
@@ -24,6 +28,7 @@ int main(int32 argc, char **args)
         app.Window->Running = !(glfwWindowShouldClose(app.Window->Context));
     }
 
+    mageRendererDestroy(app.Renderer);
     mageLogReset();
     return 0;
 }

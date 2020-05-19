@@ -1,0 +1,13 @@
+{
+    "windows":
+    [
+
+
+    ],
+    "linux":
+    [
+        { "compile-all" : "make -f ./Scripts/engine.makefile && make -f ./Scripts/client.makefile " }
+    ]
+
+
+}

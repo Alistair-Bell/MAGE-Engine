@@ -4,6 +4,7 @@ void mageEngineInitialise(uint8 *success)
 {
 	#if defined(MAGE_DEBUG)
 		mageFileDumpContents("Logs/mage.log", "", 1, NULL);
+		MAGE_LOG_CORE_WARNING("Debug mode in uses, for best performance turn debug mode of\n", NULL);
 		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
 	#endif
 
@@ -12,12 +13,12 @@ void mageEngineInitialise(uint8 *success)
 			
 		if (flag != 0)
 		{
-			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s.\n", SDL_GetError());
+			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
 			mageTryDumpSuccess(0, success);
 			return;
 		}
 
-		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything.\n", NULL);
+		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
 
 	#endif
 
@@ -29,6 +30,19 @@ void mageEngineInitialise(uint8 *success)
 			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
 			return;
 		}	
+
+		#if defined(MAGE_VULKAN)
+			uint8 flag = glfwVulkanSupported();
+
+			if (!flag)
+			{
+				MAGE_LOG_CLIENT_FATAL_ERROR("GLFW does not supoort vulkan\n", NULL);
+				mageTryDumpSuccess(0, success);
+				return;
+			}
+			MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
+
+		#endif
 
 		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
 
@@ -77,8 +91,8 @@ void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, c
 	}
 	switch (user)
 	{
-	case MAGE_LOG_USER_CORE: strcpy(userString, "core"); break;
-	case MAGE_LOG_USER_CLIENT: strcpy(userString, "client"); break;
+	case MAGE_LOG_USER_CORE: strcpy(userString, "Core"); break;
+	case MAGE_LOG_USER_CLIENT: strcpy(userString, "Client"); break;
 	}
 	
 	char str[256];
@@ -87,12 +101,12 @@ void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, c
     vsprintf(str, format, args);
 	va_end(args);
 
-	char bar[128];
-	sprintf(bar, "[Log %s %s][%s : %d]", userString, modeString, file, line);
+	char bar[512];
 
-
+	
+	sprintf(bar, "[Log %s %s][%s : %d] %s", userString, modeString, file, line, str);
+	
 	printf("%s", bar);
-	printf(" %s", str);
 
 	mageFileDumpContents("Logs/mage.log", bar, 0, NULL); 
 }

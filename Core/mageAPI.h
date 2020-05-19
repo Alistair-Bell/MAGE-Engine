@@ -887,6 +887,8 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 
 		uint32 GraphicsFamilyIndex;
 
+		uint32 GraphicsPresentFamily;
+
 	#endif
 
 } mageVulkanHandler;
@@ -905,7 +907,12 @@ extern MAGE_API void *mageVulkanHandlerAllocate();
 	@return Nothing
 **************************/
 extern MAGE_API void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
-
+/*!************************
+	@brief Destroys the vulkan devices
+	@param handler A pointer to a instance of a vulkan handler
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerCleanup(mageVulkanHandler *handler);
 
 /*!************************
 	@brief Renderer that renders objects pushed into the pipeline

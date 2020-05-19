@@ -1,5 +1,4 @@
 #include "mageAPI.h"
-#include <GLFW/glfw3.h>
 
 void *mageWindowAllocate()
 {
@@ -48,12 +47,6 @@ void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int
     	
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-
-		#if defined(MAGE_VULKAN)
-
-
-		#endif
-
 		window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
 
 		if (window->Context == NULL)
@@ -67,9 +60,6 @@ void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 		
 		glfwMakeContextCurrent(window->Context);	
-
-
-
 
 	#endif
 	
