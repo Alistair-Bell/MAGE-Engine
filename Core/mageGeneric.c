@@ -160,19 +160,19 @@ void *magePairAllocate()
 }
 void magePairInitialise(magePair *pair, const uint32 firstSize, const uint32 secondSize)
 {
-	pair->First = malloc(sizeof(firstSize));
-	pair->Second = malloc(sizeof(secondSize));
+	pair->First = malloc(firstSize);
+	pair->Second = malloc(secondSize);
 
 	pair->FirstSize = firstSize;
 	pair->SecondSize = secondSize;
 }
 void magePairSetFirst(magePair *pair, void *item)
 {
-	memcpy(pair->First, item, pair->FirstSize);
+	memcpy(pair->First, item, sizeof(item));
 }
 void magePairSetSecond(magePair *pair, void *item)
 {
-	memcpy(pair->Second, item, pair->SecondSize);
+	memcpy(pair->Second, item, sizeof(item));
 }
 void magePairSetBoth(magePair *pair, void *first, void *second)
 {

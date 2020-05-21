@@ -859,6 +859,59 @@ extern MAGE_API void mageRenderableInitialse(mageRenderable *renderable, mageVec
 extern MAGE_API void mageRenderableDestroy(mageRenderable *renderable);
 
 /*!************************
+	@brief Hanldes vulkan graphics and present indicies
+**************************/
+typedef struct MAGE_API MAGE_QUEUE_HANDLER_STRUCT
+{
+	/*!************************
+		@brief Stores the count of graphics indexs stored
+	**************************/
+	uint32 GraphicsCount;
+	/*!************************
+		@brief Stores the count of presents indexs stored
+	**************************/
+	uint32 PresentCount;
+	/*!************************
+		@brief Stores the graphics family indexes
+	**************************/
+	uint32 *GraphicsFamiles;
+	/*!************************
+		@brief Stores the present family indexs
+	**************************/
+	uint32 *PresentFamilies;
+
+} mageQueueHandler;
+
+/*!************************ 
+	@brief Allocates a block of memory for the queue handler
+	@return Void pointer to the block of memory allocated
+	@warning The pointer has not been type casted
+**************************/
+extern MAGE_API void *mageQueueHandlerAllocate();
+/*!************************ 
+	@brief Sets up the queue handler for use
+	@param handler A pointer to a instance of a queue handler
+	@return Nothing
+**************************/
+extern MAGE_API void mageQueueHandlerInitialise(mageQueueHandler *handler); 
+/*!************************ 
+	@brief Pushes indexes to the queue handler
+	@param handler A pointer to a instance of a queue handler
+	@param graphicsIndex The index to be pushed
+	@param presentIndex The index to be pushed
+	@return Nothing	
+**************************/
+extern MAGE_API void mageQueueHandlerPushIndex(mageQueueHandler *handler, int32 graphicsIndex, int32 presentIndex);
+/*!************************
+	@brief Frees the renderers memory
+	@param handler A pointer to a instance of a queue handler
+	@return Nothing
+**************************/
+extern MAGE_API void mageQueueHandlerFree(mageQueueHandler *handler);
+
+
+
+/*!************************
 	@brief Hanldes vulkan stuff
 **************************/
 typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
@@ -889,6 +942,8 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 
 		uint32 GraphicsPresentFamily;
 
+		
+
 	#endif
 
 } mageVulkanHandler;
@@ -900,13 +955,51 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 **************************/
 extern MAGE_API void *mageVulkanHandlerAllocate();
 /*!************************
-	@brief Destroys the renderer freeing itelsf
+	@brief Sets up the vulkan renderer
 	@param handler A pointer to a instance of a vulkan handler
 	@param window A pointer to a instance of a window
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
 extern MAGE_API void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
+/*!************************
+	@brief Sets up the vulkan instance
+	@param handler A pointer to a instance of a vulkan handler
+	@param window A pointer to a instance of a window
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerCreateInstance(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
+/*!************************
+	@brief Sets up the vulkan debug
+	@param handler A pointer to a instance of a vulkan handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerSetupDebug(mageVulkanHandler *handler, uint8 *success);
+/*!************************
+	@brief Picks the physical device based on criteria 
+	@param handler A pointer to a instance of a vulkan handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerCreateDevice(mageVulkanHandler *handler, mageWindow *window, uint8 *success)
+;
+/*!************************
+	@brief Creates a device based on the device selected  
+	@param handler A pointer to a instance of a vulkan handler
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerCreateDevice(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
+/*!************************
+	@brief Creates a surface based on the window api  
+	@param handler A pointer to a instance of a vulkan handler
+	@param window A pointer to a instance of a window
+	@param success A pointer where the success of the function will be dumped
+	@return Nothing
+**************************/
+extern MAGE_API void mageVulkanHandlerCreateSurface(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
 /*!************************
 	@brief Destroys the vulkan devices
 	@param handler A pointer to a instance of a vulkan handler

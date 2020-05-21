@@ -6,7 +6,6 @@ static uint8 flag;
 
 
 
-
 int main(int32 argc, char **args)
 {   
     mageEngineInitialise(&flag);
