@@ -198,6 +198,7 @@
 #include <time.h>
 #include <signal.h> 
 #include <stdint.h>
+#include <stdbool.h>
 
 /*!************************
 	@brief The mode that is a inform 

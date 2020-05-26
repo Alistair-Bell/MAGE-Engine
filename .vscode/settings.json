@@ -18,7 +18,8 @@
         "iterator": "c",
         "string_view": "c",
         "random": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "sstream": "c"
     },
     "python.pythonPath": "/bin/python3.7"
 }

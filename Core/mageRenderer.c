@@ -4,13 +4,12 @@ void *mageRendererAllocate()
 {
     return malloc(sizeof(struct MAGE_RENDERER_STRUCT));
 }
-void mageRendererInitialise(mageRenderer *renderer, mageWindow *window, uint8_t *success)
+mageResult mageRendererInitialise(mageRenderer *renderer, mageWindow *window)
 {
-    mageTryDumpSuccess(0, success);
     #if defined(MAGE_VULKAN)
-        uint8_t flag;
-        mageVulkanHandlerInitialise(&renderer->Handler, window, &flag);
+        mageVulkanHandlerInitialise(&renderer->Handler, window);
     #endif
+    return MAGE_SUCCESS;
 }
 void *mageVulkanHandlerAllocate()
 {
@@ -65,10 +64,9 @@ void *mageVulkanHandlerAllocate()
     {
         mageFreeMethod(queue->GraphicsFamily); 
     }
-    static void mageCreateInstance(mageVulkanHandler *handler, mageWindow *window, uint8_t *success)
+    static mageResult mageCreateInstance(mageVulkanHandler *handler, mageWindow *window)
     {
-        mageTryDumpSuccess(0, success);    
-        /*!************************
+         /*!************************
             Creating instance
         **************************/
         VkApplicationInfo applicationInformation;
@@ -108,14 +106,14 @@ void *mageVulkanHandlerAllocate()
         if (result != VK_SUCCESS)
         {
             MAGE_LOG_CORE_FATAL_ERROR("Failed to create vulkan instance\n", NULL);
-            return;
+            return MAGE_INSTANCE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Vulkan instance has been created\n", NULL);
     
 
-        mageTryDumpSuccess(1, success);
+        return MAGE_SUCCESS;
     }
-    static void mageIsDeviceSuitable(VkPhysicalDevice device, uint8_t *suitable)
+    static mageResult mageIsDeviceSuitable(VkPhysicalDevice device)
     {
         uint32_t flag;
         VkPhysicalDeviceProperties deviceProperties;
@@ -125,20 +123,20 @@ void *mageVulkanHandlerAllocate()
         
         flag = deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
 
-        if (!flag) return;
+        if (!flag) return MAGE_HARDWARE_INVALID;
 
         mageQueueFamilies families;
         mageQueueInitialise(&families);
 
         mageDeviceFindQueue(device, &families);
 
-        if (families.GraphicsCount <= 0) return;
-
+        if (families.GraphicsCount <= 0) return MAGE_HARDWARE_INVALID;
 
         mageQueueFree(&families);
-        *suitable = 1;
+
+        return MAGE_SUCCESS;
     }
-    static void magePickPhysicalDevice(mageVulkanHandler *handler)
+    static mageResult magePickPhysicalDevice(mageVulkanHandler *handler)
     {
         uint32_t deviceCount, i;
         vkEnumeratePhysicalDevices(handler->Instance, &deviceCount, NULL);
@@ -146,22 +144,20 @@ void *mageVulkanHandlerAllocate()
         if (deviceCount <= 0)
         {
             MAGE_LOG_CORE_FATAL_ERROR("Unable to find any physical devices\n", NULL);
-            return;
+            return MAGE_HARDWARE_NOT_PRESENT;
         }
         VkPhysicalDevice *devices = calloc(deviceCount, sizeof(VkPhysicalDevice));
         vkEnumeratePhysicalDevices(handler->Instance, &deviceCount, devices);
 
-    
-        uint8_t flag = 0;
+        uint8_t flag = 0;    
         for (i = 0; i < deviceCount; i++)
         {
-            mageIsDeviceSuitable(devices[i], &flag);
-
-            if (flag)
+            if (mageIsDeviceSuitable(devices[i]) == MAGE_SUCCESS) 
             {
                 handler->PhysicalDevice = devices[i];
                 vkGetPhysicalDeviceProperties(handler->PhysicalDevice, &handler->PhysicalProperties);
                 MAGE_LOG_CORE_INFORM("Physical device chosen %s\n", handler->PhysicalProperties.deviceName);
+                flag = 1;
                 break;
             }
 
@@ -169,11 +165,13 @@ void *mageVulkanHandlerAllocate()
         if (!flag)
         {
             MAGE_LOG_CORE_FATAL_ERROR("Unable to find suitable device for use\n", NULL);
+            return MAGE_HARDWARE_NOT_PRESENT;
         }
         
         mageFreeMethod(devices);
+        return MAGE_SUCCESS;
     }
-    static void mageCreateDevice(mageVulkanHandler *handler, uint8_t *success)
+    static mageResult mageCreateDevice(mageVulkanHandler *handler, uint8_t *success)
     {
         VkResult result = vkCreateDevice(handler->PhysicalDevice,
             &(VkDeviceCreateInfo) {
@@ -194,22 +192,22 @@ void *mageVulkanHandlerAllocate()
         if (result != VK_SUCCESS)
         {
             MAGE_LOG_CORE_FATAL_ERROR("Vulkan logical device has failed to be created\n", NULL);
-            return;
+            return MAGE_DEVICE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Vulkan logical device has been created\n", NULL); 
-    
-        
-    
+
+        return MAGE_SUCCESS;
     }
 #endif
 
-void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8_t *success)
+mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window)
 {
     #if defined(MAGE_VULKAN)
-        mageCreateInstance(handler, window, NULL);
+        mageCreateInstance(handler, window);
         magePickPhysicalDevice(handler);
         mageCreateDevice(handler, NULL);
     #endif
+    return MAGE_SUCCESS;
 }
 void mageVulkanHandlerCleanup(mageVulkanHandler *handler)
 {

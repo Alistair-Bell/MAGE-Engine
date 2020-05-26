@@ -4,7 +4,7 @@ void *mageWindowAllocate()
 {
 	return malloc(sizeof(struct MAGE_WINDOW_STRUCT));
 }
-void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title, uint8_t *success)
+mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
 {
 
 	window->Height = yResolution;
@@ -16,25 +16,14 @@ void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const i
 
 		MAGE_LOG_CORE_INFORM("Using SDL2 as window mode.\n", NULL);
 
-		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
-		
-		if (flag != 0)
-		{
-			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s.\n", SDL_GetError());
-			mageTryDumpSuccess(0, success);
-			return;
-		}
-		
-		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything.\n", NULL);
-
+	
 		window->Context = SDL_CreateWindow(window->Title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window->Width, window->Height, 0);
 
 		if (window->Context == NULL)
 		{
 			MAGE_LOG_CORE_FATAL_ERROR("SDL2 context was failed to initialise.\n", NULL);
-			mageTryDumpSuccess(0, success);
-			return;
-		}	
+			return MAGE_CONTEXT_CREATION_FAILED;
+		}
 
 		MAGE_LOG_CORE_INFORM("SDL2 window has succesfully been created.\n", NULL);
 
@@ -52,9 +41,8 @@ void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const i
 		if (window->Context == NULL)
 		{
 			glfwTerminate();
-			mageTryDumpSuccess(0, success);
 			MAGE_LOG_CORE_FATAL_ERROR("GLFW context has failed to create\n", NULL);
-			return;
+			return MAGE_CONTEXT_CREATION_FAILED;
 		}
 		
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
@@ -62,8 +50,8 @@ void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const i
 		glfwMakeContextCurrent(window->Context);	
 
 	#endif
-	
-	mageTryDumpSuccess(1, success);
+
+	return MAGE_SUCCESS;
 }
 void mageWindowSwapBuffers(mageWindow *window)
 {

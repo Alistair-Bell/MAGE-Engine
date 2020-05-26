@@ -184,8 +184,6 @@ void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, const floa
 	mageMatrix4x4 result;
 	mageMatrix4x4InitialiseDiagonal(&result, 1.0f);
 	float toRadians = tan(0.5f * fov);
-	float radiansResult;
-	mageToRadians(toRadians, &radiansResult);
 	
 	float q = 1.0f / toRadians;
 	float a = q / aspectRatio;
@@ -230,8 +228,7 @@ void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, const mageV
 	mageMatrix4x4 result;
 	mageMatrix4x4InitialiseDiagonal(&result, 1.0f);
 
-	float toRadians;
-	mageToRadians(angle, &toRadians);
+	float toRadians = mageToRadians(angle);
 	float r = toRadians;
 	float c = cos(r);
 	float s = sin(r);
@@ -394,13 +391,11 @@ void mageMatrix4x4Invert(mageMatrix4x4 *matrix)
 
 	memcpy(matrix->Elements, bar.Elements, sizeof(float) * 16);
 }
-
-
 void mageMatrix4x4Destroy(mageMatrix4x4 *matrix)
 {
 	mageFreeMethod(matrix);
 } 
-void mageToRadians(const float degrees, float *result)
+float mageToRadians(const float degrees)
 {
-	*result = degrees * (3.1415926535 / 180 );
+	return (degrees * (3.1415926535 / 180 ));
 }

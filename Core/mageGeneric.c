@@ -1,9 +1,9 @@
 #include "mageAPI.h"
 
-void mageEngineInitialise(uint8_t *success)
+mageResult mageEngineInitialise(void)
 {
 	#if defined(MAGE_DEBUG)
-		mageFileDumpContents("Logs/mage.log", "", 1, NULL);
+		mageFileDumpContents("Logs/mage.log", "", 1);
 		mageLogInitialise("Logs/mage.log");
 		MAGE_LOG_CORE_WARNING("Debug mode in uses, for best performance turn debug mode of\n", NULL);
 		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
@@ -15,8 +15,7 @@ void mageEngineInitialise(uint8_t *success)
 		if (flag != 0)
 		{
 			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
-			mageTryDumpSuccess(0, success);
-			return;
+			return MAGE_LIBRARY_FAILURE
 		}
 
 		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
@@ -27,9 +26,8 @@ void mageEngineInitialise(uint8_t *success)
 
 		if (!glfwInit())
 		{
-			mageTryDumpSuccess(0, success);
 			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
-			return;
+			return MAGE_LIBRARY_FAILURE;
 		}	
 
 		#if defined(MAGE_VULKAN)
@@ -37,9 +35,8 @@ void mageEngineInitialise(uint8_t *success)
 
 			if (!flag)
 			{
-				MAGE_LOG_CLIENT_FATAL_ERROR("GLFW does not supoort vulkan\n", NULL);
-				mageTryDumpSuccess(0, success);
-				return;
+				MAGE_LOG_CLIENT_FATAL_ERROR("GLFW does not support vulkan\n", NULL);
+				return MAGE_LIBRARY_FAILURE;
 			}
 			MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
 
@@ -49,7 +46,7 @@ void mageEngineInitialise(uint8_t *success)
 
 	#endif
 	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
-
+	return MAGE_SUCCESS;
 
 }
 
@@ -196,13 +193,12 @@ void mageDictionaryFetchIndex(mageDictionary *dictionary, magePair *buffer, cons
 {
 	memcpy(buffer, dictionary->Elements->Elements[index], sizeof(*buffer));
 }
-void mageFileReadContents(const char *file, char *buffer, const uint8_t reallocatable, uint8_t *success)
+mageResult mageFileReadContents(const char *file, char *buffer, const uint8_t reallocatable)
 {
 	FILE *f = fopen(file, "rt");
 	if (f == NULL)
 	{
-		mageTryDumpSuccess(0, success);	
-		return;
+		return MAGE_INVALID_INPUT;
 	}
     fseek(f, 0, SEEK_END);
     uint64_t length = ftell(f);	
@@ -218,13 +214,12 @@ void mageFileReadContents(const char *file, char *buffer, const uint8_t realloca
 	}
 	strcpy(buffer, foo);
 	free(foo);
-	mageTryDumpSuccess(1, success);
+	return MAGE_SUCCESS;
 }
-void mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean, uint8_t *success)
+mageResult mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean)
 {
 	FILE *f;
-	
-	switch(clean)
+		switch(clean)
 	{
 		case 1:
 			f = fopen(file, "w");
@@ -233,13 +228,11 @@ void mageFileDumpContents(const char *file, const char *buffer, const uint8_t cl
 	}
 	if (f == NULL)
 	{
-		mageTryDumpSuccess(0, success);
-		return;
+		return MAGE_INVALID_INPUT;
 	}
 	fprintf(f, "%s", buffer);
 	fclose(f);
 
-	mageTryDumpSuccess(1, success);
-
+	return MAGE_SUCCESS;
 }
 

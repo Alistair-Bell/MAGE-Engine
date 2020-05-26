@@ -31,7 +31,7 @@ void mageCameraOrthographicRecalculateViewMatrix(mageCamera *camera)
     float radians;
 
     /* Setup */
-    mageToRadians(camera->Rotation, &radians);
+    radians = mageToRadians(camera->Rotation);
     mageVector3Initialise(&angle, 0.0f, 0.0f, 1.0f);
     mageMatrix4x4InitialiseDiagonal(&identity, 1.0f);
 
