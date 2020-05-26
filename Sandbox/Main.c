@@ -1,4 +1,4 @@
-#include "../Core/mageAPI.h"
+#include "../Mage/mageAPI.h"
 
 static mageApplication app;
 static mageApplicationProps props;
