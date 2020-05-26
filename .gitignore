@@ -1,3 +1,5 @@
 build
 Logs/*.*
 Documentation/*.*
+Mage/Makefile
+Sandbox/Makefile

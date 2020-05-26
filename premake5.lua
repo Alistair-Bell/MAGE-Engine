@@ -8,7 +8,7 @@ workspace "MAGE"
         "Distribution"
     }
 
--- Engine Project
+-- Engine Project 
 
 project "MageEngine"
     location "Mage"
@@ -25,13 +25,6 @@ project "MageEngine"
         "Mage/**.h",
         "Mage/**.c"
     }
-
-    links
-    {
-    
-    }
-    
-
 
     filter "configurations:Debug"
         defines "MAGE_DEBUG"
@@ -77,4 +70,3 @@ project "Sandbox"
         "m"
     }
     
-    --LIBS = $(LIB_DIR) -lvulkan -lglfw3 -lX11 -ldl -lm -lopenal -lpthread 
