@@ -4,7 +4,7 @@ void *mageWindowAllocate()
 {
 	return malloc(sizeof(struct MAGE_WINDOW_STRUCT));
 }
-void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int32 yResolution, const char *title, uint8 *success)
+void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title, uint8_t *success)
 {
 
 	window->Height = yResolution;
@@ -16,7 +16,7 @@ void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int
 
 		MAGE_LOG_CORE_INFORM("Using SDL2 as window mode.\n", NULL);
 
-		const uint32 flag = SDL_Init(SDL_INIT_EVERYTHING);
+		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
 		
 		if (flag != 0)
 		{

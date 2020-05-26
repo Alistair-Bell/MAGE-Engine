@@ -4,14 +4,14 @@ void *mageApplicationAllocate()
 {
     return malloc(sizeof(struct MAGE_APPLICATION_STRUCT));
 }
-void mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props, uint8 *success)
+void mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props, uint8_t *success)
 {
     application->Renderer = mageRendererAllocate();
     application->Window = mageWindowAllocate();
 
-    uint8 flag;
+    uint8_t flag;
 
-    char *temp = malloc(sizeof(char) * strlen(props->Name) + 20);
+    char temp[255];
     sprintf(temp, "%s : Version %.2f", props->Name, props->Version);
     mageWindowInitialise(application->Window, props->Width, props->Height, temp, &flag);
     
@@ -28,8 +28,4 @@ void mageApplicationInitialise(mageApplication *application, const mageApplicati
         mageTryDumpSuccess(0, success);
         return;
     }
-
-
-    
-    mageFreeMethod(temp);
 }

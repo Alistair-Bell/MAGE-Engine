@@ -1,4 +1,7 @@
-build/*
+build/bin/*
+build/lib/*
+build/obj/Core/*.*
+build/obj/Client/*.*
 Documentation
 Logs
-.vscode
+.vscode/*.*

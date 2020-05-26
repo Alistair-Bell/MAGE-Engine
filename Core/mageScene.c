@@ -4,7 +4,7 @@ void *mageCameraAllocate()
 {
     return malloc(sizeof(struct MAGE_CAMERA_STRUCT));
 }
-void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8 flags)
+void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8_t flags)
 {
     camera->Position = position;
     camera->Rotation = rotation;
@@ -47,13 +47,13 @@ void mageCameraOrthographicRecalculateViewMatrix(mageCamera *camera)
     /* Final steps */
     mageMatrix4x4Multiply(&camera->ProjectionMatrix, &camera->ViewMatrix,  &camera->ViewProjectionMatrix);
 }
-void mageCameraGetFlag(mageCamera *camera, const uint8 bit, uint8 *value)
+void mageCameraGetFlag(mageCamera *camera, const uint8_t bit, uint8_t *value)
 {
-    uint8 temp = camera->Flags >> bit;
+    uint8_t temp = camera->Flags >> bit;
     temp &= 0x01;
     mageTryDumpSuccess(temp, value);
 }
-void mageCameraSetFlag(mageCamera *camera, const uint8 bit, uint8 value)
+void mageCameraSetFlag(mageCamera *camera, const uint8_t bit, uint8_t value)
 {
     camera->Flags |= value << bit; 
 }

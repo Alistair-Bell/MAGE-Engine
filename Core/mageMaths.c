@@ -148,7 +148,7 @@ void mageMatrix4x4InitialiseVector4(mageMatrix4x4 *matrix, const mageVector4 *co
 	matrix->Elements[11] = column3->w;
 	matrix->Elements[15] = column3->w;
 }
-void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8 count)
+void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8_t count)
 {		
 	mageMatrix4x4Default(matrix);
 	memcpy(matrix->Elements, elements, sizeof(float) * count);
@@ -163,7 +163,7 @@ void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal
 }
 void mageMatrix4x4Multiply(const mageMatrix4x4 *left, const mageMatrix4x4 *right, mageMatrix4x4 *result)
 {
-	uint8 row, col, e;
+	uint8_t row, col, e;
 	float data[16];
 	for (row = 0; row < 4; row++)
 	{
@@ -387,7 +387,7 @@ void mageMatrix4x4Invert(mageMatrix4x4 *matrix)
 	float determinant = bar.Elements[0] * foo[0] + bar.Elements[1] * foo[4] + bar.Elements[2] * foo[8] + bar.Elements[3] * foo[12];
 	determinant = 1.0f / determinant;
 
-	uint8 i;
+	uint8_t i;
 
 	for (i = 0; i < 16; i++)
 		bar.Elements[i] = foo[i] * determinant;

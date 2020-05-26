@@ -3,23 +3,28 @@
 
 #include "mageCore.h"
 
-typedef MAGE_API signed char int8;
-typedef MAGE_API unsigned char uint8;
-typedef MAGE_API signed short int16;
-typedef MAGE_API unsigned short uint16;
-typedef MAGE_API signed int int32;
-typedef MAGE_API unsigned int uint32;
-typedef MAGE_API signed long int64;
-typedef MAGE_API unsigned long uint64;
-typedef MAGE_API uint8 byte;
 
+/*!************************
+	 __  __          _____ ______   ______             _            
+	|  \/  |   /\   / ____|  ____| |  ____|           (_)           
+	| \  / |  /  \ | |  __| |__    | |__   _ __   __ _ _ _ __   ___ 
+	| |\/| | / /\ \| | |_ |  __|   |  __| | '_ \ / _` | | '_ \ / _ \
+	| |  | |/ ____ \ |__| | |____  | |____| | | | (_| | | | | |  __/
+	|_|  |_/_/    \_\_____|______| |______|_| |_|\__, |_|_| |_|\___|
+												__/ |             
+												|___/              
+
+	Open source 2D game engine written in clean c89
+	
+
+**************************/
 
 /*!************************
 	@brief Initialises the dependencies of the library and other important stuff
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
-extern MAGE_API void mageEngineInitialise(uint8 *success);
+extern MAGE_API void mageEngineInitialise(uint8_t *success);
 /*!************************ 
 	@brief Free method used by the destory methods throughout the API
 	@param item pointer to a block of memory which will be freed
@@ -31,13 +36,13 @@ extern MAGE_API void mageFreeMethod(void *item);
 	@param size The size of the allocation in bytes
 	@return Void pointer to the block of memory allocated
 **************************/
-extern MAGE_API void *mageAllocationMethod(const uint64 size);
+extern MAGE_API void *mageAllocationMethod(const uint64_t size);
 /*!************************
 	@brief Tries to dump the contents into a pointer passed in
 	@param contents The contents to dump in
 	@param state The block of memory to dump the contents to
 **************************/
-extern MAGE_API void mageTryDumpSuccess(uint8 contents, uint8 *state);
+extern MAGE_API void mageTryDumpSuccess(uint8_t contents, uint8_t *state);
 /*!************************
 	@brief Logs to the console and writes to an output
 	@param user Core = 0 | Client = 1
@@ -48,12 +53,17 @@ extern MAGE_API void mageTryDumpSuccess(uint8 contents, uint8 *state);
 	@param ... Values for the formatting 
 	@return Nothing
 **************************/
-extern MAGE_API void mageLogMessage(const uint8 user, const uint8 severity, const uint32 line, const char *file, const char *format, ...);
+extern MAGE_API void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...);
+/*!************************
+	@brief Sets up the log of the file
+	@return Nothing 
+**************************/
+extern void MAGE_API mageLogInitialise(const char *outputFile);
 /*!************************
 	@brief Resets the color of the console
 	@return Nothing 
 **************************/
-extern MAGE_API void mageLogReset();
+extern MAGE_API void mageLogEnd();
 /*!************************
 	@brief Resizable list for storing varying amounts of one type
 	@warning The list can only store 4294967295 numbers
@@ -67,11 +77,11 @@ typedef struct MAGE_API  MAGE_RESIZABLE_LIST_STRUCT
 	/*!************************
 		@brief Count of the amount of elements stored
 	**************************/
-	uint32 Quantity;
+	uint32_t Quantity;
 	/*!************************ 
 		@brief Size of each element in bytes 
 	**************************/
-	uint32 ElementSize;
+	uint32_t ElementSize;
 
 } mageResizableList;
 
@@ -87,7 +97,7 @@ extern MAGE_API void *mageResizableListAllocate();
 	@param size Size of the element being stored in bytes
 	@return Nothing
 **************************/
-extern MAGE_API void mageResizableListInitialise(mageResizableList *resizableList, const uint32 size);
+extern MAGE_API void mageResizableListInitialise(mageResizableList *resizableList, const uint32_t size);
 /*!************************
 	@brief Pushes element to the resizable list
 	@param resizableList A pointer to a instance of a resizable list
@@ -133,11 +143,11 @@ typedef struct MAGE_API  MAGE_PAIR_STRUCT
 	/*!************************
 		@brief The size of the first value in bytes
 	**************************/
-	uint32 FirstSize;
+	uint32_t FirstSize;
 	/*!************************
 		@brief The size of the first value in bytes
 	**************************/
-	uint32 SecondSize;
+	uint32_t SecondSize;
 
 } magePair;
 
@@ -154,7 +164,7 @@ extern MAGE_API void *magePairAllocate();
 	@param secondSize Size of the second value in bytes
 	@return Nothing
 **************************/
-extern MAGE_API void magePairInitialise(magePair *pair, const uint32 firstSize, const uint32 secondSize);
+extern MAGE_API void magePairInitialise(magePair *pair, const uint32_t firstSize, const uint32_t secondSize);
 /*!************************ 
 	@brief Sets the first value in the pair
 	@param pair A pointer to a instance of a pair
@@ -186,7 +196,7 @@ extern MAGE_API void magePairSetBoth(magePair *pair, void *first, void *second);
 	@return Nothing
 	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
 **************************/
-extern MAGE_API void magePairGetFist(magePair *pair, void *buffer, uint8 reallocatable);
+extern MAGE_API void magePairGetFist(magePair *pair, void *buffer, uint8_t reallocatable);
 /*!************************ 
 	@brief Gets the second value copying it into the buffer
 	@param pair A pointer to a instance of a pair
@@ -195,7 +205,7 @@ extern MAGE_API void magePairGetFist(magePair *pair, void *buffer, uint8 realloc
 	@return Nothing
 	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
 **************************/
-extern MAGE_API void magePairGetSecond(magePair *pair, void *buffer, uint8 reallocatable);
+extern MAGE_API void magePairGetSecond(magePair *pair, void *buffer, uint8_t reallocatable);
 /*!************************ 
 	@brief Sets both values in the pair
 	@param pair A pointer to a instance of a pair
@@ -205,21 +215,21 @@ extern MAGE_API void magePairGetSecond(magePair *pair, void *buffer, uint8 reall
 	@return Nothing
 	@warning If reallocatable is true passing an unallocated buffer will cause a segmentation fault
 **************************/
-extern MAGE_API void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8 reallocatable);
+extern MAGE_API void magePairGetBoth(magePair *pair, void *buffer1, void *buffer2, uint8_t reallocatable);
 /*!************************
 	@brief Resizes the memory buffer of the pair's first buffer
 	@param pair A pointer to a instance of a pair
 	@param newSize The new size of the buffer
 	@return Nothing
 **************************/
-extern MAGE_API void magePairResizeFirst(magePair *pair, const uint32 newSize);
+extern MAGE_API void magePairResizeFirst(magePair *pair, const uint32_t newSize);
 /*!************************
 	@brief Resizes the memory buffer of the pair's second buffer
 	@param pair A pointer to a instance of a pair
 	@param newSize The new size of the buffer
 	@return Nothing
 **************************/
-extern MAGE_API void magePairResizeSecond(magePair *pair, const uint32 newSize);
+extern MAGE_API void magePairResizeSecond(magePair *pair, const uint32_t newSize);
 /*!************************
 	@brief Resizes the memory buffer of the both pair's value buffers
 	@param pair A pointer to a instance of a pair
@@ -227,7 +237,7 @@ extern MAGE_API void magePairResizeSecond(magePair *pair, const uint32 newSize);
 	@param newSecondSize The new size of the second buffer
 	@return Nothing
 **************************/
-extern MAGE_API void magePairResizeBoth(magePair *pair, const uint32 newFirstSize, const uint32 newSecondSize);
+extern MAGE_API void magePairResizeBoth(magePair *pair, const uint32_t newFirstSize, const uint32_t newSecondSize);
 /*!************************
 	@brief Frees the first and second item
 	@param pair A pointer to a instance of a pair
@@ -295,7 +305,7 @@ extern MAGE_API void mageDictionaryFetch(mageDictionary *dictionary, magePair *b
 	@return Nothing
 	@warning Passing an invalid index will cause a memory error
 **************************/
-extern MAGE_API void mageDictionaryFetchIndex(mageDictionary *dictionary, magePair *buffer, const uint32 index);
+extern MAGE_API void mageDictionaryFetchIndex(mageDictionary *dictionary, magePair *buffer, const uint32_t index);
 
 
 /*!************************
@@ -307,7 +317,7 @@ extern MAGE_API void mageDictionaryFetchIndex(mageDictionary *dictionary, magePa
 	@return Nothing
 	@warning If the buffer is too small then the data will be potentially incomplete
 **************************/
-extern MAGE_API void mageFileReadContents(const char *file, char *buffer, const uint8 reallocatable, uint8 *success);
+extern MAGE_API void mageFileReadContents(const char *file, char *buffer, const uint8_t reallocatable, uint8_t *success);
 /*!************************
 	@brief Dumps the contents of a buffer to a file
 	@param file Path to the file 
@@ -316,7 +326,7 @@ extern MAGE_API void mageFileReadContents(const char *file, char *buffer, const 
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
-extern MAGE_API void mageFileDumpContents(const char *file, const char *buffer, const uint8 clean, uint8 *success);
+extern MAGE_API void mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean, uint8_t *success);
 
 
 /*!************************ 
@@ -588,7 +598,7 @@ extern MAGE_API void mageMatrix4x4InitialiseVector4(mageMatrix4x4 *matrix, const
 	@param count Count of the amount of floats being passed in
 	@return Nothing
 **************************/
-extern MAGE_API void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8 count);
+extern MAGE_API void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8_t count);
 /*!************************ 
 	@brief Initialises the matrix using a diagonal
 	@param matrix A pointer to a instance of a matrix
@@ -681,11 +691,11 @@ typedef struct MAGE_API MAGE_WINDOW_STRUCT
 	/*!************************
 		@brief Width of the window context
 	**************************/
-	int32 Width;
+	int32_t Width;
 	/*!************************
 		@brief Height of the window context
 	**************************/
-	int32 Height;
+	int32_t Height;
 	/*!************************
 		@brief Title of the window context
 	**************************/
@@ -713,7 +723,7 @@ typedef struct MAGE_API MAGE_WINDOW_STRUCT
 	/*!************************
 		@brief A flag whether the window is running
 	**************************/
-	uint8 Running;	
+	uint8_t Running;	
 
 } mageWindow;
 
@@ -733,7 +743,7 @@ extern MAGE_API void *mageWindowAllocate();
 	@return Nothing
 	@warning The window will not be constructed if the libraries fail to be initialsied
 **************************/
-extern MAGE_API void mageWindowInitialise(mageWindow *window, const int32 xResolution, const int32 yResolution, const char *title, uint8 *success);
+extern MAGE_API void mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title, uint8_t *success);
 /*!************************
 	@brief Swaps the buffers of the window
 	@param window A pointer to a instance of a window
@@ -781,21 +791,21 @@ extern MAGE_API void mageGetMousePositionY(mageWindow *window, double *y);
 	@param state A pointer to whether its true will be dumped 
 	@return Nothing
 **************************/
-extern MAGE_API void mageGetMouseButtonLeftClick(mageWindow *window, uint8 *state);
+extern MAGE_API void mageGetMouseButtonLeftClick(mageWindow *window, uint8_t *state);
 /*!************************ 
 	@brief Gets whether the right mouse button is being clicked
 	@param window A pointer to a instance of a window
 	@param state A pointer to whether its true will be dumped 
 	@return Nothing
 **************************/
-extern MAGE_API void mageGetMouseButtonRightClick(mageWindow *window, uint8 *state);
+extern MAGE_API void mageGetMouseButtonRightClick(mageWindow *window, uint8_t *state);
 /*!************************ 
 	@brief Gets whether the mouse is inside the window context
 	@param window A pointer to a instance of a window
 	@param state A pointer to whether its true will be dumped 
 	@return Nothing
 **************************/
-extern MAGE_API void mageGetMouseInsideContext(mageWindow *window, uint8 *state);
+extern MAGE_API void mageGetMouseInsideContext(mageWindow *window, uint8_t *state);
 /*!************************ 
 	@brief Sets the mouse x and y to a specific location
 	@param window A pointer to a instance of a window
@@ -811,7 +821,7 @@ extern MAGE_API void mageSetMousePosition(mageWindow *window, const double x, co
 	@param state A pointer to whether its true will be dumped 
 	@return Nothing
 **************************/
-extern MAGE_API void mageGetKeyDown(mageWindow *window, const int32 key, uint8 *state);
+extern MAGE_API void mageGetKeyDown(mageWindow *window, const int32_t key, uint8_t *state);
 /*!************************ 
 	@brief Gets whether the key is not being pressed down
 	@param window A pointer to a instance of a window
@@ -819,7 +829,7 @@ extern MAGE_API void mageGetKeyDown(mageWindow *window, const int32 key, uint8 *
 	@param state A pointer to whether its true will be dumped 
 	@return Nothing
 **************************/
-extern MAGE_API void mageGetKeyNotDown(mageWindow *window, const int32 key, uint8 *state);
+extern MAGE_API void mageGetKeyNotDown(mageWindow *window, const int32_t key, uint8_t *state);
 
 /*!************************
 	@brief Object that renders and is pushed to the renderer pipeline
@@ -858,57 +868,6 @@ extern MAGE_API void mageRenderableInitialse(mageRenderable *renderable, mageVec
 **************************/
 extern MAGE_API void mageRenderableDestroy(mageRenderable *renderable);
 
-/*!************************
-	@brief Hanldes vulkan graphics and present indicies
-**************************/
-typedef struct MAGE_API MAGE_QUEUE_HANDLER_STRUCT
-{
-	/*!************************
-		@brief Stores the count of graphics indexs stored
-	**************************/
-	uint32 GraphicsCount;
-	/*!************************
-		@brief Stores the count of presents indexs stored
-	**************************/
-	uint32 PresentCount;
-	/*!************************
-		@brief Stores the graphics family indexes
-	**************************/
-	uint32 *GraphicsFamiles;
-	/*!************************
-		@brief Stores the present family indexs
-	**************************/
-	uint32 *PresentFamilies;
-
-} mageQueueHandler;
-
-/*!************************ 
-	@brief Allocates a block of memory for the queue handler
-	@return Void pointer to the block of memory allocated
-	@warning The pointer has not been type casted
-**************************/
-extern MAGE_API void *mageQueueHandlerAllocate();
-/*!************************ 
-	@brief Sets up the queue handler for use
-	@param handler A pointer to a instance of a queue handler
-	@return Nothing
-**************************/
-extern MAGE_API void mageQueueHandlerInitialise(mageQueueHandler *handler); 
-/*!************************ 
-	@brief Pushes indexes to the queue handler
-	@param handler A pointer to a instance of a queue handler
-	@param graphicsIndex The index to be pushed
-	@param presentIndex The index to be pushed
-	@return Nothing	
-**************************/
-extern MAGE_API void mageQueueHandlerPushIndex(mageQueueHandler *handler, int32 graphicsIndex, int32 presentIndex);
-/*!************************
-	@brief Frees the renderers memory
-	@param handler A pointer to a instance of a queue handler
-	@return Nothing
-**************************/
-extern MAGE_API void mageQueueHandlerFree(mageQueueHandler *handler);
-
 
 
 /*!************************
@@ -938,9 +897,9 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 
 		VkInstance Instance;
 
-		uint32 GraphicsFamilyIndex;
+		uint32_t GraphicsFamilyIndex;
 
-		uint32 GraphicsPresentFamily;
+		uint32_t GraphicsPresentFamily;
 
 		
 
@@ -961,45 +920,7 @@ extern MAGE_API void *mageVulkanHandlerAllocate();
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
-extern MAGE_API void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
-/*!************************
-	@brief Sets up the vulkan instance
-	@param handler A pointer to a instance of a vulkan handler
-	@param window A pointer to a instance of a window
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerCreateInstance(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
-/*!************************
-	@brief Sets up the vulkan debug
-	@param handler A pointer to a instance of a vulkan handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerSetupDebug(mageVulkanHandler *handler, uint8 *success);
-/*!************************
-	@brief Picks the physical device based on criteria 
-	@param handler A pointer to a instance of a vulkan handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerCreateDevice(mageVulkanHandler *handler, mageWindow *window, uint8 *success)
-;
-/*!************************
-	@brief Creates a device based on the device selected  
-	@param handler A pointer to a instance of a vulkan handler
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerCreateDevice(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
-/*!************************
-	@brief Creates a surface based on the window api  
-	@param handler A pointer to a instance of a vulkan handler
-	@param window A pointer to a instance of a window
-	@param success A pointer where the success of the function will be dumped
-	@return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerCreateSurface(mageVulkanHandler *handler, mageWindow *window, uint8 *success);
+extern MAGE_API void mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window, uint8_t *success); 
 /*!************************
 	@brief Destroys the vulkan devices
 	@param handler A pointer to a instance of a vulkan handler
@@ -1036,7 +957,7 @@ extern MAGE_API void *mageRendererAllocate();
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
-extern MAGE_API void mageRendererInitialise(mageRenderer *renderer,  mageWindow *window, uint8 *success);
+extern MAGE_API void mageRendererInitialise(mageRenderer *renderer,  mageWindow *window, uint8_t *success);
 /*!************************
 	@brief Destroys the renderer freeing itelsf
 	@param renderer A pointer to a instance of a renderer
@@ -1052,7 +973,7 @@ typedef struct MAGE_API MAGE_CAMERA_STRUCT
 	/*!************************
 		@brief The flags of the camera
 	**************************/
-	uint8 Flags;
+	uint8_t Flags;
 	/*!************************
 		@brief The position within the world
 	 **************************/
@@ -1089,7 +1010,7 @@ extern MAGE_API void *mageCameraAllocate();
 	@param rotation Rotation of the camera
 	@param flags The flags 
 **************************/
-extern MAGE_API void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8 flags);
+extern MAGE_API void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8_t flags);
 /*!************************ 
 	@brief Calculates the projection for the matrix
 	@param camera A pointer to a instance of a camera
@@ -1114,7 +1035,7 @@ extern MAGE_API void mageCameraOrthographicRecalculateViewMatrix(mageCamera *cam
 	@return Nothing
 	@warning Passing in an invalid bit will cause a possible wrong result
 **************************/
-extern MAGE_API void mageCameraGetFlag(mageCamera *camera, const uint8 bit, uint8 *value);
+extern MAGE_API void mageCameraGetFlag(mageCamera *camera, const uint8_t bit, uint8_t *value);
 /*!************************
 	@brief Sets the camera flag using the index provided
 	@param camera A pointer to a instance of a camera
@@ -1124,7 +1045,7 @@ extern MAGE_API void mageCameraGetFlag(mageCamera *camera, const uint8 bit, uint
 	@warning Passing in an invalid bit will still cause a bit to be changed
 	@warning Passing in a number greater that 1 through value will cause errors
 **************************/
-extern MAGE_API void mageCameraSetFlag(mageCamera *camera, const uint8 bit, uint8 value);
+extern MAGE_API void mageCameraSetFlag(mageCamera *camera, const uint8_t bit, uint8_t value);
 
 /*!************************
 	@brief Scene stores all objects cameras and renderers
@@ -1183,11 +1104,11 @@ typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT
 	/*!************************
 		@brief The width of the applications window
 	**************************/
-	uint32 Width;
+	uint32_t Width;
 	/*!************************
 		@brief The height of the applications window
 	**************************/
-	uint32 Height;
+	uint32_t Height;
 	/*!************************
 		@brief The name of the application 
 	**************************/
@@ -1229,7 +1150,7 @@ extern MAGE_API void *mageApplicationAllocate();
 	@param success A pointer where the success of the function will be dumped
 	@return Nothing
 **************************/
-extern MAGE_API void mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props, uint8 *success);
+extern MAGE_API void mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props, uint8_t *success);
 /*!************************
 	@brief Loads a scene for the application
 	@param application A pointer to a instance of a scene

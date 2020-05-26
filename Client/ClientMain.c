@@ -2,32 +2,19 @@
 
 static mageApplication app;
 static mageApplicationProps props;
-static uint8 flag;
 
-
-
-int main(int32 argc, char **args)
+int main(int32_t argc, char **args)
 {   
-    mageEngineInitialise(&flag);
+    mageEngineInitialise(NULL);
 
     props.Height = 720;
     props.Width = 1080;
-    props.Name = "Hello World";
-    props.Version = 1.0;
-
+    props.Version = 1.0f;
+    props.Name = "MAGE Engine";
 
     mageApplicationInitialise(&app, &props, NULL);
 
-    while (app.Window->Running)
-    {
-        glfwPollEvents();
 
-        mageWindowSwapBuffers(app.Window);
-
-        app.Window->Running = !(glfwWindowShouldClose(app.Window->Context));
-    }
-
-    mageRendererDestroy(app.Renderer);
-    mageLogReset();
+    mageLogEnd();
     return 0;
 }

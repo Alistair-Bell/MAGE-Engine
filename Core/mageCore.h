@@ -25,6 +25,7 @@
 	#endif
 
 #else
+	#define GLFW_INCLUDE_NONE
 	#define MAGE_GLFW
 	#if defined (MAGE_VULKAN) 
 		#define GLFW_INCLUDE_VULKAN
@@ -196,6 +197,7 @@
 #include <math.h>
 #include <time.h>
 #include <signal.h> 
+#include <stdint.h>
 
 /*!************************
 	@brief The mode that is a inform 
@@ -234,15 +236,15 @@
 		#define MAGE_DEBUG_BREAK
 	#endif
 
-	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FUNCTION__, x, __VA_ARGS__); MAGE_DEBUG_BREAK
-	
-	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, __LINE__, __FUNCTION__, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, __LINE__, __FUNCTION__, x, __VA_ARGS__); MAGE_DEBUG_BREAK
+	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
+	#define MAGE_VALIDATION_LAYERS 1
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
