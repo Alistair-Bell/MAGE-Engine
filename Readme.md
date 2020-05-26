@@ -18,14 +18,13 @@ Using and IDE is not required but can be useful when looking at runtime memory a
   
 Firstly you will need to obtain the source code for mage. To do this clone the github page.
 
- >`git clone https://github.com/MTECGamesStudio/MAGE-Engine`
+ >`git clone https://github.com/MTECGamesStudio/MAGE-Engine` --recursive
 
-Then run the python `Helper.py` script doing.
+Then run the bash / batch script (See Scricpts/"Your Platform").
 
-> **linux** `python Helper.py -bd -ca` 
-this builds the client and engine
-
-The engine builds into an dynamic library, either link to that or use the Client folder for your project
+- On windows a visual studio project is generated
+- On MacOS an XCode project is generated
+- On Linux a makefile is generated
 
 ## The End Goal
 The goal for MAGE is for a high performance 2D renderer that can be built for 
