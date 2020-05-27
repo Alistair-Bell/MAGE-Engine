@@ -3,3 +3,5 @@ Logs/*.*
 Documentation/*.*
 Mage/Makefile
 Sandbox/Makefile
+*.vcxproj
+*.sln
