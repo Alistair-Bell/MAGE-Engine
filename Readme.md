@@ -37,7 +37,7 @@ The goal for MAGE is for a high performance 2D renderer that can be built for
 making it simple to get stuck in and create games using native c89 to mess around in.
 
 ## Current Features
-k
+
 - `Basic SDL2 and GLFW3 window support`
 - `Basic Maths`
 - `Logging System`
