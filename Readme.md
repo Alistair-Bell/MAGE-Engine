@@ -20,7 +20,7 @@ Firstly you will need to obtain the source code for mage. To do this clone the g
 
  >`git clone https://github.com/MTECGamesStudio/MAGE-Engine` --recursive
 
-Then run the bash / batch script (See Scricpts/"Your Platform").
+Then run the bash / batch script (See Scripts/"Your Platform").
 
 - On windows a visual studio project is generated
 - On MacOS an XCode project is generated
