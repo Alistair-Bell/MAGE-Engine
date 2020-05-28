@@ -20,7 +20,7 @@ Firstly you will need to obtain the source code for mage. To do this clone the g
 
  >`git clone https://github.com/MTECGamesStudio/MAGE-Engine` --recursive
 
-Then run the bash / batch script (See Scricpts/"Your Platform").
+Then run the bash / batch script (See Scripts/"Your Platform").
 
 - On windows a visual studio project is generated
 - On MacOS an XCode project is generated
@@ -37,7 +37,7 @@ The goal for MAGE is for a high performance 2D renderer that can be built for
 making it simple to get stuck in and create games using native c89 to mess around in.
 
 ## Current Features
-k
+
 - `Basic SDL2 and GLFW3 window support`
 - `Basic Maths`
 - `Logging System`
