@@ -2,6 +2,9 @@ build
 Logs/*.*
 Documentation/*.*
 Mage/Makefile
+Mage/Externals
 Sandbox/Makefile
 *.vcxproj
 *.sln
+.vscode
+.vs

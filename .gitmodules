@@ -1,4 +1,5 @@
 [submodule "Mage/Externals/GLFW"]
 	path = Mage/Externals/GLFW
-    	url = https://github.com/MTECGamesStudio/glfw
+	url = https://github.com/MTECGamesStudio/glfw.git
 	branch = master
+
