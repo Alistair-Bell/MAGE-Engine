@@ -25,6 +25,10 @@ project "MageEngine"
         "Mage/**.h",
         "Mage/**.c"
     }
+    defines
+    {
+        "MAGE_CORE"
+    }
 
     filter "configurations:Debug"
         defines "MAGE_DEBUG"

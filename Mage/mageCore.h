@@ -44,7 +44,13 @@
 **************************/
 #if defined (__linux__)
 	#define MAGE_PLATFORM_LINUX
-	
+
+	/*!************************
+		Including the linux kernal headers  
+	**************************/
+	#include <linux/kernel.h>
+	#include <linux/module.h>
+
 	/*!************************
 		Checking if it is android linux as android uses the linux kernel
 	**************************/
@@ -165,22 +171,6 @@
 	**************************/
 	#define MAGE_API
 #endif
-
-
-
-
-/*!************************
-	@brief Using vulkan rendering mode
-**************************/
-#define MAGE_VULKAN
-/*!************************
-	@brief Using a debug mode with logging
-**************************/
-#define MAGE_DEBUG
-/*!************************
-	@brief Core to say this is being called from the core library so do dll export
-**************************/
-#define MAGE_CORE
 
 
 

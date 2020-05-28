@@ -5,7 +5,11 @@
             "includePath": [
                 "${workspaceFolder}/**"
             ],
-            "defines": [],
+            "defines": [
+                "MAGE_DEBUG",
+                "MAGE_CORE"
+
+            ],
             "compilerPath": "/usr/lib64/ccache/clang",
             "cStandard": "c89",
             "intelliSenseMode": "clang-x64"
