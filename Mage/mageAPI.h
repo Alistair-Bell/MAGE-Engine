@@ -17,11 +17,40 @@
 
 **************************/
 
+/*!************************
+ * @brief A typedef for a memory allocation callback  void *func(uint64_t size)
+**************************/
+typedef void *(*mageAllocationCallback)(uint64_t);
+/*!************************
+ * @brief A typedef for a memory allocation callback  void func(void *mem)
+**************************/
+typedef void (*mageFreeCallback)(void *);
+/*!************************
+ * @brief Returned from functions and can describe the error that has occured
+**************************/
+typedef enum MAGE_RESULT_ENUM mageResult;
+/*!************************
+ * @brief The wrapper that holds the required objects needed for the engine
+**************************/
+typedef struct MAGE_API MAGE_APPLICATION_STRUCT mageApplication;
+/*!************************
+ * @brief The callback used by the application once on startup
+**************************/
+typedef mageResult (*mageApplicationStartCallback)(mageApplication *);
+/*!************************
+ * @brief The callback used by the application once on startup
+**************************/
+typedef void (*mageApplicationUpdateCallback)(mageApplication *);
+/*!************************
+ * @brief The callback used by the application once on startup
+**************************/
+typedef mageResult (*mageApplicationDestroyCallback)(mageApplication *);
+
 
 /*!************************
  * @brief Returned from functions and can describe the error that has occured
 **************************/
-typedef enum MAGE_SUCCESS_ENUM
+enum MAGE_RESULT_ENUM 
 {
 	/*!************************
  	 * @brief The error was undefined therefore unknown
@@ -30,43 +59,59 @@ typedef enum MAGE_SUCCESS_ENUM
 	/*!************************
  	 * @brief The function was executed succesfully
 	**************************/
-	MAGE_SUCCESS = 1,
+	MAGE_SUCCESS,
 	/*!************************
  	 * @brief Libraries were not succesfully initialised
 	**************************/
-	MAGE_LIBRARY_FAILURE = 2,
+	MAGE_LIBRARY_FAILURE,
 	/*!************************
  	 * @brief The inputed file was not valid or unsuccesful
 	**************************/
-	MAGE_INVALID_INPUT = 3,
+	MAGE_INVALID_INPUT,
 	/*!************************
  	 * @brief The context that was being made was invalid or unsuccesful 
 	**************************/
-	MAGE_CONTEXT_CREATION_FAILED = 4,
+	MAGE_CONTEXT_CREATION_FAILED,
 	/*!************************
  	 * @brief The hardware that is trying to be used is invalid and cannot be used  
 	**************************/
-	MAGE_HARDWARE_INVALID = 5,
+	MAGE_HARDWARE_INVALID,
 	/*!************************
  	 * @brief The instance that is being created had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
-	MAGE_INSTANCE_CREATION_FAILURE = 6,
+	MAGE_INSTANCE_CREATION_FAILURE,
 	/*!************************
  	 * @brief The device that is being created had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
-	MAGE_DEVICE_CREATION_FAILURE = 7,
+	MAGE_DEVICE_CREATION_FAILURE,
+	/*!************************
+ 	 * @brief The surface that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_SURFACE_CREATION_FAILURE,
 	/*!************************
  	 * @brief The machine has devices not present (USED BY THE VULKAN RENDERER MODE)
 	**************************/
-	MAGE_HARDWARE_NOT_PRESENT = 8,
+	MAGE_HARDWARE_NOT_PRESENT,
+	/*!************************
+ 	 * @brief The application's start method had failed
+	**************************/
+	MAGE_START_METHOD_FAILURE,
+	/*!************************
+ 	 * @brief The application's update method had failed
+	**************************/
+	MAGE_START_UPDATE_FAILURE,
+	/*!************************
+ 	 * @brief The application's destroy method had failed
+	**************************/
+	MAGE_DESTROY_METHOD_FAILURE,
 
-} mageResult;
+};
 
 /*!************************
  * @brief Initialises the dependencies of the library and other important stuff
  * @return The success of the method
 **************************/
-extern MAGE_API mageResult mageEngineInitialise(void);
+extern MAGE_API mageResult mageEngineInitialise();
 /*!************************ 
  * @brief Free method used by the destory methods throughout the API
  * @param item pointer to a block of memory which will be freed
@@ -108,9 +153,9 @@ extern void MAGE_API mageLogInitialise(const char *outputFile);
 extern MAGE_API void mageLogEnd();
 /*!************************
  * @brief Resizable list for storing varying amounts of one type
- * @warning The list can only store 4294967295 numbers
+ * @warning The list can only store 4294967295 numbers (2^32 - 1)
 **************************/
-typedef struct MAGE_API  MAGE_RESIZABLE_LIST_STRUCT
+typedef struct MAGE_API MAGE_RESIZABLE_LIST_STRUCT
 {
 	/*!************************
 	 * @brief Array of void pointers to the element stored
@@ -172,7 +217,7 @@ extern MAGE_API void mageResizableListDestroy(mageResizableList *resizableList);
 /*!************************
  * @brief Stores a pair of values
 **************************/
-typedef struct MAGE_API  MAGE_PAIR_STRUCT
+typedef struct MAGE_API MAGE_PAIR_STRUCT
 {
 	/*!************************
 	 * @brief A pointer to the first value stored
@@ -798,48 +843,35 @@ extern MAGE_API void mageWindowTerminate(mageWindow *window);
 **************************/
 extern MAGE_API void mageWindowDestroy(mageWindow *window); 
 /*!************************ 
- * @brief Gets the mouse's x and y coordinates 
- * @param window A pointer to a instance of a window
- * @param x A pointer to where the x coordinate will be dumped 
- * @param y A pointer to where the x coordinate will be dumped 
- * @return Nothing
-**************************/
-extern MAGE_API void mageGetMousePosition(mageWindow *window, double *x, double *y);
-/*!************************ 
  * @brief Gets the mouse's x coordinate 
  * @param window A pointer to a instance of a window
- * @param x A pointer to where the x coordinate will be dumped 
- * @return Nothing
+ * @return The X coordinate
 **************************/
-extern MAGE_API void mageGetMousePositionX(mageWindow *window, double *x);
+extern MAGE_API double mageGetMousePositionX(mageWindow *window);
 /*!************************ 
  * @brief Gets the mouse's y coordinate 
  * @param window A pointer to a instance of a window
- * @param y A pointer to where the y coordinate will be dumped 
- * @return Nothing
+ * @return The y coordinate
 **************************/
-extern MAGE_API void mageGetMousePositionY(mageWindow *window, double *y);
+extern MAGE_API double mageGetMousePositionY(mageWindow *window);
 /*!************************ 
  * @brief Gets whether the left mouse button is being clicked
- * @param window A pointer to a instance of a window
- * @param state A pointer to whether its true will be dumped 
- * @return Nothing
+ * @param window A pointer to a instance of a window 
+ * @return Whether the button is being clicked
 **************************/
-extern MAGE_API void mageGetMouseButtonLeftClick(mageWindow *window, uint8_t *state);
+extern MAGE_API uint8_t mageGetMouseButtonLeftClick(mageWindow *window);
 /*!************************ 
  * @brief Gets whether the right mouse button is being clicked
- * @param window A pointer to a instance of a window
- * @param state A pointer to whether its true will be dumped 
- * @return Nothing
+ * @param window A pointer to a instance of a window 
+ * @return Whether the button is being clicked
 **************************/
-extern MAGE_API void mageGetMouseButtonRightClick(mageWindow *window, uint8_t *state);
+extern MAGE_API uint8_t mageGetMouseButtonRightClick(mageWindow *window);
 /*!************************ 
  * @brief Gets whether the mouse is inside the window context
  * @param window A pointer to a instance of a window
- * @param state A pointer to whether its true will be dumped 
- * @return Nothing
+ * @return Whether it is in the context
 **************************/
-extern MAGE_API void mageGetMouseInsideContext(mageWindow *window, uint8_t *state);
+extern MAGE_API uint8_t mageGetMouseInsideContext(mageWindow *window);
 /*!************************ 
  * @brief Sets the mouse x and y to a specific location
  * @param window A pointer to a instance of a window
@@ -852,56 +884,16 @@ extern MAGE_API void mageSetMousePosition(mageWindow *window, const double x, co
  * @brief Gets whether the key is being pressed down
  * @param window A pointer to a instance of a window
  * @param key A keycode for the key that is being tested
- * @param state A pointer to whether its true will be dumped 
- * @return Nothing
+ * @return Whether the key is down
 **************************/
-extern MAGE_API void mageGetKeyDown(mageWindow *window, const int32_t key, uint8_t *state);
+extern MAGE_API uint8_t mageGetKeyDown(mageWindow *window, const int32_t key);
 /*!************************ 
  * @brief Gets whether the key is not being pressed down
  * @param window A pointer to a instance of a window
  * @param key A keycode for the key that is being tested
- * @param state A pointer to whether its true will be dumped 
- * @return Nothing
+ * @return Whether the key is not down
 **************************/
-extern MAGE_API void mageGetKeyNotDown(mageWindow *window, const int32_t key, uint8_t *state);
-
-/*!************************
- * @brief Object that renders and is pushed to the renderer pipeline
-**************************/
-typedef struct MAGE_API MAGE_RENDERABLE_STRUCT
-{
-	/*!************************ 
-	 * @brief How the renderable will scale 
-	**************************/
-	mageVector3 Scale;
-	/*!************************ 
-	 * @brief Position in the scene
-	**************************/
-	mageVector3 Position;
-
-} mageRenderable;
-/*!************************ 
- * @brief Allocates a block of memory for the renderable
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/
-extern MAGE_API void *mageRenderableAllocate();
-/*!************************ 
- * @brief Intitalises the renderable based on  a scale and position
- * @param renderable A pointer to a instance of a renderable
- * @param scale Scale of the surface that will be rendered
- * @param position Position in the world the object will be at
- * @warning Negative values for the scale may cause issues
-**************************/
-extern MAGE_API void mageRenderableInitialise(mageRenderable *renderable, mageVector3 scale, mageVector3 position);
-/*!************************
- * @brief Destroys the renderable freeing itelsf
- * @param renderable A pointer to a instance of a renderable
- * @return Nothing
- * @warning If the renderable is not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageRenderableDestroy(mageRenderable *renderable);
-
+extern MAGE_API uint8_t mageGetKeyNotDown(mageWindow *window, const int32_t key);
 
 
 /*!************************
@@ -910,6 +902,10 @@ extern MAGE_API void mageRenderableDestroy(mageRenderable *renderable);
 typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 {
 	#if defined(MAGE_VULKAN)
+
+		VkSwapchainKHR SwapChain;
+		
+		VkFormat Format;
 
 		VkPhysicalDeviceMemoryProperties MemoryProperties;
 
@@ -935,7 +931,7 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 
 		uint32_t GraphicsPresentFamily;
 
-		
+		uint32_t ImageCount;
 
 	#endif
 
@@ -1000,129 +996,6 @@ extern MAGE_API void mageRendererDestroy(mageRenderer *renderer);
 /*!************************
  * @brief Camera used for the scene
 **************************/
-typedef struct MAGE_API MAGE_CAMERA_STRUCT
-{
-	/*!************************
-	 * @brief The flags of the camera
-	**************************/
-	uint8_t Flags;
-	/*!************************
-	 * @brief The position within the world
-	 **************************/
-	mageVector3 Position;
-	/*!************************
-	 * @brief The projection matrix of the camera 
-	**************************/
-	mageMatrix4x4 ProjectionMatrix;
-	/*!************************
-	 * @brief The view matrix of the camera 
-	**************************/
-	mageMatrix4x4 ViewMatrix;
-	/*!************************
-	 * @brief The view projection matrix of the camera 
-	**************************/
-	mageMatrix4x4 ViewProjectionMatrix;
-	/*!************************
-	 * @brief Rotation the camera is at
-	**************************/
-	float Rotation;
-
-} mageCamera;
-
-/*!************************ 
- * @brief Allocates a block of memory for the camera
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageCameraAllocate();
-/*!************************
- * @brief Initialises the camera for use
- * @param camera A pointer to a instance of a camera
- * @param position The position within the world
- * @param rotation Rotation of the camera
- * @param flags The flags 
-**************************/
-extern MAGE_API void mageCameraInitialise(mageCamera *camera, const mageVector3 position, const float rotation, const uint8_t flags);
-/*!************************ 
- * @brief Calculates the projection for the matrix
- * @param camera A pointer to a instance of a camera
- * @param left Left value used for the view calculations
- * @param right Right value used for the view calculations
- * @param bottom Bottom value used for the view calculations
- * @param top Top value used for the view calculations
- * @return Nothing
-**************************/ 
-extern MAGE_API void mageCameraOrthographicSetProjection(mageCamera *camera, const float left, const float right, const float bottom, const float top);
-/*!************************
- * @brief recalculates the projection for the matrix
- * @param camera A pointer to a instance of a camera
- * @return Nothing
-**************************/
-extern MAGE_API void mageCameraOrthographicRecalculateViewMatrix(mageCamera *camera);
-/*!************************
- * @brief Gets the value of the bit using the index provided
- * @param camera A pointer to a instance of a camera
- * @param bit The index of the bit being retrieved
- * @param value Where the value of the bit will be dumped
- * @return Nothing
- * @warning Passing in an invalid bit will cause a possible wrong result
-**************************/
-extern MAGE_API void mageCameraGetFlag(mageCamera *camera, const uint8_t bit, uint8_t *value);
-/*!************************
- * @brief Sets the camera flag using the index provided
- * @param camera A pointer to a instance of a camera
- * @param bit The index of the bit being retrieved
- * @param value Where the value of the bit will be dumped
- * @return Nothing
- * @warning Passing in an invalid bit will still cause a bit to be changed
- * @warning Passing in a number greater that 1 through value will cause errors
-**************************/
-extern MAGE_API void mageCameraSetFlag(mageCamera *camera, const uint8_t bit, uint8_t value);
-
-/*!************************
- * @brief Scene stores all objects cameras and renderers
-**************************/
-typedef struct MAGE_API MAGE_SCENE_STRUCT
-{
-	/*!************************
-	 * @brief The cameras used in the scene
-	**************************/	
-	mageResizableList *Cameras;
-	/*!************************
-	 * @brief Pointer to the main camera of the scene
-	**************************/
-	mageCamera *MasterCamera;
-
-
-} mageScene;
-
-/*!************************ 
- * @brief Allocates a block of memory for the scene
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageSceneAllocate();
-/*!************************
- * @brief Initialises the scene
- * @param scene A pointer to a instance of a scene
- * @return Nothing
-**************************/
-extern MAGE_API void mageSceneInitialise(mageScene *scene);
-/*!************************
- * @brief Binds the master camera to the scene
- * @param scene A pointer to a instance of a scene
- * @param camera A pointer to a instance of a camera
- * @return Nothing
-**************************/
-extern MAGE_API void mageSceneBindMasterCamera(mageScene *scene, mageCamera *camera);
-/*!************************
- * @brief Adds a camera to the scene
- * @param scene A pointer to a instance of a scene
- * @param cameras A pointer to an array of instances of a camera
- * @param count The count of cameras to push
- * @return Nothing
-**************************/
-extern MAGE_API void mageScenePushCameras(mageScene *scene, mageCamera **cameras);
 
 /*!************************
  * @brief Constructer used for the application
@@ -1145,29 +1018,49 @@ typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT
 	 * @brief The name of the application 
 	**************************/
 	char *Name;
+	/*!************************
+ 	 * @brief The method at called once at the start of the game loop
+	**************************/
+	mageApplicationStartCallback StartMethod;
+	/*!************************
+ 	 * @brief The method at called every frame at during the game loop
+	**************************/
+	mageApplicationUpdateCallback UpdateMethod;
+	/*!************************
+ 	 * @brief The method at called every frame at during the game loop
+	**************************/
+	mageApplicationDestroyCallback DestroyMethod;
+	/*!************************
+ 	 * @brief The free method used by the application
+	**************************/
+	mageFreeCallback FreeCallback;
+	/*!************************
+ 	 * @brief The free method used by the application
+	**************************/
+	mageAllocationCallback AllocationCallback;
+
 
 } mageApplicationProps;
 
-/*!************************
- * @brief Wrapper for all the objects
-**************************/
-typedef struct MAGE_API MAGE_APPLICATION_STRUCT
+struct MAGE_APPLICATION_STRUCT
 {
 	/*!************************
- * @brief The renderer used by the application
+ 	 * @brief The renderer used by the application
 	**************************/
 	mageRenderer *Renderer;
 	/*!************************
- * @brief The current scene loaded by the application
-	**************************/
-	mageScene *CurrentScene;
-	/*!************************
- * @brief The window used by the application
+ 	 * @brief The window used by the application
 	**************************/
 	mageWindow *Window;
-
-
-} mageApplication;
+	/*!************************
+	 * @brief A pointer to an instance of the application props
+	**************************/
+	mageApplicationProps Props;
+	/*!************************
+ 	 * @brief Flag whether the application is running
+	**************************/
+	uint8_t Running;
+};	
 
 /*!************************ 
  * @brief Allocates a block of memory for the application
@@ -1183,14 +1076,11 @@ extern MAGE_API void *mageApplicationAllocate();
 **************************/
 extern MAGE_API mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props);
 /*!************************
- * @brief Loads a scene for the application
+ * @brief Runs the application
  * @param application A pointer to a instance of a scene
- * @param scene A pointer to a instance of a scene
- * @return Nothing
+ * @return The result of the application's runtime
 **************************/
-extern MAGE_API void mageApplicationLoadScene(mageApplication *application, mageScene scene);
-
-
+extern MAGE_API mageResult mageApplicationRun(mageApplication *application);
 
 
 

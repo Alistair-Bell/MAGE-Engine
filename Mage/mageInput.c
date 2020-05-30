@@ -1,66 +1,54 @@
 #include "mageAPI.h"
 
-void mageGetMousePosition(mageWindow *window, double *x, double *y)
+double mageGetMousePositionX(mageWindow *window)
 {
-	
 	#if defined(MAGE_SDL2)
-		mageGetMousePositionX(window, x);
-		mageGetMousePositionY(window, y);
+		return window->Events.motion.x;
+	#elif defined(MAGE_GLFW)
+		double x;
+		glfwGetCursorPos(window->Context, &x, NULL);
+		return x;
+	#endif
+	return 0.0;
+}
+double mageGetMousePositionY(mageWindow *window)
+{
+	#if defined(MAGE_SDL2)
+		return window->Events.motion.y;
+	#elif defined(MAGE_GLFW)
+		double y;
+		glfwGetCursorPos(window->Context, NULL, &y);
+		return y;
+	#endif
+	return 0.0;
+}
+uint8_t mageGetMouseButtonLeftClick(mageWindow *window)
+{
 
-	#elif defined(MAGE_GLFW)
-		glfwGetCursorPos(window->Context, x, y);
-	#endif
-}
-void mageGetMousePositionX(mageWindow *window, double *x)
-{
-	#if defined(MAGE_SDL2)
-		*x = window->Events.motion.x;
-	#elif defined(MAGE_GLFW)
-		glfwGetCursorPos(window->Context, x, NULL);
-	#endif
-}
-void mageGetMousePositionY(mageWindow *window, double *y)
-{
-	#if defined(MAGE_SDL2)
-		*y = window->Events.motion.y;
-	#elif defined(MAGE_GLFW)
-		glfwGetCursorPos(window->Context, NULL, y);
-	#endif
-}
-void mageGetMouseButtonLeftClick(mageWindow *window, uint8_t *state)
-{
-	uint8_t is;
 	#if defined(MAGE_SDL2)
 		
 	#elif defined(MAGE_GLFW)
-		uint8_t foo = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_LEFT);
-		is = (foo == GLFW_PRESS);
+		return (glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
 	#endif
-	
-	mageTryDumpSuccess(is, state);
+	return 0;
 }
-void mageGetMouseButtonRightClick(mageWindow *window, uint8_t *state)
+uint8_t mageGetMouseButtonRightClick(mageWindow *window)
 {
-	uint8_t is;
 	#if defined(MAGE_SDL2)
 		
 	#elif defined(MAGE_GLFW)
-		uint8_t foo = glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_RIGHT);
-		is = (foo == GLFW_PRESS);
+		return (glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
 	#endif
-
-	mageTryDumpSuccess(is, state);
+	return 0;
 }
-void mageGetMouseInsideContext(mageWindow *window, uint8_t *state)
+uint8_t mageGetMouseInsideContext(mageWindow *window)
 {
-	int32_t is;
 	#if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
-		is = glfwGetWindowAttrib(window->Context, GLFW_HOVERED);
+		return glfwGetWindowAttrib(window->Context, GLFW_HOVERED);
 	#endif
-	
-	mageTryDumpSuccess(is, state);
+	return 0;
 }
 void mageSetMousePosition(mageWindow *window, const double x, const double y)
 {
@@ -70,33 +58,26 @@ void mageSetMousePosition(mageWindow *window, const double x, const double y)
 		glfwSetCursorPos(window->Context, x, y);
 	#endif
 }
-void mageGetKeyDown(mageWindow *window, const int32_t key, uint8_t *state)
+uint8_t mageGetKeyDown(mageWindow *window, const int32_t key)
 {
-	uint32_t value;
-	uint8_t is;
 	
 	#if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
-		value = glfwGetKey(window->Context, key);
-		is = (value == GLFW_PRESS || value == GLFW_REPEAT);
+		uint8_t value = glfwGetKey(window->Context, key);
+		return value == GLFW_PRESS || value == GLFW_REPEAT;
 	#endif
-	
-	mageTryDumpSuccess(is, state);
+	return 0;
 }
-void mageGetKeyNotDown(mageWindow *window, const int32_t key, uint8_t *state)
+uint8_t mageGetKeyNotDown(mageWindow *window, const int32_t key)
 {
-	uint32_t value;
-	uint8_t is;
-	
-	#if defined(MAGE_SDL2)
+#if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
-		value = glfwGetKey(window->Context, key);
-		is = !(value == GLFW_PRESS || value == GLFW_REPEAT);
+		uint8_t value = glfwGetKey(window->Context, key);
+		return !(value == GLFW_PRESS || value == GLFW_REPEAT);
 	#endif
-	
-	mageTryDumpSuccess(is, state);
+	return 0;
 }
 
 

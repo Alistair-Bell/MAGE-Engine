@@ -10,14 +10,22 @@ workspace "MAGE"
 
 -- Engine Project 
 
+
+BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+
+
 project "MageEngine"
     location "Mage"
     kind "SharedLib"
     language "C"
     cdialect "C89"
 
-    targetdir ("build/bin/%{prj.name}")
-    objdir ("build/obj/%{prj.name}")
+    targetdir (BuildTargetPath)
+    objdir (BuildObjectPath)
+    
+    pchheader "Mage/mageAPI.h"
+    pchsource "Mage/mageAPI.c"
 
 
     files
@@ -54,8 +62,8 @@ project "Sandbox"
     language "C"
     cdialect "C89"
 
-    targetdir ("build/bin/%{prj.name}")
-    objdir ("build/obj/%{prj.name}")
+    targetdir (BuildTargetPath)
+    objdir (BuildObjectPath)
 
     files
     {
@@ -74,3 +82,17 @@ project "Sandbox"
         "m"
     }
     
+    filter "configurations:Debug"
+        defines "CLIENT_DEBUG"
+        runtime "Debug"
+        symbols "On"
+
+    filter "configurations:Release"
+        defines "CLIENT_RELEASE"
+        runtime "Release"
+        optimize "On"
+
+    filter "configurations:Dist"
+        defines "CLIENT_DISTRIBUTION"
+        runtime "Release"
+        optimize "On"

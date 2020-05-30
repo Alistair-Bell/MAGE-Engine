@@ -215,7 +215,7 @@
 **************************/
 #define MAGE_LOG_USER_CLIENT 1
 
-#if defined (MAGE_DEBUG)
+#if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
 
 	#define MAGE_VALIDATION_LAYERS 1
 

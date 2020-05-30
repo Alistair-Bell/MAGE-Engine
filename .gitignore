@@ -1,4 +1,4 @@
-build
+Build
 Logs/*.*
 Documentation/*.*
 Mage/Makefile
