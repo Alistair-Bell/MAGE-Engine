@@ -89,6 +89,18 @@ enum MAGE_RESULT_ENUM
 	**************************/
 	MAGE_SURFACE_CREATION_FAILURE,
 	/*!************************
+ 	 * @brief The command pool that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_COMMAND_POOL_FAILURE,
+	/*!************************
+ 	 * @brief The command buffer allocation had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_ALLOCATE_COMMAND_FAILURE,
+	/*!************************
+ 	 * @brief The queue submition had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_QUEUE_SUBMITION_FAILURE,
+	/*!************************
  	 * @brief The machine has devices not present (USED BY THE VULKAN RENDERER MODE)
 	**************************/
 	MAGE_HARDWARE_NOT_PRESENT,
@@ -903,6 +915,10 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 {
 	#if defined(MAGE_VULKAN)
 
+		VkQueue Queue;
+
+		VkCommandBuffer CommandBuffer;
+
 		VkSwapchainKHR SwapChain;
 		
 		VkFormat Format;
@@ -1081,8 +1097,12 @@ extern MAGE_API mageResult mageApplicationInitialise(mageApplication *applicatio
  * @return The result of the application's runtime
 **************************/
 extern MAGE_API mageResult mageApplicationRun(mageApplication *application);
-
-
+/*!************************
+ * @brief Destroys the application
+ * @param application A pointer to a instance of a scene
+ * @return Nothing
+**************************/
+extern MAGE_API void mageApplicationDestroy(mageApplication *application);
 
 
 

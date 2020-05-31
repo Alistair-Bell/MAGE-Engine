@@ -23,7 +23,7 @@ int main(int32_t argc, char **args)
     props.DestroyMethod = NULL;
 
     mageApplicationInitialise(&app, &props);
-
+    
 
     mageLogEnd();
     return 0;

@@ -27,11 +27,19 @@ project "MageEngine"
     pchheader "Mage/mageAPI.h"
     pchsource "Mage/mageAPI.c"
 
+    buildoptions
+    {
+        "-Wall",
+        "-ansi"
+    }
+
 
     files
     {
         "Mage/**.h",
-        "Mage/**.c"
+        "Mage/**.c",
+        "Mage/Vulkan/**.h",
+        "Mage/Vulkan/**.c"
     }
     defines
     {

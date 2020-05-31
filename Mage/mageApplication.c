@@ -92,10 +92,14 @@ mageResult mageApplicationRun(mageApplication *application)
         return destroyResult;
     }
 
-    mageWindowTerminate(application->Window);
-
-    application->Props.FreeCallback(application->Renderer);
+    mageApplicationDestroy(application);
+    return MAGE_SUCCESS;
+}
+void mageApplicationDestroy(mageApplication *application)
+{
     application->Props.FreeCallback(application->Window);
 
-    return MAGE_SUCCESS;
+    mageRendererDestroy(application->Renderer);
+
+    application->Props.FreeCallback(application->Renderer);
 }
