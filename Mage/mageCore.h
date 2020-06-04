@@ -174,9 +174,12 @@
 
 
 
+
 /*!************************
 	C standard includes 
 **************************/
+
+
 
 #include <assert.h>
 #include <stdlib.h>
@@ -188,7 +191,8 @@
 #include <time.h>
 #include <signal.h> 
 #include <stdint.h>
-#include <stdbool.h>
+
+#define MAGE_BIT(x) (1 << x) 
 
 /*!************************
 	@brief The mode that is a inform 
@@ -215,7 +219,7 @@
 **************************/
 #define MAGE_LOG_USER_CLIENT 1
 
-#if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+#if defined (MAGE_DEBUG)
 
 	#define MAGE_VALIDATION_LAYERS 1
 
@@ -231,23 +235,28 @@
 	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
 	#define MAGE_VALIDATION_LAYERS 1
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
 	#define MAGE_LOG_CORE_ERROR(x, ...)
 	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...)
+	#define MAGE_DEBUG_BREAK
+#endif
+
+#if defined(CLIENT_DEBUG)
+	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
+#else
 	#define MAGE_LOG_CLIENT_INFORM(x, ...)
 	#define MAGE_LOG_CLIENT_WARNING(x, ...)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...)
 	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...)
-	#define MAGE_VALIDATION_LAYERS 0
-	#define MAGE_DEBUG_BREAK
+
 #endif
+
 
 #if defined (MAGE_SDL2)
     #define MAGE_KEYCODE_SPACE SDLK_SPACE  
@@ -570,6 +579,11 @@
 	@brief Event catagory mouse
 **************************/
 #define MAGE_EVENT_CATAGORY_MOUSE 7
+
+
+
+
+#if 0
 /*!************************
 	@brief The bit of the type of the camera (0 = orthographic | 1 = perspective)
 **************************/
@@ -603,6 +617,6 @@
 **************************/
 #define MAGE_CAMERA_BIT_TOGGLE 7
 
-
+#endif
 
 #endif

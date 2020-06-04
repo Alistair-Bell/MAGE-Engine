@@ -7,9 +7,9 @@ void *mageWindowAllocate()
 mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
 {
 
-	window->Height = yResolution;
-	window->Width = xResolution;
-	window->Title = title;
+	window->Height  = yResolution;
+	window->Width   = xResolution;
+	window->Title   = title;
 	window->Running = 1;
 	
 	#if defined(MAGE_SDL2)
@@ -52,6 +52,7 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 	#endif
 
 	return MAGE_SUCCESS;
+
 }
 void mageWindowSwapBuffers(mageWindow *window)
 {

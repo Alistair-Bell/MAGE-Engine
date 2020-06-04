@@ -2,9 +2,9 @@
 
 typedef struct MAGE_API MAGE_LOGING_STRUCT
 {   
-    uint8_t LogCount;
-    uint8_t WarningCount;
-    uint8_t ErrorCount;
+    uint64_t LogCount;
+    uint64_t WarningCount;
+    uint64_t ErrorCount;
     time_t Timer;
     struct tm *Time;
     FILE *DebugFile;

@@ -69,13 +69,13 @@ enum MAGE_RESULT_ENUM
 	**************************/
 	MAGE_INVALID_INPUT,
 	/*!************************
- 	 * @brief The context that was being made was invalid or unsuccesful 
-	**************************/
-	MAGE_CONTEXT_CREATION_FAILED,
-	/*!************************
  	 * @brief The hardware that is trying to be used is invalid and cannot be used  
 	**************************/
 	MAGE_HARDWARE_INVALID,
+	/*!************************
+ 	 * @brief The context that was being made was invalid or unsuccesful 
+	**************************/
+	MAGE_CONTEXT_CREATION_FAILED,
 	/*!************************
  	 * @brief The instance that is being created had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
@@ -89,13 +89,25 @@ enum MAGE_RESULT_ENUM
 	**************************/
 	MAGE_SURFACE_CREATION_FAILURE,
 	/*!************************
+ 	 * @brief The fence that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_FENCE_CREATION_FAILURE,
+	/*!************************
+ 	 * @brief The semaphore that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_SEMAPHORE_CREATION_FAILURE,
+	/*!************************
  	 * @brief The command pool that is being created had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
-	MAGE_COMMAND_POOL_FAILURE,
+	MAGE_COMMAND_POOL_CREATION_FAILURE,
 	/*!************************
  	 * @brief The command buffer allocation had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
 	MAGE_ALLOCATE_COMMAND_FAILURE,
+	/*!************************
+ 	 * @brief The swapchain pool that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_SWAPCHAIN_CREATION_FAILED,
 	/*!************************
  	 * @brief The queue submition had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
@@ -124,6 +136,11 @@ enum MAGE_RESULT_ENUM
  * @return The success of the method
 **************************/
 extern MAGE_API mageResult mageEngineInitialise();
+/*!************************
+ * @brief Turns a result enum to string form
+ * @return The string
+**************************/
+extern MAGE_API const char *mageToString(mageResult result);
 /*!************************ 
  * @brief Free method used by the destory methods throughout the API
  * @param item pointer to a block of memory which will be freed
@@ -855,6 +872,12 @@ extern MAGE_API void mageWindowTerminate(mageWindow *window);
 **************************/
 extern MAGE_API void mageWindowDestroy(mageWindow *window); 
 /*!************************ 
+ * @brief Sets up the input handle 
+ * @param window A pointer to a instance of a window
+ * @return Nothing
+**************************/
+extern MAGE_API void mageInputIntialise(mageWindow *window);
+/*!************************ 
  * @brief Gets the mouse's x coordinate 
  * @param window A pointer to a instance of a window
  * @return The X coordinate
@@ -915,15 +938,21 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 {
 	#if defined(MAGE_VULKAN)
 
+		VkViewport Viewport;
+		
 		VkQueue Queue;
 
-		VkCommandBuffer CommandBuffer;
+		VkCommandBuffer CommandBuffer[2];
 
 		VkSwapchainKHR SwapChain;
 		
 		VkFormat Format;
 
 		VkPhysicalDeviceMemoryProperties MemoryProperties;
+
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+		
+		VkSurfaceFormatKHR SurfaceFormat;
 
 		VkDevice Device;
 
@@ -943,11 +972,15 @@ typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 
 		VkInstance Instance;
 
+		VkImage *SwapChainImages;
+
+		VkImageView *SwapChainImageViews;
+
 		uint32_t GraphicsFamilyIndex;
 
 		uint32_t GraphicsPresentFamily;
 
-		uint32_t ImageCount;
+		uint32_t SwapChainImageCount;
 
 	#endif
 

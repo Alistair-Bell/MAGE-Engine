@@ -3,11 +3,13 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Mage"
             ],
             "defines": [
                 "MAGE_DEBUG",
-                "MAGE_CORE"
+                "MAGE_CORE",
+                "CLIENT_DEBUG"
 
             ],
             "compilerPath": "/usr/lib64/ccache/clang",

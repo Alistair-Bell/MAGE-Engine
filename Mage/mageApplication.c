@@ -1,5 +1,54 @@
 #include "mageAPI.h"
 
+mageResult mageEngineInitialise(void)
+{
+    #if defined(MAGE_DEBUG)
+		mageFileDumpContents("Logs/mage.log", "", 1);
+		mageLogInitialise("Logs/mage.log");
+		MAGE_LOG_CORE_WARNING("Debug mode in uses, for best performance turn debug mode of\n", NULL);
+		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
+	#endif
+
+	#if defined(MAGE_SDL2)
+		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
+			
+		if (flag != 0)
+		{
+			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
+			return MAGE_LIBRARY_FAILURE
+		}
+
+		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
+
+	#endif
+
+	#if defined(MAGE_GLFW)
+
+		if (!glfwInit())
+		{
+			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
+			return MAGE_LIBRARY_FAILURE;
+		}	
+
+		#if defined(MAGE_VULKAN)
+			uint8_t flag = glfwVulkanSupported();
+
+			if (!flag)
+			{
+				MAGE_LOG_CLIENT_FATAL_ERROR("GLFW does not support vulkan\n", NULL);
+				return MAGE_LIBRARY_FAILURE;
+			}
+			MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
+
+		#endif
+
+		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
+
+	#endif
+	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
+	return MAGE_SUCCESS;
+
+}
 void *mageApplicationAllocate()
 {
     return malloc(sizeof(struct MAGE_APPLICATION_STRUCT));
@@ -52,6 +101,8 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
         return result;
     }
     
+    mageInputIntialise(application->Window);
+
     return MAGE_SUCCESS;
 }
 mageResult mageApplicationRun(mageApplication *application)
@@ -68,16 +119,15 @@ mageResult mageApplicationRun(mageApplication *application)
 
     while (application->Running)
     {
-        application->Props.UpdateMethod(application);
 
         #if defined(MAGE_GLFW)
 
-            /* Swap front and back buffers */
             mageWindowSwapBuffers(application->Window);
 
-            /* Poll for and process events */
-            glfwPollEvents();
+            application->Props.UpdateMethod(application);
 
+            glfwPollEvents();
+            
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
 
         #endif
@@ -97,9 +147,10 @@ mageResult mageApplicationRun(mageApplication *application)
 }
 void mageApplicationDestroy(mageApplication *application)
 {
-    application->Props.FreeCallback(application->Window);
-
     mageRendererDestroy(application->Renderer);
 
+
+    application->Props.FreeCallback(application->Window);
     application->Props.FreeCallback(application->Renderer);
+
 }

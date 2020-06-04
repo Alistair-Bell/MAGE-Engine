@@ -17,23 +17,16 @@ BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}-%{cfg.system}-%{cfg
 
 project "MageEngine"
     location "Mage"
-    kind "SharedLib"
-    language "C"
+    kind "StaticLib"
+	language "C"
     cdialect "C89"
 
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
-    
+
     pchheader "Mage/mageAPI.h"
     pchsource "Mage/mageAPI.c"
-
-    buildoptions
-    {
-        "-Wall",
-        "-ansi"
-    }
-
-
+    
     files
     {
         "Mage/**.h",
@@ -44,6 +37,11 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE"
+    }
+
+    includedirs
+    {
+        "Mage"
     }
 
     filter "configurations:Debug"

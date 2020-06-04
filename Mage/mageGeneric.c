@@ -1,55 +1,67 @@
 #include "mageAPI.h"
 
-mageResult mageEngineInitialise(void)
+const char *mageToString(mageResult result)
 {
-	#if defined(MAGE_DEBUG)
-		mageFileDumpContents("Logs/mage.log", "", 1);
-		mageLogInitialise("Logs/mage.log");
-		MAGE_LOG_CORE_WARNING("Debug mode in uses, for best performance turn debug mode of\n", NULL);
-		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
-	#endif
-
-	#if defined(MAGE_SDL2)
-		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
-			
-		if (flag != 0)
-		{
-			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
-			return MAGE_LIBRARY_FAILURE
-		}
-
-		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
-
-	#endif
-
-	#if defined(MAGE_GLFW)
-
-		if (!glfwInit())
-		{
-			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
-			return MAGE_LIBRARY_FAILURE;
-		}	
-
-		#if defined(MAGE_VULKAN)
-			uint8_t flag = glfwVulkanSupported();
-
-			if (!flag)
-			{
-				MAGE_LOG_CLIENT_FATAL_ERROR("GLFW does not support vulkan\n", NULL);
-				return MAGE_LIBRARY_FAILURE;
-			}
-			MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
-
-		#endif
-
-		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
-
-	#endif
-	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
-	return MAGE_SUCCESS;
-
+	switch (result)
+	{
+		case MAGE_SUCCESS:
+			return "Success";
+			break;
+		case MAGE_LIBRARY_FAILURE:
+			return "Library initialisation has failed";
+			break;
+		case MAGE_INVALID_INPUT:
+			return "Input was invalid";
+			break;
+		case MAGE_HARDWARE_INVALID:
+			return "System hardware is invalid";
+			break;
+		case MAGE_INSTANCE_CREATION_FAILURE:
+			return "Instance creation has failed";
+			break;
+		case MAGE_CONTEXT_CREATION_FAILED:
+			return "Context creation failed";
+			break;
+		case MAGE_DEVICE_CREATION_FAILURE:
+			return "Device creation failed";
+			break;
+		case MAGE_SURFACE_CREATION_FAILURE:
+			return "Surface creation failed";
+			break;
+		case MAGE_FENCE_CREATION_FAILURE:
+			return "Fence creation failed";	
+			break;
+		case MAGE_SEMAPHORE_CREATION_FAILURE:
+			return "Semaphore creation failed";
+			break;
+		case MAGE_COMMAND_POOL_CREATION_FAILURE:
+			return "Command pool creation failed";
+			break;
+		case MAGE_ALLOCATE_COMMAND_FAILURE:
+			return "Buffer allocation creation failed";
+			break;
+		case MAGE_SWAPCHAIN_CREATION_FAILED:
+			return "Swap chain creation failed";
+			break;
+		case MAGE_QUEUE_SUBMITION_FAILURE:
+			return "Queue sub";
+			break;
+		case MAGE_HARDWARE_NOT_PRESENT:
+			return "";
+			break;
+		case MAGE_START_METHOD_FAILURE:
+			return "";
+			break;
+		case MAGE_START_UPDATE_FAILURE:
+			return "";
+			break;
+		case MAGE_DESTROY_METHOD_FAILURE:
+			return "";
+			break;
+		default:
+			return "Unknown error";
+	}
 }
-
 void *mageAllocationMethod(const uint64_t size)
 {
 	return malloc(size);
