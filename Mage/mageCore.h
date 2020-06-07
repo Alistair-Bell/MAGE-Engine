@@ -192,6 +192,14 @@
 #include <signal.h> 
 #include <stdint.h>
 
+/*!************************
+	Allows mono c# scripting 
+**************************/
+#if defined(MAGE_MONO_EXTERNALS)
+	#include <mono-2.0/mono/metadata/assembly.h>
+	#include <mono-2.0/mono/jit/jit.h>
+#endif
+
 #define MAGE_BIT(x) (1 << x) 
 
 /*!************************

@@ -1,5 +1,4 @@
-Build
+Build*
 Logs/*.*
 Documentation/*.*
-Mage/Makefile
-Sandbox/Makefile
+Makefile*

@@ -75,9 +75,12 @@ void mageLogEnd()
 {
 	MAGE_LOG_CORE_INFORM("Logging Details:\nLog Count -> %d\nWarning Count -> %d\nError Count -> %d\n", Logger.LogCount, Logger.WarningCount, Logger.ErrorCount);
 
+    #if defined(MAGE_DEBUG) || defined(CLIENT_DEBUG)
 
-    fclose(Logger.DebugFile);
-    
-    printf("%s", "\x1b[0m");
+        fclose(Logger.DebugFile);
+        
+        printf("%s", "\x1b[0m");
+
+    #endif
 }
 

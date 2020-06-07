@@ -45,8 +45,9 @@ mageResult mageEngineInitialise(void)
 		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
 
 	#endif
+    
 	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
-	return MAGE_SUCCESS;
+    return MAGE_SUCCESS;
 
 }
 void *mageApplicationAllocate()
@@ -147,10 +148,8 @@ mageResult mageApplicationRun(mageApplication *application)
 }
 void mageApplicationDestroy(mageApplication *application)
 {
+
     mageRendererDestroy(application->Renderer);
-
-
-    application->Props.FreeCallback(application->Window);
     application->Props.FreeCallback(application->Renderer);
-
+    application->Props.FreeCallback(application->Window);
 }

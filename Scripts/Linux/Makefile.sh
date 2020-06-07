@@ -1,6 +1,6 @@
 #! /bin/bash
 echo "Running Premake"
-./Externals/Linux/premake5 --cc=clang gmake2
+./Externals/Linux/premake5 --dotnet=mono gmake2 -cc=clang gmake2
 echo "Running make"
-make
-./Build/Binaries/Sandbox-Debug-linux-x86_64/Sandbox
+make config="$1" 
+./Build/Binaries/MageEngine/MageEngine

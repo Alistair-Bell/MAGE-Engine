@@ -4,12 +4,15 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/Mage"
+                "${workspaceFolder}/Mage",
+                "/usr/local/include/mono-2.0"
+            
             ],
             "defines": [
                 "MAGE_DEBUG",
                 "MAGE_CORE",
-                "CLIENT_DEBUG"
+                "CLIENT_DEBUG",
+                "MAGE_MONO_EXTERNALS"
 
             ],
             "compilerPath": "/usr/lib64/ccache/clang",

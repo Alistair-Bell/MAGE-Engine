@@ -1,3 +1,8 @@
+
+BuildTargetPath = "Build/Binaries/%{prj.name}"
+BuildObjectPath = "Build/Objects/%{prj.name}"
+    
+
 workspace "MAGE"
     architecture "x64"
 
@@ -6,20 +11,20 @@ workspace "MAGE"
         "Debug",
         "Release",
         "Distribution"
-    }
+    } 
+-- Engine Project
 
--- Engine Project 
+group "Externals"
+    include "Mage/Externals/hypatia/"
 
-
-BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 
 project "MageEngine"
     location "Mage"
-    kind "StaticLib"
-	language "C"
+    kind "ConsoleApp"
+    language "C"
     cdialect "C89"
+
 
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
@@ -29,23 +34,58 @@ project "MageEngine"
     
     files
     {
-        "Mage/**.h",
-        "Mage/**.c",
-        "Mage/Vulkan/**.h",
-        "Mage/Vulkan/**.c"
+        "Mage/*.h",
+        "Mage/*.c",
+        "Mage/Platform/Vulkan/**.c",
+        "Mage/Platform/Mono/**.c"
     }
     defines
     {
-        "MAGE_CORE"
+        "MAGE_CORE",
+        "MAGE_MONO_EXTERNALS"
+    }
+    linkoptions 
+    { 
+        "`wx-config --libs`"
     }
 
     includedirs
     {
-        "Mage"
+        "Mage",
+        "/usr/local/include/mono-2.0"
+            
     }
+    flags
+    {
+        "FatalWarnings",
+        "FatalCompileWarnings",
+        "LinkTimeOptimization",
+        
+    }
+    links
+    {
+        "Sandbox",
+        "hypatia",
+        
+        "glfw3",
+        "vulkan",
+        "X11",
+        "dl",
+        "pthread",
+        "m",
+        "mono-2.0",
+        "c"
+    }
+
+
+    filter "system:windows"
+        systemversion "latest"
+    
+    
 
     filter "configurations:Debug"
         defines "MAGE_DEBUG"
+        defines "CLIENT_DEBUG"
         runtime "Debug"
         symbols "On"
 
@@ -54,51 +94,35 @@ project "MageEngine"
         runtime "Release"
         optimize "On"
 
-    filter "configurations:Dist"
+    filter "configurations:Distribution"
         defines "MAGE_DISTRIBUTION"
         runtime "Release"
         optimize "On"
 
 
--- Client Project
-
 project "Sandbox"
     location "%{prj.name}"
-    kind "ConsoleApp"
-    language "C"
-    cdialect "C89"
-
+    kind "SharedLib"
+    language "C#"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
-
+    
     files
     {
-        "%{prj.name}/**.h",    
-        "%{prj.name}/**.c",
+        "Mage/mageAPI.cs",
+        "%{prj.name}/**.cs",
     }
 
-    links
-    {
-        "MageEngine",
-        "glfw3",
-        "vulkan",
-        "X11",
-        "dl",
-        "pthread",
-        "m"
-    }
-    
     filter "configurations:Debug"
-        defines "CLIENT_DEBUG"
         runtime "Debug"
         symbols "On"
-
+        
     filter "configurations:Release"
-        defines "CLIENT_RELEASE"
+        runtime "Release"
+        optimize "On"
+        
+    filter "configurations:Distribution"
         runtime "Release"
         optimize "On"
 
-    filter "configurations:Dist"
-        defines "CLIENT_DISTRIBUTION"
-        runtime "Release"
-        optimize "On"
+        

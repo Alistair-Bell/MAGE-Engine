@@ -441,357 +441,6 @@ extern MAGE_API mageResult mageFileReadContents(const char *file, char *buffer, 
 extern MAGE_API mageResult mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean);
 
 
-/*!************************ 
- * @brief Stores 2 floats within the struct
-**************************/
-typedef struct MAGE_API MAGE_VECTOR2_STRUCT
-{
-	/*!************************ 
-	 * @brief First value
-	**************************/
-	float x;
-	/*!************************ 
-	 * @brief Second value
-	**************************/
-	float y;
-
-} mageVector2;
-
-/*!************************ 
- * @brief Allocates a block of memory for the vector2
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageVector2Allocate();
-/*!************************ 
- * @brief Intitalises the vector2 based on the values passed 
- * @param vector2 A pointer to a instance of a vector2
- * @param value1 The value which x will be set to
- * @param value2 The value which y will be set to
- * @return Nothing
-**************************/
-extern MAGE_API void mageVector2Initialise(mageVector2 *vector2, const float value1, const float value2);
-/*!************************ 
- * @brief Adds the right vector2 to the left vector2 
- * @param left A pointer to a instance of a vector2 which will be modified
- * @param right A pointer to a instance of a vector2 which will add the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector2Add(mageVector2 *left, const mageVector2 *right);
-/*!************************ 
- * @brief Subtracts the right vector2 to the left vector2 
- * @param left A pointer to a instance of a vector2 which will be modified
- * @param right A pointer to a instance of a vector2 which will subtract the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector2Subtract(mageVector2 *left, const mageVector2 *right);
-/*!************************ 
- * @brief Multiplies the right vector2 to the left vector2 
- * @param left A pointer to a instance of a vector2 which will be modified
- * @param right A pointer to a instance of a vector2 which will multiply the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void magemageVector2Multiply(mageVector2 *left, const mageVector2 *right);
-/*!************************ 
- * @brief Divides the right vector2 to the left vector2 
- * @param left A pointer to a instance of a vector2 which will be modified
- * @param right A pointer to a instance of a vector2 which will divide the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector2Divide(mageVector2 *left, const mageVector2 *right);
-/*!************************ 
- * @brief Destroys the vector2 freeing itelsf
- * @param vector A pointer to a instance of a vector2
- * @return Nothing
- * @warning If the vector2 not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageVector2Destroy(mageVector2 *vector);
-
-/*!************************ 
- * @brief Stores 3 floats within the struct
-**************************/
-typedef struct MAGE_API MAGE_VECTOR3_STRUCT
-{
-	/*!************************ 
-	 * @brief First value
-	**************************/
-	float x;
-	/*!************************ 
-	 * @brief Second value 
-	**************************/
-	float y;
-	/*!************************ 
-	 * @brief Third value
-	**************************/
-	float z;	
-
-} mageVector3;
-
-/*!************************ 
- * @brief Allocates a block of memory for the vector3
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageVector3Allocate();
-/*!************************ 
- * @brief Intitalises the vector3 based on the values passed 
- * @param vector3 A pointer to a instance of a vector3
- * @param value1 The value which x will be set to
- * @param value2 The value which y will be set to
- * @param value3 The value which z will be set to
- * @return Nothing
-**************************/
-extern MAGE_API void mageVector3Initialise(mageVector3 *vector3, const float value1, const float value2, const float value3);
-/*!************************ 
- * @brief Adds the right vector3 to the left vector3 
- * @param left A pointer to a instance of a vector3 which will be modified
- * @param right A pointer to a instance of a vector3 which will add the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector3Add(mageVector3 *left, const mageVector3 *right);
-/*!************************ 
- * @brief Subtracts the right vector3 to the left vector3 
- * @param left A pointer to a instance of a vector3 which will be modified
- * @param right A pointer to a instance of a vector3 which will subtract the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector3Subtract(mageVector3 *left, const mageVector3 *right);
-/*!************************ 
- * @brief Multiplies the right vector3 to the left vector3 
- * @param left A pointer to a instance of a vector3 which will be modified
- * @param right A pointer to a instance of a vector3 which will multiply the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector3Multiply(mageVector3 *left, const mageVector3 *right);
-/*!************************ 
- * @brief Divides the right vector3 to the left vector3 
- * @param left A pointer to a instance of a vector3 which will be modified
- * @param right A pointer to a instance of a vector3 which will divide the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector3Divide(mageVector3 *left, const mageVector3 *right);
-/*!************************
- * @brief Destroys the vector3 freeing itelsf
- * @param vector A pointer to a instance of a vector3
- * @return Nothing
- * @warning If the vector3 is not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageVector3Destroy(mageVector3 *vector);
-
-/*!************************ 
- * @brief Stores 4 floats within the struct
-**************************/
-typedef struct MAGE_API MAGE_VECTOR4_STRUCT
-{
-	/*!************************ 
-	 * @brief First value
-	**************************/
-	float x;
-	/*!************************ 
-	 * @brief Second value
-	**************************/
-	float y;
-	/*!************************ 
-	 * @brief Third value
-	**************************/
-	float z;
-	/*!************************ 
-	 * @brief Fourth value
-	**************************/
-	float w;	
-
-} mageVector4;
-
-/*!************************ 
- * @brief Allocates a block of memory for the vector4
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageVector4Allocate();
-/*!************************ 
- * @brief Intitalises the vector3 based on the values passed 
- * @param vector4 A pointer to a instance of a vector4
- * @param value1 The value which x will be set to
- * @param value2 The value which y will be set to
- * @param value3 The value which z will be set to
- * @param value4 The value which w will be set to
- * @return Nothing
-**************************/
-extern MAGE_API void mageVector4Initialise(mageVector4 *vector4, const float value1, const float value2, const float value3, const float value4);
-/*!************************ 
- * @brief Intitalises the vector4 based 2 vector2's
- * @param vector4 A pointer to a instance of a vector4
- * @param left The vector's x and y will set the vector4's x and y 
- * @param right The vector's x and y will set the vector4's z and w
- * @return Nothing
-**************************/
-extern MAGE_API void mageVector4InitialiseVector2(mageVector4 *vector4, const mageVector2 *left, const mageVector2 *right);
-/*!************************ 
- * @brief Adds the right vector4 to the left vector4 
- * @param left A pointer to a instance of a vector4 which will be modified
- * @param right A pointer to a instance of a vector4 which will add the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector4Add(mageVector4 *left, const mageVector4 *right);
-/*!************************ 
- * @brief Subtracts the right vector4 to the left vector4 
- * @param left A pointer to a instance of a vector4 which will be modified
- * @param right A pointer to a instance of a vector4 which will subtract the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector4Subtract(mageVector4 *left, const mageVector4 *right);
-/*!************************ 
- * @brief Multiplies the right vector4 to the left vector4 
- * @param left A pointer to a instance of a vector4 which will be modified
- * @param right A pointer to a instance of a vector4 which will multiply the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector4Multiply(mageVector4 *left, const mageVector4 *right);
-/*!************************ 
- * @brief Divides the right vector4 to the left vector4 
- * @param left A pointer to a instance of a vector4 which will be modified
- * @param right A pointer to a instance of a vector4 which will divide the left
- * @return Nothing 	
-**************************/
-extern MAGE_API void mageVector4Divide(mageVector4 *left, const mageVector4 *right);
-/*!************************
- * @brief Destroys the vector4 freeing itelsf
- * @param vector A pointer to a instance of a vector4
- * @return Nothing
- * @warning If the vector4 is not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageVector4Destroy(mageVector4 *vector);
-
-/*!************************
- * @brief Stores 16 floating point numbers
- * @brief When writing shaders in GLSL matrix4x4 is called mat4
- * @warning This implimentation uses column majoring
- * @see https://en.wikipedia.org/wiki/Row-_and_column-major_order
-**************************/
-typedef struct MAGE_API MAGE_MATRIX4X4
-{
-	/*!************************
-	 * @brief Stores 16 floats
-	**************************/
-	float Elements[16];
-
-} mageMatrix4x4;
-
-/*!************************ 
- * @brief Allocates a block of memory for the matrix
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageMatrix4x4Allocate();
-/*!************************
- * @brief Sets all the matrix's elements to 0.0f 	
- * @param matrix A pointer to a instance of a matrix
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Default(mageMatrix4x4 *matrix);
-/*!************************
- * @brief Initialises the matrix based on 4 vector4s
- * @param matrix A pointer to a instance of a matrix
- * @param column0 A pointer to a insatnce of a vector4 which the matrix's 0 index row will be set to.
-				   Elements[0] = column0.x | Elements[4] = column0.y Elements[8] = column0.z | Elements[12] = column0.w
- * @param column1 A pointer to a insatnce of a vector4 which the matrix's 1 index row will be set to.
-				   Elements[1] = column1.x | Elements[5] = column1.y Elements[9] = column1.z | Elements[13] = column1.w
- * @param column2 A pointer to a insatnce of a vector4 which the matrix's 2 index row will be set to.
-				   Elements[2] = column1.x | Elements[6] = column1.y Elements[10] = column1.z | Elements[14] = column1.w
- * @param column3 A pointer to a insatnce of a vector4 which the matrix's 3 index row will be set to.
-				   Elements[3] = column1.x | Elements[7] = column1.y Elements[11] = column1.z | Elements[15] = column1.w
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4InitialiseVector4(mageMatrix4x4 *matrix, const mageVector4 *column0, const mageVector4 *column1, const mageVector4 *column2, const mageVector4 *column3);
-/*!************************
- * @brief Initialises the matrix based on passing in a set number of floats
- * @param matrix A pointer to a instance of a matrix
- * @param elements A array of floating points
- * @param count Count of the amount of floats being passed in
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4InitialiseArray(mageMatrix4x4 *matrix, const float *elements, const uint8_t count);
-/*!************************ 
- * @brief Initialises the matrix using a diagonal
- * @param matrix A pointer to a instance of a matrix
- * @param diagonal Sets the diagonal elements to the value passed in
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4InitialiseDiagonal(mageMatrix4x4 *matrix, const float diagonal);
-/*!************************
-` * @brief Multiplies the left matrix by the right matrix
- * @param left The left matrix
- * @param right The right matrix
- * @param result The result where the calculation will be dumped
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Multiply(const mageMatrix4x4 *left, const mageMatrix4x4 *right, mageMatrix4x4 *result);
-/*!************************
- * @brief Applies a perspective matrix to the matrix
- * @param matrix A pointer to a instance of a matrix
- * @param fov The angle the rays get cas
- * @param aspectRatio The aspect ratio of the screen 
- * @param near The nearest plane to clip
- * @param far The furthest plane to clip
- * @return Nothing
- * @see https://en.wikipedia.org/wiki/3D_projection
-**************************/
-extern MAGE_API void mageMatrix4x4Perspective(mageMatrix4x4 *matrix, const float fov, const float aspectRatio, const float near, const float far);
-/*!************************
- * @brief Applies a orthographic matrix to the matrix
- * @param matrix A pointer to a instance of a matrix
- * @param left The leftmost plane
- * @param right The rightmost plane
- * @param bottom The bottommost plane
- * @param top The topmost plan
- * @param near The nearest plane included to the start of the projection
- * @param far The furthest plane included to the start of the projection
- * @return Nothing
- * @see https://en.wikipedia.org/wiki/3D_projection
-**************************/
-extern MAGE_API void mageMatrix4x4Orthographic(mageMatrix4x4 *matrix, const float left, const float right, const float bottom, const float top, const float near, const float far);
-/*!************************
- * @brief Translates the matrix
- * @param matrix A pointer to a instance of a matrix
- * @param translation The translation to be applied
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Translation(mageMatrix4x4 *matrix, const mageVector3 *translation);
-/*!************************
- * @brief Rotates a matrix using a axis and angle
- * @param matrix A pointer to a instance of a matrix
- * @param angle The angle of rotation
- * @param axis Axis to be used for rotation
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Rotation(mageMatrix4x4 *matrix, const float angle, const mageVector3 *axis);
-/*!************************
- * @brief Scales a matrix using 3 floats (vector3)
- * @param matrix A pointer to a instance of a matrix
- * @param scale The scale the matrix will be applying
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Scale(mageMatrix4x4 *matrix, const mageVector3 *scale);
-/*!************************
- * @brief Inverts using matrix maths
- * @param matrix A pointer to a instance of a matrix
- * @return Nothing
-**************************/
-extern MAGE_API void mageMatrix4x4Invert(mageMatrix4x4 *matrix);
-/*!************************
- * @brief Destroys the matrix freeing itelsf
- * @param matrix A pointer to a instance of a matrix
- * @return Nothing
- * @warning If the matrix is not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageMatrix4x4Destroy(mageMatrix4x4 *matrix);
-/*!************************
- * @brief Converts degrees into radians
- * @param result A pointer to where the result will be dumped
- * @return The result
-**************************/
-extern MAGE_API float mageToRadians(const float degrees);
-
 
 /*!************************
  * @brief Window context used by the engine to render to
@@ -1119,25 +768,67 @@ struct MAGE_APPLICATION_STRUCT
 extern MAGE_API void *mageApplicationAllocate();
 /*!************************
  * @brief Initialises the application
- * @param application A pointer to a instance of a scene
+ * @param application A pointer to a instance of a application
  * @param props The props used to construct the application and its members
  * @return The success of the method 
 **************************/
 extern MAGE_API mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props);
 /*!************************
  * @brief Runs the application
- * @param application A pointer to a instance of a scene
+ * @param application A pointer to a instance of a application
  * @return The result of the application's runtime
 **************************/
 extern MAGE_API mageResult mageApplicationRun(mageApplication *application);
 /*!************************
  * @brief Destroys the application
- * @param application A pointer to a instance of a scene
+ * @param application A pointer to a instance of a application
  * @return Nothing
 **************************/
 extern MAGE_API void mageApplicationDestroy(mageApplication *application);
 
 
+#if defined(MAGE_MONO_EXTERNALS)
+
+	typedef struct MAGE_MONO_HANDLER_STRUCT
+	{
+		/*!************************
+		 * @brief The domain used by mono
+		**************************/
+		MonoDomain *Domain;
+		/*!************************
+		 * @brief The assembler used by mono
+		**************************/
+		MonoAssembly *Assembler;
+		/*!************************
+		 * @brief The image used by mono
+		**************************/
+		MonoImage *Image;
+		
+
+	} mageMonoHandler;
+
+	/*!************************ 
+	 * @brief Allocates a block of memory for the handler
+	 * @return Void pointer to the block of memory allocated
+	 * @warning The pointer has not been type casted
+	**************************/ 
+	extern MAGE_API void *mageMonoHandlerAllocate();
+	/*!************************ 
+	 * @brief Sets up the mono for runtime use
+	 * @param handler A pointer to a instance of a mono handler
+	 * @param builtLibrary The name of the build dll from the mono compiler
+	 * @return The result of the function
+	**************************/ 
+	mageResult mageMonoHandlerInitialise(mageMonoHandler *handler, const char *builtLibrary);
+	/*!************************ 
+	 * @brief Sets up the mono for runtime use
+	 * @param monoClass The class that the method is in
+	 * @param name The name of the method inside the class
+	 * @return The method
+	**************************/ 
+	MonoMethod *mageMonoHandlerFindMethod(MonoClass *monoClass, const char *name);
+
+#endif
 
 
 #endif  
