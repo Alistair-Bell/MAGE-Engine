@@ -84,5 +84,5 @@ void mageWindowDestroy(mageWindow *window)
 		SDL_DestroyWindow(window->Context);	
 		SDL_Quit();
 	#endif	
-	mageFreeMethod(window);
+	free(window);
 }

@@ -22,6 +22,10 @@
     {
         MAGE_LOG_CLIENT_FATAL_ERROR("%s", mono_string_to_utf8(message));
     }
+    MonoBoolean mageMonoInterpretIsKeyPressed(int32_t monoEnum)
+    {
+        return 1;  
+    }
     MonoMethod *mageMonoHandlerFindMethod(MonoClass *monoClass, const char *name)
     {
         MonoMethod* method = NULL;
@@ -33,7 +37,6 @@
                 method = m;
             }
         }
-
         return method;
     }
     mageResult mageMonoHandlerInitialise(mageMonoHandler *handler, const char *builtLibrary)
@@ -49,11 +52,14 @@
 
         handler->Image = mono_assembly_get_image(handler->Assembler);
 
+        
         mono_add_internal_call("Mage.Log::Inform", mageMonoInterpretLogInform);
         mono_add_internal_call("Mage.Log::Warning", mageMonoInterpretLogWarning);
         mono_add_internal_call("Mage.Log::Error", mageMonoInterpretLogError);
         mono_add_internal_call("Mage.Log::FatalError", mageMonoInterpretLogFatalError);
+        mono_add_internal_call("Mage.Event::IsKeyPressed", mageMonoInterpretIsKeyPressed);
 
+        MAGE_LOG_CORE_INFORM("Succesfully using c# scripting!\n", NULL);
         return MAGE_SUCCESS;
     }
     void mageMonoCleanup(mageMonoHandler *handler)

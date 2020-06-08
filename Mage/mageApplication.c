@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-mageResult mageEngineInitialise(void)
+mageResult mageEngineInitialise(const mageApplicationProps *props)
 {
     #if defined(MAGE_DEBUG)
 		mageFileDumpContents("Logs/mage.log", "", 1);
@@ -57,38 +57,49 @@ void *mageApplicationAllocate()
 
 static mageResult mageApplicationDefaultStart(mageApplication *application)
 {
-    MAGE_LOG_CORE_WARNING("Using default start method\n", NULL);
     return MAGE_SUCCESS;
 }
 static void mageApplicationDefaultUpdate(mageApplication *application)
 {
-    MAGE_LOG_CORE_WARNING("Using default update method\n", NULL);
+
 }
 static mageResult mageApplicationDefaultDestroy(mageApplication *application)
 {
-    MAGE_LOG_CORE_WARNING("Using default destroy method\n", NULL);
     return MAGE_SUCCESS;
 }
 mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props)
 {
+    mageResult engineStart = mageEngineInitialise(props);
+    mageResult result;
+
     application->Props = *props;
 
     application->Running = 1;
 
-    if (application->Props.AllocationCallback == NULL) application->Props.AllocationCallback = malloc;
-    if (application->Props.FreeCallback == NULL) application->Props.FreeCallback = free;
     if (application->Props.StartMethod == NULL) application->Props.StartMethod = mageApplicationDefaultStart;
     if (application->Props.UpdateMethod == NULL) application->Props.UpdateMethod = mageApplicationDefaultUpdate;
     if (application->Props.DestroyMethod == NULL) application->Props.DestroyMethod = mageApplicationDefaultDestroy;
 
 
-    application->Renderer = application->Props.AllocationCallback(sizeof(struct MAGE_RENDERER_STRUCT));
-    application->Window = application->Props.AllocationCallback(sizeof(struct MAGE_WINDOW_STRUCT));
+    application->Renderer = mageRendererAllocate();
+    application->Window = mageWindowAllocate();
+    #if defined(MAGE_MONO_EXTERNALS)
+        
+        application->MonoHandler = mageMonoHandlerAllocate();
+
+        result = mageMonoHandlerInitialise(application->MonoHandler, application->Props.ClientDLL);
+
+        if (result != MAGE_SUCCESS) 
+        { 
+            return result; 
+        }
+
+    #endif
 
     char temp[255];
     sprintf(temp, "%s : Version %.2f", props->Name, props->Version);
         
-    mageResult result = mageWindowInitialise(application->Window, props->Width, props->Height, temp);
+    result = mageWindowInitialise(application->Window, props->Width, props->Height, temp);
     
     if (result != MAGE_SUCCESS)
     {
@@ -101,7 +112,7 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
     {
         return result;
     }
-    
+
     mageInputIntialise(application->Window);
 
     return MAGE_SUCCESS;
@@ -109,7 +120,7 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
 mageResult mageApplicationRun(mageApplication *application)
 {
     mageResult startResult, destroyResult;
-    
+
     startResult = application->Props.StartMethod(application);
     
     if (startResult != MAGE_SUCCESS)
@@ -148,8 +159,10 @@ mageResult mageApplicationRun(mageApplication *application)
 }
 void mageApplicationDestroy(mageApplication *application)
 {
-
+    mageMonoCleanup(application->MonoHandler);
     mageRendererDestroy(application->Renderer);
-    application->Props.FreeCallback(application->Renderer);
-    application->Props.FreeCallback(application->Window);
+    free(application->Renderer);
+    free(application->Window);
+    free(application->MonoHandler);
+    MAGE_LOG_CORE_INFORM("Application has been cleaned up\n", NULL);
 }

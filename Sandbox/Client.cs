@@ -8,7 +8,6 @@ namespace Client
     {
         public void Start()
         {      
-     
             Log.Inform($"Hello World {10}\n");
             Log.Warning($"Hello World {10}\n");
             Log.Error($"Hello World {10}\n");

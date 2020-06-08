@@ -16,10 +16,12 @@ static mageLoger Logger;
 
 void mageLogInitialise(const char *outputFile)
 {
-    Logger.OuputName = outputFile;
-    Logger.WarningCount = 0;
-    Logger.ErrorCount = 0;   
-    Logger.DebugFile = fopen(Logger.OuputName, "a");
+    #if defined(MAGE_DEBUG) || defined(CLIENT_DEBUG)
+        Logger.OuputName = outputFile;
+        Logger.WarningCount = 0;
+        Logger.ErrorCount = 0;   
+        Logger.DebugFile = fopen(Logger.OuputName, "a");
+    #endif
 }
 void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...)
 {   
@@ -80,7 +82,6 @@ void mageLogEnd()
         fclose(Logger.DebugFile);
         
         printf("%s", "\x1b[0m");
-
     #endif
 }
 

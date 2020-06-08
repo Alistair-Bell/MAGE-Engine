@@ -3,11 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace Mage
 {
-    public class Enitity
-    {
-
-    }
-    
     public class Log 
     {
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
@@ -26,22 +21,96 @@ namespace Mage
             public float x, y;
             
             [MethodImplAttribute(MethodImplOptions.InternalCall)]
-            public extern Vector2();
+            public extern Vector2(float x = 0.0f, float y = 0.0f);
             [MethodImplAttribute(MethodImplOptions.InternalCall)]
-            public extern Vector2(float x, float y);
-
+            public extern Vector2(Vector2 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector2 Add(Vector2 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector2 Subtract(Vector2 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector2 Multiply(Vector2 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector2 Divide(Vector2 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 Max(Vector2 first, Vector2 second);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 Minimum(Vector2 first, Vector2 second);
+            
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 operator+(Vector2 left, Vector2 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 operator-(Vector2 left, Vector2 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 operator*(Vector2 left, Vector2 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector2 operator/(Vector2 left, Vector2 right); 
         }
         public class Vector3
         {
-
+            public float x, y, z;    
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3();
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3(float x, float y, float z);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3(Vector3 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3(Vector2 xy, float z);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3 Add(Vector3 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3 Subtract(Vector3 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3 Multiply(Vector3 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector3 Divide(Vector3 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 Max(Vector3 first, Vector3 second);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 Minimum(Vector3 first, Vector3 second);
+            
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 operator+(Vector3 left, Vector3 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 operator-(Vector3 left, Vector3 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 operator*(Vector3 left, Vector3 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector3 operator/(Vector3 left, Vector3 right);
         }
         public class Vector4
         {
+            public float x, y, z, w;    
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4();
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4(float x, float y, float z, float w);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4(Vector4 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4(Vector2 xy, Vector2 zw);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4 Add(Vector4 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4 Subtract(Vector4 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4 Multiply(Vector4 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern Vector4 Divide(Vector4 other);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 Max(Vector4 first, Vector4 second);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 Minimum(Vector4 first, Vector4 second);
             
-        }
-        public class Matrix4x4
-        {
-            
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 operator+(Vector4 left, Vector4 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 operator-(Vector4 left, Vector4 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 operator*(Vector4 left, Vector4 right);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public extern static Vector4 operator/(Vector4 left, Vector4 right);
         }
     }
 

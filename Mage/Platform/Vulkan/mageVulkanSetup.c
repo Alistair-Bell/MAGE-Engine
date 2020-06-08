@@ -80,7 +80,7 @@
                 index = i;
             }
         }
-        mageFreeMethod(properties);
+        free(properties);
         return index;
     }
     VkPhysicalDevice mageSelectDevice(VkPhysicalDevice *devices, uint32_t deviceCount)
@@ -95,7 +95,7 @@
             if (scores[index] <= scores[i]) index = i; 
         }
 
-        mageFreeMethod(scores);
+        free(scores);
 
         return devices[index];
     }
@@ -117,8 +117,10 @@
 
             vkGetPhysicalDeviceProperties(handler->PhysicalDevice, &handler->PhysicalProperties);
 
+            vkGetPhysicalDeviceMemoryProperties(handler->PhysicalDevice, &handler->PhysicalMemoryProperties);
+
             MAGE_LOG_CORE_INFORM("GPU selected %s\n", handler->PhysicalProperties.deviceName);
-            mageFreeMethod(devices);
+            free(devices);
         }
 
         VkDeviceCreateInfo deviceCreateInfo;
@@ -353,8 +355,8 @@
 
             if (formats[0].format == VK_FORMAT_UNDEFINED)
             {
-                handler->SurfaceFormat.format = VK_FORMAT_B8G8R8A8_UNORM;
-                handler->SurfaceFormat.colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+                handler->SurfaceFormat.format       = VK_FORMAT_B8G8R8A8_UNORM;
+                handler->SurfaceFormat.colorSpace   = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
             }
             else
             {
@@ -364,7 +366,7 @@
             MAGE_LOG_CORE_INFORM("Physical device formats found\n", NULL);
 
 
-            mageFreeMethod(formats);
+            free(formats);
 
 
         #else  
@@ -425,11 +427,11 @@
                 return MAGE_SWAPCHAIN_CREATION_FAILED;
             }
 
-            MAGE_LOG_CLIENT_INFORM("Swap chain has been created succesfully\n", NULL);
+            MAGE_LOG_CORE_INFORM("Swap chain has been created succesfully\n", NULL);
 
             vkGetSwapchainImagesKHR(handler->Device, handler->SwapChain, &handler->SwapChainImageCount, NULL);
 
-            mageFreeMethod(presentModes);
+            free(presentModes);
         }
             
        
@@ -449,15 +451,140 @@
 
         for (i = 0; i < handler->SwapChainImageCount; i++)
         {
-            
-            /*
-                vkCreateImageView(handler->Device, &createInfo, NULL, handler->SwapChainImageViews[i]);
-            */
-        }
+            VkImageViewCreateInfo createInfo;
+            memset(&createInfo, 0, sizeof(VkImageViewCreateInfo));
+            createInfo.sType                                = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            createInfo.image                                = handler->SwapChainImages[i];
+            createInfo.viewType                             = VK_IMAGE_TYPE_2D;
+            createInfo.format                               = handler->SurfaceFormat.format;
+            createInfo.components.r                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.g                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.b                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.components.a                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+            createInfo.subresourceRange.aspectMask          = VK_IMAGE_ASPECT_COLOR_BIT;
+            createInfo.subresourceRange.baseMipLevel        = 0;
+            createInfo.subresourceRange.levelCount          = 1;
+            createInfo.subresourceRange.baseArrayLayer      = 0;
+            createInfo.subresourceRange.layerCount          = 1;
+        
+            if (vkCreateImageView(handler->Device, &createInfo, NULL, &handler->SwapChainImageViews[i]) != VK_SUCCESS)
+            {
+                MAGE_LOG_CLIENT_ERROR("Swap chain view %d of %d failed to be created\n", i, handler->SwapChainImageCount);
+            }
+
+            MAGE_LOG_CORE_INFORM("Swap chain image view %d created\n", i);
+        }   
 
         return MAGE_SUCCESS;
     }
-    mageResult mageRendererInitialise(mageRenderer *renderer, mageWindow *window)
+    mageResult mageCreateDephStencilImage(mageVulkanHandler *handler, mageWindow *window)
+    {
+        {
+            const VkFormat const tryFormats[] = 
+            {   
+                VK_FORMAT_D32_SFLOAT_S8_UINT,
+                VK_FORMAT_D24_UNORM_S8_UINT,
+                VK_FORMAT_D16_UNORM_S8_UINT,
+                VK_FORMAT_D32_SFLOAT,
+                VK_FORMAT_D16_UNORM
+            };
+            uint32_t i; 
+            uint32_t count = (sizeof(tryFormats) / sizeof(VkFormat));
+            handler->DephStencilAvailable = 0;
+            
+            for (i = 0; i < 5; i++) 
+            {
+                VkFormatProperties formatProperties;
+                memset(&formatProperties, 0, sizeof(VkFormatProperties));
+                VkFormat format = tryFormats[i];
+
+                vkGetPhysicalDeviceFormatProperties(handler->PhysicalDevice, format, &formatProperties);
+                if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) 
+                {
+                    handler->DephStencilFormat = format;
+                    break;
+                }
+		    }
+            if (handler->DephStencilFormat == VK_FORMAT_UNDEFINED)
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Deph stencil format was not selected\n", NULL);
+                return MAGE_HARDWARE_INVALID;
+            }
+            if ((handler->DephStencilFormat == VK_FORMAT_D32_SFLOAT_S8_UINT ) || ( handler->DephStencilFormat == VK_FORMAT_D24_UNORM_S8_UINT ) || ( handler->DephStencilFormat == VK_FORMAT_D16_UNORM_S8_UINT ) || ( handler->DephStencilFormat == VK_FORMAT_S8_UINT )) 
+            {
+                handler->DephStencilAvailable = 1;
+                MAGE_LOG_CORE_INFORM("Deph stencil available and chosen\n", NULL);
+            }
+
+        }
+        
+        VkImageCreateInfo imageCreateInfo;
+        memset(&imageCreateInfo, 0, sizeof(VkImageCreateInfo));
+        imageCreateInfo.sType                    = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        imageCreateInfo.flags                    = 0;
+        imageCreateInfo.imageType                = VK_IMAGE_TYPE_2D;
+        imageCreateInfo.pNext                    = NULL;
+        imageCreateInfo.format                   = handler->DephStencilFormat;
+        imageCreateInfo.extent.depth             = 1;
+        imageCreateInfo.extent.height            = window->Height;
+        imageCreateInfo.extent.width             = window->Width; 
+        imageCreateInfo.mipLevels                = 1;
+        imageCreateInfo.arrayLayers              = 1;
+        imageCreateInfo.samples                  = VK_SAMPLE_COUNT_1_BIT;
+        imageCreateInfo.tiling                   = VK_IMAGE_TILING_OPTIMAL;
+        imageCreateInfo.usage                    = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+        imageCreateInfo.sharingMode              = VK_SHARING_MODE_EXCLUSIVE;
+        imageCreateInfo.queueFamilyIndexCount    = VK_QUEUE_FAMILY_IGNORED;
+        imageCreateInfo.pQueueFamilyIndices      = NULL;
+        imageCreateInfo.initialLayout            = VK_IMAGE_LAYOUT_UNDEFINED;
+
+        if (vkCreateImage(handler->Device, &imageCreateInfo, NULL, &handler->DephStencilImage) != VK_SUCCESS)
+        {
+            MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image has failed to been created\n", NULL);
+            return MAGE_IMAGE_CREATION_FAILURE;
+        }
+        /*
+        VkMemoryRequirements requirements;
+        memset(&requirements, 0, sizeof(VkMemoryRequirements));
+        vkGetImageMemoryRequirements(handler->Device, handler->DephStencilImage, &requirements);
+
+        VkMemoryAllocateInfo memoryAllocateInfo;
+        memset(&memoryAllocateInfo, 0, sizeof(VkMemoryAllocateInfo));
+        memoryAllocateInfo.sType            = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        memoryAllocateInfo.pNext            = NULL;
+        memoryAllocateInfo.allocationSize   = requirements.size;
+        memoryAllocateInfo.memoryTypeIndex  = ;
+
+        vkAllocateMemory(handler->Device, &memoryAllocateInfo, NULL, &handler->DeviceMemory);
+        */
+
+        VkImageViewCreateInfo viewCreateInfo;
+        memset(&viewCreateInfo, 0, sizeof(VkImageViewCreateInfo));
+
+        viewCreateInfo.sType                                = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;                                
+        viewCreateInfo.image                                = handler->DephStencilImage;
+        viewCreateInfo.viewType                             = VK_IMAGE_VIEW_TYPE_2D;                             
+        viewCreateInfo.format                               = handler->DephStencilFormat;                            
+        viewCreateInfo.components.r                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewCreateInfo.components.g                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewCreateInfo.components.b                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewCreateInfo.components.a                         = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewCreateInfo.subresourceRange.aspectMask		    = VK_IMAGE_ASPECT_DEPTH_BIT | ( handler->DephStencilAvailable ? VK_IMAGE_ASPECT_STENCIL_BIT : 0 ); 
+        viewCreateInfo.subresourceRange.baseMipLevel        = 0;
+        viewCreateInfo.subresourceRange.levelCount          = 1;
+        viewCreateInfo.subresourceRange.baseArrayLayer      = 0;
+        viewCreateInfo.subresourceRange.layerCount          = 1;
+
+        if (vkCreateImageView(handler->Device, &viewCreateInfo, NULL, &handler->DephStencilImageView) != VK_SUCCESS)
+        {
+            MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image view has failed to be created\n", NULL);
+            return MAGE_IMAGE_VIEW_CREATION_FAILURE;
+        }
+
+        MAGE_LOG_CORE_INFORM("Deph stencil image created\n", NULL);
+        return MAGE_SUCCESS;
+    }
+    mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window)
     {
         typedef mageResult (*requiredFunctions)(mageVulkanHandler *, mageWindow *);
         uint32_t i;
@@ -472,13 +599,14 @@
             mageCreateSurface,
             mageCreateSwapChain,
             mageCreateSwapChainImages,
+            mageCreateDephStencilImage,
     
         };
         const uint32_t functionCount = sizeof(functions) / sizeof(requiredFunctions);
 
         for (i = 0; i < functionCount; i++)
         {
-            mageResult r = functions[i](&renderer->Handler, window);
+            mageResult r = functions[i](handler, window);
             if (r != MAGE_SUCCESS) return r;
         }
 
@@ -490,6 +618,12 @@
         vkDestroyCommandPool(handler->Device, handler->CommandPool, NULL);
         vkDestroySurfaceKHR(handler->Instance, handler->Surface, NULL);
         vkDestroySwapchainKHR(handler->Device, handler->SwapChain, NULL);
+        uint32_t i;
+
+        for (i = 0; i < handler->SwapChainImageCount; i++) 
+        {
+            vkDestroyImageView(handler->Device, handler->SwapChainImageViews[i], NULL);
+        }
         vkDestroyDevice(handler->Device, NULL);
         vkDestroyInstance(handler->Instance, NULL);
         MAGE_LOG_CORE_INFORM("Vulkan has been cleaned up\n", NULL);

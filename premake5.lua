@@ -74,7 +74,6 @@ project "MageEngine"
         "pthread",
         "m",
         "mono-2.0",
-        "c"
     }
 
 
@@ -85,7 +84,6 @@ project "MageEngine"
 
     filter "configurations:Debug"
         defines "MAGE_DEBUG"
-        defines "CLIENT_DEBUG"
         runtime "Debug"
         symbols "On"
 

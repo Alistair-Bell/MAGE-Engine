@@ -34,6 +34,10 @@ typedef enum MAGE_RESULT_ENUM mageResult;
 **************************/
 typedef struct MAGE_API MAGE_APPLICATION_STRUCT mageApplication;
 /*!************************
+ * @brief The props used to contruct the engine
+**************************/
+typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT mageApplicationProps;
+/*!************************
  * @brief The callback used by the application once on startup
 **************************/
 typedef mageResult (*mageApplicationStartCallback)(mageApplication *);
@@ -93,6 +97,14 @@ enum MAGE_RESULT_ENUM
 	**************************/
 	MAGE_FENCE_CREATION_FAILURE,
 	/*!************************
+ 	 * @brief The image that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_IMAGE_CREATION_FAILURE,
+	/*!************************
+ 	 * @brief The image that is being created had failed (USED BY THE VULKAN RENDERER MODE)
+	**************************/
+	MAGE_IMAGE_VIEW_CREATION_FAILURE,
+	/*!************************
  	 * @brief The semaphore that is being created had failed (USED BY THE VULKAN RENDERER MODE)
 	**************************/
 	MAGE_SEMAPHORE_CREATION_FAILURE,
@@ -123,7 +135,7 @@ enum MAGE_RESULT_ENUM
 	/*!************************
  	 * @brief The application's update method had failed
 	**************************/
-	MAGE_START_UPDATE_FAILURE,
+	MAGE_UPDATE_FAILURE,
 	/*!************************
  	 * @brief The application's destroy method had failed
 	**************************/
@@ -579,81 +591,90 @@ extern MAGE_API uint8_t mageGetKeyDown(mageWindow *window, const int32_t key);
 **************************/
 extern MAGE_API uint8_t mageGetKeyNotDown(mageWindow *window, const int32_t key);
 
+#if defined(MAGE_VULKAN)
 
-/*!************************
- * @brief Hanldes vulkan stuff
-**************************/
-typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
-{
-	#if defined(MAGE_VULKAN)
+	/*!************************
+	* @brief Hanldes vulkan stuff
+	**************************/
+	typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
+	{
 
-		VkViewport Viewport;
+			VkViewport Viewport;
+			
+			VkQueue Queue;
+
+			VkCommandBuffer CommandBuffer[2];
+
+			VkSwapchainKHR SwapChain;
+			
+			VkFormat Format;
+
+			VkFormat DephStencilFormat;
+
+			VkImage DephStencilImage;
+
+			VkImageView DephStencilImageView;
+
+			VkPhysicalDeviceMemoryProperties PhysicalMemoryProperties;
+
+			VkSurfaceCapabilitiesKHR SurfaceCapabilities;
+			
+			VkSurfaceFormatKHR SurfaceFormat;
+
+			VkDevice Device;
+
+			VkPhysicalDevice PhysicalDevice;
+
+			VkPhysicalDeviceProperties PhysicalProperties;
+
+			VkCommandPool CommandPool;
 		
-		VkQueue Queue;
+			VkSemaphore Semaphore;
 
-		VkCommandBuffer CommandBuffer[2];
+			VkSurfaceKHR Surface;
 
-		VkSwapchainKHR SwapChain;
-		
-		VkFormat Format;
+			VkQueue GraphicsQueue;
 
-		VkPhysicalDeviceMemoryProperties MemoryProperties;
+			VkFence Fence; 
 
-		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-		
-		VkSurfaceFormatKHR SurfaceFormat;
+			VkInstance Instance;
 
-		VkDevice Device;
+			VkImage *SwapChainImages;
 
-		VkPhysicalDevice PhysicalDevice;
+			VkImageView *SwapChainImageViews;
 
-		VkPhysicalDeviceProperties PhysicalProperties;
+			uint32_t DephStencilAvailable;
 
-		VkCommandPool CommandPool;
-	
-		VkSemaphore Semaphore;
+			uint32_t GraphicsFamilyIndex;
 
-		VkSurfaceKHR Surface;
+			uint32_t GraphicsPresentFamily;
 
-		VkQueue GraphicsQueue;
+			uint32_t SwapChainImageCount;
 
-		VkFence Fence; 
 
-		VkInstance Instance;
+	} mageVulkanHandler;
 
-		VkImage *SwapChainImages;
+	/*!************************ 
+	* @brief Allocates a block of memory for the handler
+	* @return Void pointer to the block of memory allocated
+	* @warning The pointer has not been type casted
+	**************************/
+	extern MAGE_API void *mageVulkanHandlerAllocate();
+	/*!************************
+	* @brief Sets up the vulkan renderer
+	* @param handler A pointer to a instance of a vulkan handler
+	* @param window A pointer to a instance of a window
+	* @return The success of the method
+	**************************/
+	extern MAGE_API mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window); 
+	/*!************************
+	* @brief Destroys the vulkan devices
+	* @param handler A pointer to a instance of a vulkan handler
+	* @return Nothing
+	**************************/
+	extern MAGE_API void mageVulkanHandlerCleanup(mageVulkanHandler *handler);
 
-		VkImageView *SwapChainImageViews;
-
-		uint32_t GraphicsFamilyIndex;
-
-		uint32_t GraphicsPresentFamily;
-
-		uint32_t SwapChainImageCount;
-
-	#endif
-
-} mageVulkanHandler;
-
-/*!************************ 
- * @brief Allocates a block of memory for the handler
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/
-extern MAGE_API void *mageVulkanHandlerAllocate();
-/*!************************
- * @brief Sets up the vulkan renderer
- * @param handler A pointer to a instance of a vulkan handler
- * @param window A pointer to a instance of a window
- * @return The success of the method
-**************************/
-extern MAGE_API mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window); 
-/*!************************
- * @brief Destroys the vulkan devices
- * @param handler A pointer to a instance of a vulkan handler
- * @return Nothing
-**************************/
-extern MAGE_API void mageVulkanHandlerCleanup(mageVulkanHandler *handler);
+#endif
 
 /*!************************
  * @brief Renderer that renders objects pushed into the pipeline
@@ -674,7 +695,7 @@ typedef struct MAGE_API MAGE_RENDERER_STRUCT
 /*!************************ 
  * @brief Allocates a block of memory for the renderer
  * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
+ * @warning The pointer has not been type castedThe wrapper that holds the required objects needed for the engine
 **************************/ 
 extern MAGE_API void *mageRendererAllocate();
 /*!************************
@@ -694,98 +715,6 @@ extern MAGE_API void mageRendererDestroy(mageRenderer *renderer);
 /*!************************
  * @brief Camera used for the scene
 **************************/
-
-/*!************************
- * @brief Constructer used for the application
-**************************/
-typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT
-{
-	/*!************************
-	 * @brief Application version
-	**************************/
-	double Version;
-	/*!************************
-	 * @brief The width of the applications window
-	**************************/
-	uint32_t Width;
-	/*!************************
-	 * @brief The height of the applications window
-	**************************/
-	uint32_t Height;
-	/*!************************
-	 * @brief The name of the application 
-	**************************/
-	char *Name;
-	/*!************************
- 	 * @brief The method at called once at the start of the game loop
-	**************************/
-	mageApplicationStartCallback StartMethod;
-	/*!************************
- 	 * @brief The method at called every frame at during the game loop
-	**************************/
-	mageApplicationUpdateCallback UpdateMethod;
-	/*!************************
- 	 * @brief The method at called every frame at during the game loop
-	**************************/
-	mageApplicationDestroyCallback DestroyMethod;
-	/*!************************
- 	 * @brief The free method used by the application
-	**************************/
-	mageFreeCallback FreeCallback;
-	/*!************************
- 	 * @brief The free method used by the application
-	**************************/
-	mageAllocationCallback AllocationCallback;
-
-
-} mageApplicationProps;
-
-struct MAGE_APPLICATION_STRUCT
-{
-	/*!************************
- 	 * @brief The renderer used by the application
-	**************************/
-	mageRenderer *Renderer;
-	/*!************************
- 	 * @brief The window used by the application
-	**************************/
-	mageWindow *Window;
-	/*!************************
-	 * @brief A pointer to an instance of the application props
-	**************************/
-	mageApplicationProps Props;
-	/*!************************
- 	 * @brief Flag whether the application is running
-	**************************/
-	uint8_t Running;
-};	
-
-/*!************************ 
- * @brief Allocates a block of memory for the application
- * @return Void pointer to the block of memory allocated
- * @warning The pointer has not been type casted
-**************************/ 
-extern MAGE_API void *mageApplicationAllocate();
-/*!************************
- * @brief Initialises the application
- * @param application A pointer to a instance of a application
- * @param props The props used to construct the application and its members
- * @return The success of the method 
-**************************/
-extern MAGE_API mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props);
-/*!************************
- * @brief Runs the application
- * @param application A pointer to a instance of a application
- * @return The result of the application's runtime
-**************************/
-extern MAGE_API mageResult mageApplicationRun(mageApplication *application);
-/*!************************
- * @brief Destroys the application
- * @param application A pointer to a instance of a application
- * @return Nothing
-**************************/
-extern MAGE_API void mageApplicationDestroy(mageApplication *application);
-
 
 #if defined(MAGE_MONO_EXTERNALS)
 
@@ -829,6 +758,110 @@ extern MAGE_API void mageApplicationDestroy(mageApplication *application);
 	MonoMethod *mageMonoHandlerFindMethod(MonoClass *monoClass, const char *name);
 
 #endif
+
+/*!************************
+ * @brief Constructer used for the application
+**************************/
+typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT
+{
+	/*!************************
+	 * @brief Application version
+	**************************/
+	double Version;
+	/*!************************
+	 * @brief The width of the applications window
+	**************************/
+	uint32_t Width;
+	/*!************************
+	 * @brief The height of the applications window
+	**************************/
+	uint32_t Height;
+	/*!************************
+	 * @brief The name of the application 
+	**************************/
+	char *Name;
+	/*!************************
+	 * @brief The name mono dll used for scripting
+	**************************/
+	const char *ClientDLL;
+	/*!************************
+ 	 * @brief The method at called once at the start of the game loop
+	**************************/
+	mageApplicationStartCallback StartMethod;
+	/*!************************
+ 	 * @brief The method at called every frame at during the game loop
+	**************************/
+	mageApplicationUpdateCallback UpdateMethod;
+	/*!************************
+ 	 * @brief The method at called every frame at during the game loop
+	**************************/
+	mageApplicationDestroyCallback DestroyMethod;
+	/*!************************
+ 	 * @brief The free method used by the application
+	**************************/
+	mageFreeCallback FreeCallback;
+	/*!************************
+ 	 * @brief The free method used by the application
+	**************************/
+	mageAllocationCallback AllocationCallback;
+
+
+} mageApplicationProps;
+
+struct MAGE_APPLICATION_STRUCT
+{
+	/*!************************
+ 	 * @brief The renderer used by the application
+	**************************/
+	mageRenderer *Renderer;
+	/*!************************
+ 	 * @brief The window used by the application
+	**************************/
+	mageWindow *Window;
+	
+	#if defined(MAGE_MONO_EXTERNALS)
+
+		mageMonoHandler *MonoHandler;
+
+	#endif
+	
+	/*!************************
+	 * @brief A pointer to an instance of the application props
+	**************************/
+	mageApplicationProps Props;
+	/*!************************
+ 	 * @brief Flag whether the application is running
+	**************************/
+	uint8_t Running;
+};	
+
+/*!************************ 
+ * @brief Allocates a block of memory for the application
+ * @return Void pointer to the block of memory allocated
+ * @warning The pointer has not been type casted
+**************************/ 
+extern MAGE_API void *mageApplicationAllocate();
+/*!************************
+ * @brief Initialises the application
+ * @param application A pointer to a instance of a application
+ * @param props The props used to construct the application and its members
+ * @return The success of the method 
+**************************/
+extern MAGE_API mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props);
+/*!************************
+ * @brief Runs the application
+ * @param application A pointer to a instance of a application
+ * @return The result of the application's runtime
+**************************/
+extern MAGE_API mageResult mageApplicationRun(mageApplication *application);
+/*!************************
+ * @brief Destroys the application
+ * @param application A pointer to a instance of a application
+ * @return Nothing
+**************************/
+extern MAGE_API void mageApplicationDestroy(mageApplication *application);
+
+
 
 
 #endif  

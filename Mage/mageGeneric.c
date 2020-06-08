@@ -47,28 +47,20 @@ const char *mageToString(mageResult result)
 			return "Queue sub";
 			break;
 		case MAGE_HARDWARE_NOT_PRESENT:
-			return "";
+			return "Hardware present";
 			break;
 		case MAGE_START_METHOD_FAILURE:
-			return "";
+			return "Start method failure";
 			break;
-		case MAGE_START_UPDATE_FAILURE:
-			return "";
+		case MAGE_UPDATE_FAILURE:
+			return "Start method failure";
 			break;
 		case MAGE_DESTROY_METHOD_FAILURE:
-			return "";
+			return "Destroy method failure";
 			break;
 		default:
 			return "Unknown error";
 	}
-}
-void *mageAllocationMethod(const uint64_t size)
-{
-	return malloc(size);
-}
-void mageFreeMethod(void *item)
-{
-	free(item);
 }
 void mageTryDumpSuccess(uint8_t contents, uint8_t *state)
 {
@@ -96,7 +88,7 @@ void mageResizableListPush(mageResizableList *resizableList, void *item)
 }
 void mageResizableListPop(mageResizableList *resizableList)
 {	
-	mageFreeMethod(resizableList->Elements[resizableList->Quantity - 1]);
+	free(resizableList->Elements[resizableList->Quantity - 1]);
 	resizableList->Quantity--;
 	resizableList->Elements = realloc(resizableList->Elements, resizableList->ElementSize * resizableList->Quantity);
 }
@@ -105,13 +97,13 @@ void mageResizableListFreeElements(mageResizableList *resizableList)
 	uint32_t i;
 	for (i = 0; i < resizableList->Quantity - 1; i++)
 	{
-		mageFreeMethod(resizableList->Elements[i]);
+		free(resizableList->Elements[i]);
 	}
 }
 void mageResizableListDestroy(mageResizableList *resizableList)
 {
 	mageResizableListFreeElements(resizableList);
-	mageFreeMethod(resizableList);	
+	free(resizableList);	
 }
 void *magePairAllocate()
 {
@@ -172,13 +164,13 @@ void magePairResizeBoth(magePair *pair, const uint32_t newFirstSize, const uint3
 }
 void magePairFree(magePair *pair)
 {
-	mageFreeMethod(pair->First);
-	mageFreeMethod(pair->Second);
+	free(pair->First);
+	free(pair->Second);
 }
 void magePairDestroy(magePair *pair)
 {
 	magePairFree(pair);
-	mageFreeMethod(pair);
+	free(pair);
 }
 void *mageDictionaryAllocate()
 {
