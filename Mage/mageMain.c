@@ -1,11 +1,9 @@
 #include "mageAPI.h"
 
 
-
-static mageApplication App;
-
 int32_t main(int32_t argc, char **args)
 {
+    mageApplication App;
     mageApplicationProps props;
     memset(&props, 0, sizeof(mageApplicationProps));
     
@@ -17,21 +15,8 @@ int32_t main(int32_t argc, char **args)
 
     mageApplicationInitialise(&App, &props);
 
-
-    /*
-    MonoClass *class = mono_class_from_name(MonoHandler.Image, "Client", "Example");
-    MonoMethod *method = mageMonoHandlerFindMethod(class, "Start"); 
-    MonoObject *object = mono_object_new(MonoHandler.Domain, class);
-    
-    
-    
-    mono_runtime_object_init(object);
-
-    mono_runtime_invoke(method, object, NULL, NULL);
-    */  
-
     mageApplicationRun(&App);
-    mageLogEnd();
+    
 }
 
 

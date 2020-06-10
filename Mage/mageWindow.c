@@ -36,6 +36,7 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
     	
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
+
 		window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
 
 		if (window->Context == NULL)
@@ -48,6 +49,10 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 		
 		glfwMakeContextCurrent(window->Context);	
+
+		glfwSetInputMode(window->Context, GLFW_STICKY_KEYS, GLFW_TRUE);
+
+		glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
 	#endif
 

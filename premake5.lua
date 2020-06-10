@@ -15,7 +15,7 @@ workspace "MAGE"
 -- Engine Project
 
 group "Externals"
-    include "Mage/Externals/hypatia/"
+    include "Mage/Externals/hypatia"
 
 
 

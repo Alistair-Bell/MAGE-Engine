@@ -6,26 +6,23 @@
     {
         return malloc(sizeof(struct MAGE_MONO_HANDLER_STRUCT));
     }
-    void mageMonoInterpretLogInform(MonoString *message)
+    static void mageMonoInterpretLogInform(MonoString *message)
     {
         MAGE_LOG_CLIENT_INFORM("%s", mono_string_to_utf8(message));
     }
-    void mageMonoInterpretLogWarning(MonoString *message)
+    static void mageMonoInterpretLogWarning(MonoString *message)
     {
         MAGE_LOG_CLIENT_WARNING("%s", mono_string_to_utf8(message));
     }
-    void mageMonoInterpretLogError(MonoString *message)
+    static void mageMonoInterpretLogError(MonoString *message)
     {
         MAGE_LOG_CLIENT_ERROR("%s", mono_string_to_utf8(message));
     }
-    void mageMonoInterpretLogFatalError(MonoString *message)
+    static void mageMonoInterpretLogFatalError(MonoString *message)
     {
         MAGE_LOG_CLIENT_FATAL_ERROR("%s", mono_string_to_utf8(message));
     }
-    MonoBoolean mageMonoInterpretIsKeyPressed(int32_t monoEnum)
-    {
-        return 1;  
-    }
+   
     MonoMethod *mageMonoHandlerFindMethod(MonoClass *monoClass, const char *name)
     {
         MonoMethod* method = NULL;
@@ -57,7 +54,6 @@
         mono_add_internal_call("Mage.Log::Warning", mageMonoInterpretLogWarning);
         mono_add_internal_call("Mage.Log::Error", mageMonoInterpretLogError);
         mono_add_internal_call("Mage.Log::FatalError", mageMonoInterpretLogFatalError);
-        mono_add_internal_call("Mage.Event::IsKeyPressed", mageMonoInterpretIsKeyPressed);
 
         MAGE_LOG_CORE_INFORM("Succesfully using c# scripting!\n", NULL);
         return MAGE_SUCCESS;

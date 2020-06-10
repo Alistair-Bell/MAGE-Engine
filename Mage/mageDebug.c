@@ -25,24 +25,28 @@ void mageLogInitialise(const char *outputFile)
 }
 void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...)
 {   
+    const char *colors[] = 
+    {
+        "\x1b[32m",
+        "\x1b[33m",
+        "\x1b[34m",
+        "\x1b[36m"
+    };
+
+
     switch (severity)
 	{
-	case MAGE_LOG_MODE_INFORM: 
-		printf("%s", "\x1b[32m");
-		break;
 	case MAGE_LOG_MODE_WARNING: 
 		Logger.WarningCount++;
-        printf("%s", "\x1b[33m");
 		break;
 	case MAGE_LOG_MODE_ERROR: 
 		Logger.ErrorCount++;
-        printf("%s", "\x1b[34m");
         break;
 	case MAGE_LOG_MODE_FATAL_ERROR: 
 		Logger.ErrorCount++; 
-		printf("%s", "\x1b[36m");
 		break;
 	}
+    printf("%s", colors[severity]);
 
     time(&Logger.Timer);
     Logger.Time = localtime(&Logger.Timer);

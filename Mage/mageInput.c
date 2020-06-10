@@ -2,8 +2,10 @@
 
 #if defined(MAGE_GLFW)
 	#define MAGE_KEY_COUNT 350
+	#define MAGE_MOUSE_BUTTON_COUNT 7
 #elif #defined(MAGE_SDL2)
 	#define MAGE_KEY_COUNT 1024
+	#define MAGE_MOUSE_BUTTON_COUNT 10
 #endif
 
 
@@ -20,15 +22,27 @@
 **************************/
 typedef uint8_t mageKeyHandle;
 
-typedef struct MAGE_INPUT_SYSTEM
+
+typedef struct MAGE_EVENT_SYSTEM
 {
-	mageKeyHandle Keys[MAGE_KEY_COUNT];
-	double MouseXPosition;
-	double MouseYPosition;
+	#if defined(MAGE_GLFW)
+		GLFWwindow *WindowContext;
+	#else
+		SDLEvent *EventContext;
+	#endif
 
-} mageInput;
 
-static mageInput InputHandle;
+
+	mageKeyHandle 	Keys[MAGE_KEY_COUNT];
+	uint8_t 		MouseButtons[MAGE_MOUSE_BUTTON_COUNT];
+
+	double 			MouseXPosition;
+	double 			MouseYPosition;
+	uint8_t 		WindowFocused;
+
+} mageEvent;
+
+static mageEvent EventHandle;
 
 
 static mageKeyHandle mageCreateKeyHandle(const uint8_t pressed, const uint8_t release, const uint8_t repeat)
@@ -47,22 +61,30 @@ static mageKeyHandle mageCreateKeyHandle(const uint8_t pressed, const uint8_t re
 		switch (action)
 		{
 			case GLFW_PRESS:
-				InputHandle.Keys[key] = mageCreateKeyHandle(1, 0, 0);
+				EventHandle.Keys[key] = mageCreateKeyHandle(1, 0, 0);
 				break;
 
 			case GLFW_REPEAT:
-				InputHandle.Keys[key] = mageCreateKeyHandle(1, 0, 1);
+				EventHandle.Keys[key] = mageCreateKeyHandle(1, 0, 1);
 				break;
 
 			case GLFW_RELEASE:
-				InputHandle.Keys[key] = mageCreateKeyHandle(0, 1, 0);
+				EventHandle.Keys[key] = mageCreateKeyHandle(0, 1, 0);
 				break;
 		}
 	}
 	static void mageGLFWCursorCallback(GLFWwindow *window, double x, double y)
 	{
-		InputHandle.MouseXPosition = x;
-		InputHandle.MouseYPosition = y;
+		EventHandle.MouseXPosition = x;
+		EventHandle.MouseYPosition = y;
+	}
+	static void mageGLFWWindowFocusCallback(GLFWwindow *window, int32_t focused)
+	{
+		EventHandle.WindowFocused = focused;
+	}
+	static void mageGLFWMouseButtonCallbacks(GLFWwindow* window, int button, int action, int modes)
+	{
+		EventHandle.MouseButtons[button] = action;
 	}
 	
 
@@ -70,14 +92,17 @@ static mageKeyHandle mageCreateKeyHandle(const uint8_t pressed, const uint8_t re
 
 void mageInputIntialise(mageWindow *window)
 {
-	memset(InputHandle.Keys, 0, MAGE_KEY_COUNT * sizeof(mageKeyHandle));
-	InputHandle.MouseXPosition = 0.0;
-	InputHandle.MouseYPosition = 0.0;
-	
+	memset(EventHandle.Keys, 0, MAGE_KEY_COUNT * sizeof(mageKeyHandle));
+	memset(EventHandle.MouseButtons, 0, sizeof(uint8_t) * MAGE_MOUSE_BUTTON_COUNT);
+	EventHandle.MouseXPosition = 0.0;
+	EventHandle.MouseYPosition = 0.0;
 
 	#if defined(MAGE_GLFW)
-		glfwSetKeyCallback(window->Context, mageGLFWKeyCallback);
-		glfwSetCursorPosCallback(window->Context, mageGLFWCursorCallback);
+		EventHandle.WindowContext = window->Context;
+		glfwSetKeyCallback(EventHandle.WindowContext, mageGLFWKeyCallback);
+		glfwSetCursorPosCallback(EventHandle.WindowContext, mageGLFWCursorCallback);
+		glfwSetWindowFocusCallback(EventHandle.WindowContext, mageGLFWWindowFocusCallback);
+		glfwSetMouseButtonCallback(EventHandle.WindowContext, mageGLFWMouseButtonCallbacks);
 	#endif
 }
 void mageInputFlush(mageWindow *window)
@@ -86,21 +111,21 @@ void mageInputFlush(mageWindow *window)
 }
 
 
-double mageGetMousePositionX(mageWindow *window)
+double mageGetMousePositionX()
 {
-	return InputHandle.MouseXPosition;
+	return EventHandle.MouseXPosition;
 }
-double mageGetMousePositionY(mageWindow *window)
+double mageGetMousePositionY()
 {
-	return InputHandle.MouseYPosition;
+	return EventHandle.MouseYPosition;
 }
-uint8_t mageGetMouseButtonLeftClick(mageWindow *window)
+uint8_t mageGetMouseButtonLeftClick(window)
 {
 
 	#if defined(MAGE_SDL2)
 		
 	#elif defined(MAGE_GLFW)
-		return (glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS);
+		
 	#endif
 	return 0;
 }
@@ -109,7 +134,7 @@ uint8_t mageGetMouseButtonRightClick(mageWindow *window)
 	#if defined(MAGE_SDL2)
 		
 	#elif defined(MAGE_GLFW)
-		return (glfwGetMouseButton(window->Context, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS);
+		
 	#endif
 	return 0;
 }
@@ -130,17 +155,16 @@ void mageSetMousePosition(mageWindow *window, const double x, const double y)
 		glfwSetCursorPos(window->Context, x, y);
 	#endif
 }
-uint8_t mageGetKeyDown(mageWindow *window, const int32_t key)
+uint8_t mageGetKeyDown(const int32_t key)
 {	
-	return ((InputHandle.Keys[key] >> 0) & 1) || ((InputHandle.Keys[key] >> 1) & 1);
+	return ((EventHandle.Keys[key] >> 0) & 1) || ((EventHandle.Keys[key] >> 1) & 1);
 }
-uint8_t mageGetKeyNotDown(mageWindow *window, const int32_t key)
+uint8_t mageGetKeyNotDown(const int32_t key)
 {
 #if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
-		uint8_t value = glfwGetKey(window->Context, key);
-		return !(value == GLFW_PRESS || value == GLFW_REPEAT);
+		return (!((EventHandle.Keys[key] >> 0) & 1) || ((EventHandle.Keys[key] >> 1) & 1));
 	#endif
 	return 0;
 }

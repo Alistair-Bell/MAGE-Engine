@@ -543,19 +543,19 @@ extern MAGE_API void mageInputIntialise(mageWindow *window);
  * @param window A pointer to a instance of a window
  * @return The X coordinate
 **************************/
-extern MAGE_API double mageGetMousePositionX(mageWindow *window);
+extern MAGE_API double mageGetMousePositionX();
 /*!************************ 
  * @brief Gets the mouse's y coordinate 
  * @param window A pointer to a instance of a window
  * @return The y coordinate
 **************************/
-extern MAGE_API double mageGetMousePositionY(mageWindow *window);
+extern MAGE_API double mageGetMousePositionY();
 /*!************************ 
  * @brief Gets whether the left mouse button is being clicked
  * @param window A pointer to a instance of a window 
  * @return Whether the button is being clicked
 **************************/
-extern MAGE_API uint8_t mageGetMouseButtonLeftClick(mageWindow *window);
+extern MAGE_API uint8_t mageGetMouseButtonLeftClick();
 /*!************************ 
  * @brief Gets whether the right mouse button is being clicked
  * @param window A pointer to a instance of a window 
@@ -582,14 +582,14 @@ extern MAGE_API void mageSetMousePosition(mageWindow *window, const double x, co
  * @param key A keycode for the key that is being tested
  * @return Whether the key is down
 **************************/
-extern MAGE_API uint8_t mageGetKeyDown(mageWindow *window, const int32_t key);
+extern MAGE_API uint8_t mageGetKeyDown(const int32_t key);
 /*!************************ 
  * @brief Gets whether the key is not being pressed down
  * @param window A pointer to a instance of a window
  * @param key A keycode for the key that is being tested
  * @return Whether the key is not down
 **************************/
-extern MAGE_API uint8_t mageGetKeyNotDown(mageWindow *window, const int32_t key);
+extern MAGE_API uint8_t mageGetKeyNotDown(const int32_t key);
 
 #if defined(MAGE_VULKAN)
 

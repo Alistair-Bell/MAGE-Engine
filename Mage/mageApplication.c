@@ -165,4 +165,5 @@ void mageApplicationDestroy(mageApplication *application)
     free(application->Window);
     free(application->MonoHandler);
     MAGE_LOG_CORE_INFORM("Application has been cleaned up\n", NULL);
+    mageLogEnd();
 }
