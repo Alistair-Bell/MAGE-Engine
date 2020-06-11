@@ -131,7 +131,6 @@ mageResult mageApplicationRun(mageApplication *application)
 
     while (application->Running)
     {
-
         #if defined(MAGE_GLFW)
 
             mageWindowSwapBuffers(application->Window);
@@ -143,7 +142,6 @@ mageResult mageApplicationRun(mageApplication *application)
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
 
         #endif
-    
     }
     
     destroyResult = application->Props.DestroyMethod(application);

@@ -597,59 +597,26 @@ extern MAGE_API uint8_t mageGetKeyNotDown(const int32_t key);
 	* @brief Hanldes vulkan stuff
 	**************************/
 	typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
-	{
+	{	
+		VkPhysicalDeviceMemoryProperties PhysicalMemoryProperties;
 
-			VkViewport Viewport;
-			
-			VkQueue Queue;
-
-			VkCommandBuffer CommandBuffer[2];
-
-			VkSwapchainKHR SwapChain;
-			
-			VkFormat Format;
-
-			VkFormat DephStencilFormat;
-
-			VkImage DephStencilImage;
-
-			VkImageView DephStencilImageView;
-
-			VkPhysicalDeviceMemoryProperties PhysicalMemoryProperties;
-
-			VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-			
-			VkSurfaceFormatKHR SurfaceFormat;
-
-			VkDevice Device;
-
-			VkPhysicalDevice PhysicalDevice;
-
-			VkPhysicalDeviceProperties PhysicalProperties;
-
-			VkCommandPool CommandPool;
+		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
 		
-			VkSemaphore Semaphore;
+		VkSurfaceFormatKHR SurfaceFormat;
 
-			VkSurfaceKHR Surface;
+		VkDevice Device;
 
-			VkQueue GraphicsQueue;
+		VkPhysicalDevice PhysicalDevice;
 
-			VkFence Fence; 
+		VkPhysicalDeviceProperties PhysicalProperties;
+	
+		VkInstance Instance;
 
-			VkInstance Instance;
+		uint32_t DephStencilAvailable;
 
-			VkImage *SwapChainImages;
+		uint32_t GraphicsFamilyIndex;
 
-			VkImageView *SwapChainImageViews;
-
-			uint32_t DephStencilAvailable;
-
-			uint32_t GraphicsFamilyIndex;
-
-			uint32_t GraphicsPresentFamily;
-
-			uint32_t SwapChainImageCount;
+		uint32_t GraphicsPresentFamily;
 
 
 	} mageVulkanHandler;
@@ -687,7 +654,38 @@ typedef struct MAGE_API MAGE_RENDERER_STRUCT
 		 * @brief Handler for the vulkan setup
 		**************************/
 		mageVulkanHandler Handler;
-	
+		
+		VkQueue GraphicsQueue;
+
+		VkQueue Queue;
+
+		VkCommandBuffer CommandBuffer[2];
+
+		VkViewport Viewport;
+		
+		VkSurfaceKHR Surface;
+
+		VkImage DephStencilImage;
+
+		VkFormat DephStencilFormat;
+
+		VkImageView DephStencilImageView;
+
+		VkCommandPool CommandPool;
+		
+		VkSwapchainKHR SwapChain;
+
+		VkImage *SwapChainImages;
+
+		VkImageView *SwapChainImageViews;\
+
+		VkSemaphore Semaphore;
+
+		VkFence Fence;
+
+		uint32_t SwapChainImageCount;
+
+
 	#endif
 
 } mageRenderer;

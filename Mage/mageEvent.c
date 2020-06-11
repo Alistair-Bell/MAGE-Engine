@@ -31,14 +31,13 @@ typedef struct MAGE_EVENT_SYSTEM
 		SDLEvent *EventContext;
 	#endif
 
-
-
 	mageKeyHandle 	Keys[MAGE_KEY_COUNT];
 	uint8_t 		MouseButtons[MAGE_MOUSE_BUTTON_COUNT];
 
 	double 			MouseXPosition;
 	double 			MouseYPosition;
 	uint8_t 		WindowFocused;
+	uint8_t			MouseInWindow;		
 
 } mageEvent;
 
@@ -82,9 +81,13 @@ static mageKeyHandle mageCreateKeyHandle(const uint8_t pressed, const uint8_t re
 	{
 		EventHandle.WindowFocused = focused;
 	}
-	static void mageGLFWMouseButtonCallbacks(GLFWwindow* window, int button, int action, int modes)
+	static void mageGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int modes)
 	{
 		EventHandle.MouseButtons[button] = action;
+	}
+	static void mageGLFWCursorEnterCallback(GLFWwindow *window, int32_t entered)
+	{
+		EventHandle.MouseInWindow = entered;
 	}
 	
 
@@ -102,7 +105,8 @@ void mageInputIntialise(mageWindow *window)
 		glfwSetKeyCallback(EventHandle.WindowContext, mageGLFWKeyCallback);
 		glfwSetCursorPosCallback(EventHandle.WindowContext, mageGLFWCursorCallback);
 		glfwSetWindowFocusCallback(EventHandle.WindowContext, mageGLFWWindowFocusCallback);
-		glfwSetMouseButtonCallback(EventHandle.WindowContext, mageGLFWMouseButtonCallbacks);
+		glfwSetMouseButtonCallback(EventHandle.WindowContext, mageGLFWMouseButtonCallback);
+		glfwSetCursorEnterCallback(EventHandle.WindowContext, mageGLFWCursorEnterCallback);
 	#endif
 }
 void mageInputFlush(mageWindow *window)
@@ -143,9 +147,8 @@ uint8_t mageGetMouseInsideContext(mageWindow *window)
 	#if defined(MAGE_SDL2)
 	
 	#elif defined(MAGE_GLFW)
-		return glfwGetWindowAttrib(window->Context, GLFW_HOVERED);
 	#endif
-	return 0;
+	return EventHandle.MouseInWindow;
 }
 void mageSetMousePosition(mageWindow *window, const double x, const double y)
 {

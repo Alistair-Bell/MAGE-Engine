@@ -7,19 +7,19 @@ namespace Client
     class Example 
     {
         public void Start()
-        {      
-            Log.Inform($"Hello World {10}\n");
-            Log.Warning($"Hello World {10}\n");
-            Log.Error($"Hello World {10}\n");
-            Log.FatalError($"Hello World {10}\n");   
+        {
+        
         }
         public void Update()
         {
-                
+            if (!Event.WindowFocused())
+            {
+                Log.Warning("Window is not focuesed\n");
+            }        
         }
-        public void Destroy()
+        public void End()
         {
-
+            
         }
     }
 }
