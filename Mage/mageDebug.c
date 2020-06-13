@@ -14,13 +14,27 @@ typedef struct MAGE_API MAGE_LOGING_STRUCT
 
 static mageLoger Logger;
 
+#if defined (MAGE_GLFW)
+
+    static void mageGLFWErrorCallback(int error, const char *description)
+	{
+		MAGE_LOG_CORE_ERROR("GLFW Error %d : %s\n", error, description);
+	}
+ 
+#endif
+
+
+
 void mageLogInitialise(const char *outputFile)
 {
-    #if defined(MAGE_DEBUG) || defined(CLIENT_DEBUG)
+    #if defined (MAGE_DEBUG) || defined(CLIENT_DEBUG)
         Logger.OuputName = outputFile;
         Logger.WarningCount = 0;
         Logger.ErrorCount = 0;   
         Logger.DebugFile = fopen(Logger.OuputName, "a");
+        #if defined (MAGE_GLFW)
+            glfwSetErrorCallback(mageGLFWErrorCallback);
+        #endif
     #endif
 }
 void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...)
@@ -54,7 +68,7 @@ void mageLogMessage(const uint8_t user, const uint8_t severity, const char *form
     
     char timeFormat[15];
     char userFormat[256];
-    char finalFormat[270];
+    char finalFormat[271];
 
     sprintf(timeFormat, "%02d:%02d:%02d", Logger.Time->tm_hour, Logger.Time->tm_min, Logger.Time->tm_sec);
     
@@ -81,7 +95,7 @@ void mageLogEnd()
 {
 	MAGE_LOG_CORE_INFORM("Logging Details:\nLog Count -> %d\nWarning Count -> %d\nError Count -> %d\n", Logger.LogCount, Logger.WarningCount, Logger.ErrorCount);
 
-    #if defined(MAGE_DEBUG) || defined(CLIENT_DEBUG)
+    #if defined (MAGE_DEBUG) || defined(CLIENT_DEBUG)
 
         fclose(Logger.DebugFile);
         

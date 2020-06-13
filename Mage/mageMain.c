@@ -1,19 +1,18 @@
 #include "mageAPI.h"
 
-
-int32_t main(int32_t argc, char **args)
+void main(int32_t argc, char **args)
 {
     mageApplication App;
-    mageApplicationProps props;
-    memset(&props, 0, sizeof(mageApplicationProps));
+    mageApplicationProps Props;
+    memset(&Props, 0, sizeof(mageApplicationProps));
 
-    props.Name      = "Hello World Program";
-    props.Width     = 1920;
-    props.Height    = 1080;
-    props.Version   = 1.0;
-    props.ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
+    Props.Name      = "Hello World Program";
+    Props.Width     = 1920;
+    Props.Height    = 1080;
+    Props.Version   = 1.0;
+    Props.ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
     
-    mageApplicationInitialise(&App, &props);
+    mageApplicationInitialise(&App, &Props);
     mageApplicationRun(&App);
 }
 

@@ -5,7 +5,7 @@
 **************************/
 #include <mageAPI.h>
 
-#if defined(MAGE_VULKAN)
+#if defined (MAGE_VULKAN)
 
     mageResult mageCreateInstance(mageVulkanHandler *handler, mageWindow *window)
     {
@@ -22,7 +22,7 @@
         createInfo.sType                        = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo             = &applicationInfo;
         
-        #if defined(MAGE_GLFW)
+        #if defined (MAGE_GLFW)
             uint32_t count;
             const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&count);
             createInfo.ppEnabledExtensionNames  = glfwExtensions;

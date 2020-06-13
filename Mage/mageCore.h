@@ -16,7 +16,6 @@
 /*!************************
 	Allows for support on platforms without glfw 
 **************************/
-
 #if defined (MAGE_SDL2)
 	#include <SDL2/SDL.h>
 
@@ -88,7 +87,7 @@
 	/*!************************
 		Checking if using a 64 bit windows as _WIN32 flags for either 32 or 64 bit systems
 	**************************/
-	#if defined(_WIN64)
+	#if defined (_WIN64)
 		#undef MAGE_PLATFORM_WINDOWS_32
 		#define MAGE_PLATFORM_WINDOWS_64
 	#endif
@@ -111,7 +110,7 @@
 /*!************************
 	Checking if the microsoft visual studio compiler is being used
 **************************/
-#if defined(_MSC_VER)
+#if defined (_MSC_VER)
 	#define MAGE_COMPILER_MVS
 
 /*!************************
@@ -135,7 +134,7 @@
 	/*!************************
 		Checking if using a 64 bit compiler as the 32 flag is still flagged
 	**************************/
-	#if defined(__MINGW64__)
+	#if defined (__MINGW64__)
 		#undef MAGE_COMPILER_MINGW_32
 		#define MAGE_COMPILER_MINGW_64
 	#endif
@@ -150,9 +149,9 @@
 /*!************************
 	Checking if exporting DLL
 **************************/
-#if defined(MAGE_PLATFORM_WINDOWS_32) || defined(MAGE_PLATFORM_WINDOWS_64)
+#if defined (MAGE_PLATFORM_WINDOWS_32) || defined(MAGE_PLATFORM_WINDOWS_64)
 
-	#if defined(MAGE_CORE)
+	#if defined (MAGE_CORE)
 		
 		/*!************************
 			If its the core then it will be exporting to the dll 
@@ -178,9 +177,6 @@
 /*!************************
 	C standard includes 
 **************************/
-
-
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -191,17 +187,18 @@
 #include <time.h>
 #include <signal.h> 
 #include <stdint.h>
+/*!************************
+	Local includes 
+**************************/
 #include "Externals/hypatia/src/hypatia.h"
 
 /*!************************
 	Allows mono c# scripting 
 **************************/
-#if defined(MAGE_MONO_EXTERNALS)
+#if defined (MAGE_MONO_EXTERNALS)
 	#include <mono-2.0/mono/metadata/assembly.h>
 	#include <mono-2.0/mono/jit/jit.h>
 #endif
-
-#define MAGE_BIT(x) (1 << x) 
 
 /*!************************
 	@brief The mode that is a inform 
@@ -230,9 +227,7 @@
 
 #if defined (MAGE_DEBUG)
 
-	#define MAGE_VALIDATION_LAYERS 1
-
-	#if defined(MAGE_COMPILER_MVS)
+	#if defined (MAGE_COMPILER_MVS)
 		#define MAGE_DEBUG_BREAK __debugbreak()
 	#elif defined(MAGE_PLATFORM_LINUX)
 		#define MAGE_DEBUG_BREAK raise(SIGABRT)
@@ -248,7 +243,6 @@
 	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
 	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
-	#define MAGE_VALIDATION_LAYERS 1
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
@@ -513,92 +507,18 @@
 
 #endif
 
-
 /*!************************
-	@brief Event type none
+ * @brief Sets a bit in a value
+ * @param input The number being modified
+ * @param index The nth bit along (0 -> 7 in an byte) 0 = 1,  1 = 2,  2 = 4,  3 = 8,  4 = 16
+ * @param value The value the bit will be set to (0 | 1)
 **************************/
-#define MAGE_EVENT_TYPE_NONE 0
+#define MAGE_SET_BIT(input, index, value) (input |= value << index)
 /*!************************
-	@brief Event type of window being closed (terminated)
+ * @brief Specifies the shift for the bit
+ * @param index The nth bit along (0 -> 7 in an byte) 0 = 1,  1 = 2,  2 = 4,  3 = 8,  4 = 16
 **************************/
-#define MAGE_EVENT_TYPE_WINDOW_CLOSE 1
-/*!************************
-	@brief Event type of window being refucussed (tabbed in)
-**************************/
-#define MAGE_EVENT_TYPE_WINDOW_FOCUS 2
-/*!************************
-	@brief Event type of window being lost focus (tabbed out)
-**************************/
-#define MAGE_EVENT_TYPE_WINDOW_LOST_FOCUS 3
-/*!************************
-	@brief Event type of window being moved around (not available in full screen)
-**************************/
-#define MAGE_EVENT_TYPE_WINDOW_MOVED 4
-/*!************************
-	@brief Event type of window being resized (dimensions changed)
-**************************/
-#define MAGE_EVENT_TYPE_WINDOW_RESIZE 5
-/*!************************
-	@brief Event type of application update frame
-**************************/
-#define MAGE_EVENT_TYPE_APPLICATION_UPDATE 6
-/*!************************
-	@brief Event type of window tick being increased (not related to frame rate)
-**************************/
-#define MAGE_EVENT_TYPE_APPLICATION_TICK 7
-/*!************************
-	@brief Event type of application render call being executed
-**************************/
-#define MAGE_EVENT_TYPE_APPLICATION_RENDER 8
-/*!************************
-	@brief Event type of a key being pressed
-**************************/
-#define MAGE_EVENT_TYPE_KEY_PRESSED 9
-/*!************************
-	@brief Event type of a key being released
-**************************/
-#define MAGE_EVENT_TYPE_KEY_RELEASED 10
-/*!************************
-	@brief Event type of a continued input of text streams (text input)
-**************************/
-#define MAGE_EVENT_TYPE_KEY_TYPED 11 
-/*!************************
-	@brief Event type of a mouse button being presesd
-**************************/
-#define MAGE_EVENT_TYPE_MOUSE_BUTTON_PRESSED 12
-/*!************************
-	@brief Event type of a mouse button being released
-**************************/
-#define MAGE_EVENT_TYPE_MOUSE_BUTTON_RELEASED 13
-/*!************************
-	@brief Event type of a mouse being moved
-**************************/
-#define MAGE_EVENT_TYPE_MOUSE_MOVE 14
-/*!************************
-	@brief Event type of a mouse wheel being scrolled
-**************************/
-#define MAGE_EVENT_TYPE_MOUSE_SCROLL 15
-/*!************************
-	@brief Event catagory undefined
-**************************/
-#define MAGE_EVENT_CATAGORY_NONE 3
-/*!************************
-	@brief Event catagory window
-**************************/
-#define MAGE_EVENT_CATAGORY_WINDOW 4 
-/*!************************
-	@brief Event catagory application
-**************************/
-#define MAGE_EVENT_CATAGORY_APPLICATION 5 
-/*!************************
-	@brief Event catagory keyboard
-**************************/
-#define MAGE_EVENT_CATAGORY_KEYBOARD 6
-/*!************************
-	@brief Event catagory mouse
-**************************/
-#define MAGE_EVENT_CATAGORY_MOUSE 7
-
+#define MAGE_BIT(index) (1 << index) 
 
 
 

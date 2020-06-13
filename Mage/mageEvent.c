@@ -1,178 +1,150 @@
 #include "mageAPI.h"
 
-#if defined(MAGE_GLFW)
-	#define MAGE_KEY_COUNT 350
-	#define MAGE_MOUSE_BUTTON_COUNT 7
-#elif #defined(MAGE_SDL2)
-	#define MAGE_KEY_COUNT 1024
-	#define MAGE_MOUSE_BUTTON_COUNT 10
-#endif
-
-
-/*!************************ 
- * BIT INFO
- * 7 - Unused
- * 6 - Unused
- * 5 - Unused
- * 4 - Unused
- * 3 - Unused 
- * 2 - Repeat
- * 1 - Released
- * 0 - Pressed
-**************************/
-typedef uint8_t mageKeyHandle;
-
-
-typedef struct MAGE_EVENT_SYSTEM
+static mageEventCategoryBit mageNoneCategories[] = 
 {
-	#if defined(MAGE_GLFW)
-		GLFWwindow *WindowContext;
-	#else
-		SDLEvent *EventContext;
-	#endif
-
-	mageKeyHandle 	Keys[MAGE_KEY_COUNT];
-	uint8_t 		MouseButtons[MAGE_MOUSE_BUTTON_COUNT];
-
-	double 			MouseXPosition;
-	double 			MouseYPosition;
-	uint8_t 		WindowFocused;
-	uint8_t			MouseInWindow;		
-
-} mageEvent;
-
-static mageEvent EventHandle;
-
-
-static mageKeyHandle mageCreateKeyHandle(const uint8_t pressed, const uint8_t release, const uint8_t repeat)
+    MAGE_NONE_CATEGORY,
+};
+static mageEventCategoryBit mageWindowCloseEventCategories[] =
 {
-	mageKeyHandle handle;
-	memset(&handle, 0, sizeof(mageKeyHandle));
-	handle |= pressed << 0;
-	handle |= repeat << 1;
-	return handle;
-}
-
-#if defined(MAGE_GLFW)
-
-	static void mageGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-	{
-		switch (action)
-		{
-			case GLFW_PRESS:
-				EventHandle.Keys[key] = mageCreateKeyHandle(1, 0, 0);
-				break;
-
-			case GLFW_REPEAT:
-				EventHandle.Keys[key] = mageCreateKeyHandle(1, 0, 1);
-				break;
-
-			case GLFW_RELEASE:
-				EventHandle.Keys[key] = mageCreateKeyHandle(0, 1, 0);
-				break;
-		}
-	}
-	static void mageGLFWCursorCallback(GLFWwindow *window, double x, double y)
-	{
-		EventHandle.MouseXPosition = x;
-		EventHandle.MouseYPosition = y;
-	}
-	static void mageGLFWWindowFocusCallback(GLFWwindow *window, int32_t focused)
-	{
-		EventHandle.WindowFocused = focused;
-	}
-	static void mageGLFWMouseButtonCallback(GLFWwindow* window, int button, int action, int modes)
-	{
-		EventHandle.MouseButtons[button] = action;
-	}
-	static void mageGLFWCursorEnterCallback(GLFWwindow *window, int32_t entered)
-	{
-		EventHandle.MouseInWindow = entered;
-	}
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageWindowFocusCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY
+};
+static mageEventCategoryBit mageWindowLostFocusCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageWindowMovedCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageApplicationTickCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageApplicationUpdateCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageApplicationRenderCategories[] = 
+{ 
+    MAGE_APPLICATION_CATEGORY,
+};
+static mageEventCategoryBit mageKeyPressedCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_KEYBOARD_CATEGORY,
+};
+static mageEventCategoryBit mageKeyReleasedCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_KEYBOARD_CATEGORY,
+};
+static mageEventCategoryBit mageMouseButtonPressedCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_MOUSE_CATEGORY,
+    MAGE_MOUSE_BUTTON_CATEGORY,
+};
+static mageEventCategoryBit mageMouseButtonReleasedCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_MOUSE_CATEGORY,
+    MAGE_MOUSE_BUTTON_CATEGORY,
+};
+static mageEventCategoryBit mageMouseMovedCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_MOUSE_CATEGORY,
+};
+static mageEventCategoryBit mageMouseScrolledCategories[] = 
+{ 
+    MAGE_INPUT_CATEGORY,
+    MAGE_MOUSE_CATEGORY,
+};
 	
 
-#endif
-
-void mageInputIntialise(mageWindow *window)
+mageEventHandle mageEventHandleCreate(const mageEventType type)
 {
-	memset(EventHandle.Keys, 0, MAGE_KEY_COUNT * sizeof(mageKeyHandle));
-	memset(EventHandle.MouseButtons, 0, sizeof(uint8_t) * MAGE_MOUSE_BUTTON_COUNT);
-	EventHandle.MouseXPosition = 0.0;
-	EventHandle.MouseYPosition = 0.0;
+    uint32_t i;
+    mageEventHandle handle;
+    handle = 0;
+    mageEventCategoryBit *categories = mageEventGenerateCategories(type);
+    uint32_t argumentCount = sizeof(*categories)  / sizeof(mageEventCategoryBit);
+    
+    handle = type;
 
-	#if defined(MAGE_GLFW)
-		EventHandle.WindowContext = window->Context;
-		glfwSetKeyCallback(EventHandle.WindowContext, mageGLFWKeyCallback);
-		glfwSetCursorPosCallback(EventHandle.WindowContext, mageGLFWCursorCallback);
-		glfwSetWindowFocusCallback(EventHandle.WindowContext, mageGLFWWindowFocusCallback);
-		glfwSetMouseButtonCallback(EventHandle.WindowContext, mageGLFWMouseButtonCallback);
-		glfwSetCursorEnterCallback(EventHandle.WindowContext, mageGLFWCursorEnterCallback);
-	#endif
+    for (i = 0; i < argumentCount; i++)
+    {
+        MAGE_SET_BIT(handle, categories[i], 1);
+    }
+    MAGE_SET_BIT(handle, 15, 0);
+    return handle;
 }
-void mageInputFlush(mageWindow *window)
+mageEventCategoryBit *mageEventGenerateCategories(const mageEventType type)
 {
-
+    switch (type)
+    {
+        case MAGE_NONE_EVENT:
+            return mageNoneCategories;
+            break;
+        case MAGE_WINDOW_CLOSE_EVENT:
+            return mageWindowCloseEventCategories;
+            break;
+        case MAGE_WINDOW_FOCUS_EVENT:
+            return mageWindowFocusCategories;
+            break;
+        case MAGE_WINDOW_LOST_FOCUS_EVENT:
+            return mageWindowFocusCategories;
+            break;
+        case MAGE_WINDOW_MOVED_EVENT:
+            return mageWindowMovedCategories;
+            break;
+        case MAGE_APPLICATION_TICK_EVENT:
+            return mageApplicationTickCategories;
+            break;
+        case MAGE_APPLICATION_UPDATE_EVENT:
+            return mageApplicationUpdateCategories;
+            break;
+        case MAGE_APPLICATION_RENDER_EVENT:
+            return mageApplicationRenderCategories;
+            break;
+        case MAGE_KEY_PRESSED_EVENT:
+            return mageKeyPressedCategories;
+            break;
+        case MAGE_KEY_RELEASED_EVENT:
+            return mageKeyReleasedCategories;
+            break;
+        case MAGE_MOUSE_BUTTON_PRESSED_EVENT:
+            return mageMouseButtonPressedCategories;
+            break;
+        case MAGE_MOUSE_BUTTON_RELEASED_EVENT:
+            return mageMouseButtonReleasedCategories;
+            break;
+        case MAGE_MOUSE_MOVED_EVENT:
+            return mageMouseMovedCategories;
+            break;
+        case MAGE_MOUSE_SCROLLED_EVENT:
+            return mageMouseScrolledCategories;
+            break;
+    }
 }
-
-
-double mageGetMousePositionX()
+mageEventType mageEventExtractEventType(mageEventHandle handle)
 {
-	return EventHandle.MouseXPosition;
+    return handle &= 0b1111;
 }
-double mageGetMousePositionY()
+uint8_t mageEventInCategory(const mageEventHandle handle, const mageEventCategoryBit category)
 {
-	return EventHandle.MouseYPosition;
+    mageEventCategoryBit *categories = mageEventGenerateCategories(mageEventExtractEventType(handle));
+    uint8_t categoryCount = (sizeof(*categories) / sizeof(mageEventCategoryBit));
+    uint8_t i;
+    for (i = 0; i < categoryCount; i++) 
+    {
+        if (categories[i] == category) return 1;
+    }
+    return 0;
 }
-uint8_t mageGetMouseButtonLeftClick(window)
-{
-
-	#if defined(MAGE_SDL2)
-		
-	#elif defined(MAGE_GLFW)
-		
-	#endif
-	return 0;
-}
-uint8_t mageGetMouseButtonRightClick(mageWindow *window)
-{
-	#if defined(MAGE_SDL2)
-		
-	#elif defined(MAGE_GLFW)
-		
-	#endif
-	return 0;
-}
-uint8_t mageGetMouseInsideContext(mageWindow *window)
-{
-	#if defined(MAGE_SDL2)
-	
-	#elif defined(MAGE_GLFW)
-	#endif
-	return EventHandle.MouseInWindow;
-}
-void mageSetMousePosition(mageWindow *window, const double x, const double y)
-{
-	#if defined(MAGE_SDL2)
-
-	#elif defined(MAGE_GLFW)
-		glfwSetCursorPos(window->Context, x, y);
-	#endif
-}
-uint8_t mageGetKeyDown(const int32_t key)
-{	
-	return ((EventHandle.Keys[key] >> 0) & 1) || ((EventHandle.Keys[key] >> 1) & 1);
-}
-uint8_t mageGetKeyNotDown(const int32_t key)
-{
-#if defined(MAGE_SDL2)
-	
-	#elif defined(MAGE_GLFW)
-		return (!((EventHandle.Keys[key] >> 0) & 1) || ((EventHandle.Keys[key] >> 1) & 1));
-	#endif
-	return 0;
-}
-
-
-
 
 

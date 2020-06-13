@@ -12,7 +12,7 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 	window->Title   = title;
 	window->Running = 1;
 	
-	#if defined(MAGE_SDL2)
+	#if defined (MAGE_SDL2)
 
 		MAGE_LOG_CORE_INFORM("Using SDL2 as window mode.\n", NULL);
 
@@ -48,8 +48,6 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 		
 		MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 		
-		glfwMakeContextCurrent(window->Context);	
-
 		glfwSetInputMode(window->Context, GLFW_STICKY_KEYS, GLFW_TRUE);
 
 		glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
@@ -59,35 +57,14 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 	return MAGE_SUCCESS;
 
 }
-void mageWindowSwapBuffers(mageWindow *window)
-{
-	#if defined(MAGE_SLD2)
-
-	#elif defined(MAGE_GLFW)
-		glfwSwapBuffers(window->Context);
-	#endif
-}
 void mageWindowTerminate(mageWindow *window)
 {
-	#if defined(MAGE_GLFW)
+	#if defined (MAGE_GLFW)
 		glfwDestroyWindow(window->Context);
 		glfwTerminate();
 	#elif defined(MAGE_SDL2)
 		SDL_DestroyWindow(window->Context);	
 		SDL_Quit();
 	#endif	
-
 	MAGE_LOG_CORE_INFORM("Window has been terminated\n", NULL);
-
-}
-
-void mageWindowDestroy(mageWindow *window)
-{
-	#if defined(MAGE_GLFW)
-		
-	#elif defined(MAGE_SDL2)
-		SDL_DestroyWindow(window->Context);	
-		SDL_Quit();
-	#endif	
-	free(window);
 }

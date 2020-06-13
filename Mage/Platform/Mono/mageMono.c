@@ -1,6 +1,6 @@
 #include <mageAPI.h>
 
-#if defined(MAGE_MONO_EXTERNALS)
+#if defined (MAGE_MONO_EXTERNALS)
 
     void *mageMonoHandlerAllocate()
     {

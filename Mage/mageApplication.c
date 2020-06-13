@@ -2,14 +2,14 @@
 
 mageResult mageEngineInitialise(const mageApplicationProps *props)
 {
-    #if defined(MAGE_DEBUG)
+    #if defined (MAGE_DEBUG)
 		mageFileDumpContents("Logs/mage.log", "", 1);
 		mageLogInitialise("Logs/mage.log");
 		MAGE_LOG_CORE_WARNING("Debug mode in uses, for best performance turn debug mode of\n", NULL);
 		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
 	#endif
 
-	#if defined(MAGE_SDL2)
+	#if defined (MAGE_SDL2)
 		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
 			
 		if (flag != 0)
@@ -22,15 +22,15 @@ mageResult mageEngineInitialise(const mageApplicationProps *props)
 
 	#endif
 
-	#if defined(MAGE_GLFW)
+	#if defined (MAGE_GLFW)
 
 		if (!glfwInit())
-		{
+		{			
 			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
 			return MAGE_LIBRARY_FAILURE;
 		}	
 
-		#if defined(MAGE_VULKAN)
+		#if defined (MAGE_VULKAN)
 			uint8_t flag = glfwVulkanSupported();
 
 			if (!flag)
@@ -83,7 +83,7 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
 
     application->Renderer = mageRendererAllocate();
     application->Window = mageWindowAllocate();
-    #if defined(MAGE_MONO_EXTERNALS)
+    #if defined (MAGE_MONO_EXTERNALS)
         
         application->MonoHandler = mageMonoHandlerAllocate();
 
@@ -113,8 +113,6 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
         return result;
     }
 
-    mageInputIntialise(application->Window);
-
     return MAGE_SUCCESS;
 }
 mageResult mageApplicationRun(mageApplication *application)
@@ -131,9 +129,7 @@ mageResult mageApplicationRun(mageApplication *application)
 
     while (application->Running)
     {
-        #if defined(MAGE_GLFW)
-
-            mageWindowSwapBuffers(application->Window);
+        #if defined (MAGE_GLFW)
 
             application->Props.UpdateMethod(application);
 
@@ -157,6 +153,7 @@ mageResult mageApplicationRun(mageApplication *application)
 }
 void mageApplicationDestroy(mageApplication *application)
 {
+    mageWindowTerminate(application->Window);
     mageMonoCleanup(application->MonoHandler);
     mageRendererDestroy(application->Renderer);
     free(application->Renderer);

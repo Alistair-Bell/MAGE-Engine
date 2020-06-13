@@ -1,6 +1,6 @@
 #include <mageAPI.h>
 
-#if defined(MAGE_VULKAN)
+#if defined (MAGE_VULKAN)
 
     static mageResult mageCreateFence(mageRenderer *renderer, mageWindow *window)
     {
@@ -35,7 +35,7 @@
     }
     static mageResult mageCreateCommandPool(mageRenderer *renderer, mageWindow *window)
     {
-        vkGetDeviceQueue(renderer->Handler.Device, renderer->Handler.GraphicsFamilyIndex, 0, &renderer->Queue);
+        vkGetDeviceQueue(renderer->Handler.Device, renderer->Handler.GraphicsFamilyIndex, 0, &renderer->GraphicsQueue);
         {   
             VkCommandPoolCreateInfo commandPoolInfo;
             memset(&commandPoolInfo, 0, sizeof(VkCommandPoolCreateInfo));
@@ -123,7 +123,7 @@
             submitInfo.signalSemaphoreCount = 1;
             submitInfo.pSignalSemaphores    = &renderer->Semaphore;
 
-            if (vkQueueSubmit(renderer->Queue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+            if (vkQueueSubmit(renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
             {
                 MAGE_LOG_CORE_FATAL_ERROR("Queue submition has failed\n", NULL);
                 return MAGE_QUEUE_SUBMITION_FAILURE;
@@ -141,7 +141,7 @@
             submitInfo.pWaitSemaphores      = &renderer->Semaphore;
             submitInfo.pWaitDstStageMask    = flags;
 
-            if (vkQueueSubmit(renderer->Queue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
+            if (vkQueueSubmit(renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
             {
                 MAGE_LOG_CORE_FATAL_ERROR("Queue submition 2 has failed\n", NULL);
                 return MAGE_QUEUE_SUBMITION_FAILURE;
@@ -153,7 +153,7 @@
     }
     static mageResult mageCreateSurface(mageRenderer *renderer, mageWindow *window)
     {
-        #if defined(MAGE_GLFW)
+        #if defined (MAGE_GLFW)
             
             if (glfwCreateWindowSurface(renderer->Handler.Instance, window->Context, NULL, &renderer->Surface))
             {
@@ -316,7 +316,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateDephStencilImage(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateDepthStencilImage(mageRenderer *renderer, mageWindow *window)
     {
         {
             const VkFormat const tryFormats[] = 
@@ -340,16 +340,16 @@
                 vkGetPhysicalDeviceFormatProperties(renderer->Handler.PhysicalDevice, format, &formatProperties);
                 if (formatProperties.optimalTilingFeatures & VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) 
                 {
-                    renderer->DephStencilFormat = format;
+                    renderer->DepthStencilFormat = format;
                     break;
                 }
 		    }
-            if (renderer->DephStencilFormat == VK_FORMAT_UNDEFINED)
+            if (renderer->DepthStencilFormat == VK_FORMAT_UNDEFINED)
             {
                 MAGE_LOG_CORE_FATAL_ERROR("Deph stencil format was not selected\n", NULL);
                 return MAGE_HARDWARE_INVALID;
             }
-            if ((renderer->DephStencilFormat == VK_FORMAT_D32_SFLOAT_S8_UINT ) || ( renderer->DephStencilFormat == VK_FORMAT_D24_UNORM_S8_UINT ) || ( renderer->DephStencilFormat == VK_FORMAT_D16_UNORM_S8_UINT ) || ( renderer->DephStencilFormat == VK_FORMAT_S8_UINT )) 
+            if ((renderer->DepthStencilFormat == VK_FORMAT_D32_SFLOAT_S8_UINT ) || ( renderer->DepthStencilFormat == VK_FORMAT_D24_UNORM_S8_UINT ) || ( renderer->DepthStencilFormat == VK_FORMAT_D16_UNORM_S8_UINT ) || ( renderer->DepthStencilFormat == VK_FORMAT_S8_UINT )) 
             {
                 renderer->Handler.DephStencilAvailable = 1;
                 MAGE_LOG_CORE_INFORM("Deph stencil available and chosen\n", NULL);
@@ -363,7 +363,7 @@
         imageCreateInfo.flags                    = 0;
         imageCreateInfo.imageType                = VK_IMAGE_TYPE_2D;
         imageCreateInfo.pNext                    = NULL;
-        imageCreateInfo.format                   = renderer->DephStencilFormat;
+        imageCreateInfo.format                   = renderer->DepthStencilFormat;
         imageCreateInfo.extent.depth             = 1;
         imageCreateInfo.extent.height            = window->Height;
         imageCreateInfo.extent.width             = window->Width; 
@@ -377,7 +377,7 @@
         imageCreateInfo.pQueueFamilyIndices      = NULL;
         imageCreateInfo.initialLayout            = VK_IMAGE_LAYOUT_UNDEFINED;
 
-        if (vkCreateImage(renderer->Handler.Device, &imageCreateInfo, NULL, &renderer->DephStencilImage) != VK_SUCCESS)
+        if (vkCreateImage(renderer->Handler.Device, &imageCreateInfo, NULL, &renderer->DepthStencilImage) != VK_SUCCESS)
         {
             MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image has failed to been created\n", NULL);
             return MAGE_IMAGE_CREATION_FAILURE;
@@ -385,7 +385,7 @@
         /*
         VkMemoryRequirements requirements;
         memset(&requirements, 0, sizeof(VkMemoryRequirements));
-        vkGetImageMemoryRequirements(renderer->Handler.Device, renderer->Handler.DephStencilImage, &requirements);
+        vkGetImageMemoryRequirements(renderer->Handler.Device, renderer->Handler.DepthStencilImage, &requirements);
 
         VkMemoryAllocateInfo memoryAllocateInfo;
         memset(&memoryAllocateInfo, 0, sizeof(VkMemoryAllocateInfo));
@@ -401,9 +401,9 @@
         memset(&viewCreateInfo, 0, sizeof(VkImageViewCreateInfo));
 
         viewCreateInfo.sType                                = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;                                
-        viewCreateInfo.image                                = renderer->DephStencilImage;
+        viewCreateInfo.image                                = renderer->DepthStencilImage;
         viewCreateInfo.viewType                             = VK_IMAGE_VIEW_TYPE_2D;                             
-        viewCreateInfo.format                               = renderer->DephStencilFormat;                            
+        viewCreateInfo.format                               = renderer->DepthStencilFormat;                            
         viewCreateInfo.components.r                         = VK_COMPONENT_SWIZZLE_IDENTITY;
         viewCreateInfo.components.g                         = VK_COMPONENT_SWIZZLE_IDENTITY;
         viewCreateInfo.components.b                         = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -414,7 +414,7 @@
         viewCreateInfo.subresourceRange.baseArrayLayer      = 0;
         viewCreateInfo.subresourceRange.layerCount          = 1;
 
-        if (vkCreateImageView(renderer->Handler.Device, &viewCreateInfo, NULL, &renderer->DephStencilImageView) != VK_SUCCESS)
+        if (vkCreateImageView(renderer->Handler.Device, &viewCreateInfo, NULL, &renderer->DepthStencilImageView) != VK_SUCCESS)
         {
             MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image view has failed to be created\n", NULL);
             return MAGE_IMAGE_VIEW_CREATION_FAILURE;
@@ -442,7 +442,7 @@
             mageCreateSurface,
             mageCreateSwapChain,
             mageCreateSwapChainImages,
-            mageCreateDephStencilImage,
+            mageCreateDepthStencilImage,
         };
         const uint32_t functionCount = (sizeof(functions) / sizeof(rendererSetupFunctions));
         uint32_t i;

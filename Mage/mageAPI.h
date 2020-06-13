@@ -13,22 +13,17 @@
 	|_|  |_/_/    \_\_____|______| |______|_| |_|\__, |_|_| |_|\___|
 												__/ |             
 											    |___/              
+	
 	Open source 2D game engine written in clean c89
+	To contribute go to https://github.com/MTECGamesStudio/MAGE-Engine
+	For use please read the license
 
 **************************/
 
-/*!************************
- * @brief A typedef for a memory allocation callback  void *func(uint64_t size)
-**************************/
-typedef void *(*mageAllocationCallback)(uint64_t);
-/*!************************
- * @brief A typedef for a memory allocation callback  void func(void *mem)
-**************************/
-typedef void (*mageFreeCallback)(void *);
 /*!************************
  * @brief Returned from functions and can describe the error that has occured
 **************************/
-typedef enum MAGE_RESULT_ENUM mageResult;
+typedef enum MAGE_API MAGE_RESULT_ENUM mageResult;
 /*!************************
  * @brief The wrapper that holds the required objects needed for the engine
 **************************/
@@ -49,6 +44,19 @@ typedef void (*mageApplicationUpdateCallback)(mageApplication *);
  * @brief The callback used by the application once on startup
 **************************/
 typedef mageResult (*mageApplicationDestroyCallback)(mageApplication *);
+/*!************************
+ * @brief An 8 bit unsigned integer
+**************************/
+typedef uint8_t byte;
+/*!************************
+ * @brief An event stores data about the information about a current system
+ * @brief Binary format : 
+ * @brief BITS (0  -> 3)  = the event type
+ * @brief BITS (4  -> 14) = the category of the event
+ * @brief BITS (15 -> 61) = event specific data
+ * @brief BITS (62 -> 63) = whether the event has been handled
+**************************/
+typedef uint64_t mageEventHandle;
 
 
 /*!************************
@@ -473,7 +481,7 @@ typedef struct MAGE_API MAGE_WINDOW_STRUCT
 	**************************/
 	const char *Title;
 	
-	#if defined(MAGE_SDL2)
+	#if defined (MAGE_SDL2)
 		/*!************************
 		 * @brief Window context using the SDL2 framework
 		**************************/
@@ -514,130 +522,175 @@ extern MAGE_API void *mageWindowAllocate();
 **************************/
 extern MAGE_API mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title);
 /*!************************
- * @brief Swaps the buffers of the window
- * @param window A pointer to a instance of a window
- * @return Nothing
-**************************/
-extern MAGE_API void mageWindowSwapBuffers(mageWindow *window);
-/*!************************
  * @brief Terminates the window API
  * @param window A pointer to a instance of a window
  * @return Nothing
 **************************/
 extern MAGE_API void mageWindowTerminate(mageWindow *window);
-/*!************************ 
- * @brief Destroys the resizable list freeing itelsf
- * @param window A pointer to a instance of a window
- * @return Nothing
- * @warning If the window not allocated on the heap then do not call this method
-**************************/
-extern MAGE_API void mageWindowDestroy(mageWindow *window); 
-/*!************************ 
- * @brief Sets up the input handle 
- * @param window A pointer to a instance of a window
- * @return Nothing
-**************************/
-extern MAGE_API void mageInputIntialise(mageWindow *window);
-/*!************************ 
- * @brief Gets the mouse's x coordinate 
- * @param window A pointer to a instance of a window
- * @return The X coordinate
-**************************/
-extern MAGE_API double mageGetMousePositionX();
-/*!************************ 
- * @brief Gets the mouse's y coordinate 
- * @param window A pointer to a instance of a window
- * @return The y coordinate
-**************************/
-extern MAGE_API double mageGetMousePositionY();
-/*!************************ 
- * @brief Gets whether the left mouse button is being clicked
- * @param window A pointer to a instance of a window 
- * @return Whether the button is being clicked
-**************************/
-extern MAGE_API uint8_t mageGetMouseButtonLeftClick();
-/*!************************ 
- * @brief Gets whether the right mouse button is being clicked
- * @param window A pointer to a instance of a window 
- * @return Whether the button is being clicked
-**************************/
-extern MAGE_API uint8_t mageGetMouseButtonRightClick(mageWindow *window);
-/*!************************ 
- * @brief Gets whether the mouse is inside the window context
- * @param window A pointer to a instance of a window
- * @return Whether it is in the context
-**************************/
-extern MAGE_API uint8_t mageGetMouseInsideContext(mageWindow *window);
-/*!************************ 
- * @brief Sets the mouse x and y to a specific location
- * @param window A pointer to a instance of a window
- * @param x Location the mouses x coordinate will be set at
- * @param y Location the mouses y coordinate will be set at
- * @return Nothing
-**************************/
-extern MAGE_API void mageSetMousePosition(mageWindow *window, const double x, const double y);
-/*!************************ 
- * @brief Gets whether the key is being pressed down
- * @param window A pointer to a instance of a window
- * @param key A keycode for the key that is being tested
- * @return Whether the key is down
-**************************/
-extern MAGE_API uint8_t mageGetKeyDown(const int32_t key);
-/*!************************ 
- * @brief Gets whether the key is not being pressed down
- * @param window A pointer to a instance of a window
- * @param key A keycode for the key that is being tested
- * @return Whether the key is not down
-**************************/
-extern MAGE_API uint8_t mageGetKeyNotDown(const int32_t key);
 
-#if defined(MAGE_VULKAN)
+
+
+typedef enum MAGE_API MAGE_EVENT_ENUM
+{
+	/*!************************
+	 * @brief An event that has no type and will not be dispatched to any listeners
+	**************************/
+	MAGE_NONE_EVENT = 0,
+	/*!************************
+	 * @brief Event when the window has closed (shut down)
+	**************************/
+	MAGE_WINDOW_CLOSE_EVENT, 
+	/*!************************
+	 * @brief Event when the window has been focused and is now polling
+	**************************/
+	MAGE_WINDOW_FOCUS_EVENT, 
+	/*!************************
+	 * @brief Event when the window is losted focus and in no longer polling
+	**************************/
+	MAGE_WINDOW_LOST_FOCUS_EVENT, 
+	/*!************************
+	 * @brief Event when the window has moved along the desktop
+	**************************/
+	MAGE_WINDOW_MOVED_EVENT,
+	/*!************************
+	 * @brief Event of an application tick (1 per second)
+	**************************/
+	MAGE_APPLICATION_TICK_EVENT, 
+	/*!************************
+	 * @brief Event when the application updates (not the same as tick)
+	**************************/
+	MAGE_APPLICATION_UPDATE_EVENT, 
+	/*!************************
+	 * @brief Event once a round of rendering is done
+	**************************/
+	MAGE_APPLICATION_RENDER_EVENT,
+	/*!************************
+	 * @brief Event when a key is pressed
+	**************************/
+	MAGE_KEY_PRESSED_EVENT, 
+	/*!************************
+	 * @brief Event when a key is released
+	**************************/
+	MAGE_KEY_RELEASED_EVENT,
+	/*!************************
+	 * @brief Event when the button is pressed
+	**************************/
+	MAGE_MOUSE_BUTTON_PRESSED_EVENT, 
+	/*!************************
+	 * @brief Event when a button is released
+	**************************/
+	MAGE_MOUSE_BUTTON_RELEASED_EVENT, 
+	/*!************************
+	 * @brief Event when the mouse cursor has moved
+	**************************/
+	MAGE_MOUSE_MOVED_EVENT, 
+	/*!************************
+	 * @brief Event when the mouse wheel is scrolled up or down
+	**************************/
+	MAGE_MOUSE_SCROLLED_EVENT,
+
+} mageEventType;
+
+
+/*!************************
+ * @brief The category of the event for listeners to handle
+ * @brief Each category represents a bit and events can have multiple categories
+**************************/
+typedef enum MAGE_API MAGE_EVENT_CATEGORY_BITS_ENUM
+{
+	/*!************************
+	 * @brief Events with not category, usually a red flag
+	**************************/
+	MAGE_NONE_CATEGORY 				= -1,
+	/*!************************
+	 * @brief Events around the application, ticks and render cycles
+	**************************/
+	MAGE_APPLICATION_CATEGORY		= 4,
+	/*!************************
+	 * @brief Events around input, mouse movement, key presses and mouse buttons being pressed
+	**************************/
+	MAGE_INPUT_CATEGORY				= 5,
+	/*!************************
+	 * @brief Events based on keyboard inputs and presses
+	**************************/
+	MAGE_KEYBOARD_CATEGORY 			= 6,
+	/*!************************
+	 * @brief Events based on the mouse, movement and button presses
+	**************************/
+	MAGE_MOUSE_CATEGORY				= 7,
+	/*!************************
+	 * @brief Events based on the mouse buttons, presses and states
+	**************************/
+	MAGE_MOUSE_BUTTON_CATEGORY		= 8,
+
+} mageEventCategoryBit;
+
+/*!************************
+ * @brief Creates an array of the catagories that an event type lives in
+ * @param type The type of the event 
+ * @return Array of categories 
+**************************/
+extern mageEventCategoryBit MAGE_API *mageEventGenerateCategories(const mageEventType type);
+/*!************************
+ * @brief Creates and formats the bits for the event handle and package
+ * @param type The type of the event 
+ * @return The formatted binary 
+**************************/
+extern mageEventHandle MAGE_API mageEventHandleCreate(const mageEventType type);
+/*!************************
+ * @brief Interrogates the binary to find what event type it is 
+ * @param handle The formatted binary
+ * @return The event type
+**************************/
+extern mageEventType MAGE_API mageEventExtractEventType(const mageEventHandle handle);
+/*!************************
+ * @brief Checks whether the handle is in category
+ * @param handle A formated event handle 
+ * @param category The category to check for
+ * @return Whether it is in the category
+**************************/
+extern uint8_t MAGE_API mageEventInCategory(const mageEventHandle handle, const mageEventCategoryBit category);
+
+
+
+
+#if defined (MAGE_VULKAN)
 
 	/*!************************
 	* @brief Hanldes vulkan stuff
 	**************************/
 	typedef struct MAGE_API MAGE_VULKAN_HANDLER_STRUCT
 	{	
-		VkPhysicalDeviceMemoryProperties PhysicalMemoryProperties;
-
-		VkSurfaceCapabilitiesKHR SurfaceCapabilities;
-		
-		VkSurfaceFormatKHR SurfaceFormat;
-
-		VkDevice Device;
-
-		VkPhysicalDevice PhysicalDevice;
-
-		VkPhysicalDeviceProperties PhysicalProperties;
-	
-		VkInstance Instance;
-
-		uint32_t DephStencilAvailable;
-
-		uint32_t GraphicsFamilyIndex;
-
-		uint32_t GraphicsPresentFamily;
-
+		VkPhysicalDeviceMemoryProperties 	PhysicalMemoryProperties;
+		VkSurfaceCapabilitiesKHR 			SurfaceCapabilities;
+		VkSurfaceFormatKHR 					SurfaceFormat;
+		VkDevice 							Device;
+		VkPhysicalDevice 					PhysicalDevice;
+		VkPhysicalDeviceProperties 			PhysicalProperties;
+		VkInstance 							Instance;
+		uint32_t						 	DephStencilAvailable;
+		uint32_t						 	GraphicsFamilyIndex;
+		uint32_t 							GraphicsPresentFamily;
 
 	} mageVulkanHandler;
 
 	/*!************************ 
-	* @brief Allocates a block of memory for the handler
-	* @return Void pointer to the block of memory allocated
-	* @warning The pointer has not been type casted
+	 * @brief Allocates a block of memory for the handler
+	 * @return Void pointer to the block of memory allocated
+	 * @warning The pointer has not been type casted
 	**************************/
 	extern MAGE_API void *mageVulkanHandlerAllocate();
 	/*!************************
-	* @brief Sets up the vulkan renderer
-	* @param handler A pointer to a instance of a vulkan handler
-	* @param window A pointer to a instance of a window
-	* @return The success of the method
+	 * @brief Sets up the vulkan renderer
+	 * @param handler A pointer to a instance of a vulkan handler
+	 * @param window A pointer to a instance of a window
+	 * @return The success of the method
 	**************************/
 	extern MAGE_API mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window); 
 	/*!************************
-	* @brief Destroys the vulkan devices
-	* @param handler A pointer to a instance of a vulkan handler
-	* @return Nothing
+	 * @brief Destroys the vulkan devices
+	 * @param handler A pointer to a instance of a vulkan handler
+	 * @return Nothing
 	**************************/
 	extern MAGE_API void mageVulkanHandlerCleanup(mageVulkanHandler *handler);
 
@@ -648,36 +701,56 @@ extern MAGE_API uint8_t mageGetKeyNotDown(const int32_t key);
 **************************/
 typedef struct MAGE_API MAGE_RENDERER_STRUCT
 {
-	#if defined(MAGE_VULKAN)
+	#if defined (MAGE_VULKAN)
 
 		/*!************************
 		 * @brief Handler for the vulkan setup
 		**************************/
 		mageVulkanHandler Handler;
-		
+		/*!************************
+		 * @brief The graphics queue for the rendering
+		**************************/
 		VkQueue GraphicsQueue;
-
-		VkQueue Queue;
-
+		/*!************************
+		 * @brief The command buffer including a primary and secondary
+		**************************/
 		VkCommandBuffer CommandBuffer[2];
-
+		/*!************************
+		 * @brief The main viewport of the surface
+		**************************/
 		VkViewport Viewport;
-		
+		/*!************************
+		 * @brief The window surface used to render to
+		**************************/
 		VkSurfaceKHR Surface;
-
-		VkImage DephStencilImage;
-
-		VkFormat DephStencilFormat;
-
-		VkImageView DephStencilImageView;
-
+		/*!************************
+		 * @brief A depth stencil used for rendering
+		**************************/
+		VkImage DepthStencilImage;
+		/*!************************
+		 * @brief The format of the depth stencil
+		**************************/
+		VkFormat DepthStencilFormat;
+		/*!************************
+		 * @brief The image view of the depth stencil
+		**************************/
+		VkImageView DepthStencilImageView;
+		/*!************************
+		 * @brief The command pool used by the renderer
+		**************************/
 		VkCommandPool CommandPool;
-		
+		/*!************************
+		 * @brief The swapchain of the renderer
+		**************************/
 		VkSwapchainKHR SwapChain;
-
+		/*!************************
+		 * @brief An array of swap chain images
+		**************************/
 		VkImage *SwapChainImages;
-
-		VkImageView *SwapChainImageViews;\
+		/*!************************
+		 * @brief An array of the swap chain image views
+		**************************/
+		VkImageView *SwapChainImageViews;
 
 		VkSemaphore Semaphore;
 
@@ -714,7 +787,7 @@ extern MAGE_API void mageRendererDestroy(mageRenderer *renderer);
  * @brief Camera used for the scene
 **************************/
 
-#if defined(MAGE_MONO_EXTERNALS)
+#if defined (MAGE_MONO_EXTERNALS)
 
 	typedef struct MAGE_MONO_HANDLER_STRUCT
 	{
@@ -794,16 +867,7 @@ typedef struct MAGE_API MAGE_APPLICATION_PROPS_STRUCT
  	 * @brief The method at called every frame at during the game loop
 	**************************/
 	mageApplicationDestroyCallback DestroyMethod;
-	/*!************************
- 	 * @brief The free method used by the application
-	**************************/
-	mageFreeCallback FreeCallback;
-	/*!************************
- 	 * @brief The free method used by the application
-	**************************/
-	mageAllocationCallback AllocationCallback;
-
-
+	
 } mageApplicationProps;
 
 struct MAGE_APPLICATION_STRUCT
@@ -817,7 +881,7 @@ struct MAGE_APPLICATION_STRUCT
 	**************************/
 	mageWindow *Window;
 	
-	#if defined(MAGE_MONO_EXTERNALS)
+	#if defined (MAGE_MONO_EXTERNALS)
 
 		mageMonoHandler *MonoHandler;
 
