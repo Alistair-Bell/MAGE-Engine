@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-typedef struct MAGE_API MAGE_LOGING_STRUCT
+typedef struct MAGE_LOGING_STRUCT
 {   
     uint64_t LogCount;
     uint64_t WarningCount;

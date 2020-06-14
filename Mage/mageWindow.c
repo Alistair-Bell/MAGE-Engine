@@ -2,9 +2,9 @@
 
 void *mageWindowAllocate()
 {
-	return malloc(sizeof(struct MAGE_WINDOW_STRUCT));
+	return malloc(sizeof(struct mageWindow));
 }
-mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
+mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
 {
 
 	window->Height  = yResolution;
@@ -57,7 +57,7 @@ mageResult mageWindowInitialise(mageWindow *window, const int32_t xResolution, c
 	return MAGE_SUCCESS;
 
 }
-void mageWindowTerminate(mageWindow *window)
+void mageWindowTerminate(struct mageWindow *window)
 {
 	#if defined (MAGE_GLFW)
 		glfwDestroyWindow(window->Context);

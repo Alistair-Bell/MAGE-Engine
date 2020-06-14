@@ -1,10 +1,10 @@
 #include "mageAPI.h"
 
 void main(int32_t argc, char **args)
-{
-    mageApplication App;
-    mageApplicationProps Props;
-    memset(&Props, 0, sizeof(mageApplicationProps));
+{  
+    struct mageApplication App;
+    struct mageApplicationProps Props;
+    memset(&Props, 0, sizeof(struct mageApplicationProps));
 
     Props.Name      = "Hello World Program";
     Props.Width     = 1920;
@@ -12,7 +12,7 @@ void main(int32_t argc, char **args)
     Props.Version   = 1.0;
     Props.ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
     
-    mageApplicationInitialise(&App, &Props);
+    mageApplicationInitialise(&App, Props);
     mageApplicationRun(&App);
 }
 

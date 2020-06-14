@@ -5,9 +5,14 @@
 **************************/
 #include <mageAPI.h>
 
+void *mageVulkanHandlerAllocate()
+{
+    return malloc(sizeof(struct mageVulkanHandler));
+}
+
 #if defined (MAGE_VULKAN)
 
-    mageResult mageCreateInstance(mageVulkanHandler *handler, mageWindow *window)
+    mageResult mageCreateInstance(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
         VkInstanceCreateInfo createInfo;
         VkApplicationInfo applicationInfo;
@@ -99,7 +104,7 @@
 
         return devices[index];
     }
-    mageResult mageCreateDevice(mageVulkanHandler *handler, mageWindow *window)
+    mageResult mageCreateDevice(struct mageVulkanHandler *handler, struct mageWindow *window)
     {   
         {
             uint32_t deviceCount;
@@ -162,9 +167,9 @@
         return MAGE_SUCCESS;
     }
     
-    mageResult mageVulkanHandlerInitialise(mageVulkanHandler *handler, mageWindow *window)
+    mageResult mageVulkanHandlerInitialise(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
-        typedef mageResult (*requiredFunctions)(mageVulkanHandler *, mageWindow *);
+        typedef mageResult (*requiredFunctions)(struct mageVulkanHandler *, struct mageWindow *);
         uint32_t i;
 
         requiredFunctions functions[] =
@@ -182,7 +187,7 @@
 
         return MAGE_SUCCESS;
     }
-    void mageVulkanHandlerCleanup(mageVulkanHandler *handler)
+    void mageVulkanHandlerCleanup(struct mageVulkanHandler *handler)
     {
         vkDestroyDevice(handler->Device, NULL);
         vkDestroyInstance(handler->Instance, NULL);

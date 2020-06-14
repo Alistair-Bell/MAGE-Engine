@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-mageResult mageEngineInitialise(const mageApplicationProps *props)
+mageResult mageEngineInitialise()
 {
     #if defined (MAGE_DEBUG)
 		mageFileDumpContents("Logs/mage.log", "", 1);
@@ -52,27 +52,27 @@ mageResult mageEngineInitialise(const mageApplicationProps *props)
 }
 void *mageApplicationAllocate()
 {
-    return malloc(sizeof(struct MAGE_APPLICATION_STRUCT));
+    return malloc(sizeof(struct mageApplication));
 }
 
-static mageResult mageApplicationDefaultStart(mageApplication *application)
+static mageResult mageApplicationDefaultStart(struct mageApplication *application)
 {
     return MAGE_SUCCESS;
 }
-static void mageApplicationDefaultUpdate(mageApplication *application)
+static void mageApplicationDefaultUpdate(struct mageApplication *application)
 {
 
 }
-static mageResult mageApplicationDefaultDestroy(mageApplication *application)
+static mageResult mageApplicationDefaultDestroy(struct mageApplication *application)
 {
     return MAGE_SUCCESS;
 }
-mageResult mageApplicationInitialise(mageApplication *application, const mageApplicationProps *props)
+mageResult mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps props)
 {
     mageResult engineStart = mageEngineInitialise(props);
     mageResult result;
 
-    application->Props = *props;
+    application->Props = props; 
 
     application->Running = 1;
 
@@ -97,9 +97,9 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
     #endif
 
     char temp[255];
-    sprintf(temp, "%s : Version %.2f", props->Name, props->Version);
+    sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
         
-    result = mageWindowInitialise(application->Window, props->Width, props->Height, temp);
+    result = mageWindowInitialise(application->Window, application->Props.Width, application->Props.Height, temp);
     
     if (result != MAGE_SUCCESS)
     {
@@ -115,7 +115,7 @@ mageResult mageApplicationInitialise(mageApplication *application, const mageApp
 
     return MAGE_SUCCESS;
 }
-mageResult mageApplicationRun(mageApplication *application)
+mageResult mageApplicationRun(struct mageApplication *application)
 {
     mageResult startResult, destroyResult;
 
@@ -151,7 +151,7 @@ mageResult mageApplicationRun(mageApplication *application)
     mageApplicationDestroy(application);
     return MAGE_SUCCESS;
 }
-void mageApplicationDestroy(mageApplication *application)
+void mageApplicationDestroy(struct mageApplication *application)
 {
     mageWindowTerminate(application->Window);
     mageMonoCleanup(application->MonoHandler);

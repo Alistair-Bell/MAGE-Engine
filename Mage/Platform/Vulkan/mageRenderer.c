@@ -2,7 +2,7 @@
 
 #if defined (MAGE_VULKAN)
 
-    static mageResult mageCreateFence(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateFence(struct mageRenderer *renderer, struct mageWindow *window)
     {
         VkFenceCreateInfo fenceCreateInfo;
         memset(&fenceCreateInfo, 0, sizeof(VkFenceCreateInfo));
@@ -17,7 +17,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSemaphore(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateSemaphore(struct mageRenderer *renderer, struct mageWindow *window)
     {
         VkSemaphoreCreateInfo semaphoreCreateInfo;
         memset(&semaphoreCreateInfo, 0, sizeof(VkSemaphoreCreateInfo));
@@ -33,7 +33,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateCommandPool(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateCommandPool(struct mageRenderer *renderer, struct mageWindow *window)
     {
         vkGetDeviceQueue(renderer->Handler.Device, renderer->Handler.GraphicsFamilyIndex, 0, &renderer->GraphicsQueue);
         {   
@@ -151,7 +151,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSurface(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window)
     {
         #if defined (MAGE_GLFW)
             
@@ -214,7 +214,7 @@
 
        return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSwapChain(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWindow *window)
     {   
         {
             uint32_t count = renderer->Handler.SurfaceCapabilities.minImageCount;
@@ -276,7 +276,7 @@
        
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSwapChainImages(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct mageWindow *window)
     {
         {
             renderer->SwapChainImages = calloc(renderer->SwapChainImageCount, sizeof(VkImage));
@@ -316,7 +316,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateDepthStencilImage(mageRenderer *renderer, mageWindow *window)
+    static mageResult mageCreateDepthStencilImage(struct mageRenderer *renderer, struct mageWindow *window)
     {
         {
             const VkFormat const tryFormats[] = 
@@ -423,7 +423,7 @@
         MAGE_LOG_CORE_INFORM("Deph stencil image created\n", NULL);
         return MAGE_SUCCESS;
     }
-    mageResult mageRendererInitialise(mageRenderer *renderer, mageWindow *window)
+    mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window)
     {
         mageResult result = mageVulkanHandlerInitialise(&renderer->Handler, window);
 
@@ -432,7 +432,7 @@
             return result;
         }
         
-        typedef mageResult (*rendererSetupFunctions)(mageRenderer *, mageWindow *);
+        typedef mageResult (*rendererSetupFunctions)(struct mageRenderer *, struct mageWindow *);
 
         const rendererSetupFunctions functions[] = 
         {
@@ -454,7 +454,7 @@
         }
 
     }
-    void mageRendererCleanup(mageRenderer *renderer)
+    void mageRendererCleanup(struct mageRenderer *renderer)
     {
         vkDestroyFence(renderer->Handler.Device, renderer->Fence, NULL);
         vkDestroyCommandPool(renderer->Handler.Device, renderer->CommandPool, NULL);
@@ -468,7 +468,7 @@
         }
         mageVulkanHandlerCleanup(&renderer->Handler);
     }
-    void mageRendererDestroy(mageRenderer *renderer)
+    void mageRendererDestroy(struct mageRenderer *renderer)
     {
         mageRendererCleanup(renderer);
         MAGE_LOG_CORE_INFORM("Renderer has been destroyed\n", NULL);

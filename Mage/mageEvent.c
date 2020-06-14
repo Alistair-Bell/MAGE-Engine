@@ -66,10 +66,10 @@ static mageEventCategoryBit mageMouseScrolledCategories[] =
 };
 	
 
-mageEventHandle mageEventHandleCreate(const mageEventType type)
+uint16_t mageEventHandleCreate(const mageEventType type)
 {
     uint32_t i;
-    mageEventHandle handle;
+    uint16_t handle;
     handle = 0;
     mageEventCategoryBit *categories = mageEventGenerateCategories(type);
     uint32_t argumentCount = sizeof(*categories)  / sizeof(mageEventCategoryBit);
@@ -131,11 +131,11 @@ mageEventCategoryBit *mageEventGenerateCategories(const mageEventType type)
             break;
     }
 }
-mageEventType mageEventExtractEventType(mageEventHandle handle)
+mageEventType mageEventExtractEventType(uint16_t handle)
 {
     return handle &= 0b1111;
 }
-uint8_t mageEventInCategory(const mageEventHandle handle, const mageEventCategoryBit category)
+uint8_t mageEventInCategory(const uint16_t handle, const mageEventCategoryBit category)
 {
     mageEventCategoryBit *categories = mageEventGenerateCategories(mageEventExtractEventType(handle));
     uint8_t categoryCount = (sizeof(*categories) / sizeof(mageEventCategoryBit));

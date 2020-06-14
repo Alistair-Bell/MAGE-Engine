@@ -4,7 +4,7 @@
 
     void *mageMonoHandlerAllocate()
     {
-        return malloc(sizeof(struct MAGE_MONO_HANDLER_STRUCT));
+        return malloc(sizeof(struct mageMonoHandler));
     }
     static void mageMonoInterpretLogInform(MonoString *message)
     {
@@ -36,7 +36,7 @@
         }
         return method;
     }
-    mageResult mageMonoHandlerInitialise(mageMonoHandler *handler, const char *builtLibrary)
+    mageResult mageMonoHandlerInitialise(struct mageMonoHandler *handler, const char *builtLibrary)
     {
         handler->Domain = mono_jit_init("MAGE-Engine");
         handler->Assembler = mono_domain_assembly_open(handler->Domain, builtLibrary);
@@ -58,7 +58,7 @@
         MAGE_LOG_CORE_INFORM("Succesfully using c# scripting!\n", NULL);
         return MAGE_SUCCESS;
     }
-    void mageMonoCleanup(mageMonoHandler *handler)
+    void mageMonoCleanup(struct mageMonoHandler *handler)
     {
         mono_jit_cleanup(handler->Domain);
     }

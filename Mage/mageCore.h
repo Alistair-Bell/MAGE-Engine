@@ -51,7 +51,7 @@
 	#include <linux/module.h>
 
 	/*!************************
-		Checking if it is android linux as android uses the linux kernel
+		Checking if it is android as android uses the linux kernel
 	**************************/
 	#if defined (__ANDROID__)
 		#undef MAGE_PLATFORM_LINUX
@@ -139,38 +139,6 @@
 		#define MAGE_COMPILER_MINGW_64
 	#endif
 #endif
-
-
-/*!************************
-	DLL building check
-**************************/
-
-
-/*!************************
-	Checking if exporting DLL
-**************************/
-#if defined (MAGE_PLATFORM_WINDOWS_32) || defined(MAGE_PLATFORM_WINDOWS_64)
-
-	#if defined (MAGE_CORE)
-		
-		/*!************************
-			If its the core then it will be exporting to the dll 
-		**************************/
-		#define MAGE_API __declspec(dllexport)
-	#else
-		
-		/*!************************
-			If its the core then it will be importing the dll 
-		**************************/
-		#define MAGE_API __declspec(dllimport)
-	#endif
-#else
-	/*!************************
-		Prefix used to for core methods and stuff for dll export use
-	**************************/
-	#define MAGE_API
-#endif
-
 
 
 
@@ -519,43 +487,5 @@
  * @param index The nth bit along (0 -> 7 in an byte) 0 = 1,  1 = 2,  2 = 4,  3 = 8,  4 = 16
 **************************/
 #define MAGE_BIT(index) (1 << index) 
-
-
-
-#if 0
-/*!************************
-	@brief The bit of the type of the camera (0 = orthographic | 1 = perspective)
-**************************/
-#define MAGE_CAMERA_BIT_TYPE 0
-/*!************************
-	@brief The bit whether the camera is the master one (0 = extra camera | 1 = main camera)
-**************************/
-#define MAGE_CAMERA_BIT_MASTER 1
-/*!************************
-	@brief The bit whether it is static in the x axis (0 = not fixed | 1 = fixed)
-**************************/
-#define MAGE_CAMERA_BIT_STATIC_X 2
-/*!************************
-	@brief The bit whether it is static in the y axis (0 = not fixed | 1 = fixed)
-**************************/
-#define MAGE_CAMERA_BIT_STATIC_Y 3
-/*!************************
-	@brief The bit whether it is static in the z axis (0 = not fixed | 1 = fixed)
-**************************/
-#define MAGE_CAMERA_BIT_STATIC_Z 4
-/*!************************
-	@brief The bit whether it is staticly fixed in the rotation (0 = not fixed | 1 = fixed)
-**************************/
-#define MAGE_CAMERA_BIT_STATIC_ROTATION 5
-/*!************************
-	@brief The bit whether the override method is being used (0 = defualt | 1 = overriden)
-**************************/
-#define MAGE_CAMERA_BIT_UPDATE_OVERRIDE 6
-/*!************************
-	@brief The bit whether the camera is on (0 = off | 1 = on)
-**************************/
-#define MAGE_CAMERA_BIT_TOGGLE 7
-
-#endif
 
 #endif
