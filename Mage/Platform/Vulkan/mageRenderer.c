@@ -162,55 +162,55 @@
             }
             MAGE_LOG_CORE_INFORM("Vulkan surface has been created (glfw mode)\n", NULL);
             
-            VkBool32 supported;
-            memset(&renderer->Handler.SurfaceCapabilities, 0, sizeof(VkSurfaceCapabilitiesKHR));
-            
-            vkGetPhysicalDeviceSurfaceSupportKHR(renderer->Handler.PhysicalDevice, renderer->Handler.GraphicsFamilyIndex, renderer->Surface, &supported);
-
-            if (supported != VK_TRUE)
-            {
-                MAGE_LOG_CORE_FATAL_ERROR("Physical device does not support surface\n", NULL);
-                return MAGE_HARDWARE_INVALID;
-            }
-            MAGE_LOG_CORE_INFORM("Physical device supports surface\n", NULL);
+        #elif defined(MAGE_SDL)  
+            /* SDL_Vulkan_CreateSurface */
         
-            if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &renderer->Handler.SurfaceCapabilities) != VK_SUCCESS)
-            {
-                MAGE_LOG_CORE_FATAL_ERROR("Surface capabilities were not met\n", NULL);
-                return MAGE_DEVICE_CREATION_FAILURE;
-            }
-
-            uint32_t formatCount = 0; 
-            vkGetPhysicalDeviceSurfaceFormatsKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &formatCount, NULL);
-
-            if (formatCount <= 0) 
-            {
-                MAGE_LOG_CLIENT_INFORM("Format count is too low! %d found\n", formatCount);
-                return MAGE_HARDWARE_NOT_PRESENT;
-            }
-
-            VkSurfaceFormatKHR *formats = calloc(formatCount, sizeof(VkSurfaceFormatKHR));
-            vkGetPhysicalDeviceSurfaceFormatsKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &formatCount, formats);
-
-            if (formats[0].format == VK_FORMAT_UNDEFINED)
-            {
-                renderer->Handler.SurfaceFormat.format       = VK_FORMAT_B8G8R8A8_UNORM;
-                renderer->Handler.SurfaceFormat.colorSpace   = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
-            }
-            else
-            {
-                renderer->Handler.SurfaceFormat = formats[0];
-            }
-
-            MAGE_LOG_CORE_INFORM("Physical device formats found\n", NULL);
-
-
-            free(formats);
-
-
-        #else  
-            #error I am currently to lazy to add sdl support for now. Just use glfw
         #endif
+
+        VkBool32 supported;
+        memset(&renderer->Handler.SurfaceCapabilities, 0, sizeof(VkSurfaceCapabilitiesKHR));
+        
+        vkGetPhysicalDeviceSurfaceSupportKHR(renderer->Handler.PhysicalDevice, renderer->Handler.GraphicsFamilyIndex, renderer->Surface, &supported);
+
+        if (supported != VK_TRUE)
+        {
+            MAGE_LOG_CORE_FATAL_ERROR("Physical device does not support surface\n", NULL);
+            return MAGE_HARDWARE_INVALID;
+        }
+        MAGE_LOG_CORE_INFORM("Physical device supports surface\n", NULL);
+    
+        if (vkGetPhysicalDeviceSurfaceCapabilitiesKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &renderer->Handler.SurfaceCapabilities) != VK_SUCCESS)
+        {
+            MAGE_LOG_CORE_FATAL_ERROR("Surface capabilities were not met\n", NULL);
+            return MAGE_DEVICE_CREATION_FAILURE;
+        }
+
+        uint32_t formatCount = 0; 
+        vkGetPhysicalDeviceSurfaceFormatsKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &formatCount, NULL);
+
+        if (formatCount <= 0) 
+        {
+            MAGE_LOG_CLIENT_INFORM("Format count is too low! %d found\n", formatCount);
+            return MAGE_HARDWARE_NOT_PRESENT;
+        }
+
+        VkSurfaceFormatKHR *formats = calloc(formatCount, sizeof(VkSurfaceFormatKHR));
+        vkGetPhysicalDeviceSurfaceFormatsKHR(renderer->Handler.PhysicalDevice, renderer->Surface, &formatCount, formats);
+
+        if (formats[0].format == VK_FORMAT_UNDEFINED)
+        {
+            renderer->Handler.SurfaceFormat.format       = VK_FORMAT_B8G8R8A8_UNORM;
+            renderer->Handler.SurfaceFormat.colorSpace   = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+        }
+        else
+        {
+            renderer->Handler.SurfaceFormat = formats[0];
+        }
+
+        MAGE_LOG_CORE_INFORM("Physical device formats found\n", NULL);
+
+
+        free(formats);
 
        return MAGE_SUCCESS;
     }
@@ -453,6 +453,7 @@
             if (result != MAGE_SUCCESS) return result;
         }
 
+        return MAGE_SUCCESS;
     }
     void mageRendererCleanup(struct mageRenderer *renderer)
     {

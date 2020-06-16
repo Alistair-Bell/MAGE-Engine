@@ -16,13 +16,13 @@
 /*!************************
 	Allows for support on platforms without glfw 
 **************************/
-#if defined (MAGE_SDL2)
+#if defined (MAGE_SDL)
 	#include <SDL2/SDL.h>
 
 	#if defined (MAGE_VULKAN) 
 		#include <SDL2/SDL_vulkan.h>
 	#endif
-
+	#error This mode has not been fully implimented, please use the glfw mode
 #else
 	#define GLFW_INCLUDE_NONE
 	#define MAGE_GLFW
@@ -225,7 +225,7 @@
 
 
 
-#if defined (MAGE_SDL2)
+#if defined (MAGE_SDL)
     #define MAGE_KEYCODE_SPACE SDLK_SPACE  
     #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE  
     #define MAGE_KEYCODE_COMMA SDLK_COMMA   

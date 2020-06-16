@@ -62,12 +62,6 @@ const char *mageToString(mageResult result)
 			return "Unknown error";
 	}
 }
-void mageTryDumpSuccess(uint8_t contents, uint8_t *state)
-{
-	if (state != NULL)
-		memcpy(state, &contents, sizeof(*state));
-		return;	
-}
 mageResult mageFileReadContents(const char *file, char *buffer, const uint8_t reallocatable)
 {
 	FILE *f = fopen(file, "rt");

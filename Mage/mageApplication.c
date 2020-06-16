@@ -9,13 +9,13 @@ mageResult mageEngineInitialise()
 		MAGE_LOG_CORE_INFORM("Cleaned previous file contents\n", NULL);
 	#endif
 
-	#if defined (MAGE_SDL2)
-		const uint32_tflag = SDL_Init(SDL_INIT_EVERYTHING);
+	#if defined (MAGE_SDL)
+		const uint32_t flag = SDL_Init(SDL_INIT_EVERYTHING);
 			
 		if (flag != 0)
 		{
 			MAGE_LOG_CLIENT_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
-			return MAGE_LIBRARY_FAILURE
+			return MAGE_LIBRARY_FAILURE;
 		}
 
 		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
@@ -45,10 +45,9 @@ mageResult mageEngineInitialise()
 		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
 
 	#endif
-    
-	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
+	
+    MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
     return MAGE_SUCCESS;
-
 }
 void *mageApplicationAllocate()
 {
@@ -69,7 +68,7 @@ static mageResult mageApplicationDefaultDestroy(struct mageApplication *applicat
 }
 mageResult mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps props)
 {
-    mageResult engineStart = mageEngineInitialise(props);
+    mageEngineInitialise(props);
     mageResult result;
 
     application->Props = props; 
@@ -113,6 +112,8 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
         return result;
     }
 
+    mageEventSetupMaster();
+    mageInputSetup(application->Window);
     return MAGE_SUCCESS;
 }
 mageResult mageApplicationRun(struct mageApplication *application)

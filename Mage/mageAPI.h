@@ -60,6 +60,10 @@ typedef enum MAGE_EVENT_ENUM mageEventType;
  * @brief Each category represents a bit and events can have multiple categories
 **************************/
 typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM mageEventCategoryBit;
+/*!************************
+ * @brief An enum of the required sizes to store an event package along with the data
+**************************/
+typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM mageEventRequiredByteSize;
 
 /*!************************
  * @brief The callback used by the application once on startup
@@ -73,7 +77,10 @@ typedef void (*mageApplicationUpdateCallback)(struct mageApplication *);
  * @brief The callback used by the application once on startup
 **************************/
 typedef mageResult (*mageApplicationDestroyCallback)(struct mageApplication *);
-
+/*!************************
+ * @brief The callback used to register and event listener
+**************************/
+typedef void (*mageEventListenerCallback)(void *, mageEventType);
 
 
 /*!************************
@@ -178,24 +185,6 @@ extern mageResult mageEngineInitialise();
  * @return The string
 **************************/
 extern const char *mageToString(mageResult result);
-/*!************************ 
- * @brief Free method used by the destory methods throughout the API
- * @param item pointer to a block of memory which will be freed
- * @return Nothing
-**************************/
-extern void mageFreeMethod(void *item);
-/*!************************ 
- * @brief Allocation method used by the allocate methods throughout the API
- * @param size The size of the allocation in bytes
- * @return Void pointer to the block of memory allocated
-**************************/
-extern void *mageAllocationMethod(const uint64_t size);
-/*!************************
- * @brief Tries to dump the contents into a pointer passed in
- * @param contents The contents to dump in
- * @param state The block of memory to dump the contents to
-**************************/
-extern void mageTryDumpSuccess(uint8_t contents, uint8_t *state);
 /*!************************
  * @brief Logs to the console and writes to an output
  * @param user Core = 0 | Client = 1
@@ -256,7 +245,7 @@ struct mageWindow
 	**************************/
 	const char *Title;
 	
-	#if defined (MAGE_SDL2)
+	#if defined (MAGE_SDL)
 		/*!************************
 		 * @brief Window context using the SDL2 framework
 		**************************/
@@ -350,6 +339,10 @@ enum MAGE_EVENT_ENUM
 	**************************/
 	MAGE_KEY_RELEASED_EVENT,
 	/*!************************
+	 * @brief Event when a key is repeated
+	**************************/
+	MAGE_KEY_REPEAT_EVENT,
+	/*!************************
 	 * @brief Event when the button is pressed
 	**************************/
 	MAGE_MOUSE_BUTTON_PRESSED_EVENT, 
@@ -368,6 +361,81 @@ enum MAGE_EVENT_ENUM
 
 };
 
+enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM
+{
+	/*!************************
+	 * @brief Byte size of a none event
+	**************************/
+	MAGE_NONE_EVENT_BYTE_SIZE 				= 0,
+	/*!************************
+	 * @brief Byte size of an window close event
+	**************************/
+	MAGE_WINDOW_CLOSE_EVENT_BYTE_SIZE 			= sizeof(int16_t),
+	/*!************************
+	 * @brief Byte size of an window focus event
+	**************************/
+	MAGE_WINDOW_FOCUS_EVENT_BYTE_SIZE 			= sizeof(uint16_t),
+	/*!************************
+	 * @brief Byte size of an window focus event
+	**************************/
+	MAGE_WINDOW_LOST_FOCUS_EVENT_BYTE_SIZE		= sizeof(uint16_t),
+	/*!************************
+	 * @brief Byte size of an window focus event
+	 * @brief Byte 3 - 6: X position of the window (int32_t)
+	 * @brief Byte 7 - 10 Y position of the window (int32_t)
+	**************************/
+	MAGE_WINDOW_MOVED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + (sizeof(uint32_t) * 2),
+	/*!************************
+	 * @brief Byte size of an application tick event
+	 * @brief Byte 3 - 6: The current tick of the application (uint32_t)
+	**************************/
+	MAGE_APPLICATION_TICK_EVENT_BYTE_SIZE 		= sizeof(uint16_t) + sizeof(int32_t),
+	/*!************************
+	 * @brief Byte size of an application update event
+	**************************/
+	MAGE_APPLICATION_UPDATE_EVENT_BYTE_SIZE 	= sizeof(uint16_t),
+	/*!************************
+	 * @brief Byte size of an application render update event
+	**************************/
+	MAGE_APPLICATION_RENDER_EVENT_BYTE_SIZE 	= sizeof(uint16_t),
+	/*!************************
+	 * @brief Byte size of an key pressent event
+	 * @brief Byte 3 -> 4 The keycode of the key (last bit unused) (uint8_t)
+	**************************/
+	MAGE_KEY_PRESSED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + sizeof(uint8_t),
+	/*!************************
+	 * @brief Byte size of an key repeat event
+	 * @brief Byte 3 -> 4 The keycode of the key (last bit unused) (uint8_t)
+	**************************/
+	MAGE_KEY_REPEAT_EVENT_BYTE_SIZE				= sizeof(uint16_t) + sizeof(uint8_t),
+	/*!************************
+	 * @brief Byte size of an key released event
+	 * @brief Byte 3 -> 4 The keycode of the key (last bit unused) (uint8_t)
+	**************************/
+	MAGE_KEY_RELEASED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + sizeof(uint8_t),
+	/*!************************
+	 * @brief Byte size of an mouse button pressed event
+	 * @brief Byte 3 -> 4 The mousecode of the button (last 5 bits unused) (uint8_t)
+	**************************/
+	MAGE_MOUSE_BUTTON_PRESSED_EVENT_BYTE_SIZE 	= sizeof(uint16_t) + sizeof(uint8_t),
+	/*!************************
+	 * @brief Byte size of an mouse button released event
+	 * @brief Byte 3 -> 4 The mousecode of the button (last 5 bits unused) (uint8_t)
+	**************************/
+	MAGE_MOUSE_BUTTON_RELEASED_EVENT_BYTE_SIZE 	= sizeof(uint16_t) + sizeof(uint8_t),
+	/*!************************
+	 * @brief Byte size of an mouse moved event
+	 * @brief Byte 3 -> 10 The mouse x position (double)
+	 * @brief Byte 11 -> 18 The mouse y position (double) 
+	**************************/
+	MAGE_MOUSE_MOVED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + (sizeof(double) * 2),
+	/*!************************
+	 * @brief Byte size of an mouse moved event
+	 * @brief Byte 3 -> 10 The wheel x offset (double)
+	 * @brief Byte 11 -> 18 The mouse y offset (double) 
+	**************************/
+	MAGE_MOUSE_SCROLLED_EVENT_BYTE_SIZE 		= sizeof(uint16_t) + (sizeof(double) * 2),
+};
 
 enum MAGE_EVENT_CATEGORY_BITS_ENUM
 {
@@ -399,17 +467,30 @@ enum MAGE_EVENT_CATEGORY_BITS_ENUM
 };
 
 /*!************************
- * @brief Creates an array of the catagories that an event type lives in
- * @param type The type of the event 
- * @return Array of categories 
+ * @brief Sets up the callbacks for the window input for use 
+ * @param window A pointer to the instance of the window structure
+ * @return Nothing
 **************************/
-extern mageEventCategoryBit *mageEventGenerateCategories(const mageEventType type);
+void mageInputSetup(struct mageWindow *window);
+/*!************************
+ * @brief Sets up the event system for use
+ * @param callback An array of functions listeners for events
+ * @param callbackCount The amount of listeners passed in
+ * @return The success of the function
+**************************/
+void mageEventSetupMaster();
 /*!************************
  * @brief Creates and formats the bits for the event handle and package
  * @param type The type of the event 
  * @return The formatted binary 
 **************************/
 extern uint16_t mageEventHandleCreate(const mageEventType type);
+/*!************************
+ * @brief Creates an array of the catagories that an event type lives in
+ * @param type The type of the event 
+ * @return Array of categories 
+**************************/
+extern mageEventCategoryBit *mageEventGenerateCategories(const mageEventType type);
 /*!************************
  * @brief Interrogates the binary to find what event type it is 
  * @param handle The formatted binary
@@ -423,8 +504,74 @@ extern mageEventType mageEventExtractEventType(const uint16_t handle);
  * @return Whether it is in the category
 **************************/
 extern uint8_t mageEventInCategory(const uint16_t handle, const mageEventCategoryBit category);
-
-extern void *mageEventCopyHandle(void *buffer);
+/*!************************
+ * @brief Adds an event listen callback and is sent the binary of each event
+ * @param callback The function to be run when the event is found
+ * @return Nothing
+**************************/
+extern void mageEventRegisterListener(mageEventListenerCallback callback);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the to the window close event
+ * @param buffer Where the 2 bytes will be formatted
+ * @warning The required buffer size is 2 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatWindowClose(void *buffer);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the window focused event
+ * @param buffer Where the 2 bytes will be formatted
+ * @warning The required buffer size is 2 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatWindowFocus(void *buffer);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the window lost focus event
+ * @param buffer Where the 2 bytes will be formatted
+ * @warning The required buffer size is 2 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatWindowLostFocus(void *buffer);
+/*!************************
+ * @brief Formats the bytes 1 - 10 to hold data related to the window moved event
+ * @param buffer Where the 10 bytes will be formatted
+ * @param x The x position of the window
+ * @param y The y position of the window
+ * @warning The required buffer size is 10 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatWindowMoved(void *buffer, const int32_t x, const int32_t y);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the keycode of the key pressed event
+ * @param buffer Where the 3 bytes will be formatted
+ * @param keycode The keycode of that is being pressed
+ * @warning The required buffer size is 2 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatKeyPressed(void *buffer, const uint8_t keycode);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the keycode of the key released event
+ * @param buffer Where the 3 bytes will be formatted
+ * @param keycode The keycode of that is being pressed
+ * @warning The required buffer size is 3 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatKeyReleased(void *buffer, const uint8_t keycode);
+/*!************************
+ * @brief Formats the bytes 1 - 18 to hold data related the mouse positions of the mouse event
+ * @param buffer Where the 18 bytes will be formatted
+ * @param keycode The keycode of that is being pressed
+ * @warning The required buffer size is 18 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatMouseMoved(void *buffer, const double x, const double y);
+/*!************************
+ * @brief Dispatches an event to the master handler
+ * @param event A pointer to the memory that the event stores
+ * @warning The first 2 bytes of the event should be formated  
+ * @warning By dispatching an event the event conditions are assumed to be met
+ * @return Nothing
+**************************/
+extern void mageEventDispatch(void *event);
 
 
 
@@ -477,63 +624,63 @@ struct mageRenderer
 		/*!************************
 		 * @brief Handler for the vulkan setup
 		**************************/
-		struct mageVulkanHandler Handler;
+		struct mageVulkanHandler 	Handler;
 		/*!************************
 		 * @brief The graphics queue for the rendering
 		**************************/
-		VkQueue GraphicsQueue;
+		VkQueue 					GraphicsQueue;
 		/*!************************
 		 * @brief The command buffer including a primary and secondary
 		**************************/
-		VkCommandBuffer CommandBuffer[2];
+		VkCommandBuffer				CommandBuffer[2];
 		/*!************************
 		 * @brief The main viewport of the surface
 		**************************/
-		VkViewport Viewport;
+		VkViewport 					Viewport;
 		/*!************************
 		 * @brief The window surface used to render to
 		**************************/
-		VkSurfaceKHR Surface;
+		VkSurfaceKHR 				Surface;
 		/*!************************
 		 * @brief A depth stencil used for rendering
 		**************************/
-		VkImage DepthStencilImage;
+		VkImage 					DepthStencilImage;
 		/*!************************
 		 * @brief The format of the depth stencil
 		**************************/
-		VkFormat DepthStencilFormat;
+		VkFormat					DepthStencilFormat;
 		/*!************************
 		 * @brief The image view of the depth stencil
 		**************************/
-		VkImageView DepthStencilImageView;
+		VkImageView 				DepthStencilImageView;
 		/*!************************
 		 * @brief The command pool used by the renderer
 		**************************/
-		VkCommandPool CommandPool;
+		VkCommandPool 				CommandPool;
 		/*!************************
 		 * @brief The swapchain of the renderer
 		**************************/
-		VkSwapchainKHR SwapChain;
+		VkSwapchainKHR 				SwapChain;
 		/*!************************
 		 * @brief An array of swap chain images
 		**************************/
-		VkImage *SwapChainImages;
+		VkImage 				   	*SwapChainImages;
 		/*!************************
 		 * @brief An array of the swap chain image views
 		**************************/
-		VkImageView *SwapChainImageViews;
+		VkImageView 				*SwapChainImageViews;
 		/*!************************
 		 * @brief The semaphore used by the renderer
 		**************************/
-		VkSemaphore Semaphore;
+		VkSemaphore 				Semaphore;
 		/*!************************
 		 * @brief The fence used by the renderer
 		**************************/
-		VkFence Fence;
+		VkFence 					Fence;
 		/*!************************
 		 * @brief Count of the swap chain images the renderer has
 		**************************/
-		uint32_t SwapChainImageCount;
+		uint32_t 					SwapChainImageCount;
 	#endif
 
 };
@@ -608,35 +755,35 @@ struct mageApplicationProps
 	/*!************************
 	 * @brief Application version
 	**************************/
-	double Version;
+	double 							Version;
 	/*!************************
 	 * @brief The width of the applications window
 	**************************/
-	uint32_t Width;
+	uint32_t 						Width;
 	/*!************************
 	 * @brief The height of the applications window
 	**************************/
-	uint32_t Height;
+	uint32_t 						Height;
 	/*!************************
 	 * @brief The name of the application 
 	**************************/
-	char *Name;
+	char 							*Name;
 	/*!************************
 	 * @brief The name mono dll used for scripting
 	**************************/
-	const char *ClientDLL;
+	const char 						*ClientDLL;
 	/*!************************
  	 * @brief The method at called once at the start of the game loop
 	**************************/
-	mageApplicationStartCallback StartMethod;
+	mageApplicationStartCallback 	StartMethod;
 	/*!************************
  	 * @brief The method at called every frame at during the game loop
 	**************************/
-	mageApplicationUpdateCallback UpdateMethod;
+	mageApplicationUpdateCallback 	UpdateMethod;
 	/*!************************
  	 * @brief The method at called every frame at during the game loop
 	**************************/
-	mageApplicationDestroyCallback DestroyMethod;
+	mageApplicationDestroyCallback 	DestroyMethod;
 	
 };
 
@@ -645,11 +792,11 @@ struct mageApplication
 	/*!************************
  	 * @brief The renderer used by the application
 	**************************/
-	struct mageRenderer *Renderer;
+	struct mageRenderer 		*Renderer;
 	/*!************************
  	 * @brief The window used by the application
 	**************************/
-	struct mageWindow *Window;
+	struct mageWindow 			*Window;
 	
 	#if defined (MAGE_MONO_EXTERNALS)
 
@@ -664,7 +811,7 @@ struct mageApplication
 	/*!************************
  	 * @brief Flag whether the application is running
 	**************************/
-	uint8_t Running;
+	uint8_t 					Running;
 
 };	
 

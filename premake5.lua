@@ -66,7 +66,6 @@ project "MageEngine"
     {
         "Sandbox",
         "hypatia",
-        
         "glfw3",
         "vulkan",
         "X11",
@@ -81,7 +80,6 @@ project "MageEngine"
         systemversion "latest"
     
     
-
     filter "configurations:Debug"
         defines "MAGE_DEBUG"
         runtime "Debug"

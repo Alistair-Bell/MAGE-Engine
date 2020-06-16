@@ -1,5 +1,5 @@
 project "hypatia"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C"
     cdialect "C89"
 

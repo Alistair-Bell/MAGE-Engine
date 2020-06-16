@@ -12,7 +12,7 @@ mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolu
 	window->Title   = title;
 	window->Running = 1;
 	
-	#if defined (MAGE_SDL2)
+	#if defined (MAGE_SDL)
 
 		MAGE_LOG_CORE_INFORM("Using SDL2 as window mode.\n", NULL);
 
@@ -62,7 +62,7 @@ void mageWindowTerminate(struct mageWindow *window)
 	#if defined (MAGE_GLFW)
 		glfwDestroyWindow(window->Context);
 		glfwTerminate();
-	#elif defined(MAGE_SDL2)
+	#elif defined(MAGE_SDL)
 		SDL_DestroyWindow(window->Context);	
 		SDL_Quit();
 	#endif	

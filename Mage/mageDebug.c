@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-typedef struct MAGE_LOGING_STRUCT
+struct  mageLoger 
 {   
     uint64_t LogCount;
     uint64_t WarningCount;
@@ -10,9 +10,9 @@ typedef struct MAGE_LOGING_STRUCT
     FILE *DebugFile;
     const char *OuputName;
 
-} mageLoger;
+};
 
-static mageLoger Logger;
+static struct mageLoger Logger;
 
 #if defined (MAGE_GLFW)
 
@@ -22,8 +22,6 @@ static mageLoger Logger;
 	}
  
 #endif
-
-
 
 void mageLogInitialise(const char *outputFile)
 {
