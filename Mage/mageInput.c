@@ -35,7 +35,20 @@
     }
     static void mageGLFWMouseButtonCallback(GLFWwindow *window, int32_t button, int32_t action, int32_t modifiers)
     {
-        
+        void *buffer = malloc(MAGE_MOUSE_BUTTON_PRESSED_EVENT_BYTE_SIZE);
+        memset(buffer, 0, MAGE_MOUSE_BUTTON_PRESSED_EVENT_BYTE_SIZE);
+        switch (action)
+        {
+            case GLFW_PRESS:
+                mageEventFormatMouseButtonPressed(buffer, button);
+                break;
+
+            case GLFW_RELEASE:
+                mageEventFormatMouseButtonRelease(buffer, button);
+                break;
+        }
+        mageEventDispatch(buffer);
+        free(buffer);
     }
     static void mageGLFWWindowCloseCallback(GLFWwindow *window)
     {
@@ -66,7 +79,7 @@
     static void mageGLFWCursorEnterCallback(GLFWwindow *window, int32_t entered)
     {
         
-    }
+    }   
     static void mageGLFWWindowMovesCallback(GLFWwindow *window, int32_t x, int32_t y)
     {
         void *buffer = malloc(MAGE_WINDOW_MOVED_EVENT_BYTE_SIZE);
@@ -77,7 +90,11 @@
     }
     static void mageGLFWScrollWheelCallback(GLFWwindow *window, double xOffset, double yOffset)
     {
-
+        void *buffer = malloc(MAGE_MOUSE_SCROLLED_EVENT_BYTE_SIZE);
+        memset(buffer, 0, MAGE_MOUSE_SCROLLED_EVENT_BYTE_SIZE);
+        mageEventFormatMouseWheelMoved(buffer, xOffset, yOffset);
+        mageEventDispatch(buffer);
+        free(buffer);
     }
 
 #endif

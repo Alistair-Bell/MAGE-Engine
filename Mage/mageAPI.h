@@ -543,7 +543,7 @@ extern void mageEventFormatWindowMoved(void *buffer, const int32_t x, const int3
 /*!************************
  * @brief Formats the bytes 1 - 2 to hold data related to the keycode of the key pressed event
  * @param buffer Where the 3 bytes will be formatted
- * @param keycode The keycode of that is being pressed
+ * @param keycode The keycode that is being pressed
  * @warning The required buffer size is 2 bytes, if less then we are going to have a bad time
  * @return Nothing
 **************************/
@@ -551,19 +551,53 @@ extern void mageEventFormatKeyPressed(void *buffer, const uint8_t keycode);
 /*!************************
  * @brief Formats the bytes 1 - 2 to hold data related to the keycode of the key released event
  * @param buffer Where the 3 bytes will be formatted
- * @param keycode The keycode of that is being pressed
+ * @param keycode The keycode that is being pressed
  * @warning The required buffer size is 3 bytes, if less then we are going to have a bad time
  * @return Nothing
 **************************/
 extern void mageEventFormatKeyReleased(void *buffer, const uint8_t keycode);
 /*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the keycode of the key repeat event
+ * @param buffer Where the 3 bytes will be formatted
+ * @param keycode The keycode that is being pressed
+ * @warning The required buffer size is 3 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatKeyRepeat(void *buffer, const uint8_t keycode);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the mousecode of the mouse press event
+ * @param buffer Where the 3 bytes will be formatted
+ * @param mousecode The mousecode that is being pressed
+ * @warning The required buffer size is 3 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatMouseButtonPressed(void *buffer, const uint8_t mousecode);
+/*!************************
+ * @brief Formats the bytes 1 - 2 to hold data related to the mousecode of the mouse release event
+ * @param buffer Where the 3 bytes will be formatted
+ * @param mousecode The mousecode that is being pressed
+ * @warning The required buffer size is 3 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatMouseButtonRelease(void *buffer, const uint8_t mousecode);
+/*!************************
  * @brief Formats the bytes 1 - 18 to hold data related the mouse positions of the mouse event
  * @param buffer Where the 18 bytes will be formatted
- * @param keycode The keycode of that is being pressed
+ * @param x The x position of the mouse
+ * @param y The y position of the mouse
  * @warning The required buffer size is 18 bytes, if less then we are going to have a bad time
  * @return Nothing
 **************************/
 extern void mageEventFormatMouseMoved(void *buffer, const double x, const double y);
+/*!************************
+ * @brief Formats the bytes 1 - 18 to hold data related the mouse wheel positions of the event
+ * @param buffer Where the 18 bytes will be formatted
+ * @param x If the middle mouse button is being pressed when scrolling the wheel
+ * @param y The x & y position of the mouse wheel
+ * @warning The required buffer size is 18 bytes, if less then we are going to have a bad time
+ * @return Nothing
+**************************/
+extern void mageEventFormatMouseWheelMoved(void *buffer, const double x, const double y);
 /*!************************
  * @brief Dispatches an event to the master handler
  * @param event A pointer to the memory that the event stores
@@ -572,7 +606,6 @@ extern void mageEventFormatMouseMoved(void *buffer, const double x, const double
  * @return Nothing
 **************************/
 extern void mageEventDispatch(void *event);
-
 
 
 

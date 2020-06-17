@@ -155,6 +155,8 @@
 #include <time.h>
 #include <signal.h> 
 #include <stdint.h>
+#include <pthread.h>
+
 /*!************************
 	Local includes 
 **************************/
@@ -226,25 +228,25 @@
 
 
 #if defined (MAGE_SDL)
-    #define MAGE_KEYCODE_SPACE SDLK_SPACE  
-    #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE  
-    #define MAGE_KEYCODE_COMMA SDLK_COMMA   
-    #define MAGE_KEYCODE_MINUS SDLK_MINUS   
-    #define MAGE_KEYCODE_PERIOD SDLK_PERIOD   
-    #define MAGE_KEYCODE_SLASH SDLK_BACKSLASH  
-    #define MAGE_KEYCODE_D0 SDLK_0  
-    #define MAGE_KEYCODE_D1 SDLK_1  
-    #define MAGE_KEYCODE_D2 SDLK_2   
-    #define MAGE_KEYCODE_D3 SDLK_3  
-    #define MAGE_KEYCODE_D4 SDLK_4  
-    #define MAGE_KEYCODE_D5 SDLK_5  
-    #define MAGE_KEYCODE_D6 SDLK_6
-    #define MAGE_KEYCODE_D7 SDLK_7  
-    #define MAGE_KEYCODE_D8 SDLK_8 
-    #define MAGE_KEYCODE_D9 SDLK_9   
-    #define MAGE_KEYCODE_SEMICOLON SDLK_SEMICOLON   
-    #define MAGE_KEYCODE_EQUAL SDLK_EQUALS
-    #define MAGE_KEYCODE_A SDLK_a  
+    #define MAGE_KEYCODE_SPACE SDLK_SPACE 
+    #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE 
+    #define MAGE_KEYCODE_COMMA SDLK_COMMA  
+    #define MAGE_KEYCODE_MINUS SDLK_MINUS  
+    #define MAGE_KEYCODE_PERIOD SDLK_PERIOD  
+    #define MAGE_KEYCODE_SLASH SDLK_BACKSLASH 
+    #define MAGE_KEYCODE_D0 SDLK_0 
+    #define MAGE_KEYCODE_D1 SDLK_1 
+    #define MAGE_KEYCODE_D2 SDLK_2  
+    #define MAGE_KEYCODE_D3 SDLK_3 
+    #define MAGE_KEYCODE_D4 SDLK_4 
+    #define MAGE_KEYCODE_D5 SDLK_5 
+    #define MAGE_KEYCODE_D6 SDLK_
+    #define MAGE_KEYCODE_D7 SDLK_7 
+    #define MAGE_KEYCODE_D8 SDLK_8
+    #define MAGE_KEYCODE_D9 SDLK_9  
+    #define MAGE_KEYCODE_SEMICOLON SDLK_SEMICOLON  
+    #define MAGE_KEYCODE_EQUAL SDLK_EQUAL
+    #define MAGE_KEYCODE_A SDLK_a 
     #define MAGE_KEYCODE_B SDLK_b
     #define MAGE_KEYCODE_C SDLK_c
     #define MAGE_KEYCODE_D SDLK_d

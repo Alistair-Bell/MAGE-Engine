@@ -162,6 +162,18 @@ void mageEventFormatKeyRepeat(void *buffer, const uint8_t keycode)
     memmove(buffer, &temp, sizeof(uint16_t));
     memmove(buffer + 2, &keycode, sizeof(uint8_t));
 }
+void mageEventFormatMouseButtonPressed(void *buffer, const uint8_t mousecode)
+{
+    uint16_t temp = mageEventHandleCreate(MAGE_MOUSE_BUTTON_PRESSED_EVENT);
+    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove(buffer + 2, &mousecode, sizeof(uint8_t));
+}
+void mageEventFormatMouseButtonRelease(void *buffer, const uint8_t mousecode)
+{
+    uint16_t temp = mageEventHandleCreate(MAGE_MOUSE_BUTTON_RELEASED_EVENT);
+    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove(buffer + 2, &mousecode, sizeof(uint8_t));
+}
 void mageEventFormatMouseMoved(void *buffer, const double x, const double y)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_MOUSE_MOVED_EVENT);
@@ -169,14 +181,27 @@ void mageEventFormatMouseMoved(void *buffer, const double x, const double y)
     memmove(buffer + 2, &x, sizeof(double));
     memmove(buffer + 10, &y, sizeof(double));    
 }
+void mageEventFormatMouseWheelMoved(void *buffer, const double x, const double y)
+{
+    uint16_t temp = mageEventHandleCreate(MAGE_MOUSE_SCROLLED_EVENT);
+    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove(buffer + 2, &x, sizeof(double));
+    memmove(buffer + 10, &y, sizeof(double));
+}
 void mageEventDispatch(void *event)
 {
     uint64_t i;
     uint16_t foo = 0;
-    memcpy(&foo, event, 2);
-    for (i = 0; i < EventMaster.ListenerCount; i++) 
+    switch (EventMaster.ListenerCount)
     {
-        EventMaster.Listeners[i](event, mageEventExtractEventType(foo));
+        case 0:
+            return;
+        default:
+            memcpy(&foo, event, 2);
+            for (i = 0; i < EventMaster.ListenerCount; i++) 
+            {
+                EventMaster.Listeners[i](event, mageEventExtractEventType(foo));
+            }
     }
 }
 
