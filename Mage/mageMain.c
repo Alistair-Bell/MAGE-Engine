@@ -3,7 +3,6 @@
 static void example_input(void *event, mageEventType type)
 {
 
-
 }
 
 void main(int32_t argc, char **args)

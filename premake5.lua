@@ -10,8 +10,7 @@ workspace "MAGE"
     {
         "Debug",
         "Release",
-        "Distribution"
-    } 
+    }
 -- Engine Project
 
 group "Externals"

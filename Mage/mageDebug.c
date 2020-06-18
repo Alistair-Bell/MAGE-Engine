@@ -5,6 +5,7 @@ struct  mageLoger
     uint64_t LogCount;
     uint64_t WarningCount;
     uint64_t ErrorCount;
+    uint64_t FatalErrorCount;
     time_t Timer;
     struct tm *Time;
     FILE *DebugFile;
@@ -25,7 +26,7 @@ static struct mageLoger Logger;
 
 void mageLogInitialise(const char *outputFile)
 {
-    #if defined (MAGE_DEBUG) || defined(CLIENT_DEBUG)
+    #if defined (MAGE_DEBUG) 
         Logger.OuputName = outputFile;
         Logger.WarningCount = 0;
         Logger.ErrorCount = 0;   
@@ -90,9 +91,9 @@ void mageLogMessage(const uint8_t user, const uint8_t severity, const char *form
 }
 void mageLogEnd()
 {
-	MAGE_LOG_CORE_INFORM("Logging Details:\nLog Count -> %d\nWarning Count -> %d\nError Count -> %d\n", Logger.LogCount, Logger.WarningCount, Logger.ErrorCount);
+	MAGE_LOG_CORE_INFORM("Logging Details:\nLog Count         -> %d\nWarning Count     -> %d\nError Count       -> %d\nFatal Error Count -> %d\n", Logger.LogCount, Logger.WarningCount, Logger.ErrorCount, Logger.FatalErrorCount);
 
-    #if defined (MAGE_DEBUG) || defined(CLIENT_DEBUG)
+    #if defined (MAGE_DEBUG)
 
         fclose(Logger.DebugFile);
         

@@ -59,7 +59,7 @@ void *mageVulkanHandlerAllocate()
             windowCount = 0;
         #endif
 
-        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+        #if defined (MAGE_DEBUG)
             char **temp = calloc(windowCount + debugCount, sizeof(char *));
             debugCount = 1;
             uint32_t i = 0;
@@ -137,18 +137,20 @@ void *mageVulkanHandlerAllocate()
     }
     static mageResult mageSetupValidationLayerCallback(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
-        if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
-        {   
-            MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
-            return MAGE_UNKNOWN;
-        }   
-        MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
+        #if defined (MAGE_DEBUG)
+            if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
+            {   
+                MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
+                return MAGE_UNKNOWN;
+            }   
+            MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
+        #endif
         return MAGE_SUCCESS;
     }
 
     static mageResult mageCreateInstance(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
-        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+        #if defined (MAGE_DEBUG)
             
             if (!mageCheckRequiredValidiationLayersPresent())
             {
@@ -177,7 +179,7 @@ void *mageVulkanHandlerAllocate()
         createInfo.pApplicationInfo             = &applicationInfo;
         createInfo.ppEnabledExtensionNames      = mageGetRequiredInstanceExtensions(&count);
         createInfo.enabledExtensionCount        = count;
-        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+        #if defined (MAGE_DEBUG)
             createInfo.enabledLayerCount = 1;
             createInfo.ppEnabledLayerNames      = mageRequiredValidationLayers;
             magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
@@ -323,7 +325,7 @@ void *mageVulkanHandlerAllocate()
         {
             
             mageCreateInstance,
-            #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+            #if defined (MAGE_DEBUG)
                 mageSetupValidationLayerCallback,
             #endif
             mageCreateDevice,
@@ -342,7 +344,7 @@ void *mageVulkanHandlerAllocate()
     {
         vkDestroyDevice(handler->Device, NULL);
         
-        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+        #if defined (MAGE_DEBUG)
             mageDestroyDebugUtilsMessengerEXT(handler->Instance, handler->DebugMessenger, NULL);
         #endif
         
