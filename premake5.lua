@@ -16,8 +16,7 @@ workspace "MAGE"
 
 group "Externals"
     include "Mage/Externals/hypatia"
-
-
+    include "Mage/Externals/glfw3"
 
 project "MageEngine"
     location "Mage"
@@ -60,13 +59,12 @@ project "MageEngine"
         "FatalWarnings",
         "FatalCompileWarnings",
         "LinkTimeOptimization",
-        
     }
     links
     {
         "Sandbox",
         "hypatia",
-        "glfw3",
+        "GLFW",
         "vulkan",
         "X11",
         "dl",

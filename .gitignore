@@ -2,3 +2,4 @@ Build*
 Logs/*.*
 Documentation/*.*
 Makefile*
+Mage/Externals/glfw3

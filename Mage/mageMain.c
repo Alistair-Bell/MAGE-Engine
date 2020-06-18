@@ -1,5 +1,11 @@
 #include "mageAPI.h"
 
+static void example_input(void *event, mageEventType type)
+{
+
+
+}
+
 void main(int32_t argc, char **args)
 {  
     struct mageApplication App;
@@ -13,6 +19,7 @@ void main(int32_t argc, char **args)
     Props.ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
     
     mageApplicationInitialise(&App, Props);
+    mageEventRegisterListener(example_input);
     mageApplicationRun(&App);
 }
 

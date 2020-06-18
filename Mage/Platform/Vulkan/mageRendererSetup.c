@@ -1,7 +1,7 @@
 #include <mageAPI.h>
 
 #if defined (MAGE_VULKAN)
-
+    
     static mageResult mageCreateFence(struct mageRenderer *renderer, struct mageWindow *window)
     {
         VkFenceCreateInfo fenceCreateInfo;
@@ -147,8 +147,10 @@
                 return MAGE_QUEUE_SUBMITION_FAILURE;
             }
             MAGE_LOG_CORE_INFORM("Queue submition 2 was succesfull\n", NULL);
+        
+            vkQueueWaitIdle(renderer->GraphicsQueue);
+            
         }
-
         return MAGE_SUCCESS;
     }
     static mageResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window)
@@ -239,8 +241,7 @@
             if (flag) MAGE_LOG_CORE_INFORM("GPU supports mailbox present mode, using mailbox present mode over FIFO mode\n", NULL);
 
 
-
-            createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+            createInfo.sType                    = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             createInfo.sType					= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             createInfo.surface					= renderer->Surface;
             createInfo.minImageCount			= count;
@@ -395,7 +396,6 @@
         memoryAllocateInfo.memoryTypeIndex  = ;
 
         vkAllocateMemory(renderer->Handler.Device, &memoryAllocateInfo, NULL, &renderer->Handler.DeviceMemory);
-        */
 
         VkImageViewCreateInfo viewCreateInfo;
         memset(&viewCreateInfo, 0, sizeof(VkImageViewCreateInfo));
@@ -421,6 +421,7 @@
         }
 
         MAGE_LOG_CORE_INFORM("Deph stencil image created\n", NULL);
+        */
         return MAGE_SUCCESS;
     }
     mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window)
@@ -457,17 +458,25 @@
     }
     void mageRendererCleanup(struct mageRenderer *renderer)
     {
-        vkDestroyFence(renderer->Handler.Device, renderer->Fence, NULL);
+
         vkDestroyCommandPool(renderer->Handler.Device, renderer->CommandPool, NULL);
-        vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
+        vkDestroyFence(renderer->Handler.Device, renderer->Fence, NULL);
+        vkDestroySemaphore(renderer->Handler.Device, renderer->Semaphore, NULL);
         vkDestroySwapchainKHR(renderer->Handler.Device, renderer->SwapChain, NULL);
+        vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
+
         uint32_t i;
 
         for (i = 0; i < renderer->SwapChainImageCount; i++) 
         {
             vkDestroyImageView(renderer->Handler.Device, renderer->SwapChainImageViews[i], NULL);
         }
+        vkDestroyImage(renderer->Handler.Device, renderer->DepthStencilImage, NULL);
+
+
+
         mageVulkanHandlerCleanup(&renderer->Handler);
+
     }
     void mageRendererDestroy(struct mageRenderer *renderer)
     {

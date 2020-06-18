@@ -29,7 +29,7 @@
 	#if defined (MAGE_VULKAN) 
 		#define GLFW_INCLUDE_VULKAN
 	#endif
-	#include <GLFW/glfw3.h>
+	#include "Externals/glfw3/include/GLFW/glfw3.h"
 #endif
 
 
@@ -161,6 +161,7 @@
 	Local includes 
 **************************/
 #include "Externals/hypatia/src/hypatia.h"
+
 
 /*!************************
 	Allows mono c# scripting 

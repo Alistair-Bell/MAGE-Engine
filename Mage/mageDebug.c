@@ -84,7 +84,6 @@ void mageLogMessage(const uint8_t user, const uint8_t severity, const char *form
             sprintf(finalFormat, "[%s] Client: %s", timeFormat, userFormat);
             break;
     }
-    
     printf("%s", finalFormat);
     fprintf(Logger.DebugFile, "%s", finalFormat);
     Logger.LogCount++;

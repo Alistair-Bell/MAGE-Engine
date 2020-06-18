@@ -12,12 +12,161 @@ void *mageVulkanHandlerAllocate()
 
 #if defined (MAGE_VULKAN)
 
-    mageResult mageCreateInstance(struct mageVulkanHandler *handler, struct mageWindow *window)
+    static const char * const RequiredExtensions[] = 
     {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    };
+
+    static const char *mageRequiredValidationLayers[] =
+    {
+        "VK_LAYER_KHRONOS_validation",
+    };
+
+    static uint8_t mageCheckRequiredValidiationLayersPresent()
+    {
+        uint32_t layerCount, requiredLayerCount, i, j;
+        requiredLayerCount = 1;
+        vkEnumerateInstanceLayerProperties(&layerCount, NULL);
+        VkLayerProperties *properties = calloc(layerCount, sizeof(VkLayerProperties));
+        vkEnumerateInstanceLayerProperties(&layerCount, properties);
+
+        uint8_t layerFound = 0;
+        for (i = 0; i < requiredLayerCount; i++)
+        {
+            for (j = 0; j < layerCount; j++)
+            {   
+                if (strcmp(mageRequiredValidationLayers[i], properties[j].layerName) == 0)
+                {
+                    layerFound = 1;
+                    break;
+                }
+            }
+        }
+        return layerFound;
+    }
+    static const char **mageGetRequiredInstanceExtensions(uint32_t *clientCount)
+    {
+        *clientCount = 0;
+        char **extensions;
+        char **windowExtensions;
+        const char *debugExtensions[] = { VK_EXT_DEBUG_UTILS_EXTENSION_NAME };
+        uint32_t windowCount;
+        uint32_t debugCount;
+        
+        #if defined (MAGE_GLFW)
+            windowExtensions = (char **) glfwGetRequiredInstanceExtensions(&windowCount);
+        #elif defined (MAGE_SDL)
+            windowCount = 0;
+        #endif
+
+        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+            char **temp = calloc(windowCount + debugCount, sizeof(char *));
+            debugCount = 1;
+            uint32_t i = 0;
+
+            for (i = 0; i < windowCount + debugCount; i++)
+            {
+                if (i < windowCount)
+                {
+                    temp[i] = malloc(strlen(windowExtensions[i]));
+                    strcpy(temp[i], windowExtensions[i]);
+                }
+                else
+                {
+                    temp[i] = malloc(strlen(debugExtensions[i - windowCount]));
+                    strcpy(temp[i], debugExtensions[i - windowCount]);
+                }
+            }
+            extensions = temp;
+        #else
+            debugCount = 0;
+            extensions = windowExtensions;
+        #endif
+
+
+        *clientCount = windowCount + debugCount;
+        return (const char **) extensions;
+    }
+    static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *pUserData) 
+    {
+        switch (messageType)
+        {   
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
+                MAGE_LOG_CORE_ERROR("Validation Layers %s\n", callbackData->pMessage);
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
+                MAGE_LOG_CORE_ERROR("Validation Layers : violation issue %s\n", callbackData->pMessage);
+                break;
+            case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
+                MAGE_LOG_CORE_ERROR("Validation Layers : performance issue %s\n", callbackData->pMessage);
+                break; 
+            default:
+                MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
+                break;  
+        }
+        return VK_FALSE;
+    }
+    static VkResult mageCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger) 
+    {
+        PFN_vkCreateDebugUtilsMessengerEXT function = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+        if (function != NULL) 
+        {
+            return function(instance, pCreateInfo, pAllocator, pDebugMessenger);
+        } 
+        else 
+        {
+            return VK_ERROR_EXTENSION_NOT_PRESENT;
+        }
+    }
+    static void mageDestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator) 
+    {
+        PFN_vkDestroyDebugUtilsMessengerEXT function = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+        if (function != NULL) 
+        {
+            function(instance, debugMessenger, pAllocator);
+        }
+    }
+    static void magePopulateValidationLayerCallback(VkDebugUtilsMessengerCreateInfoEXT *info)
+    {
+        memset(info, 0, sizeof(VkDebugUtilsMessengerCreateInfoEXT));
+        info->sType                 = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        info->messageSeverity       = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        info->messageType           = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        info->pfnUserCallback       = mageVulkanDebugCallback;
+        info->pUserData             = NULL;
+    }
+    static mageResult mageSetupValidationLayerCallback(struct mageVulkanHandler *handler, struct mageWindow *window)
+    {
+        if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
+        {   
+            MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
+            return MAGE_UNKNOWN;
+        }   
+        MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
+        return MAGE_SUCCESS;
+    }
+
+    static mageResult mageCreateInstance(struct mageVulkanHandler *handler, struct mageWindow *window)
+    {
+        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+            
+            if (!mageCheckRequiredValidiationLayersPresent())
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Validation layers were not present!\n", NULL);
+                return MAGE_UNKNOWN;
+            }
+            MAGE_LOG_CORE_INFORM("Vulkan validation layers are in use\n", NULL);
+
+        #endif
+        
+        
         VkInstanceCreateInfo createInfo;
         VkApplicationInfo applicationInfo;
+        uint32_t count;
         memset(&createInfo, 0, sizeof(VkInstanceCreateInfo));
         memset(&applicationInfo, 0, sizeof(VkApplicationInfo));
+
+
 
         applicationInfo.sType                   = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         applicationInfo.apiVersion              = VK_API_VERSION_1_2;
@@ -26,17 +175,17 @@ void *mageVulkanHandlerAllocate()
         applicationInfo.engineVersion           = VK_MAKE_VERSION(1, 0, 0);
         createInfo.sType                        = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo             = &applicationInfo;
-        
-        #if defined (MAGE_GLFW)
-            uint32_t count;
-            const char **glfwExtensions = glfwGetRequiredInstanceExtensions(&count);
-            createInfo.ppEnabledExtensionNames  = glfwExtensions;
-            createInfo.enabledExtensionCount    = count;  
+        createInfo.ppEnabledExtensionNames      = mageGetRequiredInstanceExtensions(&count);
+        createInfo.enabledExtensionCount        = count;
+        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+            createInfo.enabledLayerCount = 1;
+            createInfo.ppEnabledLayerNames      = mageRequiredValidationLayers;
+            magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
+            
+            createInfo.pNext                    = (VkDebugUtilsMessengerCreateInfoEXT*) &handler->DebugMessengerCreateInformation;
         #else
-            createInfo.ppEnabledExtensionNames  = NULL;
-            createInfo.enabledExtensionCount    = 0;
+            createInfo.pNext                    = NULL;
         #endif
-
 
         VkResult result = vkCreateInstance(&createInfo, NULL, &handler->Instance);
 
@@ -49,15 +198,12 @@ void *mageVulkanHandlerAllocate()
     
         return MAGE_SUCCESS;
     }
-    uint32_t mageScoreDevice(VkPhysicalDevice device)
+    static uint32_t mageScoreDevice(VkPhysicalDevice device)
     {
         VkPhysicalDeviceProperties properties;
-        VkPhysicalDeviceFeatures features;
         memset(&properties, 0, sizeof(VkPhysicalDeviceProperties));
-        memset(&features, 0, sizeof(VkPhysicalDeviceFeatures));
-        
+
         vkGetPhysicalDeviceProperties(device, &properties);
-        vkGetPhysicalDeviceFeatures(device, &features);
 
         uint32_t score = 0;
 
@@ -70,7 +216,9 @@ void *mageVulkanHandlerAllocate()
 
         return score;
     }
-    int32_t mageGetFamilyIndex(VkPhysicalDevice device)
+
+    
+    static int32_t mageGetFamilyIndex(VkPhysicalDevice device)
     {
         uint32_t queueCount, i;
         int32_t index = -1;
@@ -88,7 +236,7 @@ void *mageVulkanHandlerAllocate()
         free(properties);
         return index;
     }
-    VkPhysicalDevice mageSelectDevice(VkPhysicalDevice *devices, uint32_t deviceCount)
+    static VkPhysicalDevice mageSelectDevice(VkPhysicalDevice *devices, uint32_t deviceCount)
     {
         uint32_t index = 0;
         uint32_t i;
@@ -104,7 +252,7 @@ void *mageVulkanHandlerAllocate()
 
         return devices[index];
     }
-    mageResult mageCreateDevice(struct mageVulkanHandler *handler, struct mageWindow *window)
+    static mageResult mageCreateDevice(struct mageVulkanHandler *handler, struct mageWindow *window)
     {   
         {
             uint32_t deviceCount;
@@ -152,7 +300,7 @@ void *mageVulkanHandlerAllocate()
         deviceCreateInfo.sType                   = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         deviceCreateInfo.queueCreateInfoCount    = 1;
         deviceCreateInfo.pQueueCreateInfos       = &queueCreateInfo;
-        deviceCreateInfo.ppEnabledExtensionNames = (const char * const []) { VK_KHR_SWAPCHAIN_EXTENSION_NAME, };
+        deviceCreateInfo.ppEnabledExtensionNames = RequiredExtensions;
         deviceCreateInfo.enabledExtensionCount   = 1;
 
 
@@ -166,7 +314,6 @@ void *mageVulkanHandlerAllocate()
 
         return MAGE_SUCCESS;
     }
-    
     mageResult mageVulkanHandlerInitialise(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
         typedef mageResult (*requiredFunctions)(struct mageVulkanHandler *, struct mageWindow *);
@@ -174,7 +321,11 @@ void *mageVulkanHandlerAllocate()
 
         requiredFunctions functions[] =
         {
+            
             mageCreateInstance,
+            #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+                mageSetupValidationLayerCallback,
+            #endif
             mageCreateDevice,
         };
         const uint32_t functionCount = sizeof(functions) / sizeof(requiredFunctions);
@@ -190,6 +341,11 @@ void *mageVulkanHandlerAllocate()
     void mageVulkanHandlerCleanup(struct mageVulkanHandler *handler)
     {
         vkDestroyDevice(handler->Device, NULL);
+        
+        #if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+            mageDestroyDebugUtilsMessengerEXT(handler->Instance, handler->DebugMessenger, NULL);
+        #endif
+        
         vkDestroyInstance(handler->Instance, NULL);
         MAGE_LOG_CORE_INFORM("Vulkan has been cleaned up\n", NULL);
     }

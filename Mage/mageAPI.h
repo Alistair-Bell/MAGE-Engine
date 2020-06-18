@@ -14,7 +14,8 @@
 												__/ |             
 											    |___/              
 	
-	Open source 2D game engine written in clean c89
+	Open source 2D game engine written in with low memory footprint and performance in mind
+	The engine is not the next unity or unreal. Just a fun tool to mess around with
 	To contribute go to https://github.com/MTECGamesStudio/MAGE-Engine
 	For use please read the license
 
@@ -613,17 +614,22 @@ extern void mageEventDispatch(void *event);
 
 	struct mageVulkanHandler
 	{	
-		VkPhysicalDeviceMemoryProperties 	PhysicalMemoryProperties;
-		VkSurfaceCapabilitiesKHR 			SurfaceCapabilities;
-		VkSurfaceFormatKHR 					SurfaceFormat;
-		VkDevice 							Device;
-		VkPhysicalDevice 					PhysicalDevice;
-		VkPhysicalDeviceProperties 			PhysicalProperties;
-		VkInstance 							Instance;
-		uint32_t						 	DephStencilAvailable;
-		uint32_t						 	GraphicsFamilyIndex;
-		uint32_t 							GraphicsPresentFamily;
-
+		VkPhysicalDeviceMemoryProperties 		PhysicalMemoryProperties;
+		VkSurfaceCapabilitiesKHR 				SurfaceCapabilities;
+		VkSurfaceFormatKHR 						SurfaceFormat;
+		VkDevice 								Device;
+		VkPhysicalDevice 						PhysicalDevice;
+		VkPhysicalDeviceProperties 				PhysicalProperties;
+		VkInstance 								Instance;
+		#if defined (MAGE_DEBUG) || defined (CLIENT_DEBUG)
+			VkDebugUtilsMessengerEXT			DebugMessenger;
+			VkDebugUtilsMessengerCreateInfoEXT	DebugMessengerCreateInformation;
+		#endif
+		
+		uint32_t						 		DephStencilAvailable;
+		uint32_t						 		GraphicsFamilyIndex;
+		uint32_t 								GraphicsPresentFamily;
+		
 	};
 
 	/*!************************ 
@@ -822,28 +828,12 @@ struct mageApplicationProps
 
 struct mageApplication
 {
-	/*!************************
- 	 * @brief The renderer used by the application
-	**************************/
 	struct mageRenderer 		*Renderer;
-	/*!************************
- 	 * @brief The window used by the application
-	**************************/
 	struct mageWindow 			*Window;
-	
-	#if defined (MAGE_MONO_EXTERNALS)
-
-		struct mageMonoHandler *MonoHandler;
-
-	#endif
-	
-	/*!************************
-	 * @brief A pointer to an instance of the application props
-	**************************/
 	struct mageApplicationProps Props;
-	/*!************************
- 	 * @brief Flag whether the application is running
-	**************************/
+	#if defined (MAGE_MONO_EXTERNALS)
+		struct mageMonoHandler *MonoHandler;
+	#endif
 	uint8_t 					Running;
 
 };	
