@@ -100,7 +100,8 @@
             VkCommandBufferBeginInfo bufferBeginInfo;
             memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
             
-            bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            bufferBeginInfo.sType             = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            bufferBeginInfo.flags             = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; 
             vkBeginCommandBuffer(renderer->CommandBuffer[1], &bufferBeginInfo);
 
             renderer->Viewport.height    = window->Height;
@@ -112,7 +113,7 @@
             
             MAGE_LOG_CORE_INFORM("Command viewport 2 set\n", NULL);
             
-            vkEndCommandBuffer(renderer->CommandBuffer[1]);
+            vkEndCommandBuffer(renderer->CommandBuffer[1]); 
         }
         {
             VkSubmitInfo submitInfo;

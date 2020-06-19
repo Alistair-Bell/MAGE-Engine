@@ -137,29 +137,6 @@ mageResult mageApplicationRun(struct mageApplication *application)
 
     #if defined (MAGE_VULKAN)
     
-    VkCommandPool commnadPool;
-    VkCommandPoolCreateInfo commnadPoolCreateInfo;
-    memset(&commnadPool, 0, sizeof(VkCommandPool));
-    memset(&commnadPoolCreateInfo, 0, sizeof(VkCommandPoolCreateInfo));
-    
-    commnadPoolCreateInfo.sType             = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-    commnadPoolCreateInfo.flags             = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-    commnadPoolCreateInfo.queueFamilyIndex  = application->Renderer->Handler.GraphicsFamilyIndex;
-
-    vkCreateCommandPool(application->Renderer->Handler.Device, &commnadPoolCreateInfo, NULL, &commnadPool);
-
-    VkCommandBuffer commandBuffer;
-    VkCommandBufferAllocateInfo allocateInfo;
-    memset(&commandBuffer, 0, sizeof(VkCommandBuffer));
-    memset(&allocateInfo, 0, sizeof(VkCommandBufferAllocateInfo));
-    
-    allocateInfo.sType              = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-    allocateInfo.commandPool        = commnadPool;
-    allocateInfo.level              = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    allocateInfo.commandBufferCount = 1;
-
-    vkAllocateCommandBuffers(application->Renderer->Handler.Device, &allocateInfo, &commandBuffer);
-
     VkExtent2D extent;
     memset(&extent, 0, sizeof(VkExtent2D));
     extent.height = application->Window->Height;
@@ -185,13 +162,13 @@ mageResult mageApplicationRun(struct mageApplication *application)
             
             mageRendererBeginRender(application->Renderer);
             #if defined (MAGE_VULKAN)
-
-                VkCommandBufferBeginInfo bufferBseginInfo;
-                memset(&bufferBseginInfo, 0, sizeof(VkCommandBufferBeginInfo));
-                bufferBseginInfo.sType             = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-                bufferBseginInfo.flags             = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-                vkBeginCommandBuffer(commandBuffer, &bufferBseginInfo);
-
+                
+                VkCommandBufferBeginInfo bufferBeginInfo;
+                memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
+                bufferBeginInfo.sType             = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+                bufferBeginInfo.flags             = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+                vkBeginCommandBuffer(application->Renderer->CommandBuffer[0], &bufferBeginInfo);
+                
                 f += 0.001;
 
                 VkClearValue values[2];
@@ -214,11 +191,11 @@ mageResult mageApplicationRun(struct mageApplication *application)
                 renderPassBeginInfo.pClearValues    = values;
 
 
-                vkCmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+                vkCmdBeginRenderPass(application->Renderer->CommandBuffer[0], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-                vkCmdEndRenderPass(commandBuffer);
+                vkCmdEndRenderPass(application->Renderer->CommandBuffer[0]);
 
-                vkEndCommandBuffer(commandBuffer);
+                vkEndCommandBuffer(application->Renderer->CommandBuffer[0]);
 
                 VkSubmitInfo submitInfo;
                 memset(&submitInfo, 0, sizeof(VkSubmitInfo));
@@ -227,13 +204,13 @@ mageResult mageApplicationRun(struct mageApplication *application)
                 submitInfo.pWaitSemaphores      = NULL;
                 submitInfo.pWaitDstStageMask    = NULL;
                 submitInfo.commandBufferCount   = 1;
-                submitInfo.pCommandBuffers      = &commandBuffer;
+                submitInfo.pCommandBuffers      = &application->Renderer->CommandBuffer[0];
                 submitInfo.signalSemaphoreCount = 1;
                 submitInfo.pSignalSemaphores    = &application->Renderer->Semaphore; 
 
                 vkQueueSubmit(application->Renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 
-                    mageRendererEndRendering(application->Renderer);
+                mageRendererEndRendering(application->Renderer);
             #endif
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
         #endif
@@ -242,8 +219,7 @@ mageResult mageApplicationRun(struct mageApplication *application)
     #if defined (MAGE_VULKAN)
 
     vkQueueWaitIdle(application->Renderer->GraphicsQueue);
-    vkDestroyCommandPool(application->Renderer->Handler.Device, commnadPool, NULL);
-
+    
     #endif
 
     destroyResult = application->Props.DestroyMethod(application);
