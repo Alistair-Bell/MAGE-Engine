@@ -16,6 +16,8 @@
 	
 	Open source 2D game engine written in with low memory footprint and performance in mind
 	The engine is not the next unity or unreal. Just a fun tool to mess around with
+	Documentation has been moved to the github wiki so use that for the documentation or ask me personally
+	Documentation will be released once version 1.0 is released
 	To contribute go to https://github.com/MTECGamesStudio/MAGE-Engine
 	For use please read the license
 
@@ -29,9 +31,9 @@ struct mageMonoHandler;
 struct mageRenderer;
 struct mageVulkanHandler;
 	
-typedef enum MAGE_RESULT_ENUM mageResult;
-typedef enum MAGE_EVENT_ENUM mageEventType;
-typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM mageEventCategoryBit;
+typedef enum MAGE_RESULT_ENUM 					mageResult;
+typedef enum MAGE_EVENT_ENUM 					mageEventType;
+typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM 		mageEventCategoryBit;
 typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM mageEventRequiredByteSize;
 
 typedef mageResult  (*mageApplicationStartCallback)		(struct mageApplication *);
@@ -42,12 +44,13 @@ typedef void 		(*mageEventListenerCallback)		(void *, mageEventType);
 
 enum MAGE_RESULT_ENUM 
 {
-	MAGE_UNKNOWN = -1,
+	MAGE_UNKNOWN 								= -1,
 	MAGE_SUCCESS,
 	MAGE_LIBRARY_FAILURE,
 	MAGE_INVALID_INPUT,
 	MAGE_HARDWARE_INVALID,
 	MAGE_CONTEXT_CREATION_FAILED,
+	MAGE_DEBUG_MESSENGER_FAILED,
 	MAGE_INSTANCE_CREATION_FAILURE,
 	MAGE_DEVICE_CREATION_FAILURE,
 	MAGE_SURFACE_CREATION_FAILURE,
@@ -58,6 +61,8 @@ enum MAGE_RESULT_ENUM
 	MAGE_COMMAND_POOL_CREATION_FAILURE,
 	MAGE_ALLOCATE_COMMAND_FAILURE,
 	MAGE_SWAPCHAIN_CREATION_FAILED,
+	MAGE_RENDER_PASS_CREATION_FAILURE,
+	MAGE_FRAME_BUFFER_CREATION_FAILED,
 	MAGE_QUEUE_SUBMITION_FAILURE,
 	MAGE_HARDWARE_NOT_PRESENT,
 	MAGE_START_METHOD_FAILURE,
@@ -117,10 +122,10 @@ struct mageWindow
 	uint32_t 								Running;	
 	const char 							   *Title;
 #if defined (MAGE_SDL)
-	SDL_Window						       *Context;
+	SDL_Window						       	*Context;
 	SDL_Event 								Events;
 #elif defined(MAGE_GLFW)
-	GLFWwindow 							   *Context;
+	GLFWwindow 							   	*Context;
 #endif
 };
 
@@ -129,7 +134,6 @@ struct mageVulkanHandler
 {	
 	VkPhysicalDeviceMemoryProperties 		PhysicalMemoryProperties;
 	VkSurfaceCapabilitiesKHR 				SurfaceCapabilities;
-	VkSurfaceFormatKHR 						SurfaceFormat;
 	VkDevice 								Device;
 	VkPhysicalDevice 						PhysicalDevice;
 	VkPhysicalDeviceProperties 				PhysicalProperties;
@@ -143,7 +147,6 @@ struct mageVulkanHandler
 	uint32_t						 		DephStencilAvailable;
 	uint32_t						 		GraphicsFamilyIndex;
 	uint32_t 								GraphicsPresentFamily;
-		
 };
 #endif
 struct mageRenderer
@@ -154,16 +157,22 @@ struct mageRenderer
 	VkCommandBuffer							CommandBuffer[2];
 	VkViewport 								Viewport;
 	VkSurfaceKHR 							Surface;
+	VkSurfaceFormatKHR 						SurfaceFormat;
 	VkImage 								DepthStencilImage;
 	VkFormat								DepthStencilFormat;
 	VkImageView 							DepthStencilImageView;
+	VkDeviceMemory							DepthStencilImageMemory;
 	VkCommandPool 							CommandPool;
 	VkSwapchainKHR 							SwapChain;
 	VkImage 				   				*SwapChainImages;
 	VkImageView 							*SwapChainImageViews;
+	VkFramebuffer							*FrameBuffers;
 	VkSemaphore 							Semaphore;
 	VkFence 								Fence;
+	VkRenderPass							RenderPass;
+
 	uint32_t 								SwapChainImageCount;
+	uint32_t 								ActiveSwapChainImageId;
 #endif
 };
 #if defined (MAGE_MONO_EXTERNALS)
@@ -194,7 +203,6 @@ struct mageApplication
 	struct mageMonoHandler 					*MonoHandler;
 #endif
 	uint8_t 								Running;
-
 };	
 
 
@@ -232,7 +240,13 @@ extern mageResult 						 mageVulkanHandlerInitialise(struct mageVulkanHandler *h
 extern void 							 mageVulkanHandlerCleanup(struct mageVulkanHandler *handler);
 extern void 	   						*mageRendererAllocate();
 extern mageResult 						 mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window);
+extern void								 mageRendererBeginRender(struct mageRenderer *renderer);
 extern void 							 mageRendererDestroy(struct mageRenderer *renderer);
+#if defined (MAGE_VULKAN)
+extern uint32_t  						 mageFindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, const VkMemoryRequirements *memoryRequirements, const VkMemoryPropertyFlags memoryProperties);
+extern VkFramebuffer					 mageRendererGetActiveFrameBuffer(struct mageRenderer *renderer);
+extern void								 mageRendererEndRendering(struct mageRenderer *renderer);
+#endif
 #if defined (MAGE_MONO_EXTERNALS)
 extern void 							*mageMonoHandlerAllocate();
 extern mageResult 						 mageMonoHandlerInitialise(struct mageMonoHandler *handler, const char *builtLibrary);

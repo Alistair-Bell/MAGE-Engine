@@ -16,7 +16,7 @@ workspace "MAGE"
 group "Externals"
     include "Mage/Externals/hypatia"
     include "Mage/Externals/glfw3"
-
+    
 project "MageEngine"
     location "Mage"
     kind "ConsoleApp"
@@ -65,10 +65,6 @@ project "MageEngine"
         "hypatia",
         "GLFW",
         "vulkan",
-        "X11",
-        "dl",
-        "pthread",
-        "m",
         "mono-2.0",
     }
 
@@ -76,7 +72,14 @@ project "MageEngine"
     filter "system:windows"
         systemversion "latest"
     
-    
+    filter "system:linux"
+        
+        links 
+        { 
+            "dl",
+            "m",
+        }
+
     filter "configurations:Debug"
         defines "MAGE_DEBUG"
         runtime "Debug"
@@ -85,12 +88,7 @@ project "MageEngine"
     filter "configurations:Release"
         defines "MAGE_RELEASE"
         runtime "Release"
-        optimize "On"
-
-    filter "configurations:Distribution"
-        defines "MAGE_DISTRIBUTION"
-        runtime "Release"
-        optimize "On"
+        optimize "Speed"
 
 
 project "Sandbox"
@@ -112,10 +110,6 @@ project "Sandbox"
         
     filter "configurations:Release"
         runtime "Release"
-        optimize "On"
-        
-    filter "configurations:Distribution"
-        runtime "Release"
-        optimize "On"
+        optimize "Speed"
 
         

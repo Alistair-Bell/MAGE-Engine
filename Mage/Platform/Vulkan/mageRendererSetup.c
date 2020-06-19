@@ -201,12 +201,12 @@
 
         if (formats[0].format == VK_FORMAT_UNDEFINED)
         {
-            renderer->Handler.SurfaceFormat.format       = VK_FORMAT_B8G8R8A8_UNORM;
-            renderer->Handler.SurfaceFormat.colorSpace   = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
+            renderer->SurfaceFormat.format       = VK_FORMAT_B8G8R8A8_UNORM;
+            renderer->SurfaceFormat.colorSpace   = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR;
         }
         else
         {
-            renderer->Handler.SurfaceFormat = formats[0];
+            renderer->SurfaceFormat = formats[0];
         }
 
         MAGE_LOG_CORE_INFORM("Physical device formats found\n", NULL);
@@ -245,8 +245,8 @@
             createInfo.sType					= VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
             createInfo.surface					= renderer->Surface;
             createInfo.minImageCount			= count;
-            createInfo.imageFormat				= renderer->Handler.SurfaceFormat.format;
-            createInfo.imageColorSpace			= renderer->Handler.SurfaceFormat.colorSpace;
+            createInfo.imageFormat				= renderer->SurfaceFormat.format;
+            createInfo.imageColorSpace			= renderer->SurfaceFormat.colorSpace;
             createInfo.imageExtent.width		= window->Width;
             createInfo.imageExtent.height		= window->Height;
             createInfo.imageArrayLayers			= 1;
@@ -296,7 +296,7 @@
             createInfo.sType                                = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             createInfo.image                                = renderer->SwapChainImages[i];
             createInfo.viewType                             = VK_IMAGE_TYPE_2D;
-            createInfo.format                               = renderer->Handler.SurfaceFormat.format;
+            createInfo.format                               = renderer->SurfaceFormat.format;
             createInfo.components.r                         = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.g                         = VK_COMPONENT_SWIZZLE_IDENTITY;
             createInfo.components.b                         = VK_COMPONENT_SWIZZLE_IDENTITY;
@@ -383,19 +383,24 @@
             MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image has failed to been created\n", NULL);
             return MAGE_IMAGE_CREATION_FAILURE;
         }
-        /*
         VkMemoryRequirements requirements;
         memset(&requirements, 0, sizeof(VkMemoryRequirements));
-        vkGetImageMemoryRequirements(renderer->Handler.Device, renderer->Handler.DepthStencilImage, &requirements);
+        vkGetImageMemoryRequirements(renderer->Handler.Device, renderer->DepthStencilImage, &requirements);
+        
+        uint32_t memoryIndex = mageFindMemoryTypeIndex(&renderer->Handler.PhysicalMemoryProperties, &requirements, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
 
         VkMemoryAllocateInfo memoryAllocateInfo;
         memset(&memoryAllocateInfo, 0, sizeof(VkMemoryAllocateInfo));
         memoryAllocateInfo.sType            = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
         memoryAllocateInfo.pNext            = NULL;
         memoryAllocateInfo.allocationSize   = requirements.size;
-        memoryAllocateInfo.memoryTypeIndex  = ;
+        memoryAllocateInfo.memoryTypeIndex  = memoryIndex;
 
-        vkAllocateMemory(renderer->Handler.Device, &memoryAllocateInfo, NULL, &renderer->Handler.DeviceMemory);
+        vkAllocateMemory(renderer->Handler.Device, &memoryAllocateInfo, NULL, &renderer->DepthStencilImageMemory);
+        vkBindImageMemory(renderer->Handler.Device, renderer->DepthStencilImage, renderer->DepthStencilImageMemory, 0);
+
+    
 
         VkImageViewCreateInfo viewCreateInfo;
         memset(&viewCreateInfo, 0, sizeof(VkImageViewCreateInfo));
@@ -421,7 +426,97 @@
         }
 
         MAGE_LOG_CORE_INFORM("Deph stencil image created\n", NULL);
-        */
+        return MAGE_SUCCESS;
+    }
+    static mageResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageWindow *window)
+    {
+        VkAttachmentDescription attachmentDescription[2];
+        memset(&attachmentDescription, 0, sizeof(VkAttachmentDescription) * 2);
+        attachmentDescription[0].flags						= 0;
+	    attachmentDescription[0].format						= renderer->DepthStencilFormat;
+	    attachmentDescription[0].samples					= VK_SAMPLE_COUNT_1_BIT;
+	    attachmentDescription[0].loadOp						= VK_ATTACHMENT_LOAD_OP_CLEAR;
+	    attachmentDescription[0].storeOp					= VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	    attachmentDescription[0].stencilLoadOp				= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	    attachmentDescription[0].stencilStoreOp				= VK_ATTACHMENT_STORE_OP_STORE;
+	    attachmentDescription[0].initialLayout				= VK_IMAGE_LAYOUT_UNDEFINED;
+	    attachmentDescription[0].finalLayout				    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	    
+        attachmentDescription[1].flags						= 0;
+	    attachmentDescription[1].format						= renderer->SurfaceFormat.format;
+	    attachmentDescription[1].samples                    = VK_SAMPLE_COUNT_1_BIT;
+	    attachmentDescription[1].loadOp						= VK_ATTACHMENT_LOAD_OP_CLEAR;
+	    attachmentDescription[1].storeOp					= VK_ATTACHMENT_STORE_OP_STORE;
+	    attachmentDescription[1].initialLayout				= VK_IMAGE_LAYOUT_UNDEFINED;
+	    attachmentDescription[1].finalLayout                = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+        
+        VkAttachmentReference depthStencilAttachment;
+        memset(&depthStencilAttachment, 0, sizeof(VkAttachmentReference));
+        depthStencilAttachment.attachment                   = 0;
+        depthStencilAttachment.layout                       = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference attachmentReference[1];
+        memset(attachmentReference, 0, sizeof(VkAttachmentReference) * 1);
+        attachmentReference[0].attachment                   = 1;
+        attachmentReference[0].layout                       = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkSubpassDescription subpassDescriptions[1];
+        memset(subpassDescriptions, 0, sizeof(VkSubpassDescription) * 1);
+        
+        subpassDescriptions[0].pipelineBindPoint            = VK_PIPELINE_BIND_POINT_GRAPHICS;
+        subpassDescriptions[0].pColorAttachments            = attachmentReference;
+        subpassDescriptions[0].colorAttachmentCount         = 1;
+        subpassDescriptions[0].pDepthStencilAttachment      = &depthStencilAttachment;
+    
+        VkRenderPassCreateInfo createInfo; 
+        memset(&createInfo, 0, sizeof(VkRenderPassCreateInfo));
+        createInfo.sType            = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+        createInfo.attachmentCount  = sizeof(attachmentDescription) / sizeof(VkAttachmentDescription);
+        createInfo.pAttachments     = attachmentDescription; 
+        createInfo.subpassCount     = sizeof(subpassDescriptions) / sizeof(VkSubpassDescription);
+        createInfo.pSubpasses       = subpassDescriptions; 
+        
+        if (vkCreateRenderPass(renderer->Handler.Device, &createInfo, NULL, &renderer->RenderPass) != VK_SUCCESS)
+        {
+            return MAGE_RENDER_PASS_CREATION_FAILURE;
+            MAGE_LOG_CORE_FATAL_ERROR("Render pass had failed to be created\n", NULL);
+        }
+        
+        MAGE_LOG_CORE_INFORM("Render pass has been succesfully created\n", NULL);
+        return MAGE_SUCCESS;
+    }
+    static mageResult mageCreateFrameBuffer(struct mageRenderer *renderer, struct mageWindow *window)
+    {
+        renderer->FrameBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
+        uint32_t i;
+
+        for (i = 0; i < renderer->SwapChainImageCount; i++)
+        {
+            VkImageView views[2];
+            memset(views, 0, sizeof(VkImageView) * 2);
+            views[0] = renderer->DepthStencilImageView;
+            views[1] = renderer->SwapChainImageViews[i];
+
+
+            VkFramebufferCreateInfo createInfo;
+            memset(&createInfo, 0, sizeof(VkFramebufferCreateInfo));
+            createInfo.sType            = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            createInfo.renderPass       = renderer->RenderPass;
+            createInfo.attachmentCount  = 2;
+            createInfo.pAttachments     = views;
+            createInfo.width            = window->Width;
+            createInfo.height           = window->Height;
+            createInfo.layers           = 1;
+
+
+            if (vkCreateFramebuffer(renderer->Handler.Device, &createInfo, NULL, &renderer->FrameBuffers[i]) != VK_SUCCESS)
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Frame buffer %d has failed to be created\n", NULL);
+                return MAGE_FRAME_BUFFER_CREATION_FAILED;
+            }   
+        }
+
+        MAGE_LOG_CORE_INFORM("Frame buffer has been succesfully created\n", NULL);
         return MAGE_SUCCESS;
     }
     mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window)
@@ -444,6 +539,8 @@
             mageCreateSwapChain,
             mageCreateSwapChainImages,
             mageCreateDepthStencilImage,
+            mageCreateRenderPass,
+            mageCreateFrameBuffer,
         };
         const uint32_t functionCount = (sizeof(functions) / sizeof(rendererSetupFunctions));
         uint32_t i;
@@ -453,7 +550,7 @@
             result = functions[i](renderer, window);
             if (result != MAGE_SUCCESS) return result;
         }
-
+        MAGE_LOG_CORE_INFORM("Vulkan renderer has been setup succesfully\n", NULL);
         return MAGE_SUCCESS;
     }
     void mageRendererCleanup(struct mageRenderer *renderer)
@@ -464,6 +561,7 @@
         vkDestroySemaphore(renderer->Handler.Device, renderer->Semaphore, NULL);
         vkDestroySwapchainKHR(renderer->Handler.Device, renderer->SwapChain, NULL);
         vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
+        vkDestroyRenderPass(renderer->Handler.Device, renderer->RenderPass, NULL);
 
         uint32_t i;
 
@@ -471,9 +569,16 @@
         {
             vkDestroyImageView(renderer->Handler.Device, renderer->SwapChainImageViews[i], NULL);
         }
+        /* Depth stencil */
+        vkDestroyImageView(renderer->Handler.Device, renderer->DepthStencilImageView, NULL);
+        vkFreeMemory(renderer->Handler.Device, renderer->DepthStencilImageMemory, NULL);
         vkDestroyImage(renderer->Handler.Device, renderer->DepthStencilImage, NULL);
 
-
+        /* Frame buffers */
+        for (i = 0; i < renderer->SwapChainImageCount; i++) 
+        {
+            vkDestroyFramebuffer(renderer->Handler.Device, renderer->FrameBuffers[i], NULL); 
+        }
 
         mageVulkanHandlerCleanup(&renderer->Handler);
 

@@ -22,6 +22,22 @@ void *mageVulkanHandlerAllocate()
         "VK_LAYER_KHRONOS_validation",
     };
 
+    uint32_t mageFindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, const VkMemoryRequirements *memoryRequirements, const VkMemoryPropertyFlags memoryProperties)
+    {
+        uint32_t i;
+        for (i = 0; i < gpuMemoryProperties->memoryTypeCount; i++) 
+        {
+            if (memoryRequirements->memoryTypeBits & (1 << i)) 
+            {
+                if ((gpuMemoryProperties->memoryTypes[i].propertyFlags & memoryProperties ) == memoryProperties ) 
+                {
+                    return i;
+                }
+            }
+	    }
+        MAGE_LOG_CORE_ERROR("GPU memory index was not found\n", NULL);
+	    return UINT32_MAX;
+    }
     static uint8_t mageCheckRequiredValidiationLayersPresent()
     {
         uint32_t layerCount, requiredLayerCount, i, j;
@@ -141,7 +157,7 @@ void *mageVulkanHandlerAllocate()
             if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
             {   
                 MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
-                return MAGE_UNKNOWN;
+                return MAGE_DEBUG_MESSENGER_FAILED;
             }   
             MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
         #endif
@@ -155,7 +171,7 @@ void *mageVulkanHandlerAllocate()
             if (!mageCheckRequiredValidiationLayersPresent())
             {
                 MAGE_LOG_CORE_FATAL_ERROR("Validation layers were not present!\n", NULL);
-                return MAGE_UNKNOWN;
+                return MAGE_HARDWARE_NOT_PRESENT;
             }
             MAGE_LOG_CORE_INFORM("Vulkan validation layers are in use\n", NULL);
 
@@ -313,7 +329,6 @@ void *mageVulkanHandlerAllocate()
             return MAGE_DEVICE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Vulkan device has been created succesfully\n", NULL);
-
         return MAGE_SUCCESS;
     }
     mageResult mageVulkanHandlerInitialise(struct mageVulkanHandler *handler, struct mageWindow *window)
