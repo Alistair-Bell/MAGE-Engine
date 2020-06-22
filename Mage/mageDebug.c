@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-struct  mageLoger 
+struct mageLoger 
 {   
     uint64_t LogCount;
     uint64_t WarningCount;

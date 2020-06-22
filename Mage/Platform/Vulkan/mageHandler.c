@@ -60,7 +60,7 @@ void *mageVulkanHandlerAllocate()
         }
         return layerFound;
     }
-    static const char **mageGetRequiredInstanceExtensions(uint32_t *clientCount)
+    static char **mageGetRequiredInstanceExtensions(uint32_t *clientCount)
     {
         *clientCount = 0;
         char **extensions;
@@ -101,7 +101,7 @@ void *mageVulkanHandlerAllocate()
 
 
         *clientCount = windowCount + debugCount;
-        return (const char **) extensions;
+        return (char **) extensions;
     }
     static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *pUserData) 
     {
@@ -184,7 +184,7 @@ void *mageVulkanHandlerAllocate()
         memset(&createInfo, 0, sizeof(VkInstanceCreateInfo));
         memset(&applicationInfo, 0, sizeof(VkApplicationInfo));
 
-
+        char **extensions = mageGetRequiredInstanceExtensions(&count);
 
         applicationInfo.sType                   = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         applicationInfo.apiVersion              = VK_API_VERSION_1_2;
@@ -193,17 +193,17 @@ void *mageVulkanHandlerAllocate()
         applicationInfo.engineVersion           = VK_MAKE_VERSION(1, 0, 0);
         createInfo.sType                        = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         createInfo.pApplicationInfo             = &applicationInfo;
-        createInfo.ppEnabledExtensionNames      = mageGetRequiredInstanceExtensions(&count);
+        createInfo.ppEnabledExtensionNames      = (const char **)extensions;
         createInfo.enabledExtensionCount        = count;
-        #if defined (MAGE_DEBUG)
-            createInfo.enabledLayerCount = 1;
-            createInfo.ppEnabledLayerNames      = mageRequiredValidationLayers;
-            magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
+#if defined (MAGE_DEBUG)
+        createInfo.enabledLayerCount = 1;
+        createInfo.ppEnabledLayerNames          = mageRequiredValidationLayers;
+        magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
             
-            createInfo.pNext                    = (VkDebugUtilsMessengerCreateInfoEXT*) &handler->DebugMessengerCreateInformation;
-        #else
-            createInfo.pNext                    = NULL;
-        #endif
+        createInfo.pNext                        = (VkDebugUtilsMessengerCreateInfoEXT*) &handler->DebugMessengerCreateInformation;
+#else
+        createInfo.pNext                        = NULL;
+#endif
 
         VkResult result = vkCreateInstance(&createInfo, NULL, &handler->Instance);
 
@@ -213,7 +213,13 @@ void *mageVulkanHandlerAllocate()
             return MAGE_INSTANCE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Vulkan instance has been created succesfully\n", NULL);
-    
+        
+        {
+            uint32_t i;
+            for (i = 0; i < count; i++) free(extensions[i]);
+            free(extensions);
+        }
+
         return MAGE_SUCCESS;
     }
     static uint32_t mageScoreDevice(VkPhysicalDevice device)

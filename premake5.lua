@@ -40,7 +40,7 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE",
-        "MAGE_MONO_EXTERNALS"
+        --"MAGE_MONO_EXTERNALS"
     }
     linkoptions 
     { 
@@ -61,11 +61,11 @@ project "MageEngine"
     }
     links
     {
-        "Sandbox",
+        --"Sandbox",
         "hypatia",
         "GLFW",
         "vulkan",
-        "mono-2.0",
+        --"mono-2.0",
     }
 
 

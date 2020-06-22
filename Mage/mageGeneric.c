@@ -62,12 +62,13 @@ const char *mageToString(mageResult result)
 			return "Unknown error";
 	}
 }
-mageResult mageFileReadContents(const char *file, char *buffer, const uint8_t reallocatable)
+char *mageFileReadContents(const char *file, const char *readmode, uint32_t *fileSize)
 {
-	FILE *f = fopen(file, "rt");
+	FILE *f = fopen(file, readmode);
 	if (f == NULL)
 	{
-		return MAGE_INVALID_INPUT;
+		MAGE_LOG_CORE_ERROR("Invalid file %s\n", file);
+		return NULL;
 	}
     fseek(f, 0, SEEK_END);
     uint64_t length = ftell(f);	
@@ -77,13 +78,8 @@ mageResult mageFileReadContents(const char *file, char *buffer, const uint8_t re
     fread(foo, 1, length, f);
     fclose(f);
 	
-	if (reallocatable)
-	{
-		buffer = realloc(buffer, sizeof(foo));
-	}
-	strcpy(buffer, foo);
-	free(foo);
-	return MAGE_SUCCESS;
+	if (fileSize != NULL) *fileSize = length;
+	return foo;
 }
 mageResult mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean)
 {

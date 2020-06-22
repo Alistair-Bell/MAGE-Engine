@@ -2,3 +2,5 @@ Build*
 Logs/*.*
 Documentation/*.*
 Makefile*
+mono_crash*
+.blob

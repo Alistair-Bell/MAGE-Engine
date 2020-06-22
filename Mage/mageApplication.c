@@ -73,19 +73,18 @@ static mageResult mageApplicationDefaultDestroy(struct mageApplication *applicat
 {
     return MAGE_SUCCESS;
 }
-mageResult mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps props)
+mageResult mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps engineProps, struct mageRendererProps rendererProps)
 {
-    mageEngineInitialise(props);
+    mageEngineInitialise(engineProps);
     mageResult result;
 
-    application->Props = props; 
+    application->Props = engineProps; 
 
     application->Running = 1;
 
     if (application->Props.StartMethod == NULL) application->Props.StartMethod = mageApplicationDefaultStart;
     if (application->Props.UpdateMethod == NULL) application->Props.UpdateMethod = mageApplicationDefaultUpdate;
     if (application->Props.DestroyMethod == NULL) application->Props.DestroyMethod = mageApplicationDefaultDestroy;
-
 
     application->Renderer = mageRendererAllocate();
     application->Window = mageWindowAllocate();
@@ -112,7 +111,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
         return result;
     }
 
-    result = mageRendererInitialise(application->Renderer, application->Window);
+    result = mageRendererInitialise(application->Renderer, application->Window, &rendererProps);
     
     if (result != MAGE_SUCCESS)
     {
@@ -211,7 +210,7 @@ mageResult mageApplicationRun(struct mageApplication *application)
                 vkQueueSubmit(application->Renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
 
                 mageRendererEndRendering(application->Renderer);
-            #endif
+                #endif
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
         #endif
     }
@@ -235,12 +234,15 @@ mageResult mageApplicationRun(struct mageApplication *application)
 }
 void mageApplicationDestroy(struct mageApplication *application)
 {
-    mageWindowTerminate(application->Window);
-    mageMonoCleanup(application->MonoHandler);
+    
     mageRendererDestroy(application->Renderer);
+    mageWindowTerminate(application->Window);
     free(application->Renderer);
     free(application->Window);
+#if defined (MAGE_MONO_EXTERNALS)
+    mageMonoCleanup(application->MonoHandler);
     free(application->MonoHandler);
+#endif
     MAGE_LOG_CORE_INFORM("Application has been cleaned up\n", NULL);
     mageLogEnd();
 }

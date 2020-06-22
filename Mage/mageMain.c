@@ -1,25 +1,29 @@
 #include "mageAPI.h"
 
-static void example_input(void *event, mageEventType type)
-{
+struct mageApplication          *Application;
+struct mageApplicationProps     *ApplicationProps;
+struct mageRendererProps        *RendererProps;
 
-}
-
-void main(int32_t argc, char **args)
+int32_t main(int32_t argc, char **args)
 {  
-    struct mageApplication App;
-    struct mageApplicationProps Props;
-    memset(&Props, 0, sizeof(struct mageApplicationProps));
+    Application = malloc(sizeof(struct mageApplication));
+    ApplicationProps = malloc(sizeof(struct mageApplicationProps));
+    RendererProps = malloc(sizeof(struct mageRendererProps));
 
-    Props.Name      = "Hello World Program";
-    Props.Width     = 1920;
-    Props.Height    = 1080;
-    Props.Version   = 1.0;
-    Props.ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
+    ApplicationProps->Name      = "MAGE - GLFW - Vulkan";
+    ApplicationProps->Width     = 1920;
+    ApplicationProps->Height    = 1080;
+    ApplicationProps->Version   = 1.0;
+    ApplicationProps->ClientDLL = "Build/Binaries/Sandbox/Sandbox.dll";
     
-    mageApplicationInitialise(&App, Props);
-    mageEventRegisterListener(example_input);
-    mageApplicationRun(&App);
+    mageApplicationInitialise(Application, *ApplicationProps, *RendererProps);
+    mageApplicationRun(Application);
+
+
+    free(Application);
+    free(ApplicationProps);
+    free(RendererProps);
+    
 }
 
 

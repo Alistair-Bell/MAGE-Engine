@@ -478,17 +478,7 @@
 
 #endif
 
-/*!************************
- * @brief Sets a bit in a value
- * @param input The number being modified
- * @param index The nth bit along (0 -> 7 in an byte) 0 = 1,  1 = 2,  2 = 4,  3 = 8,  4 = 16
- * @param value The value the bit will be set to (0 | 1)
-**************************/
 #define MAGE_SET_BIT(input, index, value) (input |= value << index)
-/*!************************
- * @brief Specifies the shift for the bit
- * @param index The nth bit along (0 -> 7 in an byte) 0 = 1,  1 = 2,  2 = 4,  3 = 8,  4 = 16
-**************************/
 #define MAGE_BIT(index) (1 << index) 
 
 #endif

@@ -2,7 +2,7 @@
 
 #if defined (MAGE_VULKAN)
     
-    static mageResult mageCreateFence(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateFence(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         VkFenceCreateInfo fenceCreateInfo;
         memset(&fenceCreateInfo, 0, sizeof(VkFenceCreateInfo));
@@ -14,10 +14,9 @@
             return MAGE_FENCE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Fence creation was succesfull\n", NULL);
-
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSemaphore(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateSemaphore(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         VkSemaphoreCreateInfo semaphoreCreateInfo;
         memset(&semaphoreCreateInfo, 0, sizeof(VkSemaphoreCreateInfo));
@@ -33,7 +32,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateCommandPool(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateCommandPool(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         vkGetDeviceQueue(renderer->Handler.Device, renderer->Handler.GraphicsFamilyIndex, 0, &renderer->GraphicsQueue);
         {   
@@ -154,7 +153,7 @@
         }
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         #if defined (MAGE_GLFW)
             
@@ -217,7 +216,21 @@
 
        return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateExtent2D(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+    {
+        renderer->Extent2D.height = window->Height;
+        renderer->Extent2D.width  = window->Width;
+        return MAGE_SUCCESS;
+    }
+    static mageResult mageCreateRenderArea(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+    {
+        memset(&renderer->RenderArea, 0, sizeof(VkRect2D));
+        renderer->RenderArea.offset.x = 0;
+        renderer->RenderArea.offset.y = 0;
+        renderer->RenderArea.extent   = renderer->Extent2D;
+        return MAGE_SUCCESS;
+    }
+    static mageResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {   
         {
             uint32_t count = renderer->Handler.SurfaceCapabilities.minImageCount;
@@ -278,7 +291,7 @@
        
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         {
             renderer->SwapChainImages = calloc(renderer->SwapChainImageCount, sizeof(VkImage));
@@ -318,7 +331,7 @@
 
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateDepthStencilImage(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateDepthStencilImage(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         {
             const VkFormat const tryFormats[] = 
@@ -429,7 +442,7 @@
         MAGE_LOG_CORE_INFORM("Deph stencil image created\n", NULL);
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         VkAttachmentDescription attachmentDescription[2];
         memset(&attachmentDescription, 0, sizeof(VkAttachmentDescription) * 2);
@@ -486,7 +499,7 @@
         MAGE_LOG_CORE_INFORM("Render pass has been succesfully created\n", NULL);
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateFrameBuffer(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateFrameBuffer(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         renderer->FrameBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
         uint32_t i;
@@ -520,8 +533,179 @@
         MAGE_LOG_CORE_INFORM("Frame buffer has been succesfully created\n", NULL);
         return MAGE_SUCCESS;
     }
-    mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window)
+    static mageResult mageCreateRenderPipeline(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+    {      
+        /* Creating default shaders */
+        
+        VkShaderModule vertexShaderModule = mageShaderCreateModule(renderer->Handler.Device, "Mage/Resources/Shaders/vertex.sprv");
+        VkShaderModule framgentShaderModule = mageShaderCreateModule(renderer->Handler.Device, "Mage/Resources/Shaders/fragment.sprv");
+        
+        VkPipelineShaderStageCreateInfo vertexStageCreateInfo;
+        memset(&vertexStageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
+        vertexStageCreateInfo.sType     = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        vertexStageCreateInfo.stage     = mageShaderTypeToBit(MAGE_VERTEX_SHADER);
+        vertexStageCreateInfo.module    = vertexShaderModule;
+        vertexStageCreateInfo.pName     = "main";
+        
+        VkPipelineShaderStageCreateInfo fragmentStageCreateInfo;
+        memset(&fragmentStageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
+        fragmentStageCreateInfo.sType   = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        fragmentStageCreateInfo.stage   = VK_SHADER_STAGE_FRAGMENT_BIT;
+        fragmentStageCreateInfo.module  = framgentShaderModule;
+        fragmentStageCreateInfo.pName   = "main";
+
+
+        VkPipelineShaderStageCreateInfo shaderStages[] = { vertexStageCreateInfo, fragmentStageCreateInfo };
+        
+        /* Pipeline verexes */
+        VkPipelineVertexInputStateCreateInfo pipelineVertexStateCreateInfo;
+        memset(&pipelineVertexStateCreateInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
+        pipelineVertexStateCreateInfo.sType                             = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+        pipelineVertexStateCreateInfo.vertexBindingDescriptionCount     = 0;
+        pipelineVertexStateCreateInfo.pVertexBindingDescriptions        = NULL; 
+        pipelineVertexStateCreateInfo.vertexAttributeDescriptionCount   = 0;
+        pipelineVertexStateCreateInfo.pVertexAttributeDescriptions      = NULL; 
+
+        /* Pipeline assembly */
+        VkPipelineInputAssemblyStateCreateInfo pipelineAssemblyCreateInfo;
+        memset(&pipelineAssemblyCreateInfo, 0, sizeof(VkPipelineInputAssemblyStateCreateInfo));
+        pipelineAssemblyCreateInfo.sType                    = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+        pipelineAssemblyCreateInfo.topology                 = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+        pipelineAssemblyCreateInfo.primitiveRestartEnable   = VK_FALSE;
+        
+        /* Creating scissors extent */
+        VkExtent2D extent;
+        memset(&extent, 0, sizeof(VkExtent2D));
+        extent.height    = (uint32_t)window->Height;
+        extent.width     = (uint32_t)window->Width;
+        
+        /* Creating scissors */
+        VkRect2D pipelineScissors;
+        memset(&pipelineScissors, 0, sizeof(VkRect2D));
+        pipelineScissors.offset.x = 0.0;
+        pipelineScissors.offset.y = 0.0;
+        pipelineScissors.extent   = extent;
+        
+
+
+        /* Linking viewport(s) to pipelines */
+        VkPipelineViewportStateCreateInfo pipelineViewportCreateInfo;
+        memset(&pipelineViewportCreateInfo, 0, sizeof(VkPipelineViewportStateCreateInfo));
+        pipelineViewportCreateInfo.sType            = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+        pipelineViewportCreateInfo.viewportCount    = 1;
+        pipelineViewportCreateInfo.pViewports       = &renderer->Viewport;
+        pipelineViewportCreateInfo.pScissors        = &pipelineScissors;
+        pipelineViewportCreateInfo.scissorCount     = 1;
+
+        /* Rasterisation for the pipeline */
+        VkPipelineRasterizationStateCreateInfo pipelineRasterizationCreateInfo;
+        memset(&pipelineRasterizationCreateInfo, 0, sizeof(VkPipelineRasterizationStateCreateInfo));
+        pipelineRasterizationCreateInfo.sType                   = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+        pipelineRasterizationCreateInfo.depthBiasEnable         = VK_FALSE;
+        pipelineRasterizationCreateInfo.rasterizerDiscardEnable = VK_TRUE;
+        pipelineRasterizationCreateInfo.polygonMode             = VK_POLYGON_MODE_FILL;
+        pipelineRasterizationCreateInfo.lineWidth               = 1.0f;
+        pipelineRasterizationCreateInfo.cullMode                = VK_CULL_MODE_BACK_BIT;
+        pipelineRasterizationCreateInfo.frontFace               = VK_FRONT_FACE_CLOCKWISE;
+        pipelineRasterizationCreateInfo.depthBiasEnable         = VK_FALSE;
+        pipelineRasterizationCreateInfo.depthBiasConstantFactor = 0.0f;
+        pipelineRasterizationCreateInfo.depthBiasClamp          = 0.0f;
+        pipelineRasterizationCreateInfo.depthBiasSlopeFactor    = 0.0f;
+
+        /* Multisampling for the pipeline */
+        VkPipelineMultisampleStateCreateInfo pipelineMultisamplingCreateInfo;
+        memset(&pipelineMultisamplingCreateInfo, 0, sizeof(VkPipelineMultisampleStateCreateInfo));
+        pipelineMultisamplingCreateInfo.sType                     = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+        pipelineMultisamplingCreateInfo.sampleShadingEnable       = VK_FALSE;
+        pipelineMultisamplingCreateInfo.rasterizationSamples      = VK_SAMPLE_COUNT_1_BIT;
+        pipelineMultisamplingCreateInfo.minSampleShading          = 1.0f; 
+        pipelineMultisamplingCreateInfo.pSampleMask               = NULL; 
+        pipelineMultisamplingCreateInfo.alphaToCoverageEnable     = VK_FALSE; 
+        pipelineMultisamplingCreateInfo.alphaToOneEnable          = VK_FALSE; 
+
+        /* Color blending attachment for the pipeline */
+        VkPipelineColorBlendAttachmentState pipelineColorBlendAttachmentCreateInfo;
+        memset(&pipelineColorBlendAttachmentCreateInfo, 0, sizeof(VkPipelineColorBlendAttachmentState));
+        pipelineColorBlendAttachmentCreateInfo.colorWriteMask         = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+        pipelineColorBlendAttachmentCreateInfo.blendEnable            = VK_TRUE;
+        pipelineColorBlendAttachmentCreateInfo.srcColorBlendFactor    = VK_BLEND_FACTOR_SRC_ALPHA;
+        pipelineColorBlendAttachmentCreateInfo.dstColorBlendFactor    = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        pipelineColorBlendAttachmentCreateInfo.colorBlendOp           = VK_BLEND_OP_ADD;
+        pipelineColorBlendAttachmentCreateInfo.srcAlphaBlendFactor    = VK_BLEND_FACTOR_ONE;
+        pipelineColorBlendAttachmentCreateInfo.dstAlphaBlendFactor    = VK_BLEND_FACTOR_ZERO;
+        pipelineColorBlendAttachmentCreateInfo.alphaBlendOp           = VK_BLEND_OP_ADD;
+        
+        /* Color blending for the pipeline */
+        VkPipelineColorBlendStateCreateInfo pipelineColorBlendCreateInfo;
+        memset(&pipelineColorBlendCreateInfo, 0, sizeof(VkPipelineColorBlendStateCreateInfo));
+        pipelineColorBlendCreateInfo.sType              = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+        pipelineColorBlendCreateInfo.logicOpEnable      = VK_FALSE;
+        pipelineColorBlendCreateInfo.logicOp            = VK_TRUE;
+        pipelineColorBlendCreateInfo.attachmentCount    = 1;
+        pipelineColorBlendCreateInfo.pAttachments       = &pipelineColorBlendAttachmentCreateInfo;
+        pipelineColorBlendCreateInfo.blendConstants[0]  = 0.0f;
+        pipelineColorBlendCreateInfo.blendConstants[1]  = 0.0f;
+        pipelineColorBlendCreateInfo.blendConstants[2]  = 0.0f;
+        pipelineColorBlendCreateInfo.blendConstants[3]  = 0.0f;
+
+        /* Dynamic states used by the pipeline */
+        VkDynamicState pipelineDynamicStates[] = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
+        
+        VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo;
+        memset(&pipelineDynamicStateCreateInfo, 0, sizeof(VkPipelineDynamicStateCreateInfo));
+        pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+        pipelineDynamicStateCreateInfo.dynamicStateCount = 2;
+        pipelineDynamicStateCreateInfo.pDynamicStates = pipelineDynamicStates;
+
+
+        /* Creating pipeline layout information */
+        VkPipelineLayoutCreateInfo layoutCreateInfo;
+        memset(&layoutCreateInfo, 0, sizeof(VkPipelineLayoutCreateInfo));
+        layoutCreateInfo.sType                    = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+        layoutCreateInfo.setLayoutCount           = 0; 
+        layoutCreateInfo.pSetLayouts              = NULL; 
+        layoutCreateInfo.pushConstantRangeCount   = 0; 
+        layoutCreateInfo.pPushConstantRanges      = NULL; 
+        
+        /* Creating the layout */
+        if (vkCreatePipelineLayout(renderer->Handler.Device, &layoutCreateInfo, NULL, &renderer->PipeLineLayout) != VK_SUCCESS)
+        {
+            MAGE_LOG_CORE_FATAL_ERROR("Renderer pipeline has failed to be created\n", NULL);
+            return MAGE_PIPELINE_CREATION_FAILURE;
+        }
+        MAGE_LOG_CORE_INFORM("Render pipeline layout created failure\n", NULL);
+        VkGraphicsPipelineCreateInfo pipelineCreateInfo;
+        memset(&pipelineCreateInfo, 0, sizeof(VkGraphicsPipelineCreateInfo));
+        pipelineCreateInfo.sType                    = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+        pipelineCreateInfo.stageCount               = 2;
+        pipelineCreateInfo.pStages                  = shaderStages;
+        pipelineCreateInfo.pVertexInputState        = &pipelineVertexStateCreateInfo;
+        pipelineCreateInfo.pInputAssemblyState      = &pipelineAssemblyCreateInfo;
+        pipelineCreateInfo.pViewportState           = &pipelineViewportCreateInfo;
+        pipelineCreateInfo.pRasterizationState      = &pipelineRasterizationCreateInfo;
+        pipelineCreateInfo.pMultisampleState        = &pipelineMultisamplingCreateInfo;
+        pipelineCreateInfo.pColorBlendState         = &pipelineColorBlendCreateInfo;
+        pipelineCreateInfo.layout                   = renderer->PipeLineLayout;
+        pipelineCreateInfo.renderPass               = renderer->RenderPass;
+        pipelineCreateInfo.subpass                  = 0;
+        pipelineCreateInfo.basePipelineHandle       = VK_NULL_HANDLE;
+
+
+        if (vkCreateGraphicsPipelines(renderer->Handler.Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, NULL, &renderer->GraphicsPipeline) != VK_SUCCESS) 
+        {
+            return -1;
+        }
+
+        vkDestroyShaderModule(renderer->Handler.Device, vertexShaderModule, NULL);
+        vkDestroyShaderModule(renderer->Handler.Device, framgentShaderModule, NULL);
+        
+        return MAGE_SUCCESS;
+    }
+    mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
+        renderer->RegisteredShaderCount = 0;
+        renderer->RegisteredShaders = NULL;
+
         mageResult result = mageVulkanHandlerInitialise(&renderer->Handler, window);
 
         if (result != MAGE_SUCCESS) 
@@ -529,7 +713,7 @@
             return result;
         }
         
-        typedef mageResult (*rendererSetupFunctions)(struct mageRenderer *, struct mageWindow *);
+        typedef mageResult (*rendererSetupFunctions)(struct mageRenderer *, struct mageWindow *, struct mageRendererProps *);
 
         const rendererSetupFunctions functions[] = 
         {
@@ -537,18 +721,21 @@
             mageCreateSemaphore,
             mageCreateCommandPool,
             mageCreateSurface,
+            mageCreateExtent2D,
+            mageCreateRenderArea,
             mageCreateSwapChain,
             mageCreateSwapChainImages,
             mageCreateDepthStencilImage,
             mageCreateRenderPass,
             mageCreateFrameBuffer,
+            mageCreateRenderPipeline,
         };
         const uint32_t functionCount = (sizeof(functions) / sizeof(rendererSetupFunctions));
         uint32_t i;
 
         for (i = 0; i < functionCount; i++)
         {
-            result = functions[i](renderer, window);
+            result = functions[i](renderer, window, props);
             if (result != MAGE_SUCCESS) return result;
         }
         MAGE_LOG_CORE_INFORM("Vulkan renderer has been setup succesfully\n", NULL);
@@ -563,6 +750,8 @@
         vkDestroySwapchainKHR(renderer->Handler.Device, renderer->SwapChain, NULL);
         vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
         vkDestroyRenderPass(renderer->Handler.Device, renderer->RenderPass, NULL);
+        vkDestroyPipelineLayout(renderer->Handler.Device, renderer->PipeLineLayout, NULL);
+        vkDestroyPipeline(renderer->Handler.Device, renderer->GraphicsPipeline, NULL);
 
         uint32_t i;
 
@@ -580,9 +769,8 @@
         {
             vkDestroyFramebuffer(renderer->Handler.Device, renderer->FrameBuffers[i], NULL); 
         }
-
+        
         mageVulkanHandlerCleanup(&renderer->Handler);
-
     }
     void mageRendererDestroy(struct mageRenderer *renderer)
     {
