@@ -11,9 +11,7 @@
             "defines": [
                 "MAGE_DEBUG",
                 "MAGE_CORE",
-                "CLIENT_DEBUG",
-                "MAGE_MONO_EXTERNALS"
-
+                "SANDBOX_DEBUG"
             ],
             "compilerPath": "/usr/lib64/ccache/clang",
             "cStandard": "c89",

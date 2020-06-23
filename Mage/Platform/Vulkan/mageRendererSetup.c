@@ -192,7 +192,7 @@
 
         if (formatCount <= 0) 
         {
-            MAGE_LOG_CLIENT_INFORM("Format count is too low! %d found\n", formatCount);
+            MAGE_LOG_CORE_FATAL_ERROR("Format count is too low! %d found\n", formatCount);
             return MAGE_HARDWARE_NOT_PRESENT;
         }
 
@@ -394,7 +394,7 @@
 
         if (vkCreateImage(renderer->Handler.Device, &imageCreateInfo, NULL, &renderer->DepthStencilImage) != VK_SUCCESS)
         {
-            MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image has failed to been created\n", NULL);
+            MAGE_LOG_CORE_FATAL_ERROR("Deph stencil image has failed to been created\n", NULL);
             return MAGE_IMAGE_CREATION_FAILURE;
         }
         VkMemoryRequirements requirements;
@@ -435,7 +435,7 @@
 
         if (vkCreateImageView(renderer->Handler.Device, &viewCreateInfo, NULL, &renderer->DepthStencilImageView) != VK_SUCCESS)
         {
-            MAGE_LOG_CLIENT_FATAL_ERROR("Deph stencil image view has failed to be created\n", NULL);
+            MAGE_LOG_CORE_FATAL_ERROR("Deph stencil image view has failed to be created\n", NULL);
             return MAGE_IMAGE_VIEW_CREATION_FAILURE;
         }
 
@@ -454,7 +454,7 @@
 	    attachmentDescription[0].stencilLoadOp				= VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	    attachmentDescription[0].stencilStoreOp				= VK_ATTACHMENT_STORE_OP_STORE;
 	    attachmentDescription[0].initialLayout				= VK_IMAGE_LAYOUT_UNDEFINED;
-	    attachmentDescription[0].finalLayout				    = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	    attachmentDescription[0].finalLayout                = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 	    
         attachmentDescription[1].flags						= 0;
 	    attachmentDescription[1].format						= renderer->SurfaceFormat.format;
@@ -499,7 +499,7 @@
         MAGE_LOG_CORE_INFORM("Render pass has been succesfully created\n", NULL);
         return MAGE_SUCCESS;
     }
-    static mageResult mageCreateFrameBuffer(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+    static mageResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
         renderer->FrameBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
         uint32_t i;
@@ -530,32 +530,31 @@
             }   
         }
 
-        MAGE_LOG_CORE_INFORM("Frame buffer has been succesfully created\n", NULL);
+        MAGE_LOG_CORE_INFORM("Frame buffers has been succesfully created\n", NULL);
         return MAGE_SUCCESS;
     }
     static mageResult mageCreateRenderPipeline(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {      
-        /* Creating default shaders */
-        
-        VkShaderModule vertexShaderModule = mageShaderCreateModule(renderer->Handler.Device, "Mage/Resources/Shaders/vertex.sprv");
-        VkShaderModule framgentShaderModule = mageShaderCreateModule(renderer->Handler.Device, "Mage/Resources/Shaders/fragment.sprv");
-        
-        VkPipelineShaderStageCreateInfo vertexStageCreateInfo;
-        memset(&vertexStageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
-        vertexStageCreateInfo.sType     = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        vertexStageCreateInfo.stage     = mageShaderTypeToBit(MAGE_VERTEX_SHADER);
-        vertexStageCreateInfo.module    = vertexShaderModule;
-        vertexStageCreateInfo.pName     = "main";
-        
-        VkPipelineShaderStageCreateInfo fragmentStageCreateInfo;
-        memset(&fragmentStageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
-        fragmentStageCreateInfo.sType   = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-        fragmentStageCreateInfo.stage   = VK_SHADER_STAGE_FRAGMENT_BIT;
-        fragmentStageCreateInfo.module  = framgentShaderModule;
-        fragmentStageCreateInfo.pName   = "main";
+        VkPipelineShaderStageCreateInfo *pipelineShaderStages = calloc(props->ShaderCount, sizeof(VkPipelineShaderStageCreateInfo));
+        VkShaderModule *pipelineShaderModules                 = calloc(props->ShaderCount, sizeof(VkShaderModule));
+        {
+            uint32_t i;
+            for (i = 0; i < props->ShaderCount; i++)
+            {
+                VkShaderModule module = mageShaderCreateModule(renderer->Handler.Device, props->RuntimeShaders[i].FilePath);
 
+                VkPipelineShaderStageCreateInfo stageCreateInfo;
+                memset(&stageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
+                stageCreateInfo.sType     = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+                stageCreateInfo.stage     = mageShaderTypeToBit(props->RuntimeShaders[i].ShaderType);
+                stageCreateInfo.module    = module;
+                stageCreateInfo.pName     = props->RuntimeShaders[i].RuntimeFunctionName;
+                pipelineShaderStages[i]   = stageCreateInfo;
+                pipelineShaderModules[i]  = module;
+                MAGE_LOG_CORE_INFORM("Creating shader %s with entry point of %s, shader %d of %d\n", props->RuntimeShaders[i].FilePath, props->RuntimeShaders[i].RuntimeFunctionName, i + 1, props->ShaderCount);
+            }
+        }
 
-        VkPipelineShaderStageCreateInfo shaderStages[] = { vertexStageCreateInfo, fragmentStageCreateInfo };
         
         /* Pipeline verexes */
         VkPipelineVertexInputStateCreateInfo pipelineVertexStateCreateInfo;
@@ -585,8 +584,6 @@
         pipelineScissors.offset.x = 0.0;
         pipelineScissors.offset.y = 0.0;
         pipelineScissors.extent   = extent;
-        
-
 
         /* Linking viewport(s) to pipelines */
         VkPipelineViewportStateCreateInfo pipelineViewportCreateInfo;
@@ -673,12 +670,12 @@
             MAGE_LOG_CORE_FATAL_ERROR("Renderer pipeline has failed to be created\n", NULL);
             return MAGE_PIPELINE_CREATION_FAILURE;
         }
-        MAGE_LOG_CORE_INFORM("Render pipeline layout created failure\n", NULL);
+        MAGE_LOG_CORE_INFORM("Render pipeline layout created succesfully\n", NULL);
         VkGraphicsPipelineCreateInfo pipelineCreateInfo;
         memset(&pipelineCreateInfo, 0, sizeof(VkGraphicsPipelineCreateInfo));
         pipelineCreateInfo.sType                    = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-        pipelineCreateInfo.stageCount               = 2;
-        pipelineCreateInfo.pStages                  = shaderStages;
+        pipelineCreateInfo.stageCount               = props->ShaderCount;
+        pipelineCreateInfo.pStages                  = pipelineShaderStages;
         pipelineCreateInfo.pVertexInputState        = &pipelineVertexStateCreateInfo;
         pipelineCreateInfo.pInputAssemblyState      = &pipelineAssemblyCreateInfo;
         pipelineCreateInfo.pViewportState           = &pipelineViewportCreateInfo;
@@ -693,19 +690,21 @@
 
         if (vkCreateGraphicsPipelines(renderer->Handler.Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, NULL, &renderer->GraphicsPipeline) != VK_SUCCESS) 
         {
-            return -1;
+            MAGE_LOG_CORE_FATAL_ERROR("Graphics pipeline has failed to be created\n", NULL);
+            return MAGE_GRAPHICS_PIPELINE_CREATION_FAILURE;
         }
-
-        vkDestroyShaderModule(renderer->Handler.Device, vertexShaderModule, NULL);
-        vkDestroyShaderModule(renderer->Handler.Device, framgentShaderModule, NULL);
-        
+        uint32_t i;
+        for (i = 0; i < props->ShaderCount; i++)
+        {
+            vkDestroyShaderModule(renderer->Handler.Device, pipelineShaderModules[i], NULL);
+        }
+        free(pipelineShaderModules);
+        free(pipelineShaderStages);
+        MAGE_LOG_CORE_INFORM("Graphics pipeline was created succesfully\n", NULL);
         return MAGE_SUCCESS;
     }
     mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
-        renderer->RegisteredShaderCount = 0;
-        renderer->RegisteredShaders = NULL;
-
         mageResult result = mageVulkanHandlerInitialise(&renderer->Handler, window);
 
         if (result != MAGE_SUCCESS) 
@@ -727,8 +726,8 @@
             mageCreateSwapChainImages,
             mageCreateDepthStencilImage,
             mageCreateRenderPass,
-            mageCreateFrameBuffer,
             mageCreateRenderPipeline,
+            mageCreateFrameBuffers, 
         };
         const uint32_t functionCount = (sizeof(functions) / sizeof(rendererSetupFunctions));
         uint32_t i;
@@ -750,8 +749,8 @@
         vkDestroySwapchainKHR(renderer->Handler.Device, renderer->SwapChain, NULL);
         vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
         vkDestroyRenderPass(renderer->Handler.Device, renderer->RenderPass, NULL);
-        vkDestroyPipelineLayout(renderer->Handler.Device, renderer->PipeLineLayout, NULL);
         vkDestroyPipeline(renderer->Handler.Device, renderer->GraphicsPipeline, NULL);
+        vkDestroyPipelineLayout(renderer->Handler.Device, renderer->PipeLineLayout, NULL);
 
         uint32_t i;
 
@@ -769,6 +768,7 @@
         {
             vkDestroyFramebuffer(renderer->Handler.Device, renderer->FrameBuffers[i], NULL); 
         }
+        free(renderer->FrameBuffers);
         
         mageVulkanHandlerCleanup(&renderer->Handler);
     }

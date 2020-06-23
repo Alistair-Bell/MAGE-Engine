@@ -26,7 +26,8 @@
                 return VK_SHADER_STAGE_COMPUTE_BIT;
 
             default:
-                MAGE_LOG_CLIENT_WARNING("Undefined shader type\n", NULL);
+                MAGE_LOG_CORE_ERROR("Undefined shader type\n", NULL);
+                return;
         }
     }
     mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *runtimeFunctionName, const mageShaderType shaderType)
@@ -34,11 +35,6 @@
         shader->FilePath            = shaderFile;
         shader->ShaderType          = shaderType;
         shader->RuntimeFunctionName = runtimeFunctionName;
-    }
-    void mageShaderDestroy(struct mageRenderer *renderer, struct mageShader *shader)
-    {
-        vkDestroyShaderModule(renderer->Handler.Device, shader->ShaderModule, NULL);
-        MAGE_LOG_CORE_INFORM("Destroying shader %s\n", shader->FilePath);
     }
     VkFramebuffer mageRendererGetActiveFrameBuffer(struct mageRenderer *renderer)
     {
@@ -58,7 +54,7 @@
         shaderCreateInfo.pCode        = (uint32_t*)code;
 
         vkCreateShaderModule(device, &shaderCreateInfo, NULL, &module);
-        free(code);
+        /* free(code); */
         return module;
     }
     void mageRendererBeginRender(struct mageRenderer *renderer)

@@ -164,14 +164,6 @@
 
 
 /*!************************
-	Allows mono c# scripting 
-**************************/
-#if defined (MAGE_MONO_EXTERNALS)
-	#include <mono-2.0/mono/metadata/assembly.h>
-	#include <mono-2.0/mono/jit/jit.h>
-#endif
-
-/*!************************
 	@brief The mode that is a inform 
 **************************/
 #define MAGE_LOG_MODE_INFORM 0
@@ -210,24 +202,16 @@
 	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
 	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)
 	#define MAGE_LOG_CORE_ERROR(x, ...)
 	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...)
 	#define MAGE_DEBUG_BREAK
-	#define MAGE_LOG_CLIENT_INFORM(x, ...)
-	#define MAGE_LOG_CLIENT_WARNING(x, ...)
-	#define MAGE_LOG_CLIENT_ERROR(x, ...)
-	#define MAGE_LOG_CLIENT_FATAL_ERROR(x, ...)
 #endif
 
 
-
+/*
 #if defined (MAGE_SDL)
     #define MAGE_KEYCODE_SPACE SDLK_SPACE 
     #define MAGE_KEYCODE_APOSTROPHE SDLK_QUOTE 
@@ -477,6 +461,7 @@
 	#define MAGE_MOUSECODE_BUTTON_MIDDLE 		3
 
 #endif
+*/
 
 #define MAGE_SET_BIT(input, index, value) (input |= value << index)
 #define MAGE_BIT(index) (1 << index) 

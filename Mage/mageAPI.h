@@ -28,7 +28,6 @@ struct mageApplication;
 struct mageApplicationProps;
 struct mageRendererProps;
 struct mageWindow;
-struct mageMonoHandler;
 struct mageRenderer;
 struct mageVulkanHandler;
 
@@ -37,6 +36,7 @@ typedef enum MAGE_EVENT_ENUM 					mageEventType;
 typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM 		mageEventCategoryBit;
 typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM mageEventRequiredByteSize;
 typedef enum MAGE_SHADER_TYPE_ENUM				mageShaderType;
+typedef enum MAGE_KEYCODE_ENUM					mageKeycode;
 
 typedef mageResult  (*mageApplicationStartCallback)		(struct mageApplication *);
 typedef void 		(*mageApplicationUpdateCallback)	(struct mageApplication *);
@@ -66,6 +66,7 @@ enum MAGE_RESULT_ENUM
 	MAGE_RENDER_PASS_CREATION_FAILURE,
 	MAGE_PIPELINE_CREATION_FAILURE,
 	MAGE_FRAME_BUFFER_CREATION_FAILED,
+	MAGE_GRAPHICS_PIPELINE_CREATION_FAILURE,
 	MAGE_QUEUE_SUBMITION_FAILURE,
 	MAGE_HARDWARE_NOT_PRESENT,
 	MAGE_SHADER_CREATION_FAILURE,
@@ -127,6 +128,14 @@ enum MAGE_SHADER_TYPE_ENUM
 	MAGE_FRAGMENT_SHADER						= 5,
 	MAGE_COMPUTE_SHADER							= 6,
 };
+enum MAGE_KEYCODE_ENUM
+{
+#if defined (MAGE_GLFW)	
+	MAGE_KEYCODE_A_B
+#elif defined (MAGE_SDL)
+
+#endif
+};
 
 struct mageWindow
 {
@@ -153,10 +162,10 @@ struct mageVulkanHandler
 	VkPhysicalDeviceProperties 				PhysicalProperties;
 	VkInstance 								Instance;
 	
-	#if defined (MAGE_DEBUG)
-		VkDebugUtilsMessengerEXT			DebugMessenger;
-		VkDebugUtilsMessengerCreateInfoEXT	DebugMessengerCreateInformation;
-	#endif
+#if defined (MAGE_DEBUG)
+	VkDebugUtilsMessengerEXT				DebugMessenger;
+	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInformation;
+#endif
 	
 	uint32_t						 		DephStencilAvailable;
 	uint32_t						 		GraphicsFamilyIndex;
@@ -196,24 +205,15 @@ struct mageRenderer
 	uint32_t 								ActiveSwapChainImageId;
 #endif
 };
-#if defined (MAGE_MONO_EXTERNALS)
-struct mageMonoHandler
-{
-	MonoDomain 								*Domain;
-	MonoAssembly 							*Assembler;
-	MonoImage 								*Image;
-};
-#endif
 struct mageApplicationProps
 {
 	double 									Version;
 	uint32_t 								Width;
 	uint32_t 								Height;
-	char 						   			*Name;
-	const char 					   			*ClientDLL;
 	mageApplicationStartCallback 			StartMethod;
 	mageApplicationUpdateCallback 			UpdateMethod;
 	mageApplicationDestroyCallback 			DestroyMethod;
+	char 						   			*Name;
 };
 struct mageApplication
 {
@@ -289,11 +289,6 @@ extern uint32_t  						 mageFindMemoryTypeIndex(const VkPhysicalDeviceMemoryProp
 extern VkShaderStageFlagBits			 mageShaderTypeToBit(const mageShaderType shaderType);
 extern VkFramebuffer					 mageRendererGetActiveFrameBuffer(struct mageRenderer *renderer);
 extern VkShaderModule					 mageShaderCreateModule(VkDevice device, const char *file);
-#endif
-#if defined (MAGE_MONO_EXTERNALS)
-extern void 							*mageMonoHandlerAllocate();
-extern mageResult 						 mageMonoHandlerInitialise(struct mageMonoHandler *handler, const char *builtLibrary);
-extern MonoMethod 						*mageMonoHandlerFindMethod(MonoClass *monoClass, const char *name);
 #endif
 extern void		 						*mageApplicationAllocate();
 extern mageResult 						 mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps engineProps, struct mageRendererProps rendererProps);

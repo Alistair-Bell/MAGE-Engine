@@ -15,6 +15,7 @@ void *mageVulkanHandlerAllocate()
     static const char * const RequiredExtensions[] = 
     {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+        VK_KHR_SURFACE_EXTENSION_NAME,
     };
 
     static const char *mageRequiredValidationLayers[] =
@@ -108,13 +109,13 @@ void *mageVulkanHandlerAllocate()
         switch (messageType)
         {   
             case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
-                MAGE_LOG_CORE_ERROR("Validation Layers %s\n", callbackData->pMessage);
+                MAGE_LOG_CORE_INFORM("Validation Layers %s\n", callbackData->pMessage);
                 break;
             case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
-                MAGE_LOG_CORE_ERROR("Validation Layers : violation issue %s\n", callbackData->pMessage);
+                MAGE_LOG_CORE_FATAL_ERROR("Validation Layers : violation issue %s\n", callbackData->pMessage);
                 break;
             case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
-                MAGE_LOG_CORE_ERROR("Validation Layers : performance issue %s\n", callbackData->pMessage);
+                MAGE_LOG_CORE_WARNING("Validation Layers : performance issue %s\n", callbackData->pMessage);
                 break; 
             default:
                 MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
@@ -153,31 +154,29 @@ void *mageVulkanHandlerAllocate()
     }
     static mageResult mageSetupValidationLayerCallback(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
-        #if defined (MAGE_DEBUG)
-            if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
-            {   
-                MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
-                return MAGE_DEBUG_MESSENGER_FAILED;
-            }   
-            MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
-        #endif
+    #if defined (MAGE_DEBUG)
+        if (mageCreateDebugUtilsMessengerEXT(handler->Instance, &handler->DebugMessengerCreateInformation, NULL, &handler->DebugMessenger) != VK_SUCCESS) 
+        {   
+            MAGE_LOG_CORE_FATAL_ERROR("Debug messenger has failed to be created\n", NULL);
+            return MAGE_DEBUG_MESSENGER_FAILED;
+        }   
+        MAGE_LOG_CORE_INFORM("Debug messenger was set up succesfully\n", NULL);
+    #endif
         return MAGE_SUCCESS;
     }
 
     static mageResult mageCreateInstance(struct mageVulkanHandler *handler, struct mageWindow *window)
     {
-        #if defined (MAGE_DEBUG)
+    #if defined (MAGE_DEBUG)
             
-            if (!mageCheckRequiredValidiationLayersPresent())
-            {
-                MAGE_LOG_CORE_FATAL_ERROR("Validation layers were not present!\n", NULL);
-                return MAGE_HARDWARE_NOT_PRESENT;
-            }
-            MAGE_LOG_CORE_INFORM("Vulkan validation layers are in use\n", NULL);
+        if (!mageCheckRequiredValidiationLayersPresent())
+        {
+            MAGE_LOG_CORE_FATAL_ERROR("Validation layers were not present!\n", NULL);
+            return MAGE_HARDWARE_NOT_PRESENT;
+        }
+        MAGE_LOG_CORE_INFORM("Vulkan validation layers are in use\n", NULL);
 
-        #endif
-        
-        
+    #endif
         VkInstanceCreateInfo createInfo;
         VkApplicationInfo applicationInfo;
         uint32_t count;
@@ -185,7 +184,6 @@ void *mageVulkanHandlerAllocate()
         memset(&applicationInfo, 0, sizeof(VkApplicationInfo));
 
         char **extensions = mageGetRequiredInstanceExtensions(&count);
-
         applicationInfo.sType                   = VK_STRUCTURE_TYPE_APPLICATION_INFO;
         applicationInfo.apiVersion              = VK_API_VERSION_1_2;
         applicationInfo.pApplicationName        = window->Title;
@@ -195,31 +193,31 @@ void *mageVulkanHandlerAllocate()
         createInfo.pApplicationInfo             = &applicationInfo;
         createInfo.ppEnabledExtensionNames      = (const char **)extensions;
         createInfo.enabledExtensionCount        = count;
-#if defined (MAGE_DEBUG)
+    #if defined (MAGE_DEBUG)
         createInfo.enabledLayerCount = 1;
         createInfo.ppEnabledLayerNames          = mageRequiredValidationLayers;
         magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
-            
         createInfo.pNext                        = (VkDebugUtilsMessengerCreateInfoEXT*) &handler->DebugMessengerCreateInformation;
-#else
+    #else
         createInfo.pNext                        = NULL;
-#endif
+    #endif
 
         VkResult result = vkCreateInstance(&createInfo, NULL, &handler->Instance);
 
         if (result != VK_SUCCESS)
         {
-            MAGE_LOG_CLIENT_FATAL_ERROR("Vulkan instance has failed to be created\n", NULL);
+            MAGE_LOG_CORE_FATAL_ERROR("Vulkan instance has failed to be created\n", NULL);
             return MAGE_INSTANCE_CREATION_FAILURE;
         }
         MAGE_LOG_CORE_INFORM("Vulkan instance has been created succesfully\n", NULL);
         
+    #if defined (MAGE_DEBUG)
+        uint32_t i;
         {
-            uint32_t i;
             for (i = 0; i < count; i++) free(extensions[i]);
-            free(extensions);
+                free(extensions);
         }
-
+    #endif
         return MAGE_SUCCESS;
     }
     static uint32_t mageScoreDevice(VkPhysicalDevice device)
@@ -240,8 +238,6 @@ void *mageVulkanHandlerAllocate()
 
         return score;
     }
-
-    
     static int32_t mageGetFamilyIndex(VkPhysicalDevice device)
     {
         uint32_t queueCount, i;
@@ -346,9 +342,9 @@ void *mageVulkanHandlerAllocate()
         {
             
             mageCreateInstance,
-            #if defined (MAGE_DEBUG)
-                mageSetupValidationLayerCallback,
-            #endif
+        #if defined (MAGE_DEBUG)
+            mageSetupValidationLayerCallback,
+        #endif
             mageCreateDevice,
         };
         const uint32_t functionCount = sizeof(functions) / sizeof(requiredFunctions);

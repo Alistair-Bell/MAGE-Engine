@@ -7,10 +7,11 @@
     {
         void *buffer = malloc(MAGE_KEY_PRESSED_EVENT);
         memset(buffer, 0, MAGE_WINDOW_CLOSE_EVENT_BYTE_SIZE);
-            
+          
         switch (action)
         {
             case GLFW_PRESS:
+                MAGE_LOG_CORE_FATAL_ERROR("Key | %d\n", key);
                 mageEventFormatKeyPressed(buffer, key);
                 break;
 

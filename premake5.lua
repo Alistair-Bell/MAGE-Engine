@@ -11,12 +11,11 @@ workspace "MAGE"
         "Debug",
         "Release",
     }
--- Engine Project
 
-group "Externals"
-    include "Mage/Externals/hypatia"
-    include "Mage/Externals/glfw3"
+    startproject "Sandbox"
     
+    
+-- Engine Project
 project "MageEngine"
     location "Mage"
     kind "ConsoleApp"
@@ -29,18 +28,16 @@ project "MageEngine"
 
     pchheader "Mage/mageAPI.h"
     pchsource "Mage/mageAPI.c"
-    
+
     files
     {
         "Mage/*.h",
         "Mage/*.c",
         "Mage/Platform/Vulkan/**.c",
-        "Mage/Platform/Mono/**.c"
     }
     defines
     {
         "MAGE_CORE",
-        --"MAGE_MONO_EXTERNALS"
     }
     linkoptions 
     { 
@@ -50,8 +47,6 @@ project "MageEngine"
     includedirs
     {
         "Mage",
-        "/usr/local/include/mono-2.0"
-            
     }
     flags
     {
@@ -61,55 +56,66 @@ project "MageEngine"
     }
     links
     {
-        --"Sandbox",
+        "Sandbox",
         "hypatia",
         "GLFW",
         "vulkan",
-        --"mono-2.0",
     }
 
 
     filter "system:windows"
-        systemversion "latest"
-    
+    systemversion "latest"
+
     filter "system:linux"
-        
-        links 
-        { 
-            "dl",
-            "m",
-        }
 
-    filter "configurations:Debug"
-        defines "MAGE_DEBUG"
-        runtime "Debug"
-        symbols "On"
+    links 
+    { 
+        "dl",
+        "m",
+    }
 
-    filter "configurations:Release"
-        defines "MAGE_RELEASE"
-        runtime "Release"
-        optimize "Speed"
+filter "configurations:Debug"
+    defines "MAGE_DEBUG"
+    runtime "Debug"
+    symbols "On"
+
+filter "configurations:Release"
+    defines "MAGE_RELEASE"
+    runtime "Release"
+    optimize "On"
+
 
 
 project "Sandbox"
     location "%{prj.name}"
-    kind "SharedLib"
-    language "C#"
+    kind "StaticLib"
+    language "c"
+    cdialect "c89"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
+
+    includedirs
+    {
+        "Mage",
+    }
     
     files
     {
-        "Mage/mageAPI.cs",
-        "%{prj.name}/**.cs",
+        "%{prj.name}/**.h",   
+        "%{prj.name}/**.c",
     }
 
     filter "configurations:Debug"
+        defines "SANDBOX_DEBUG"    
         runtime "Debug"
         symbols "On"
-        
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "Speed"
 
-        
+    filter "configurations:Release"
+        defines "SANDBOX_RELEASE"
+        runtime "Release"
+        optimize "On"
+
+
+group "Externals"
+    include "Mage/Externals/hypatia"
+    include "Mage/Externals/glfw3"
