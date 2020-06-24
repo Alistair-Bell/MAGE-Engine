@@ -4,28 +4,42 @@
     
     static mageResult mageCreateFence(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
+
+        renderer->Fences = calloc(renderer->MaxImagesInFlight, sizeof(VkFence));
         VkFenceCreateInfo fenceCreateInfo;
         memset(&fenceCreateInfo, 0, sizeof(VkFenceCreateInfo));
         fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        
-        if (vkCreateFence(renderer->Handler.Device, &fenceCreateInfo, NULL, &renderer->Fence) != VK_SUCCESS)
+        uint32_t i;
+        for (i = 0; i < renderer->MaxImagesInFlight; i++)
         {
-            MAGE_LOG_CORE_FATAL_ERROR("Fence creation has failed\n", NULL);
-            return MAGE_FENCE_CREATION_FAILURE;
+            vkCreateFence(renderer->Handler.Device, &fenceCreateInfo, NULL, &renderer->Fences[i]);
         }
+        
         MAGE_LOG_CORE_INFORM("Fence creation was succesfull\n", NULL);
         return MAGE_SUCCESS;
     }
     static mageResult mageCreateSemaphore(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
+        renderer->AvailableSemaphores = calloc(renderer->MaxImagesInFlight, sizeof(VkSemaphore));
+        renderer->RenderFinishedSemaphores = calloc(renderer->MaxImagesInFlight, sizeof(VkSemaphore));
+
         VkSemaphoreCreateInfo semaphoreCreateInfo;
         memset(&semaphoreCreateInfo, 0, sizeof(VkSemaphoreCreateInfo));
         semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
         
-        if (vkCreateSemaphore(renderer->Handler.Device, &semaphoreCreateInfo, NULL, &renderer->Semaphore) != VK_SUCCESS)
+        uint32_t i;
+        for (i = 0; i < renderer->MaxImagesInFlight; i++)
         {
-            MAGE_LOG_CORE_FATAL_ERROR("Semaphore creation has failed\n", NULL);
-            return MAGE_SEMAPHORE_CREATION_FAILURE;
+            if (vkCreateSemaphore(renderer->Handler.Device, &semaphoreCreateInfo, NULL, &renderer->AvailableSemaphores[i]) != VK_SUCCESS)
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Semaphore creation has failed\n", NULL);
+                return MAGE_SEMAPHORE_CREATION_FAILURE;
+            }
+            if (vkCreateSemaphore(renderer->Handler.Device, &semaphoreCreateInfo, NULL, &renderer->RenderFinishedSemaphores[i]) != VK_SUCCESS)
+            {
+                MAGE_LOG_CORE_FATAL_ERROR("Semaphore creation has failed\n", NULL);
+                return MAGE_SEMAPHORE_CREATION_FAILURE;
+            }
         }
 
         MAGE_LOG_CORE_INFORM("Semaphore creation was succesfull\n", NULL);
@@ -52,105 +66,75 @@
             }
             MAGE_LOG_CORE_INFORM("Command pool has been created succesfully\n", NULL);
         }
+        return MAGE_SUCCESS;
+    }
+    static mageResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+    {
+        renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
+        VkCommandBufferAllocateInfo allocateInfo;
+        memset(&allocateInfo, 0, sizeof(VkCommandBufferAllocateInfo));
+        allocateInfo.sType                  = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+        allocateInfo.commandPool            = renderer->CommandPool;
+        allocateInfo.level                  = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+        allocateInfo.commandBufferCount     = (uint32_t) renderer->SwapChainImageCount;
+
+        if (vkAllocateCommandBuffers(renderer->Handler.Device, &allocateInfo, renderer->CommandBuffers) != VK_SUCCESS)
         {
-            VkCommandBufferAllocateInfo allocateInfo;        
-            memset(&allocateInfo, 0, sizeof(VkCommandBufferAllocateInfo));
+            MAGE_LOG_CORE_FATAL_ERROR("Command buffer allocation has failed\n", NULL);
+            MAGE_ALLOCATE_COMMAND_FAILURE;
+        }
+        uint32_t i;
 
-            allocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-            allocateInfo.commandPool            = renderer->CommandPool;
-            allocateInfo.commandBufferCount     = 2;
-            allocateInfo.level                  = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-
-            if (vkAllocateCommandBuffers(renderer->Handler.Device, &allocateInfo, renderer->CommandBuffer) != VK_SUCCESS)
+        for (i = 0; i < renderer->SwapChainImageCount; i++)
+        {
+            VkCommandBufferBeginInfo beginInfo;
+            memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
+            beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+            if (vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo) != VK_SUCCESS)
             {
-                MAGE_LOG_CORE_FATAL_ERROR("Command buffer allocation has failed\n", NULL);
-                return MAGE_ALLOCATE_COMMAND_FAILURE;
-            }
+                MAGE_LOG_CORE_FATAL_ERROR("Command buffer %d has failed to begin\n", NULL);
+                return MAGE_UNKNOWN;
+            }   
+           
+           
+            VkExtent2D extent;
+            extent.height = window->Height;
+            extent.width  = window->Width;
+            VkOffset2D offset;
+            offset.x = 0;
+            offset.y = 0;
 
-            MAGE_LOG_CORE_INFORM("Command buffer allocation was succesfull\n", NULL);
+            VkClearValue clearValues[2];
+            memset(&clearValues, 0, sizeof(VkClearValue) * 2);
+            clearValues[0].color.float32[0] = 0.0f;
+            clearValues[0].color.float32[1] = 0.0f;
+            clearValues[0].color.float32[2] = 0.0f;
+            clearValues[0].color.float32[3] = 1.0f;
+
+            clearValues[1].color.float32[0] = 0.0f;
+            clearValues[1].color.float32[1] = 0.0f;
+            clearValues[1].color.float32[2] = 0.0f;
+            clearValues[1].color.float32[3] = 1.0f;
+    
+            VkRenderPassBeginInfo renderPassInfo;
+            memset(&renderPassInfo, 0, sizeof(VkRenderPassBeginInfo));
+            renderPassInfo.sType                = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            renderPassInfo.renderPass           = renderer->RenderPass;
+            renderPassInfo.framebuffer          = renderer->FrameBuffers[i];
+            renderPassInfo.renderArea.offset    = offset;
+            renderPassInfo.renderArea.extent    = extent;
+            renderPassInfo.pClearValues         = clearValues;
+            renderPassInfo.clearValueCount      = 2;
+
+            vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+            vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+            MAGE_LOG_CORE_INFORM("Command buffer %d bound to pipeline\n", i);
+            vkCmdDraw(renderer->CommandBuffers[i], 3, 1, 0, 0);
+            vkCmdEndRenderPass(renderer->CommandBuffers[i]);
+            vkEndCommandBuffer(renderer->CommandBuffers[i]);
+
         }
-        {
-            VkCommandBufferBeginInfo bufferBeginInfo;
-            memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
-            
-            bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            vkBeginCommandBuffer(renderer->CommandBuffer[0], &bufferBeginInfo);
-
-            vkCmdPipelineBarrier(renderer->CommandBuffer[0], 
-                                VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-                                VK_PIPELINE_STAGE_ALL_COMMANDS_BIT,
-                                0,
-                                0, NULL,
-                                0, NULL,
-                                0, NULL);
-
-            renderer->Viewport.height    = window->Height;
-            renderer->Viewport.width     = window->Width;
-            renderer->Viewport.x         = 0;
-            renderer->Viewport.y         = 0;
-            renderer->Viewport.maxDepth  = 0.0f;
-            vkCmdSetViewport(renderer->CommandBuffer[0], 0, 1, &renderer->Viewport);
-            
-            MAGE_LOG_CORE_INFORM("Command viewport 1 set\n", NULL);
-            
-            vkEndCommandBuffer(renderer->CommandBuffer[0]);
-        }
-        {
-            VkCommandBufferBeginInfo bufferBeginInfo;
-            memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
-            
-            bufferBeginInfo.sType             = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-            bufferBeginInfo.flags             = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT; 
-            vkBeginCommandBuffer(renderer->CommandBuffer[1], &bufferBeginInfo);
-
-            renderer->Viewport.height    = window->Height;
-            renderer->Viewport.width     = window->Width;
-            renderer->Viewport.x         = 0;
-            renderer->Viewport.y         = 0;
-            renderer->Viewport.maxDepth  = 0.0f;
-            vkCmdSetViewport(renderer->CommandBuffer[1], 0, 1, &renderer->Viewport);
-            
-            MAGE_LOG_CORE_INFORM("Command viewport 2 set\n", NULL);
-            
-            vkEndCommandBuffer(renderer->CommandBuffer[1]); 
-        }
-        {
-            VkSubmitInfo submitInfo;
-            memset(&submitInfo, 0, sizeof(VkSubmitInfo));
-            submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            submitInfo.commandBufferCount   = 1;
-            submitInfo.pCommandBuffers      = &renderer->CommandBuffer[0];
-            submitInfo.signalSemaphoreCount = 1;
-            submitInfo.pSignalSemaphores    = &renderer->Semaphore;
-
-            if (vkQueueSubmit(renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
-            {
-                MAGE_LOG_CORE_FATAL_ERROR("Queue submition has failed\n", NULL);
-                return MAGE_QUEUE_SUBMITION_FAILURE;
-            }
-            MAGE_LOG_CORE_INFORM("Queue submition 1 was succesfull\n", NULL);
-        }
-        {
-            const VkPipelineStageFlags flags[] = { VK_PIPELINE_STAGE_ALL_COMMANDS_BIT };
-            VkSubmitInfo submitInfo;
-            memset(&submitInfo, 0, sizeof(VkSubmitInfo));
-            submitInfo.sType                = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-            submitInfo.commandBufferCount   = 1;
-            submitInfo.pCommandBuffers      = &renderer->CommandBuffer[1];
-            submitInfo.waitSemaphoreCount   = 1;
-            submitInfo.pWaitSemaphores      = &renderer->Semaphore;
-            submitInfo.pWaitDstStageMask    = flags;
-
-            if (vkQueueSubmit(renderer->GraphicsQueue, 1, &submitInfo, VK_NULL_HANDLE) != VK_SUCCESS)
-            {
-                MAGE_LOG_CORE_FATAL_ERROR("Queue submition 2 has failed\n", NULL);
-                return MAGE_QUEUE_SUBMITION_FAILURE;
-            }
-            MAGE_LOG_CORE_INFORM("Queue submition 2 was succesfull\n", NULL);
-        
-            vkQueueWaitIdle(renderer->GraphicsQueue);
-            
-        }
+        MAGE_LOG_CORE_INFORM("Command buffers created\n", NULL);
         return MAGE_SUCCESS;
     }
     static mageResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
@@ -325,6 +309,7 @@
             {
                 MAGE_LOG_CORE_ERROR("Swap chain view %d of %d failed to be created\n", i, renderer->SwapChainImageCount);
             }
+
 
             MAGE_LOG_CORE_INFORM("Swap chain image view %d created\n", i);
         }   
@@ -686,8 +671,7 @@
         pipelineCreateInfo.renderPass               = renderer->RenderPass;
         pipelineCreateInfo.subpass                  = 0;
         pipelineCreateInfo.basePipelineHandle       = VK_NULL_HANDLE;
-
-
+        
         if (vkCreateGraphicsPipelines(renderer->Handler.Device, VK_NULL_HANDLE, 1, &pipelineCreateInfo, NULL, &renderer->GraphicsPipeline) != VK_SUCCESS) 
         {
             MAGE_LOG_CORE_FATAL_ERROR("Graphics pipeline has failed to be created\n", NULL);
@@ -705,6 +689,8 @@
     }
     mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
     {
+        renderer->MaxImagesInFlight = 2;
+        renderer->CurrentFrame = 0;
         mageResult result = mageVulkanHandlerInitialise(&renderer->Handler, window);
 
         if (result != MAGE_SUCCESS) 
@@ -717,8 +703,6 @@
         const rendererSetupFunctions functions[] = 
         {
             mageCreateFence,
-            mageCreateSemaphore,
-            mageCreateCommandPool,
             mageCreateSurface,
             mageCreateExtent2D,
             mageCreateRenderArea,
@@ -728,6 +712,9 @@
             mageCreateRenderPass,
             mageCreateRenderPipeline,
             mageCreateFrameBuffers, 
+            mageCreateSemaphore,
+            mageCreateCommandPool,
+            mageCreateCommandBuffers,
         };
         const uint32_t functionCount = (sizeof(functions) / sizeof(rendererSetupFunctions));
         uint32_t i;
@@ -743,9 +730,6 @@
     void mageRendererCleanup(struct mageRenderer *renderer)
     {
 
-        vkDestroyCommandPool(renderer->Handler.Device, renderer->CommandPool, NULL);
-        vkDestroyFence(renderer->Handler.Device, renderer->Fence, NULL);
-        vkDestroySemaphore(renderer->Handler.Device, renderer->Semaphore, NULL);
         vkDestroySwapchainKHR(renderer->Handler.Device, renderer->SwapChain, NULL);
         vkDestroySurfaceKHR(renderer->Handler.Instance, renderer->Surface, NULL);
         vkDestroyRenderPass(renderer->Handler.Device, renderer->RenderPass, NULL);
@@ -768,7 +752,18 @@
         {
             vkDestroyFramebuffer(renderer->Handler.Device, renderer->FrameBuffers[i], NULL); 
         }
+        for (i = 0; i < renderer->MaxImagesInFlight; i++)
+        {
+            vkDestroySemaphore(renderer->Handler.Device, renderer->AvailableSemaphores[i], NULL);
+            vkDestroySemaphore(renderer->Handler.Device, renderer->RenderFinishedSemaphores[i], NULL);
+            vkDestroyFence(renderer->Handler.Device, renderer->Fences[i], NULL);
+        }
+        vkDestroyCommandPool(renderer->Handler.Device, renderer->CommandPool, NULL);
+        
+        free(renderer->AvailableSemaphores);
+        free(renderer->RenderFinishedSemaphores);
         free(renderer->FrameBuffers);
+        free(renderer->Fences);
         
         mageVulkanHandlerCleanup(&renderer->Handler);
     }

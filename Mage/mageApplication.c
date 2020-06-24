@@ -91,7 +91,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
         return result;
     }
 
-    result = mageRendererInitialise(application->Renderer, application->Window, &rendererProps);
+    result = mageRendererInitialise(application->Renderer, application->Window, &rendererProps); 
     
     if (result != MAGE_SUCCESS)
     {
@@ -122,7 +122,8 @@ mageResult mageApplicationRun(struct mageApplication *application)
             application->Props.UpdateMethod(application);
 
             glfwPollEvents();
-            
+            mageRendererRender(application->Renderer);
+
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
         #endif
     }

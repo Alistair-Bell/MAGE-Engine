@@ -11,8 +11,6 @@
         switch (action)
         {
             case GLFW_PRESS:
-                MAGE_LOG_CORE_FATAL_ERROR("Key | %d\n", key);
-                mageEventFormatKeyPressed(buffer, key);
                 break;
 
             case GLFW_RELEASE:

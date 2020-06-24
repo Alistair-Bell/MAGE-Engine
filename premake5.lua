@@ -82,9 +82,8 @@ filter "configurations:Debug"
 filter "configurations:Release"
     defines "MAGE_RELEASE"
     runtime "Release"
-    optimize "On"
-
-
+    optimize "Speed"
+    symbols "On"
 
 project "Sandbox"
     location "%{prj.name}"

@@ -178,7 +178,6 @@ struct mageRenderer
 #if defined (MAGE_VULKAN)
 	struct mageVulkanHandler 				Handler;
 	VkQueue 								GraphicsQueue;
-	VkCommandBuffer							CommandBuffer[2];
 	VkViewport 								Viewport;
 	VkSurfaceKHR 							Surface;
 	VkSurfaceFormatKHR 						SurfaceFormat;
@@ -188,11 +187,13 @@ struct mageRenderer
 	VkDeviceMemory							DepthStencilImageMemory;
 	VkCommandPool 							CommandPool;
 	VkSwapchainKHR 							SwapChain;
+	VkCommandBuffer							*CommandBuffers;
 	VkImage 				   				*SwapChainImages;
 	VkImageView 							*SwapChainImageViews;
 	VkFramebuffer							*FrameBuffers;
-	VkSemaphore 							Semaphore;
-	VkFence 								Fence;
+	VkSemaphore 							*AvailableSemaphores;
+	VkSemaphore								*RenderFinishedSemaphores;
+	VkFence 								*Fences;
 	VkRenderPass							RenderPass;
 	VkPipelineLayout						PipeLineLayout;
 	VkPipeline								GraphicsPipeline;
@@ -203,6 +204,8 @@ struct mageRenderer
 	uint32_t								RegisteredShaderCount;
 	uint32_t 								SwapChainImageCount;
 	uint32_t 								ActiveSwapChainImageId;
+	uint32_t								MaxImagesInFlight;
+	uint32_t								CurrentFrame;
 #endif
 };
 struct mageApplicationProps
@@ -278,8 +281,7 @@ extern mageResult 						 mageVulkanHandlerInitialise(struct mageVulkanHandler *h
 extern void 							 mageVulkanHandlerCleanup(struct mageVulkanHandler *handler);
 extern void 	   						*mageRendererAllocate();
 extern mageResult 						 mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props);
-extern void								 mageRendererBeginRender(struct mageRenderer *renderer);
-extern void								 mageRendererEndRendering(struct mageRenderer *renderer);
+extern void 							 mageRendererRender(struct mageRenderer *renderer);
 extern void 							 mageRendererClear(struct mageRenderer *renderer);
 extern void 							 mageRendererDestroy(struct mageRenderer *renderer);
 extern void 							*mageShaderAllocate();

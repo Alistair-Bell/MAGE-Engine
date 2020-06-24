@@ -54,56 +54,36 @@
         shaderCreateInfo.pCode        = (uint32_t*)code;
 
         vkCreateShaderModule(device, &shaderCreateInfo, NULL, &module);
-        /* free(code); */
+        free(code);
         return module;
     }
-    void mageRendererBeginRender(struct mageRenderer *renderer)
+    void mageRendererRender(struct mageRenderer *renderer)
     {
-        vkAcquireNextImageKHR(renderer->Handler.Device, renderer->SwapChain, UINT64_MAX, VK_NULL_HANDLE, renderer->Fence, &renderer->ActiveSwapChainImageId);
-        vkWaitForFences(renderer->Handler.Device, 1, &renderer->Fence, VK_TRUE, UINT64_MAX);
-        vkResetFences(renderer->Handler.Device, 1, &renderer->Fence);
-        vkQueueWaitIdle(renderer->GraphicsQueue);
+
+        int32_t imageIndex;
+        /* 
+        vkWaitForFences(renderer->Handler.Device, 1, renderer->Fences[renderer->CurrentFrame], VK_TRUE, UINT64_MAX);
+        vkAcquireNextImageKHR(renderer->Handler.Device, renderer->SwapChain, UINT64_MAX, renderer->AvailableSemaphores[renderer->CurrentFrame], VK_NULL_HANDLE, &imageIndex); */
+    
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        renderer->CurrentFrame = (renderer->CurrentFrame + 1) % renderer->MaxImagesInFlight;
     }
     void mageRendererClear(struct mageRenderer *renderer)
     {
-        VkClearValue values[2];
-        memset(&values, 0, sizeof(VkClearValue) * 2);
-        values[0].depthStencil.depth    = 0.0f;
-        values[0].depthStencil.stencil  = 0;
-        values[1].color.float32[0]		= 1.0f;
-        values[1].color.float32[1]		= 0.0f;
-        values[1].color.float32[2]		= 0.0f;
-		        
-        VkRenderPassBeginInfo renderPassBeginInfo;
-        memset(&renderPassBeginInfo, 0, sizeof(VkRenderPassBeginInfo));
-        renderPassBeginInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassBeginInfo.renderPass      = renderer->RenderPass;
-        renderPassBeginInfo.framebuffer     = mageRendererGetActiveFrameBuffer(renderer);
-        renderPassBeginInfo.renderArea      = renderer->RenderArea;
-        renderPassBeginInfo.clearValueCount = 2;
-        renderPassBeginInfo.pClearValues    = values;
-
-
-        vkCmdBeginRenderPass(renderer->CommandBuffer[0], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-        vkCmdEndRenderPass(renderer->CommandBuffer[0]);
+    
     }
     void mageRendererEndRendering(struct mageRenderer *renderer)
     {
-        VkResult result = VK_RESULT_MAX_ENUM;
-
-        VkPresentInfoKHR info;
-        memset(&info, 0, sizeof(VkPresentInfoKHR));
-
-        info.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        info.waitSemaphoreCount = 1;
-        info.pWaitSemaphores    = &renderer->Semaphore;
-        info.swapchainCount     = 1;
-        info.pSwapchains        = &renderer->SwapChain;
-        info.pImageIndices      = &renderer->ActiveSwapChainImageId;
-        info.pResults           = &result;
-
-        vkQueuePresentKHR(renderer->GraphicsQueue, &info);
+    
+    
     }
 
 #endif

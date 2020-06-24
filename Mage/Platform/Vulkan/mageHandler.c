@@ -15,8 +15,11 @@ void *mageVulkanHandlerAllocate()
     static const char * const RequiredExtensions[] = 
     {
         VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    #if defined (MAGE_RELEASE)
         VK_KHR_SURFACE_EXTENSION_NAME,
+    #endif 
     };
+
 
     static const char *mageRequiredValidationLayers[] =
     {
@@ -63,6 +66,7 @@ void *mageVulkanHandlerAllocate()
     }
     static char **mageGetRequiredInstanceExtensions(uint32_t *clientCount)
     {
+        
         *clientCount = 0;
         char **extensions;
         char **windowExtensions;
@@ -85,6 +89,7 @@ void *mageVulkanHandlerAllocate()
             {
                 if (i < windowCount)
                 {
+                    MAGE_LOG_CORE_INFORM("%s\n", windowExtensions[i]);
                     temp[i] = malloc(strlen(windowExtensions[i]));
                     strcpy(temp[i], windowExtensions[i]);
                 }
@@ -121,7 +126,7 @@ void *mageVulkanHandlerAllocate()
                 MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
                 break;  
         }
-        return VK_FALSE;
+        return VK_TRUE;
     }
     static VkResult mageCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger) 
     {
@@ -194,7 +199,7 @@ void *mageVulkanHandlerAllocate()
         createInfo.ppEnabledExtensionNames      = (const char **)extensions;
         createInfo.enabledExtensionCount        = count;
     #if defined (MAGE_DEBUG)
-        createInfo.enabledLayerCount = 1;
+        createInfo.enabledLayerCount            = 1;
         createInfo.ppEnabledLayerNames          = mageRequiredValidationLayers;
         magePopulateValidationLayerCallback(&handler->DebugMessengerCreateInformation);
         createInfo.pNext                        = (VkDebugUtilsMessengerCreateInfoEXT*) &handler->DebugMessengerCreateInformation;
@@ -321,8 +326,7 @@ void *mageVulkanHandlerAllocate()
         deviceCreateInfo.queueCreateInfoCount    = 1;
         deviceCreateInfo.pQueueCreateInfos       = &queueCreateInfo;
         deviceCreateInfo.ppEnabledExtensionNames = RequiredExtensions;
-        deviceCreateInfo.enabledExtensionCount   = 1;
-
+        deviceCreateInfo.enabledExtensionCount   = sizeof(RequiredExtensions) / sizeof(char *);
 
         VkResult result = vkCreateDevice(handler->PhysicalDevice, &deviceCreateInfo, NULL, &handler->Device);
         if (result != VK_SUCCESS)
