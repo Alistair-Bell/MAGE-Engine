@@ -30,6 +30,7 @@ struct mageRendererProps;
 struct mageWindow;
 struct mageRenderer;
 struct mageVulkanHandler;
+struct mageIndiciesIndexes;
 
 typedef enum MAGE_RESULT_ENUM 					mageResult;
 typedef enum MAGE_EVENT_ENUM 					mageEventType;
@@ -128,27 +129,13 @@ enum MAGE_SHADER_TYPE_ENUM
 	MAGE_FRAGMENT_SHADER						= 5,
 	MAGE_COMPUTE_SHADER							= 6,
 };
-enum MAGE_KEYCODE_ENUM
-{
-#if defined (MAGE_GLFW)	
-	MAGE_KEYCODE_A_B
-#elif defined (MAGE_SDL)
-
-#endif
-};
-
 struct mageWindow
 {
 	int32_t 								Width;
 	int32_t 								Height;
 	uint32_t 								Running;	
 	const char 							   *Title;
-#if defined (MAGE_SDL)
-	SDL_Window						       	*Context;
-	SDL_Event 								Events;
-#elif defined(MAGE_GLFW)
 	GLFWwindow 							   	*Context;
-#endif
 };
 
 
@@ -223,15 +210,19 @@ struct mageApplication
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
 	struct mageApplicationProps 			Props;
-#if defined (MAGE_MONO_EXTERNALS)
-	struct mageMonoHandler 					*MonoHandler;
-#endif
 	uint8_t 								Running;
 };
 struct mageRendererProps
 {
 	struct mageShader						*RuntimeShaders;
 	uint32_t 								ShaderCount;
+};
+struct mageIndiciesIndexes
+{
+	uint32_t								*GraphicIndexes;
+	uint32_t								*PresentIndexes;
+	uint32_t								GraphicIndexesCount;
+	uint32_t								PresentIndexesCount;
 };
 struct mageShader
 {
@@ -243,59 +234,191 @@ struct mageShader
 #endif
 };
 
-extern void 							*mageDebugMemoryAllocate(uint64_t size, char *file, uint64_t line, const char *function);
 
 
+extern mageResult mageEngineInitialise(
 
-extern mageResult  						 mageEngineInitialise();
-extern const char 						*mageToString(mageResult result);
-extern void 	   						 mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...);
-extern void 	   						 mageLogEnd();
-extern void 	   						 mageLogInitialise(const char *outputFile);
-extern char 						 	*mageFileReadContents(const char *file, const char *readmode, uint32_t *fileSize);
-extern mageResult  						 mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean);
-extern void 	 						*mageWindowAllocate();
-extern mageResult 						 mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title);
-extern void 	  						 mageWindowTerminate(struct mageWindow *window);
-extern void 							 mageInputSetup(struct mageWindow *window);
-extern void 							 mageEventSetupMaster();
-extern mageEventCategoryBit 			*mageEventGenerateCategories(const mageEventType type);
-extern uint16_t 						 mageEventHandleCreate(const mageEventType type);
-extern mageEventType 					 mageEventExtractEventType(const uint16_t handle);
-extern uint8_t 							 mageEventInCategory(const uint16_t handle, const mageEventCategoryBit category);
-extern void 							 mageEventRegisterListener(mageEventListenerCallback callback);
-extern void 							 mageEventFormatWindowClose(void *buffer);
-extern void 							 mageEventFormatWindowFocus(void *buffer);
-extern void 							 mageEventFormatWindowLostFocus(void *buffer);
-extern void 							 mageEventFormatWindowMoved(void *buffer, const int32_t x, const int32_t y);
-extern void 							 mageEventFormatKeyPressed(void *buffer, const uint8_t keycode);
-extern void 							 mageEventFormatKeyReleased(void *buffer, const uint8_t keycode);
-extern void 							 mageEventFormatKeyRepeat(void *buffer, const uint8_t keycode);
-extern void 							 mageEventFormatMouseButtonPressed(void *buffer, const uint8_t mousecode);
-extern void 							 mageEventFormatMouseButtonRelease(void *buffer, const uint8_t mousecode);
-extern void 							 mageEventFormatMouseMoved(void *buffer, const double x, const double y);
-extern void 							 mageEventFormatMouseWheelMoved(void *buffer, const double x, const double y);
-extern void 							 mageEventDispatch(void *event);
-extern void 	   						*mageVulkanHandlerAllocate();
-extern mageResult 						 mageVulkanHandlerInitialise(struct mageVulkanHandler *handler, struct mageWindow *window); 
-extern void 							 mageVulkanHandlerCleanup(struct mageVulkanHandler *handler);
-extern void 	   						*mageRendererAllocate();
-extern mageResult 						 mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props);
-extern void 							 mageRendererRender(struct mageRenderer *renderer);
-extern void 							 mageRendererClear(struct mageRenderer *renderer);
-extern void 							 mageRendererDestroy(struct mageRenderer *renderer);
-extern void 							*mageShaderAllocate();
-extern mageResult						 mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *runtimeFunctionName, const mageShaderType shaderType);
+);
+extern const char *mageToString(
+	mageResult result
+);
+extern void mageLogMessage(
+	const uint8_t user, 
+	const uint8_t severity, 
+	const char *format, 
+	...
+);
+extern void mageLogEnd(
+
+);
+extern void mageLogInitialise(
+	const char *outputFile
+);
+extern char *mageFileReadContents(
+	const char *file, 
+	const char *readmode, 
+	uint32_t *fileSize
+);
+extern mageResult mageFileDumpContents(
+	const char *file, 
+	const char *buffer, 
+	const uint8_t clean
+);
+extern mageResult mageWindowInitialise(
+	struct mageWindow *window, 
+	const int32_t xResolution, 
+	const int32_t yResolution, 
+	const char *title
+);
+extern void mageWindowTerminate(
+	struct mageWindow *window
+);
+extern void mageInputSetup(
+	struct mageWindow *window
+);
+extern void mageEventSetupMaster(
+
+);
+extern mageEventCategoryBit *mageEventGenerateCategories(
+	const mageEventType type
+);
+extern uint16_t mageEventHandleCreate(
+	const mageEventType type
+);
+extern mageEventType mageEventExtractEventType(
+	const uint16_t handle
+);
+extern uint8_t mageEventInCategory(
+	const uint16_t handle, 
+	const mageEventCategoryBit category
+);
+extern void mageEventRegisterListener(
+	mageEventListenerCallback callback
+);
+extern void mageEventFormatWindowClose(
+	void *buffer
+);
+extern void mageEventFormatWindowFocus(
+	void *buffer
+);
+extern void mageEventFormatWindowLostFocus(
+	void *buffer
+);
+extern void mageEventFormatWindowMoved(
+	void *buffer, 
+	const int32_t x, 
+	const int32_t y
+);
+extern void mageEventFormatKeyPressed(
+	void *buffer, 
+	const uint8_t keycode
+);
+extern void mageEventFormatKeyReleased(
+	void *buffer, 
+	const uint8_t keycode
+);
+extern void mageEventFormatKeyRepeat(
+	void *buffer, 
+	const uint8_t keycode
+);
+extern void mageEventFormatMouseButtonPressed(
+	void *buffer, 
+	const uint8_t mousecode
+);
+extern void mageEventFormatMouseButtonRelease(
+	void *buffer, 
+	const uint8_t mousecode
+);
+extern void mageEventFormatMouseMoved(
+	void *buffer, 
+	const double x, 
+	const double y
+);
+extern void mageEventFormatMouseWheelMoved(
+	void *buffer, 
+	const double x, 
+	const double y
+);
+extern void mageEventDispatch(
+	void *event
+);
+extern mageResult mageVulkanHandlerInitialise(
+	struct mageVulkanHandler *handler, 
+	struct mageWindow *window
+); 
+extern void mageVulkanHandlerCleanup(
+	struct mageVulkanHandler *handler
+);
+extern mageResult mageRendererInitialise(
+	struct mageRenderer *renderer, 
+	struct mageWindow *window, 
+	struct mageRendererProps *props
+);
+extern void mageRendererRender(
+	struct mageRenderer *renderer
+);
+extern void mageRendererClear(
+	struct mageRenderer *renderer
+);
+extern void mageRendererDestroy(
+	struct mageRenderer *renderer
+);
+extern void mageIndiciesIndexesInitialise(
+	struct mageIndiciesIndexes *indicies, 
+	const uint32_t *graphics, 
+	const uint32_t graphicCount, 
+	const uint32_t *presents, 
+	const uint32_t presentCount
+);
+extern void mageIndiciesIndexesDestroy(
+	struct mageIndiciesIndexes *indicies
+);
+extern mageResult mageShaderInitialise(
+	struct mageShader *shader, 
+	const char *shaderFile, 
+	const char *runtimeFunctionName, 
+	const mageShaderType shaderType
+);
+
+
 #if defined (MAGE_VULKAN)
-extern uint32_t  						 mageFindMemoryTypeIndex(const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, const VkMemoryRequirements *memoryRequirements, const VkMemoryPropertyFlags memoryProperties);
-extern VkShaderStageFlagBits			 mageShaderTypeToBit(const mageShaderType shaderType);
-extern VkFramebuffer					 mageRendererGetActiveFrameBuffer(struct mageRenderer *renderer);
-extern VkShaderModule					 mageShaderCreateModule(VkDevice device, const char *file);
+
+extern uint32_t mageFindMemoryTypeIndex(
+	const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, 
+	const VkMemoryRequirements *memoryRequirements, 
+	const VkMemoryPropertyFlags memoryProperties
+);
+extern VkShaderStageFlagBits mageShaderTypeToBit(
+	const mageShaderType shaderType
+);
+extern VkFramebuffer mageRendererGetActiveFrameBuffer(
+	struct mageRenderer *renderer
+);
+extern VkShaderModule mageShaderCreateModule(
+	VkDevice device, 
+	const char *file
+);
+extern mageResult mageGetDeviceIndexes(
+	struct mageRenderer *renderer,
+	struct mageIndiciesIndexes *indicies
+);
+
 #endif
-extern void		 						*mageApplicationAllocate();
-extern mageResult 						 mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps engineProps, struct mageRendererProps rendererProps);
-extern mageResult 						 mageApplicationRun(struct mageApplication *application);
-extern void 	  						 mageApplicationDestroy(struct mageApplication *application);
+
+extern mageResult mageApplicationInitialise(
+	struct mageApplication *application, 
+	struct mageApplicationProps engineProps, 
+	struct mageRendererProps rendererProps
+);
+extern mageResult mageApplicationRun(
+	struct mageApplication *application
+);
+extern void mageApplicationDestroy(
+	struct mageApplication *application
+);
+
+
+
 #endif  
 
 

@@ -49,11 +49,6 @@ mageResult mageEngineInitialise()
     MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
     return MAGE_SUCCESS;
 }
-void *mageApplicationAllocate()
-{
-    return malloc(sizeof(struct mageApplication));
-}
-
 static mageResult mageApplicationDefaultStart(struct mageApplication *application)
 {
     return MAGE_SUCCESS;
@@ -79,8 +74,8 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
     if (application->Props.UpdateMethod == NULL) application->Props.UpdateMethod = mageApplicationDefaultUpdate;
     if (application->Props.DestroyMethod == NULL) application->Props.DestroyMethod = mageApplicationDefaultDestroy;
 
-    application->Renderer = mageRendererAllocate();
-    application->Window = mageWindowAllocate();
+    application->Renderer = malloc(sizeof(struct mageRenderer));
+    application->Window = malloc(sizeof(struct mageWindow));
     char temp[255];
     sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
     
@@ -122,7 +117,7 @@ mageResult mageApplicationRun(struct mageApplication *application)
             application->Props.UpdateMethod(application);
 
             glfwPollEvents();
-            mageRendererRender(application->Renderer);
+            /* mageRendererRender(application->Renderer); */
 
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
         #endif

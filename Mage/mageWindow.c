@@ -1,9 +1,5 @@
 #include "mageAPI.h"
 
-void *mageWindowAllocate()
-{
-	return malloc(sizeof(struct mageWindow));
-}
 mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
 {
 
