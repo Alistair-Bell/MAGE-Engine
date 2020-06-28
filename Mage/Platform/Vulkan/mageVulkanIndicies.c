@@ -6,34 +6,37 @@ void mageIndiciesIndexesInitialise(struct mageIndiciesIndexes *indicies, const u
     indicies->PresentIndexes = calloc(presentCount, sizeof(uint32_t));
     memcpy(indicies->GraphicIndexes, graphics, graphicCount * sizeof(uint32_t));
     memcpy(indicies->PresentIndexes, presents, presentCount * sizeof(uint32_t));
+    indicies->GraphicIndexesCount = graphicCount;
+    indicies->PresentIndexesCount = presentCount;
 }
 void mageIndiciesIndexesDestroy(struct mageIndiciesIndexes *indicies)
 {
     free(indicies->GraphicIndexes);
     free(indicies->PresentIndexes);
 }
-mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, struct mageIndiciesIndexes *indicies)
+mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice device, struct mageIndiciesIndexes *indicies)
 {
     uint32_t queueCount;
-    vkGetPhysicalDeviceQueueFamilyProperties(renderer->Handler.PhysicalDevice, &queueCount, NULL);
-    VkQueueFamilyProperties *properties = calloc(queueCount, sizeof(VkPhysicalDeviceProperties));
-    vkGetPhysicalDeviceQueueFamilyProperties(renderer->Handler.PhysicalDevice, &queueCount, properties);
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueCount, NULL);
+    VkQueueFamilyProperties *queueProperties = calloc(queueCount, sizeof(VkPhysicalDeviceProperties));
+    vkGetPhysicalDeviceQueueFamilyProperties(device, &queueCount, queueProperties);
+
 
     uint32_t graphicsIndex, presentIndex, i;
     uint32_t graphicsFound = 0;
     uint32_t presentFound = 0;
-    uint32_t found = 0;
+
 
     for (i = 0; i < queueCount; i++)
     {
-        if (properties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        if (queueProperties[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             graphicsIndex = i;
             graphicsFound = 1;
         }
         VkBool32 supported;
 
-        vkGetPhysicalDeviceSurfaceSupportKHR(renderer->Handler.PhysicalDevice, i, renderer->Surface, &supported);
+        vkGetPhysicalDeviceSurfaceSupportKHR(device, i, renderer->Surface, &supported);
 
         if (supported)
         {
@@ -46,14 +49,15 @@ mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, struct mageIndici
             break;
         }
     }
-    if (!found)
+    if (!(presentFound || graphicsFound))
     {
-        MAGE_LOG_CORE_FATAL_ERROR("Graphics or present index not found\n", NULL);
+        VkPhysicalDeviceProperties properties;
+        vkGetPhysicalDeviceProperties(device, &properties);
+        MAGE_LOG_CORE_ERROR("Device %s, graphics or present index not found\n", properties.deviceName);
         return MAGE_HARDWARE_INVALID;
     }
-    mageIndiciesIndexesInitialise(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
     
-
-    free(properties);
+    mageIndiciesIndexesInitialise(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
+    free(queueProperties);
     return MAGE_SUCCESS;
 }

@@ -22,7 +22,6 @@ project "MageEngine"
     language "C"
     cdialect "C89"
 
-
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 

@@ -29,7 +29,6 @@ struct mageApplicationProps;
 struct mageRendererProps;
 struct mageWindow;
 struct mageRenderer;
-struct mageVulkanHandler;
 struct mageIndiciesIndexes;
 
 typedef enum MAGE_RESULT_ENUM 					mageResult;
@@ -137,62 +136,30 @@ struct mageWindow
 	const char 							   *Title;
 	GLFWwindow 							   	*Context;
 };
-
-
-#if defined (MAGE_VULKAN)
-struct mageVulkanHandler
-{	
-	VkPhysicalDeviceMemoryProperties 		PhysicalMemoryProperties;
-	VkSurfaceCapabilitiesKHR 				SurfaceCapabilities;
-	VkDevice 								Device;
-	VkPhysicalDevice 						PhysicalDevice;
-	VkPhysicalDeviceProperties 				PhysicalProperties;
-	VkInstance 								Instance;
-	
-#if defined (MAGE_DEBUG)
-	VkDebugUtilsMessengerEXT				DebugMessenger;
-	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInformation;
-#endif
-	
-	uint32_t						 		DephStencilAvailable;
-	uint32_t						 		GraphicsFamilyIndex;
-	uint32_t 								GraphicsPresentFamily;
+struct mageIndiciesIndexes
+{
+	uint32_t								*GraphicIndexes;
+	uint32_t								*PresentIndexes;
+	uint32_t								GraphicIndexesCount;
+	uint32_t								PresentIndexesCount;
 };
-#endif
-
 struct mageRenderer
 {
 #if defined (MAGE_VULKAN)
-	struct mageVulkanHandler 				Handler;
-	VkQueue 								GraphicsQueue;
-	VkViewport 								Viewport;
+	
+	VkInstance 								Instance;
+	VkDevice								Device;
+	
+	
+	VkPhysicalDevice						PhysicalDevice;
 	VkSurfaceKHR 							Surface;
-	VkSurfaceFormatKHR 						SurfaceFormat;
-	VkImage 								DepthStencilImage;
-	VkFormat								DepthStencilFormat;
-	VkImageView 							DepthStencilImageView;
-	VkDeviceMemory							DepthStencilImageMemory;
-	VkCommandPool 							CommandPool;
-	VkSwapchainKHR 							SwapChain;
-	VkCommandBuffer							*CommandBuffers;
-	VkImage 				   				*SwapChainImages;
-	VkImageView 							*SwapChainImageViews;
-	VkFramebuffer							*FrameBuffers;
-	VkSemaphore 							*AvailableSemaphores;
-	VkSemaphore								*RenderFinishedSemaphores;
-	VkFence 								*Fences;
-	VkRenderPass							RenderPass;
-	VkPipelineLayout						PipeLineLayout;
-	VkPipeline								GraphicsPipeline;
-	VkExtent2D								Extent2D;
-	VkRect2D 								RenderArea;
-	struct mageShader						*RegisteredShaders;
+	VkQueue 								PresentQueue;
+	VkQueue									GraphicalQueue;
+	
+	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
+	VkDebugUtilsMessengerEXT				DebugMessenger;
+	struct mageIndiciesIndexes				Indexes;
 
-	uint32_t								RegisteredShaderCount;
-	uint32_t 								SwapChainImageCount;
-	uint32_t 								ActiveSwapChainImageId;
-	uint32_t								MaxImagesInFlight;
-	uint32_t								CurrentFrame;
 #endif
 };
 struct mageApplicationProps
@@ -216,13 +183,6 @@ struct mageRendererProps
 {
 	struct mageShader						*RuntimeShaders;
 	uint32_t 								ShaderCount;
-};
-struct mageIndiciesIndexes
-{
-	uint32_t								*GraphicIndexes;
-	uint32_t								*PresentIndexes;
-	uint32_t								GraphicIndexesCount;
-	uint32_t								PresentIndexesCount;
 };
 struct mageShader
 {
@@ -342,13 +302,6 @@ extern void mageEventFormatMouseWheelMoved(
 extern void mageEventDispatch(
 	void *event
 );
-extern mageResult mageVulkanHandlerInitialise(
-	struct mageVulkanHandler *handler, 
-	struct mageWindow *window
-); 
-extern void mageVulkanHandlerCleanup(
-	struct mageVulkanHandler *handler
-);
 extern mageResult mageRendererInitialise(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window, 
@@ -363,16 +316,7 @@ extern void mageRendererClear(
 extern void mageRendererDestroy(
 	struct mageRenderer *renderer
 );
-extern void mageIndiciesIndexesInitialise(
-	struct mageIndiciesIndexes *indicies, 
-	const uint32_t *graphics, 
-	const uint32_t graphicCount, 
-	const uint32_t *presents, 
-	const uint32_t presentCount
-);
-extern void mageIndiciesIndexesDestroy(
-	struct mageIndiciesIndexes *indicies
-);
+
 extern mageResult mageShaderInitialise(
 	struct mageShader *shader, 
 	const char *shaderFile, 
@@ -400,6 +344,17 @@ extern VkShaderModule mageShaderCreateModule(
 );
 extern mageResult mageGetDeviceIndexes(
 	struct mageRenderer *renderer,
+	VkPhysicalDevice device,
+	struct mageIndiciesIndexes *indicies
+);
+extern void mageIndiciesIndexesInitialise(
+	struct mageIndiciesIndexes *indicies, 
+	const uint32_t *graphics, 
+	const uint32_t graphicCount, 
+	const uint32_t *presents, 
+	const uint32_t presentCount
+);
+extern void mageIndiciesIndexesDestroy(
 	struct mageIndiciesIndexes *indicies
 );
 

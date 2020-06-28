@@ -12,6 +12,7 @@ extern struct mageRendererProps ClientRendererProps();
 int32_t main(int32_t argc, char **args)
 {  
 #if defined (MAGE_DEBUG)
+    mageFileDumpContents("Logs/mage.log", "", 1);
     mageLogInitialise("Logs/mage.log");
 #endif
     Application = malloc(sizeof(struct mageApplication));
