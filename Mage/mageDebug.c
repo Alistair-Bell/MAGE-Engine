@@ -15,14 +15,12 @@ struct mageLoger
 
 static struct mageLoger Logger;
 
-#if defined (MAGE_GLFW)
 
-    static void mageGLFWErrorCallback(int error, const char *description)
-	{
-		MAGE_LOG_CORE_ERROR("GLFW Error %d : %s\n", error, description);
-	}
- 
-#endif
+
+static void mageGLFWErrorCallback(int error, const char *description)
+{
+    MAGE_LOG_CORE_ERROR("GLFW Error %d : %s\n", error, description);
+}
 
 void mageLogInitialise(const char *outputFile)
 {
@@ -31,9 +29,7 @@ void mageLogInitialise(const char *outputFile)
         Logger.WarningCount = 0;
         Logger.ErrorCount = 0;   
         Logger.DebugFile = fopen(Logger.OuputName, "a");
-        #if defined (MAGE_GLFW)
-            glfwSetErrorCallback(mageGLFWErrorCallback);
-        #endif
+        glfwSetErrorCallback(mageGLFWErrorCallback);
     #endif
 }
 void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...)

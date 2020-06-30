@@ -5,7 +5,12 @@
 struct mageShader VertexShader;
 struct mageShader FragmentShader;
 struct mageShader RuntimeShaders[2];
+mageEventListenerCallback Callbacks[1];
 
+static void EventListener(void *event, mageEventType type)
+{
+    assert(0 == 0);
+}
 
 static mageResult ClientStart()
 {
@@ -32,6 +37,11 @@ struct mageApplicationProps ClientApplicationProps()
     props.StartMethod = ClientStart;
     props.UpdateMethod = ClientUpdate;
     props.DestroyMethod = ClientEnd;
+    
+    Callbacks[0] = EventListener;
+
+    props.ListenerCount = 1;
+    props.Listeners = Callbacks;
 
     return props;   
 }
@@ -40,8 +50,15 @@ struct mageRendererProps ClientRendererProps()
     struct mageRendererProps props;
     memset(&props, 0, sizeof(struct mageRendererProps));
 
-    props.RuntimeShaders = NULL;
-    props.ShaderCount    = 0;
+
+    mageShaderInitialise(&VertexShader, "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_VERTEX_SHADER);
+    mageShaderInitialise(&FragmentShader, "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_FRAGMENT_SHADER);
+
+    RuntimeShaders[0] = VertexShader;
+    RuntimeShaders[1] = FragmentShader;
+
+    props.RuntimeShaders = RuntimeShaders;
+    props.ShaderCount    = 2;
 
     return props;
 }

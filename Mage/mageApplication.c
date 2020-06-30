@@ -1,52 +1,28 @@
 #include "mageAPI.h"
 
-
-static double CIRCLE_RAD		= HYP_PI * 2;
-static double CIRCLE_THIRD	    = (HYP_PI * 2) / 3.0;
-static double CIRCLE_THIRD_1	= 0;
-static double CIRCLE_THIRD_2	= (HYP_PI * 2) / 3.0;
-static double CIRCLE_THIRD_3	= ((HYP_PI * 2) / 3.0) * 2;
-
 mageResult mageEngineInitialise()
 {
-	#if defined (MAGE_SDL)
-		const uint32_t flag = SDL_Init(SDL_INIT_EVERYTHING);
-			
-		if (flag != 0)
-		{
-			MAGE_LOG_CORE_FATAL_ERROR("SDL2 failed to initialise : %s\n", SDL_GetError());
-			return MAGE_LIBRARY_FAILURE;
-		}
+	if (!glfwInit())
+    {			
+        MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
+        return MAGE_LIBRARY_FAILURE;
+    }	
 
-		MAGE_LOG_CORE_INFORM("SDL2 has succesfully initialised everything\n", NULL);
+    #if defined (MAGE_VULKAN)
+        uint8_t flag = glfwVulkanSupported();
 
-	#endif
+        if (!flag)
+        {
+            MAGE_LOG_CORE_FATAL_ERROR("GLFW does not support vulkan\n", NULL);
+            return MAGE_LIBRARY_FAILURE;
+        }
+        MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
 
-	#if defined (MAGE_GLFW)
+    #endif
 
-		if (!glfwInit())
-		{			
-			MAGE_LOG_CORE_FATAL_ERROR("GLFW library has failed to initialise\n", NULL);
-			return MAGE_LIBRARY_FAILURE;
-		}	
+    MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
 
-		#if defined (MAGE_VULKAN)
-			uint8_t flag = glfwVulkanSupported();
-
-			if (!flag)
-			{
-				MAGE_LOG_CORE_FATAL_ERROR("GLFW does not support vulkan\n", NULL);
-				return MAGE_LIBRARY_FAILURE;
-			}
-			MAGE_LOG_CORE_INFORM("GLFW supports vulkan\n", NULL);
-
-		#endif
-
-		MAGE_LOG_CORE_INFORM("GLFW has succesfully initialised everything.\n", NULL);
-
-	#endif
-	
-    MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
+	MAGE_LOG_CORE_INFORM("Engine dependencies initialised\n", NULL);
     return MAGE_SUCCESS;
 }
 static mageResult mageApplicationDefaultStart(struct mageApplication *application)
@@ -95,6 +71,15 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
 
     mageEventSetupMaster();
     mageInputSetup(application->Window);
+    uint32_t i;
+
+    for (i = 0; i < engineProps.ListenerCount; i++)
+    {
+        MAGE_LOG_CORE_INFORM("Registering event listener %d of %d\n", i + 1, engineProps.ListenerCount);
+        mageEventRegisterListener(engineProps.Listeners[i]);
+    }
+
+
     return MAGE_SUCCESS;
 }
 mageResult mageApplicationRun(struct mageApplication *application)
@@ -112,15 +97,13 @@ mageResult mageApplicationRun(struct mageApplication *application)
     
     while (application->Running)
     {
-        #if defined (MAGE_GLFW)
+    
+        application->Props.UpdateMethod(application);
 
-            application->Props.UpdateMethod(application);
-
-            glfwPollEvents();
-            /* mageRendererRender(application->Renderer); */
+        glfwPollEvents();
+        /* mageRendererRender(application->Renderer); */
 
             application->Running = !(glfwWindowShouldClose(application->Window->Context));
-        #endif
     }
 
     destroyResult = application->Props.DestroyMethod(application);

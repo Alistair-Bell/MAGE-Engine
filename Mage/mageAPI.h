@@ -23,6 +23,13 @@
 
 **************************/
 
+#if defined (MAGE_VULKAN)
+
+#define MAGE_CHECK_VULKAN(function) \
+	mageHandleVulkanResult(__FUNCTION__, function)
+
+#endif
+
 	
 struct mageApplication;
 struct mageApplicationProps;
@@ -30,6 +37,7 @@ struct mageRendererProps;
 struct mageWindow;
 struct mageRenderer;
 struct mageIndiciesIndexes;
+struct mageSwapChainSupportDetails;
 
 typedef enum MAGE_RESULT_ENUM 					mageResult;
 typedef enum MAGE_EVENT_ENUM 					mageEventType;
@@ -51,6 +59,7 @@ enum MAGE_RESULT_ENUM
 	MAGE_LIBRARY_FAILURE,
 	MAGE_INVALID_INPUT,
 	MAGE_HARDWARE_INVALID,
+	MAGE_VULKAN_NOT_READY,
 	MAGE_CONTEXT_CREATION_FAILED,
 	MAGE_DEBUG_MESSENGER_FAILED,
 	MAGE_INSTANCE_CREATION_FAILURE,
@@ -128,6 +137,23 @@ enum MAGE_SHADER_TYPE_ENUM
 	MAGE_FRAGMENT_SHADER						= 5,
 	MAGE_COMPUTE_SHADER							= 6,
 };
+
+
+#if defined (MAGE_VULKAN)
+
+struct mageSwapChainSupportDetails
+{
+	VkSurfaceCapabilitiesKHR 				Capabilities;
+	VkSurfaceFormatKHR 						*Formats;
+	VkPresentModeKHR						*PresentModes;
+	VkExtent2D								Extent;
+
+	uint32_t								FormatCount;
+	uint32_t								PresentCount;
+};
+
+#endif
+
 struct mageWindow
 {
 	int32_t 								Width;
@@ -150,15 +176,30 @@ struct mageRenderer
 	VkInstance 								Instance;
 	VkDevice								Device;
 	
-	
 	VkPhysicalDevice						PhysicalDevice;
 	VkSurfaceKHR 							Surface;
 	VkQueue 								PresentQueue;
 	VkQueue									GraphicalQueue;
 	
+	VkSwapchainKHR							SwapChain;
+	VkImage									*SwapChainImages;
+	VkImageView								*SwapChainImageViews;
+
+	VkExtent2D								SwapChainExtent;
+	VkFormat								SwapChainFormat;
+
+	VkPipelineLayout 						GraphicsPipelineLayout;
+	VkPipeline								GraphicsPipeline;
+
+	VkRenderPass							PrimaryRenderPass;
+
+	
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
 	VkDebugUtilsMessengerEXT				DebugMessenger;
 	struct mageIndiciesIndexes				Indexes;
+	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
+
+	uint32_t 								SwapChainImageCount;
 
 #endif
 };
@@ -170,6 +211,8 @@ struct mageApplicationProps
 	mageApplicationStartCallback 			StartMethod;
 	mageApplicationUpdateCallback 			UpdateMethod;
 	mageApplicationDestroyCallback 			DestroyMethod;
+	mageEventListenerCallback				*Listeners;
+	uint32_t 								ListenerCount;
 	char 						   			*Name;
 };
 struct mageApplication
@@ -189,11 +232,7 @@ struct mageShader
 	mageShaderType 							ShaderType;
 	const char 								*FilePath;
 	const char 								*RuntimeFunctionName;
-#if defined (MAGE_VULKAN)
-	VkShaderModule 							ShaderModule;
-#endif
 };
-
 
 
 extern mageResult mageEngineInitialise(
@@ -327,6 +366,10 @@ extern mageResult mageShaderInitialise(
 
 #if defined (MAGE_VULKAN)
 
+extern VkResult mageHandleVulkanResult(
+	const char *functionName,
+	VkResult functionResult
+);
 extern uint32_t mageFindMemoryTypeIndex(
 	const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, 
 	const VkMemoryRequirements *memoryRequirements, 
@@ -339,8 +382,8 @@ extern VkFramebuffer mageRendererGetActiveFrameBuffer(
 	struct mageRenderer *renderer
 );
 extern VkShaderModule mageShaderCreateModule(
-	VkDevice device, 
-	const char *file
+	struct mageShader *shader, 
+	VkDevice device
 );
 extern mageResult mageGetDeviceIndexes(
 	struct mageRenderer *renderer,
@@ -356,6 +399,30 @@ extern void mageIndiciesIndexesInitialise(
 );
 extern void mageIndiciesIndexesDestroy(
 	struct mageIndiciesIndexes *indicies
+);
+extern void mageSwapChainSupportInitialise(
+	struct mageSwapChainSupportDetails *swapChainSupport,
+	const VkSurfaceCapabilitiesKHR surfaceCapabilities,
+	VkSurfaceFormatKHR *formats,
+	const uint32_t formatCount,
+	VkPresentModeKHR *presentModes,
+	const uint32_t presentCount,
+	VkExtent2D extent
+);
+extern mageResult mageGetSwapChainSupport(
+	struct mageSwapChainSupportDetails *swapChainSupport,
+	struct mageWindow *window,
+	VkPhysicalDevice physicalDevice,
+	VkSurfaceKHR surface
+);
+extern VkPresentModeKHR mageSwapChainSupportPickPresentMode(
+	struct mageSwapChainSupportDetails *swapChainSupport
+);
+extern VkSurfaceFormatKHR mageSwapChainSupportPickSurfaceFormat(
+	struct mageSwapChainSupportDetails *swapChainDetails
+);
+extern void mageSwapChainSupportDestroy(
+	struct mageSwapChainSupportDetails *swapChainSupport
 );
 
 #endif

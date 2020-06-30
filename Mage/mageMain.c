@@ -9,6 +9,9 @@ extern struct mageApplicationProps ClientApplicationProps();
 extern struct mageRendererProps ClientRendererProps();
 
 
+static struct mageShader mageDefaultShaders[2];
+
+
 int32_t main(int32_t argc, char **args)
 {  
 #if defined (MAGE_DEBUG)
@@ -21,17 +24,19 @@ int32_t main(int32_t argc, char **args)
     memset(&ApplicationProps, 0, sizeof(struct mageApplicationProps));
     memset(&RendererProps, 0, sizeof(struct mageRendererProps));
 
-    ApplicationProps.Name = "Hello World";
-    ApplicationProps.Version = 1.0;
-    ApplicationProps.Height = 1080;
-    ApplicationProps.Width = 1920;
+    ApplicationProps    = ClientApplicationProps();
+    RendererProps       = ClientRendererProps();
 
-    RendererProps.RuntimeShaders = NULL;
-    RendererProps.ShaderCount = 0;
+    if (RendererProps.ShaderCount <= 0 || RendererProps.RuntimeShaders == NULL)
+    {
+        MAGE_LOG_CORE_WARNING("Using default shaders, none specified\n", NULL);
+        struct mageShader fragment, vertex;
+    }
+
 
 
     mageApplicationInitialise(Application, ApplicationProps, RendererProps);
-
+    mageApplicationRun(Application);
 
 #if defined (MAGE_DEBUG)
     mageLogEnd();
