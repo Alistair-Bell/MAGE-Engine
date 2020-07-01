@@ -39,7 +39,7 @@ static mageResult mageApplicationDefaultDestroy(struct mageApplication *applicat
 }
 mageResult mageApplicationInitialise(struct mageApplication *application, struct mageApplicationProps engineProps, struct mageRendererProps rendererProps)
 {
-    mageEngineInitialise(engineProps);
+    mageEngineInitialise();
     mageResult result;
 
     application->Props = engineProps; 

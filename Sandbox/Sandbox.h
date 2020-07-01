@@ -1,3 +1,8 @@
+#ifndef __SANDBOX__
+#define __SANDBOX__
+
+#include <mageAPI.h>
+
 #if defined (SANDBOX_DEBUG)
 
 #define LOG_CLIENT_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CLIENT, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
@@ -14,4 +19,4 @@
 
 #endif
 
-
+#endif

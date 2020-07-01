@@ -238,17 +238,17 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
 
     free(presents);
     free(formats);
-
+    return MAGE_SUCCESS;
 }
 VkPresentModeKHR mageSwapChainSupportPickPresentMode(struct mageSwapChainSupportDetails *swapChainSupport)
 {
     uint32_t i;
     
-    for (i = 0; i < swapChainSupport->FormatCount; i++)
+    for (i = 0; i < swapChainSupport->PresentCount; i++)
     {
-        if (swapChainSupport->Formats[i].format == VK_PRESENT_MODE_MAILBOX_KHR)
+        if (swapChainSupport->PresentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR)
         {
-            return swapChainSupport->Formats[i].format;
+            return swapChainSupport->PresentModes[i];
         }
     }
     return VK_PRESENT_MODE_FIFO_KHR;

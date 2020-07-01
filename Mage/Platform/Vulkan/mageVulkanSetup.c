@@ -128,11 +128,8 @@ static void magePopulateValidationLayerCallback(VkDebugUtilsMessengerCreateInfoE
 static VkResult mageSetupValidationLayerCallback(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {
     magePopulateValidationLayerCallback(&renderer->DebugMessengerCreateInfo);
-    if (mageCreateDebugUtilsMessengerEXT(renderer->Instance, &renderer->DebugMessengerCreateInfo, NULL, &renderer->DebugMessenger) != VK_SUCCESS) 
-    {   
-        return MAGE_DEBUG_MESSENGER_FAILED;
-    }   
-    return MAGE_SUCCESS;
+    VkResult result = MAGE_CHECK_VULKAN(mageCreateDebugUtilsMessengerEXT(renderer->Instance, &renderer->DebugMessengerCreateInfo, NULL, &renderer->DebugMessenger)); 
+    return result;
 }
 static uint8_t mageIsDeviceSuitable(struct mageRenderer *renderer, VkPhysicalDevice device)
 {
@@ -200,7 +197,7 @@ static VkResult mageCreateInstance(struct mageRenderer *renderer, struct mageWin
 {
     if (!mageCheckValidationLayers(renderer, window))
     {
-        return MAGE_HARDWARE_INVALID;
+        return VK_ERROR_INCOMPATIBLE_DRIVER;
     }
     VkInstanceCreateInfo instanceCreateInfo;
     VkApplicationInfo applicationInfo;
@@ -247,7 +244,7 @@ static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mag
     if (deviceCount <= 0)
     {
         MAGE_LOG_CORE_FATAL_ERROR("Unable to find any vulkan physical devices\n", NULL);
-        return MAGE_HARDWARE_INVALID;
+        return VK_ERROR_INCOMPATIBLE_DRIVER;
     }
     VkPhysicalDevice *devices = calloc(deviceCount, sizeof(VkPhysicalDevice));
     uint32_t *scores = calloc(deviceCount, sizeof(uint32_t));    
@@ -294,7 +291,7 @@ static VkResult mageFetchQueues(struct mageRenderer *renderer, struct mageWindow
 {
     vkGetDeviceQueue(renderer->Device, renderer->Indexes.GraphicIndexes[renderer->Indexes.GraphicIndexesCount - 1], 0, &renderer->GraphicalQueue);
     vkGetDeviceQueue(renderer->Device, renderer->Indexes.PresentIndexes[renderer->Indexes.PresentIndexesCount - 1], 0, &renderer->PresentQueue);
-    return MAGE_SUCCESS;
+    return VK_SUCCESS;
 }
 static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {
@@ -321,7 +318,6 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
     createInfo.minImageCount                = imageCount;
     createInfo.preTransform                 = renderer->SwapChainSupportInfo.Capabilities.currentTransform;
     createInfo.compositeAlpha               = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-    createInfo.imageSharingMode             = mageSwapChainSupportPickPresentMode(&renderer->SwapChainSupportInfo);
     createInfo.clipped                      = VK_TRUE;
     createInfo.oldSwapchain                 = VK_NULL_HANDLE;
 
@@ -551,8 +547,8 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
 
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
     {
-        mageResult result = functions[i](renderer, window, props);
-        if (result != VK_SUCCESS) return result;
+        VkResult result = functions[i](renderer, window, props);
+        if (result != VK_SUCCESS) return MAGE_UNKNOWN;
     }
     MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations\n", i, sizeof(functions) / sizeof(function));
     return MAGE_SUCCESS;

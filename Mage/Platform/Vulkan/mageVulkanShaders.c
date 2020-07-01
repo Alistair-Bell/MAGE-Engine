@@ -7,17 +7,17 @@ VkShaderStageFlagBits mageShaderTypeToBit(mageShaderType shaderType)
     switch (shaderType)
     {
         case MAGE_VERTEX_SHADER:
-            return VK_PIPELINE_STAGE_VERTEX_SHADER_BIT;
+            return VK_SHADER_STAGE_VERTEX_BIT;
 	    case MAGE_TESSELLATION_CONTROL_SHADER:
-            return VK_PIPELINE_STAGE_TESSELLATION_CONTROL_SHADER_BIT;
+            return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
 	    case MAGE_TESSELLATION_EVALUATION_SHADER:
-            return VK_PIPELINE_STAGE_TESSELLATION_EVALUATION_SHADER_BIT;
+            return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
 	    case MAGE_GEOMETRY_SHADER:
-            return VK_PIPELINE_STAGE_GEOMETRY_SHADER_BIT;
+            return VK_SHADER_STAGE_GEOMETRY_BIT;
 	    case MAGE_FRAGMENT_SHADER:
-            return VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+            return VK_SHADER_STAGE_FRAGMENT_BIT;
 	    case MAGE_COMPUTE_SHADER:
-            return VK_PIPELINE_STAGE_COMPUTE_SHADER_BIT;    
+            return VK_SHADER_STAGE_COMPUTE_BIT;    
     }
 }
 mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *runtimeFunctionName, const mageShaderType shaderType)

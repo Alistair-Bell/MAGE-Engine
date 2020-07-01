@@ -37,6 +37,7 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE",
+        "LUA_C89_NUMBERS",
     }
     linkoptions 
     { 
@@ -49,9 +50,7 @@ project "MageEngine"
     }
     flags
     {
-        "FatalWarnings",
-        "FatalCompileWarnings",
-        "LinkTimeOptimization",
+        --"LinkTimeOptimization",
     }
     links
     {
@@ -59,6 +58,7 @@ project "MageEngine"
         "hypatia",
         "GLFW",
         "vulkan",
+        "lua"
     }
 
 
@@ -77,6 +77,12 @@ filter "configurations:Debug"
     defines "MAGE_DEBUG"
     runtime "Debug"
     symbols "On"
+    
+    flags
+    {
+        "FatalWarnings",
+        "FatalCompileWarnings",
+    }
 
 filter "configurations:Release"
     defines "MAGE_RELEASE"
@@ -88,7 +94,7 @@ project "Sandbox"
     location "%{prj.name}"
     kind "StaticLib"
     language "c"
-    cdialect "c89"
+    cdialect "C89"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
@@ -101,6 +107,11 @@ project "Sandbox"
     {
         "%{prj.name}/**.h",   
         "%{prj.name}/**.c",
+    }
+    defines
+    {
+        "LUA_USE_C89",
+        
     }
 
     filter "configurations:Debug"
@@ -117,3 +128,4 @@ project "Sandbox"
 group "Externals"
     include "Mage/Externals/hypatia"
     include "Mage/Externals/glfw3"
+    include "Mage/Externals/lua-5.4.0/"

@@ -18,6 +18,7 @@ static mageEventCategoryBit mageKeyPressedCategories[] =          { MAGE_INPUT_C
 static mageEventCategoryBit mageKeyReleasedCategories[] =         { MAGE_INPUT_CATEGORY, MAGE_KEYBOARD_CATEGORY };
 static mageEventCategoryBit mageMouseButtonPressedCategories[] =  { MAGE_INPUT_CATEGORY, MAGE_MOUSE_CATEGORY, MAGE_MOUSE_BUTTON_CATEGORY };
 static mageEventCategoryBit mageMouseButtonReleasedCategories[] = { MAGE_INPUT_CATEGORY, MAGE_MOUSE_CATEGORY, MAGE_MOUSE_BUTTON_CATEGORY };
+static mageEventCategoryBit mageMouseButtonRepeatCategories[] = { MAGE_INPUT_CATEGORY, MAGE_MOUSE_CATEGORY, MAGE_MOUSE_BUTTON_CATEGORY };
 static mageEventCategoryBit mageMouseMovedCategories[] =          { MAGE_INPUT_CATEGORY, MAGE_MOUSE_CATEGORY };
 static mageEventCategoryBit mageMouseScrolledCategories[] =       { MAGE_INPUT_CATEGORY, MAGE_MOUSE_CATEGORY };
 
@@ -85,6 +86,9 @@ mageEventCategoryBit *mageEventGenerateCategories(const mageEventType type)
             break;
         case MAGE_KEY_RELEASED_EVENT:
             return mageKeyReleasedCategories;
+            break;
+        case MAGE_KEY_REPEAT_EVENT:
+            return mageMouseButtonRepeatCategories;
             break;
         case MAGE_MOUSE_BUTTON_PRESSED_EVENT:
             return mageMouseButtonPressedCategories;

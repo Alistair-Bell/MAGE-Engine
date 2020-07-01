@@ -1,6 +1,5 @@
-#include <mageAPI.h>
-
 #include "Sandbox.h"
+#include "ResourceLoader.h"
 
 struct mageShader VertexShader;
 struct mageShader FragmentShader;
@@ -29,20 +28,22 @@ struct mageApplicationProps ClientApplicationProps()
 {
     struct mageApplicationProps props;
     memset(&props, 0, sizeof(struct mageApplicationProps)); 
+
+
+    uint32_t width;
+    uint32_t height;
+    char name[256];
+    double version;
+
+
+    SetupLoader("Sandbox/Resources.lua");
+    LoadEngineConfig(&width, &height, &version, name);
+
+
     props.Name = "Hello World";
     props.Width = 1920;
     props.Height = 1080;
     props.Version = 1.0;
-
-    props.StartMethod = ClientStart;
-    props.UpdateMethod = ClientUpdate;
-    props.DestroyMethod = ClientEnd;
-    
-    Callbacks[0] = EventListener;
-
-    props.ListenerCount = 1;
-    props.Listeners = Callbacks;
-
     return props;   
 }
 struct mageRendererProps ClientRendererProps()

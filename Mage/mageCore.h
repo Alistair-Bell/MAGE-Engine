@@ -145,6 +145,10 @@
 #include <stdint.h>
 
 #include "Externals/hypatia/src/hypatia.h"
+#include "Externals/lua-5.4.0/src/lua.h"
+#include "Externals/lua-5.4.0/src/lauxlib.h"
+#include "Externals/lua-5.4.0/src/lualib.h"
+
 
 
 #define MAGE_LOG_MODE_INFORM 0
