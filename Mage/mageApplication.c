@@ -62,6 +62,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
         return result;
     }
 
+    
     result = mageRendererInitialise(application->Renderer, application->Window, &rendererProps); 
     
     if (result != MAGE_SUCCESS)
@@ -94,7 +95,6 @@ mageResult mageApplicationRun(struct mageApplication *application)
         return startResult;
     }
 
-    
     while (application->Running)
     {
     
@@ -103,7 +103,7 @@ mageResult mageApplicationRun(struct mageApplication *application)
         glfwPollEvents();
         /* mageRendererRender(application->Renderer); */
 
-            application->Running = !(glfwWindowShouldClose(application->Window->Context));
+        application->Running = !(glfwWindowShouldClose(application->Window->Context));
     }
 
     destroyResult = application->Props.DestroyMethod(application);

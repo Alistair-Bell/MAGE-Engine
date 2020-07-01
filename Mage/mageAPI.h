@@ -192,8 +192,11 @@ struct mageRenderer
 	VkPipeline								GraphicsPipeline;
 
 	VkRenderPass							PrimaryRenderPass;
-
+	VkFramebuffer							*Framebuffers;
+	VkCommandPool							CommandPool;
 	
+	VkCommandBuffer							*CommandBuffers;
+
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
 	VkDebugUtilsMessengerEXT				DebugMessenger;
 	struct mageIndiciesIndexes				Indexes;
@@ -361,6 +364,9 @@ extern mageResult mageShaderInitialise(
 	const char *shaderFile, 
 	const char *runtimeFunctionName, 
 	const mageShaderType shaderType
+);
+extern mageShaderType mageShaderTypeFromString(
+	const char *name
 );
 
 
