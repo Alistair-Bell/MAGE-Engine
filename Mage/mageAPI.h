@@ -26,7 +26,7 @@
 #if defined (MAGE_VULKAN)
 
 #define MAGE_CHECK_VULKAN(function) \
-	mageHandleVulkanResult(__FUNCTION__, function)
+	mageHandleVulkanResult(#function, function)
 
 #endif
 
@@ -196,6 +196,10 @@ struct mageRenderer
 	VkCommandPool							CommandPool;
 	
 	VkCommandBuffer							*CommandBuffers;
+
+	VkSemaphore								ImageAvailableSemaphore;
+	VkSemaphore								RenderFinishedSemaphore;
+
 
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
 	VkDebugUtilsMessengerEXT				DebugMessenger;

@@ -62,8 +62,8 @@ void mageLogMessage(const uint8_t user, const uint8_t severity, const char *form
 
     
     char timeFormat[15];
-    char userFormat[256];
-    char finalFormat[271];
+    char userFormat[1024];
+    char finalFormat[1024];
 
     sprintf(timeFormat, "%02d:%02d:%02d", Logger.Time->tm_hour, Logger.Time->tm_min, Logger.Time->tm_sec);
     

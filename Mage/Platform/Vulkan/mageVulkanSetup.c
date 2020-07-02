@@ -393,6 +393,15 @@ static VkResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageW
     subpassDescription.colorAttachmentCount         = 1;
     subpassDescription.pColorAttachments            = &attachmentReference;
 
+    VkSubpassDependency dependency;
+    memset(&dependency, 0, sizeof(VkSubpassDependency));
+
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+    dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.srcAccessMask = 0;
+    dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
     VkRenderPassCreateInfo createInfo;
     memset(&createInfo, 0, sizeof(VkRenderPassCreateInfo));
@@ -401,7 +410,9 @@ static VkResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageW
     createInfo.pAttachments         = &attachmentDescription;
     createInfo.subpassCount         = 1;
     createInfo.pSubpasses           = &subpassDescription;
-    
+    createInfo.dependencyCount      = 1;
+    createInfo.pDependencies        = &dependency;
+
     return MAGE_CHECK_VULKAN(vkCreateRenderPass(renderer->Device, &createInfo, NULL, &renderer->PrimaryRenderPass));
 }
 static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
@@ -607,14 +618,53 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-
         vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
 
+        VkClearValue clearValue;
+        memset(&clearValue, 0, sizeof(VkClearValue));
+        
+        clearValue.color.float32[0] = 0.0f;
+        clearValue.color.float32[1] = 0.0f;
+        clearValue.color.float32[2] = 0.0f;
+        clearValue.color.float32[3] = 0.0f;
+        
+        VkRenderPassBeginInfo renderPassInfo;
+        memset(&renderPassInfo, 0, sizeof(VkRenderPassBeginInfo));
+        
+        renderPassInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass               = renderer->PrimaryRenderPass;
+        renderPassInfo.framebuffer              = renderer->Framebuffers[i];
+        renderPassInfo.renderArea.offset        = (VkOffset2D){ 0.f, 0.f };
+        renderPassInfo.renderArea.extent        = renderer->SwapChainSupportInfo.Extent;
+        renderPassInfo.clearValueCount          = 1;
+        renderPassInfo.pClearValues             = &clearValue;
+
+        vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        
+        vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+        vkCmdDraw(renderer->CommandBuffers[i], 3, 1, 0, 0);
+        vkCmdEndRenderPass(renderer->CommandBuffers[i]);
+        VkResult result = MAGE_CHECK_VULKAN(vkEndCommandBuffer(renderer->CommandBuffers[i]));
+        if (result != VK_SUCCESS) { return result; }
     }
 
     return VK_SUCCESS;
 }
+static VkResult mageCreateSemaphores(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+{
+    VkSemaphoreCreateInfo createInfo;
+    memset(&createInfo, 0, sizeof(VkSemaphoreCreateInfo));
 
+    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkResult firstResult, secondResult;
+
+    firstResult = MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &createInfo, NULL, &renderer->ImageAvailableSemaphore));
+    secondResult = MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &createInfo, NULL, &renderer->RenderFinishedSemaphore));
+    if (firstResult != VK_SUCCESS || secondResult != VK_SUCCESS) { return firstResult; }
+
+    return VK_SUCCESS;
+}
 
 mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {   
@@ -638,6 +688,7 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
         mageCreateFrameBuffers,
         mageCreateCommandPool,
         mageCreateCommandBuffers,
+        mageCreateSemaphores,
     };
 
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
@@ -652,6 +703,9 @@ void mageRendererDestroy(struct mageRenderer *renderer)
 {
     uint32_t i;
     
+    vkDestroySemaphore(renderer->Device, renderer->ImageAvailableSemaphore, NULL);
+    vkDestroySemaphore(renderer->Device, renderer->RenderFinishedSemaphore, NULL);
+
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
     vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
     vkDestroyPipelineLayout(renderer->Device, renderer->GraphicsPipelineLayout, NULL);

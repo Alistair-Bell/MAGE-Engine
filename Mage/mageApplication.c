@@ -101,7 +101,7 @@ mageResult mageApplicationRun(struct mageApplication *application)
         application->Props.UpdateMethod(application);
 
         glfwPollEvents();
-        /* mageRendererRender(application->Renderer); */
+        mageRendererRender(application->Renderer); 
 
         application->Running = !(glfwWindowShouldClose(application->Window->Context));
     }
