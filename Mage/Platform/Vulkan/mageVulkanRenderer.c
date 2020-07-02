@@ -5,12 +5,19 @@
 void mageRendererRender(struct mageRenderer *renderer)
 {
     uint32_t index;
-    vkAcquireNextImageKHR(renderer->Device, renderer->SwapChain, UINT64_MAX, renderer->ImageAvailableSemaphore, VK_NULL_HANDLE, &index);
+    vkWaitForFences(renderer->Device, 1, &renderer->ConcurentFences[renderer->CurrentFrame], VK_TRUE, UINT64_MAX);
+    vkAcquireNextImageKHR(renderer->Device, renderer->SwapChain, UINT64_MAX, renderer->ImageAvailableSemaphores[renderer->CurrentFrame], VK_NULL_HANDLE, &index);
     
+    if (renderer->ConcurrentImages[renderer->CurrentFrame] != VK_NULL_HANDLE)
+    {
+        vkWaitForFences(renderer->Device, 1, &renderer->ConcurrentImages[renderer->CurrentFrame], VK_TRUE, UINT64_MAX);
+    }
+    renderer->ConcurrentImages[renderer->CurrentFrame] = renderer->ConcurentFences[renderer->CurrentFrame];
+
     VkSubmitInfo submitInfo;
     memset(&submitInfo, 0, sizeof(VkSubmitInfo));
-    VkSemaphore waitSemaphores[] = { renderer->ImageAvailableSemaphore };
-    VkSemaphore signalSemaphores[] = { renderer->RenderFinishedSemaphore };
+    VkSemaphore waitSemaphores[] = { renderer->ImageAvailableSemaphores[renderer->CurrentFrame] };
+    VkSemaphore signalSemaphores[] = { renderer->RenderFinishedSemaphores[renderer->CurrentFrame] };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -23,6 +30,11 @@ void mageRendererRender(struct mageRenderer *renderer)
     submitInfo.pSignalSemaphores    = signalSemaphores;
 
 
+    
+
+    vkResetFences(renderer->Device, 1, &renderer->ConcurentFences[renderer->CurrentFrame]);
+    vkQueueSubmit(renderer->GraphicalQueue, 1, &submitInfo, renderer->ConcurrentImages[renderer->CurrentFrame]);
+    
     VkPresentInfoKHR presentInfo;
     memset(&presentInfo, 0, sizeof(VkPresentInfoKHR));
 
@@ -34,13 +46,10 @@ void mageRendererRender(struct mageRenderer *renderer)
     presentInfo.swapchainCount = 1;
     presentInfo.pSwapchains = swapChains;
     presentInfo.pImageIndices = &index;
-
-    vkQueueSubmit(renderer->GraphicalQueue, 1, &submitInfo, VK_NULL_HANDLE);
+    
     vkQueuePresentKHR(renderer->PresentQueue, &presentInfo);
-    vkQueueWaitIdle(renderer->PresentQueue);
-
-
-   
+    
+    renderer->CurrentFrame = (renderer->CurrentFrame + 1) % renderer->ConcurentFrames;
 }
 
 

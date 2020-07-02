@@ -650,25 +650,39 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
 
     return VK_SUCCESS;
 }
-static VkResult mageCreateSemaphores(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
+static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {
-    VkSemaphoreCreateInfo createInfo;
-    memset(&createInfo, 0, sizeof(VkSemaphoreCreateInfo));
+    uint32_t i;
+    VkSemaphoreCreateInfo semaphorecreateInfo;
+    memset(&semaphorecreateInfo, 0, sizeof(VkSemaphoreCreateInfo));
 
-    createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphorecreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
-    VkResult firstResult, secondResult;
+    VkFenceCreateInfo fenceCreateInfo;
+    memset(&fenceCreateInfo, 0, sizeof(VkFenceCreateInfo));
+    fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    firstResult = MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &createInfo, NULL, &renderer->ImageAvailableSemaphore));
-    secondResult = MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &createInfo, NULL, &renderer->RenderFinishedSemaphore));
-    if (firstResult != VK_SUCCESS || secondResult != VK_SUCCESS) { return firstResult; }
+    renderer->ImageAvailableSemaphores = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->RenderFinishedSemaphores = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->ConcurentFences = calloc(renderer->ConcurentFrames, sizeof(VkQueue));
+    renderer->ConcurrentImages = calloc(renderer->ConcurentFrames, sizeof(VkQueue));
 
+    for (i = 0; i < renderer->ConcurentFrames; i++)
+    {
+        MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->ImageAvailableSemaphores[i]));
+        MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->RenderFinishedSemaphores[i]));
+        MAGE_CHECK_VULKAN(vkCreateFence(renderer->Device, &fenceCreateInfo, NULL, &renderer->ConcurentFences[i]));
+        renderer->ConcurrentImages[i] = VK_NULL_HANDLE;
+    }
     return VK_SUCCESS;
 }
 
 mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {   
-        
+    renderer->ConcurentFrames = 2;    
+    renderer->CurrentFrame = 0;
+    
     uint32_t i;
     typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererProps *);
     function functions[] = 
@@ -688,7 +702,7 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
         mageCreateFrameBuffers,
         mageCreateCommandPool,
         mageCreateCommandBuffers,
-        mageCreateSemaphores,
+        mageCreateSynchronisationObjects,
     };
 
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
@@ -703,8 +717,12 @@ void mageRendererDestroy(struct mageRenderer *renderer)
 {
     uint32_t i;
     
-    vkDestroySemaphore(renderer->Device, renderer->ImageAvailableSemaphore, NULL);
-    vkDestroySemaphore(renderer->Device, renderer->RenderFinishedSemaphore, NULL);
+    for (i = 0; i < renderer->ConcurentFrames; i++)
+    {
+        vkDestroySemaphore(renderer->Device, renderer->ImageAvailableSemaphores[i], NULL);
+        vkDestroySemaphore(renderer->Device, renderer->RenderFinishedSemaphores[i], NULL);
+        vkDestroyFence(renderer->Device, renderer->ConcurentFences[i], NULL);
+    }
 
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
     vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
@@ -732,7 +750,11 @@ void mageRendererDestroy(struct mageRenderer *renderer)
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);
-}
+    free(renderer->ImageAvailableSemaphores);
+    free(renderer->RenderFinishedSemaphores);
+    free(renderer->ConcurentFences);
+    free(renderer->ConcurrentImages);
+}   
 
 
 #endif

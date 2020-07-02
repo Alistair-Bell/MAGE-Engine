@@ -197,8 +197,10 @@ struct mageRenderer
 	
 	VkCommandBuffer							*CommandBuffers;
 
-	VkSemaphore								ImageAvailableSemaphore;
-	VkSemaphore								RenderFinishedSemaphore;
+	VkSemaphore								*ImageAvailableSemaphores;
+	VkSemaphore								*RenderFinishedSemaphores;
+	VkFence									*ConcurentFences;
+	VkFence									*ConcurrentImages;
 
 
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
@@ -207,6 +209,8 @@ struct mageRenderer
 	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
 
 	uint32_t 								SwapChainImageCount;
+	uint32_t								ConcurentFrames;
+	uint32_t								CurrentFrame;
 
 #endif
 };
