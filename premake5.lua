@@ -39,18 +39,13 @@ project "MageEngine"
         "MAGE_CORE",
         "LUA_C89_NUMBERS",
     }
-    linkoptions 
-    { 
-        "`wx-config --libs`"
-    }
-
     includedirs
     {
         "Mage",
     }
     flags
     {
-        --"LinkTimeOptimization",
+        "LinkTimeOptimization",
     }
     links
     {
@@ -70,6 +65,7 @@ project "MageEngine"
     links 
     { 
         "dl",
+        "pthread",
         "m",
     }
 
