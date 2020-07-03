@@ -31,6 +31,8 @@ int32_t main(int32_t argc, char **args)
         struct mageShader fragment, vertex;
     }
     
+    
+    
     mageApplicationInitialise(Application, ApplicationProps, RendererProps);
     mageApplicationRun(Application);
 #if defined (MAGE_DEBUG)

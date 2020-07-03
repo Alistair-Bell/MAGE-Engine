@@ -148,6 +148,7 @@
 #include "Externals/lua-5.4.0/src/lua.h"
 #include "Externals/lua-5.4.0/src/lauxlib.h"
 #include "Externals/lua-5.4.0/src/lualib.h"
+#include "Externals/lodepng/src/lodepng.h"
 
 
 

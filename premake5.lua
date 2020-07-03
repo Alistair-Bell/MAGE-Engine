@@ -1,6 +1,6 @@
 
-BuildTargetPath = "Build/Binaries/%{prj.name}"
-BuildObjectPath = "Build/Objects/%{prj.name}"
+BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}"
+BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}"
     
 
 workspace "MAGE"
@@ -53,7 +53,8 @@ project "MageEngine"
         "hypatia",
         "GLFW",
         "vulkan",
-        "lua"
+        "lua",
+        "lodepng",
     }
 
 
@@ -124,4 +125,5 @@ project "Sandbox"
 group "Externals"
     include "Mage/Externals/hypatia"
     include "Mage/Externals/glfw3"
-    include "Mage/Externals/lua-5.4.0/"
+    include "Mage/Externals/lua-5.4.0"
+    include "Mage/Externals/lodepng"

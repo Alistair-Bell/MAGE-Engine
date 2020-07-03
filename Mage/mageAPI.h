@@ -38,6 +38,7 @@ struct mageWindow;
 struct mageRenderer;
 struct mageIndiciesIndexes;
 struct mageSwapChainSupportDetails;
+struct mageVertex;
 
 typedef enum MAGE_RESULT_ENUM 					mageResult;
 typedef enum MAGE_EVENT_ENUM 					mageEventType;
@@ -143,11 +144,12 @@ enum MAGE_SHADER_TYPE_ENUM
 
 struct mageSwapChainSupportDetails
 {
+#if defined (MAGE_VULKAN)
 	VkSurfaceCapabilitiesKHR 				Capabilities;
 	VkSurfaceFormatKHR 						*Formats;
 	VkPresentModeKHR						*PresentModes;
 	VkExtent2D								Extent;
-
+#endif
 	uint32_t								FormatCount;
 	uint32_t								PresentCount;
 };
@@ -243,6 +245,11 @@ struct mageShader
 	mageShaderType 							ShaderType;
 	const char 								*FilePath;
 	const char 								*RuntimeFunctionName;
+};
+struct mageVertex
+{
+	struct vector2 Position;
+	struct vector3 Color;
 };
 
 

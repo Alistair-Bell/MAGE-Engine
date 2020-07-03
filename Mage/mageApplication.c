@@ -100,12 +100,12 @@ mageResult mageApplicationRun(struct mageApplication *application)
         application->Props.UpdateMethod(application);
 
         glfwPollEvents();
-        mageRendererRender(application->Renderer); 
+        mageRendererRender(application->Renderer);
 
         application->Running = !(glfwWindowShouldClose(application->Window->Context));
     }
 #if defined (MAGE_VULKAN)
-    vkDeviceWaitIdle(application->Renderer->Device);
+    vkDeviceWaitIdle(application->Renderer->Device); 
 #endif
 
     destroyResult = application->Props.DestroyMethod(application);

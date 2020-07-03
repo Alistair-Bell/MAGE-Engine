@@ -71,7 +71,4 @@ void mageRendererRender(struct mageRenderer *renderer)
 
 
 
-
-
-
 #endif
