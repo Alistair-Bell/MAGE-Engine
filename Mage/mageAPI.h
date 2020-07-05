@@ -363,7 +363,7 @@ extern mageResult mageRendererInitialise(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window, 
 	struct mageRendererProps *props
-);
+);	
 extern void mageRendererRender(
 	struct mageRenderer *renderer
 );
@@ -383,7 +383,6 @@ extern mageResult mageShaderInitialise(
 extern mageShaderType mageShaderTypeFromString(
 	const char *name
 );
-
 
 #if defined (MAGE_VULKAN)
 
@@ -444,6 +443,12 @@ extern VkSurfaceFormatKHR mageSwapChainSupportPickSurfaceFormat(
 );
 extern void mageSwapChainSupportDestroy(
 	struct mageSwapChainSupportDetails *swapChainSupport
+);
+extern VkVertexInputBindingDescription mageVertexBindingDescription(
+	
+);
+extern VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(
+	uint32_t *count
 );
 
 #endif

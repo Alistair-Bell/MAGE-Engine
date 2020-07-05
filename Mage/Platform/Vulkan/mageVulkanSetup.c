@@ -439,14 +439,25 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
     memset(&vertexInputInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
-    
+
+    uint32_t inputCount;
+    VkVertexInputBindingDescription bindingDescription = mageVertexBindingDescription();
+    VkVertexInputAttributeDescription *inputDescriptions = mageVertexGetAttributeDescriptions(&inputCount);
+
+    vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    /*
+    vertexInputInfo.vertexBindingDescriptionCount       = 1;
+    vertexInputInfo.pVertexBindingDescriptions          = &bindingDescription;
+    vertexInputInfo.vertexAttributeDescriptionCount     = inputCount;
+    vertexInputInfo.pVertexAttributeDescriptions        = inputDescriptions;
+    */
     vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount       = 0;
     vertexInputInfo.vertexAttributeDescriptionCount     = 0;
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly;
     memset(&inputAssembly, 0, sizeof(VkPipelineInputAssemblyStateCreateInfo));
-    
+
     inputAssembly.sType                     = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology                  = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable    = VK_FALSE;
