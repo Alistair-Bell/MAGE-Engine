@@ -4,9 +4,7 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/Mage",
-                "/usr/local/include/mono-2.0"
-            
+                "${workspaceFolder}/Mage/Source"
             ],
             "defines": [
                 "MAGE_DEBUG",

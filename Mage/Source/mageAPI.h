@@ -252,6 +252,9 @@ struct mageVertexBuffer
 {
 	struct vector2 							*Vertecies;
 	uint32_t 								PositionCount;
+#if defined (MAGE_VULKAN)
+	VkBuffer 								Buffer;
+#endif
 };
 
 
@@ -386,17 +389,19 @@ extern mageResult mageShaderInitialise(
 extern mageShaderType mageShaderTypeFromString(
 	const char *name
 );
-extern void mageVertexBufferInitialise(
-	struct mageVertexBuffer *buffer,
-	struct vector2 *verticies,
-	uint32_t count
-);
-extern void mageVertexBufferDestroy(
-	struct mageVertexBuffer *buffer
-);
 
 #if defined (MAGE_VULKAN)
 
+extern void mageVertexBufferInitialise(
+	struct mageVertexBuffer *buffer,
+	struct vector2 *verticies,
+	uint32_t count,
+	VkDevice device
+);
+extern void mageVertexBufferDestroy(
+	struct mageVertexBuffer *buffer,
+	VkDevice device
+);
 extern VkResult mageHandleVulkanResult(
 	const char *functionName,
 	VkResult functionResult

@@ -451,6 +451,13 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     vertexInputInfo.vertexAttributeDescriptionCount     = 1;
     vertexInputInfo.pVertexAttributeDescriptions        = &inputDescriptions;
     */
+    struct mageVertexBuffer buffer;
+    struct vector2 vec;
+    vec.x = 1.0f;
+    vec.y = 1.0f;
+    mageVertexBufferInitialise(&buffer, &vec, 1, renderer->Device);
+    mageVertexBufferDestroy(&buffer, renderer->Device);
+
     vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexAttributeDescriptionCount     = 0;
     vertexInputInfo.vertexBindingDescriptionCount       = 0;

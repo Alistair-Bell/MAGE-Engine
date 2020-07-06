@@ -25,14 +25,14 @@ project "MageEngine"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
-    pchheader "Mage/mageAPI.h"
-    pchsource "Mage/mageAPI.c"
+    pchheader "Mage/Source/mageAPI.h"
+    pchsource "Mage/Source/mageAPI.c"
 
     files
     {
-        "Mage/*.h",
-        "Mage/*.c",
-        "Mage/Platform/Vulkan/**.c",
+        "Mage/Source/*.h",
+        "Mage/Source/*.c",
+        "Mage/Source/Platform/Vulkan/**.c",
     }
     defines
     {
@@ -40,7 +40,7 @@ project "MageEngine"
     }
     includedirs
     {
-        "Mage",
+        "Mage/Source/",
     }
     flags
     {
@@ -62,12 +62,12 @@ project "MageEngine"
 
     filter "system:linux"
 
-    links 
-    { 
-        "dl",
-        "pthread",
-        "m",
-    }
+        links 
+        { 
+            "dl",
+            "pthread",
+            "m",
+        }
 
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
@@ -96,7 +96,7 @@ project "Sandbox"
 
     includedirs
     {
-        "Mage",
+        "Mage/Source",
     }
     
     files

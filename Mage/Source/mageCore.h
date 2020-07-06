@@ -7,7 +7,7 @@
 	**************************/
 #else 
 	#define MAGE_VULKAN
-	#include "Externals/Vulkan-Headers/include/vulkan/vulkan.h"
+	#include "../Externals/Vulkan-Headers/include/vulkan/vulkan.h"
 #endif
 
 #define GLFW_INCLUDE_NONE
@@ -15,7 +15,7 @@
 #if defined (MAGE_VULKAN) 
 	#define GLFW_INCLUDE_VULKAN
 #endif
-#include "Externals/glfw3/include/GLFW/glfw3.h"
+#include "../Externals/glfw3/include/GLFW/glfw3.h"
 
 
 /*!************************
@@ -141,9 +141,9 @@
 #include <signal.h> 
 #include <stdint.h>
 
-#include "Externals/hypatia/src/hypatia.h"
-#include "Externals/lodepng/src/lodepng.h"
-#include "Externals/libyaml/include/yaml.h"
+#include "../Externals/hypatia/src/hypatia.h"
+#include "../Externals/lodepng/src/lodepng.h"
+#include "../Externals/libyaml/include/yaml.h"
 
 
 #define MAGE_LOG_MODE_INFORM 0
