@@ -30,6 +30,7 @@
 
 #endif
 
+
 	
 struct mageApplication;
 struct mageApplicationProps;
@@ -227,6 +228,7 @@ struct mageApplicationProps
 	mageEventListenerCallback				*Listeners;
 	uint32_t 								ListenerCount;
 	char 						   			*Name;
+	const char 								*WindowIcon;
 };
 struct mageApplication
 {
@@ -246,10 +248,10 @@ struct mageShader
 	const char 								*FilePath;
 	const char 								*RuntimeFunctionName;
 };
-struct mageVertex
+struct mageVertexBuffer
 {
-	struct vector2 Position;
-	struct vector3 Color;
+	struct vector2 							*Vertecies;
+	uint32_t 								PositionCount;
 };
 
 
@@ -285,7 +287,8 @@ extern mageResult mageWindowInitialise(
 	struct mageWindow *window, 
 	const int32_t xResolution, 
 	const int32_t yResolution, 
-	const char *title
+	const char *title,
+	const char *icon
 );
 extern void mageWindowTerminate(
 	struct mageWindow *window
@@ -383,6 +386,14 @@ extern mageResult mageShaderInitialise(
 extern mageShaderType mageShaderTypeFromString(
 	const char *name
 );
+extern void mageVertexBufferInitialise(
+	struct mageVertexBuffer *buffer,
+	struct vector2 *verticies,
+	uint32_t count
+);
+extern void mageVertexBufferDestroy(
+	struct mageVertexBuffer *buffer
+);
 
 #if defined (MAGE_VULKAN)
 
@@ -444,11 +455,12 @@ extern VkSurfaceFormatKHR mageSwapChainSupportPickSurfaceFormat(
 extern void mageSwapChainSupportDestroy(
 	struct mageSwapChainSupportDetails *swapChainSupport
 );
+
 extern VkVertexInputBindingDescription mageVertexBindingDescription(
 	
 );
-extern VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(
-	uint32_t *count
+extern VkVertexInputAttributeDescription mageVertexGetAttributeDescriptions(
+
 );
 
 #endif

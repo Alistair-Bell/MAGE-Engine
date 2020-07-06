@@ -10,7 +10,6 @@ extern void ClientLoadProps(struct mageApplicationProps *applicationProps, struc
 
 static struct mageShader mageDefaultShaders[2];
 
-
 int32_t main(int32_t argc, char **args)
 {  
 #if defined (MAGE_DEBUG)

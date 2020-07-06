@@ -55,7 +55,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
     char temp[255];
     sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
     
-    result = mageWindowInitialise(application->Window, application->Props.Width, application->Props.Height, temp);
+    result = mageWindowInitialise(application->Window, application->Props.Width, application->Props.Height, temp, engineProps.WindowIcon);
     
     if (result != MAGE_SUCCESS)
     {

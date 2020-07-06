@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title)
+mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title, const char *icon)
 {
 
 	window->Height  = yResolution;
@@ -15,11 +15,11 @@ mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolu
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
 	window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
 
-	GLFWimage icon;
+	GLFWimage localIcon;
 	uint8_t data;
 	uint32_t width, height;
 	uint8_t *image;
-	uint32_t error = lodepng_decode32_file(&image, &width, &height, "Mage/Resources/Textures/MTEC/Logo.png");
+	uint32_t error = lodepng_decode32_file(&image, &width, &height, icon);
 
 	if (error) 
 	{
@@ -28,10 +28,10 @@ mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolu
   	}
 	else
 	{
-		icon.width = width;
-		icon.height = height;
-		icon.pixels = image;
-		glfwSetWindowIcon(window->Context, 1, &icon);
+		localIcon.width = width;
+		localIcon.height = height;
+		localIcon.pixels = image;
+		glfwSetWindowIcon(window->Context, 1, &localIcon);
 	}
 
 

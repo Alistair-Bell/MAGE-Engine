@@ -37,7 +37,6 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE",
-        "LUA_C89_NUMBERS",
     }
     includedirs
     {
@@ -53,8 +52,8 @@ project "MageEngine"
         "hypatia",
         "GLFW",
         "vulkan",
-        "lua",
         "lodepng",
+        "yaml"    
     }
 
 
@@ -107,7 +106,6 @@ project "Sandbox"
     }
     defines
     {
-        "LUA_USE_C89",
         
     }
 
@@ -125,5 +123,5 @@ project "Sandbox"
 group "Externals"
     include "Mage/Externals/hypatia"
     include "Mage/Externals/glfw3"
-    include "Mage/Externals/lua-5.4.0"
     include "Mage/Externals/lodepng"
+    include "Mage/Externals/libyaml"

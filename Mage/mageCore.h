@@ -7,10 +7,7 @@
 	**************************/
 #else 
 	#define MAGE_VULKAN
-	/*!************************
-		Includes the vulkan api headers and related extensions 
-	**************************/
-	#include <vulkan/vulkan.h>
+	#include "Externals/Vulkan-Headers/include/vulkan/vulkan.h"
 #endif
 
 #define GLFW_INCLUDE_NONE
@@ -145,11 +142,8 @@
 #include <stdint.h>
 
 #include "Externals/hypatia/src/hypatia.h"
-#include "Externals/lua-5.4.0/src/lua.h"
-#include "Externals/lua-5.4.0/src/lauxlib.h"
-#include "Externals/lua-5.4.0/src/lualib.h"
 #include "Externals/lodepng/src/lodepng.h"
-
+#include "Externals/libyaml/include/yaml.h"
 
 
 #define MAGE_LOG_MODE_INFORM 0

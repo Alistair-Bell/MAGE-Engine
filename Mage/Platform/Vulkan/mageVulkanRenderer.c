@@ -19,7 +19,6 @@ void mageRendererRender(struct mageRenderer *renderer)
     VkSemaphore waitSemaphores[] = { renderer->ImageAvailableSemaphores[renderer->CurrentFrame] };
     VkSemaphore signalSemaphores[] = { renderer->RenderFinishedSemaphores[renderer->CurrentFrame] };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-    
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount   = 1;
     submitInfo.pWaitSemaphores      = waitSemaphores;
@@ -28,10 +27,6 @@ void mageRendererRender(struct mageRenderer *renderer)
     submitInfo.pCommandBuffers      = &renderer->CommandBuffers[index];
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores    = signalSemaphores;
-
-
-    
-
     vkResetFences(renderer->Device, 1, &renderer->ConcurentFences[renderer->CurrentFrame]);
     vkQueueSubmit(renderer->GraphicalQueue, 1, &submitInfo, renderer->ConcurrentImages[renderer->CurrentFrame]);
     

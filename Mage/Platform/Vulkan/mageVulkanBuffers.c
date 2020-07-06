@@ -2,33 +2,35 @@
 
 #if defined (MAGE_VULKAN)
 
+void mageVertexBufferInitialise(struct mageVertexBuffer *buffer, struct vector2 *verticies, uint32_t count)
+{
+    buffer->Vertecies = calloc(count, sizeof(struct vector2));
+    memcpy(buffer->Vertecies, verticies, sizeof(struct vector2) * count);
+    buffer->PositionCount = count;
+}
+void mageVertexBufferDestroy(struct mageVertexBuffer *buffer)
+{
+    free(buffer->Vertecies);
+}
 VkVertexInputBindingDescription mageVertexBindingDescription()
 {
-    VkVertexInputBindingDescription description;
-    memset(&description, 0, sizeof(VkVertexInputBindingDescription));
-
-    description.binding     = 0;
-    description.stride      = sizeof(struct mageVertex);
-    description.inputRate   = VK_VERTEX_INPUT_RATE_VERTEX;
-
-    return description;
-}   
-VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(uint32_t *count)
+    VkVertexInputBindingDescription bindingDescription;
+    memset(&bindingDescription, 0, sizeof(VkVertexInputBindingDescription));
+    bindingDescription.binding      = 0;
+    bindingDescription.stride       = sizeof(struct mageVertexBuffer);
+    bindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_VERTEX;
+    return bindingDescription;
+}
+VkVertexInputAttributeDescription mageVertexGetAttributeDescriptions()
 {
-    VkVertexInputAttributeDescription *description = calloc(2, sizeof(VkVertexInputAttributeDescription));
-    memset(description, 0, sizeof(VkVertexInputAttributeDescription) * 2);
-    description[0].binding      = 0;
-    description[0].location     = 0;
-    description[0].format       = VK_FORMAT_R32G32_SFLOAT;
-    description[0].offset       = offsetof(struct mageVertex, Position);
+    VkVertexInputAttributeDescription attributeDescriptions;
+    memset(&attributeDescriptions, 0, sizeof(VkVertexInputAttributeDescription));
 
-    description[1].binding      = 0;
-    description[1].location     = 1;
-    description[1].format       = VK_FORMAT_R32G32B32_SFLOAT;
-    description[1].offset       = offsetof(struct mageVertex, Color);
-
-    *count = 2;
-    return description;
+    attributeDescriptions.binding    = 0;
+    attributeDescriptions.location   = 0;
+    attributeDescriptions.format     = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions.offset     = offsetof(struct mageVertexBuffer, Vertecies);
+    return attributeDescriptions;
 }
 
 #endif

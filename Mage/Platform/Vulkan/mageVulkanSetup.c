@@ -440,20 +440,20 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
     memset(&vertexInputInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
 
-    uint32_t inputCount;
     VkVertexInputBindingDescription bindingDescription = mageVertexBindingDescription();
-    VkVertexInputAttributeDescription *inputDescriptions = mageVertexGetAttributeDescriptions(&inputCount);
+    VkVertexInputAttributeDescription inputDescriptions = mageVertexGetAttributeDescriptions();
 
     vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    
     /*
     vertexInputInfo.vertexBindingDescriptionCount       = 1;
     vertexInputInfo.pVertexBindingDescriptions          = &bindingDescription;
-    vertexInputInfo.vertexAttributeDescriptionCount     = inputCount;
-    vertexInputInfo.pVertexAttributeDescriptions        = inputDescriptions;
+    vertexInputInfo.vertexAttributeDescriptionCount     = 1;
+    vertexInputInfo.pVertexAttributeDescriptions        = &inputDescriptions;
     */
     vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount       = 0;
     vertexInputInfo.vertexAttributeDescriptionCount     = 0;
+    vertexInputInfo.vertexBindingDescriptionCount       = 0;
 
     VkPipelineInputAssemblyStateCreateInfo inputAssembly;
     memset(&inputAssembly, 0, sizeof(VkPipelineInputAssemblyStateCreateInfo));
