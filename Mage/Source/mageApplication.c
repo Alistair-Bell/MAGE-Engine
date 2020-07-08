@@ -43,6 +43,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
     mageResult result;
 
     application->Props = engineProps; 
+    application->RendererProps = rendererProps;
 
     application->Running = 1;
 
@@ -54,8 +55,9 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
     application->Window = malloc(sizeof(struct mageWindow));
     char temp[255];
     sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
-    
-    result = mageWindowInitialise(application->Window, application->Props.Width, application->Props.Height, temp, engineProps.WindowIcon);
+    application->Props.Name = temp;
+
+    result = mageWindowInitialise(application->Window, &application->Props);
     
     if (result != MAGE_SUCCESS)
     {
@@ -70,7 +72,7 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
     }
 
     mageEventSetupMaster();
-    mageInputSetup(application->Window);
+    mageInputSetup(application);
     uint32_t i;
 
     for (i = 0; i < engineProps.ListenerCount; i++)

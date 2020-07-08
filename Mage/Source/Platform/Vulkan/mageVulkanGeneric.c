@@ -271,6 +271,22 @@ void mageSwapChainSupportDestroy(struct mageSwapChainSupportDetails *swapChainSu
     free(swapChainSupport->Formats);
     free(swapChainSupport->PresentModes);
 }
+uint32_t mageFindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, struct mageRenderer *renderer)
+{
+
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(renderer->PhysicalDevice, &memoryProperties);
+
+    uint32_t i;
+    for (i= 0; i < memoryProperties.memoryTypeCount; i++) {
+        if ((typeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) 
+        {
+            return i;
+        }
+    }
+    MAGE_LOG_CORE_FATAL_ERROR("Memory index was not found\n", NULL);
+    return UINT32_MAX;
+}
 
 
 

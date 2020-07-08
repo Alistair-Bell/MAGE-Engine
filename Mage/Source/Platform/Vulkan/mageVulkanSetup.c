@@ -12,6 +12,12 @@ static const char *const mageRequiredLayers[] =
 {
     "VK_LAYER_KHRONOS_validation",
 };
+struct mageVertexBuffer vertexBuffers[] = { 
+    { .Vertex = { .x = 0.0f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 0.0f}   },
+    { .Vertex = { .x = 1.0f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f}   },
+    { .Vertex = { .x = -1.0f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f}   } };
+
+struct mageBuffer exampleBuffer;
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *pUserData) 
 {
@@ -261,6 +267,7 @@ static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mag
     vkGetPhysicalDeviceProperties(renderer->PhysicalDevice, &properties);
     MAGE_LOG_CORE_INFORM("Device picked %s\n", properties.deviceName);
     mageGetDeviceIndexes(renderer, renderer->PhysicalDevice, &renderer->Indexes);
+    vkGetPhysicalDeviceMemoryProperties(renderer->PhysicalDevice, &renderer->PhysicalDeviceMemoryProperties);
     free(devices);
     free(scores);
     return VK_SUCCESS;
@@ -440,28 +447,16 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
     memset(&vertexInputInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
 
+    uint32_t count;
     VkVertexInputBindingDescription bindingDescription = mageVertexBindingDescription();
-    VkVertexInputAttributeDescription inputDescriptions = mageVertexGetAttributeDescriptions();
+    VkVertexInputAttributeDescription *inputDescriptions = mageVertexGetAttributeDescriptions(&count);
 
     vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    
-    /*
     vertexInputInfo.vertexBindingDescriptionCount       = 1;
     vertexInputInfo.pVertexBindingDescriptions          = &bindingDescription;
-    vertexInputInfo.vertexAttributeDescriptionCount     = 1;
-    vertexInputInfo.pVertexAttributeDescriptions        = &inputDescriptions;
-    */
-    struct mageVertexBuffer buffer;
-    struct vector2 vec;
-    vec.x = 1.0f;
-    vec.y = 1.0f;
-    mageVertexBufferInitialise(&buffer, &vec, 1, renderer->Device);
-    mageVertexBufferDestroy(&buffer, renderer->Device);
-
-    vertexInputInfo.sType                               = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexAttributeDescriptionCount     = 0;
-    vertexInputInfo.vertexBindingDescriptionCount       = 0;
-
+    vertexInputInfo.vertexAttributeDescriptionCount     = count;
+    vertexInputInfo.pVertexAttributeDescriptions        = inputDescriptions;
+    
     VkPipelineInputAssemblyStateCreateInfo inputAssembly;
     memset(&inputAssembly, 0, sizeof(VkPipelineInputAssemblyStateCreateInfo));
 
@@ -579,8 +574,7 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     }
     free(pipelineShaderModules);
     free(pipelineShaderStages);
-        
-
+    free(inputDescriptions);
     return result;  
 }
 static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
@@ -617,6 +611,7 @@ static VkResult mageCreateCommandPool(struct mageRenderer *renderer, struct mage
 }
 static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {
+    mageBufferAllocate(&exampleBuffer, vertexBuffers, sizeof(vertexBuffers), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, renderer);
     uint32_t i;
     renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
 
@@ -636,7 +631,6 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
 
         VkClearValue clearValue;
         memset(&clearValue, 0, sizeof(VkClearValue));
@@ -657,15 +651,24 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         renderPassInfo.clearValueCount          = 1;
         renderPassInfo.pClearValues             = &clearValue;
 
+
+        vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
+
         vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-        
+
         vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+        
+        VkBuffer useBuffers[] = { exampleBuffer.Buffer };
+        VkDeviceSize offsets[] = { 0 };
+
+        vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, useBuffers, offsets);
+        
         vkCmdDraw(renderer->CommandBuffers[i], 3, 1, 0, 0);
+        
         vkCmdEndRenderPass(renderer->CommandBuffers[i]);
         VkResult result = MAGE_CHECK_VULKAN(vkEndCommandBuffer(renderer->CommandBuffers[i]));
         if (result != VK_SUCCESS) { return result; }
     }
-
     return VK_SUCCESS;
 }
 static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
@@ -700,7 +703,7 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
 {   
     renderer->ConcurentFrames = 2;    
     renderer->CurrentFrame = 0;
-    
+
     uint32_t i;
     typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererProps *);
     function functions[] = 
@@ -731,40 +734,76 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
     MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations\n", i, sizeof(functions) / sizeof(function));
     return MAGE_SUCCESS;
 }
+static void mageCleanupSwapChain(struct mageRenderer *renderer)
+{
+    uint32_t i;
+    for (i = 0; i < renderer->SwapChainImageCount; i++)
+    {
+        vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
+    }
+    mageBufferDestroy(&exampleBuffer, renderer);
+    vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
+    vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
+    vkDestroyPipelineLayout(renderer->Device, renderer->GraphicsPipelineLayout, NULL);
+
+    for (i = 0; i < renderer->SwapChainImageCount; i++)
+    {
+        vkDestroyImageView(renderer->Device, renderer->SwapChainImageViews[i], NULL);
+    }
+
+    vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
+    vkDestroySwapchainKHR(renderer->Device, renderer->SwapChain, NULL);
+    vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
+}
+void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *rendererProps)
+{
+    vkDeviceWaitIdle(renderer->Device);
+    mageCleanupSwapChain(renderer);
+    
+    typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererProps *);
+    function functions[] = 
+    {
+        mageCreateSwapChain,
+        mageCreateSwapChainImages,
+        mageCreateRenderPass,
+        mageCreateGraphicsPipeline,
+        mageCreateFrameBuffers,
+        mageCreateCommandPool,
+        mageCreateCommandBuffers,    
+    };
+    uint32_t i;
+    for (i = 0; i < sizeof(functions) / sizeof(function); i++)
+    {
+        functions[i](renderer, window, rendererProps);
+    }
+}
 void mageRendererDestroy(struct mageRenderer *renderer)
 {
     uint32_t i;
     
+    mageCleanupSwapChain(renderer);
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {
         vkDestroySemaphore(renderer->Device, renderer->ImageAvailableSemaphores[i], NULL);
         vkDestroySemaphore(renderer->Device, renderer->RenderFinishedSemaphores[i], NULL);
         vkDestroyFence(renderer->Device, renderer->ConcurentFences[i], NULL);
     }
+    
+    vkDestroySurfaceKHR(renderer->Instance, renderer->Surface, NULL);
 
-    vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
-    vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
-    vkDestroyPipelineLayout(renderer->Device, renderer->GraphicsPipelineLayout, NULL);
-    vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
-
-    for (i = 0; i < renderer->SwapChainImageCount; i++)
-    {
-        vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
-        vkDestroyImageView(renderer->Device, renderer->SwapChainImageViews[i], NULL);
-    }
-
-    vkDestroySwapchainKHR(renderer->Device, renderer->SwapChain, NULL);
     vkDestroyDevice(renderer->Device, NULL);
+
 
 #if defined (MAGE_DEBUG)
     mageDestroyDebugUtilsMessengerEXT(renderer->Instance, renderer->DebugMessenger, NULL);
 #endif
 
-    vkDestroySurfaceKHR(renderer->Instance, renderer->Surface, NULL);
     vkDestroyInstance(renderer->Instance, NULL);
+    
+    
     mageIndiciesIndexesDestroy(&renderer->Indexes);
     mageSwapChainSupportDestroy(&renderer->SwapChainSupportInfo);
-    
+
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);

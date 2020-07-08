@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-
+static struct mageApplication *App;
 
 static void mageGLFWKeyCallback(GLFWwindow *window, int32_t key, int32_t scancode, int32_t action, int32_t modifiers)
 {
@@ -94,15 +94,22 @@ static void mageGLFWScrollWheelCallback(GLFWwindow *window, double xOffset, doub
     mageEventDispatch(buffer);
     free(buffer);
 }
-
-void mageInputSetup(struct mageWindow *window)
+static void mageGLFWWindowResizeCallback(GLFWwindow *window, int32_t width, int32_t height)
 {
-    glfwSetKeyCallback          (window->Context, mageGLFWKeyCallback);
-    glfwSetCursorPosCallback    (window->Context, mageGLFWMouseMoveCallback);
-    glfwSetMouseButtonCallback  (window->Context, mageGLFWMouseButtonCallback);
-    glfwSetWindowCloseCallback  (window->Context, mageGLFWWindowCloseCallback);
-    glfwSetWindowFocusCallback  (window->Context, mageGLFWWindowFocusCallback);
-    glfwSetCursorEnterCallback  (window->Context, mageGLFWCursorEnterCallback);
-    glfwSetWindowPosCallback    (window->Context, mageGLFWWindowMovesCallback);
-    glfwSetScrollCallback       (window->Context, mageGLFWScrollWheelCallback);
+    App->Window->Width = width;
+    App->Window->Height = height;
+    mageRendererResize(App->Renderer, App->Window, &App->RendererProps);
+}
+void mageInputSetup(struct mageApplication *application)
+{
+    App = application;
+    glfwSetKeyCallback          (application->Window->Context, mageGLFWKeyCallback);
+    glfwSetCursorPosCallback    (application->Window->Context, mageGLFWMouseMoveCallback);
+    glfwSetMouseButtonCallback  (application->Window->Context, mageGLFWMouseButtonCallback);
+    glfwSetWindowCloseCallback  (application->Window->Context, mageGLFWWindowCloseCallback);
+    glfwSetWindowFocusCallback  (application->Window->Context, mageGLFWWindowFocusCallback);
+    glfwSetCursorEnterCallback  (application->Window->Context, mageGLFWCursorEnterCallback);
+    glfwSetWindowPosCallback    (application->Window->Context, mageGLFWWindowMovesCallback);
+    glfwSetScrollCallback       (application->Window->Context, mageGLFWScrollWheelCallback);
+    glfwSetWindowSizeCallback   (application->Window->Context, mageGLFWWindowResizeCallback);
 }

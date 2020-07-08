@@ -1,30 +1,33 @@
 #include "mageAPI.h"
 
-mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolution, const int32_t yResolution, const char *title, const char *icon)
+mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicationProps *props)
 {
 
-	window->Height  = yResolution;
-	window->Width   = xResolution;
-	window->Title   = title;
+	window->Height  = props->Height;
+	window->Width   = props->Width;
+	window->Title   = props->Name;
 	window->Running = 1;
 	
 	MAGE_LOG_CORE_INFORM("Using GLFW as window mode\n", NULL);
 		
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); 
-	window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, NULL, NULL);
+	GLFWmonitor *monitor = NULL;
+
+
+	if (props->FixedResolution) { glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); }
+	if (props->Fullscreen) { monitor = glfwGetPrimaryMonitor(); }
+
+	window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, monitor, NULL);
 
 	GLFWimage localIcon;
 	uint8_t data;
 	uint32_t width, height;
 	uint8_t *image;
-	uint32_t error = lodepng_decode32_file(&image, &width, &height, icon);
+	uint32_t error = lodepng_decode32_file(&image, &width, &height, props->WindowIcon);
 
 	if (error) 
 	{
     	MAGE_LOG_CORE_ERROR("Image decoder error %u: %s\n", error, lodepng_error_text(error));
-
   	}
 	else
 	{
@@ -33,9 +36,6 @@ mageResult mageWindowInitialise(struct mageWindow *window, const int32_t xResolu
 		localIcon.pixels = image;
 		glfwSetWindowIcon(window->Context, 1, &localIcon);
 	}
-
-
-
 	
 	if (window->Context == NULL)
 	{

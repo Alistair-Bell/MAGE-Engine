@@ -178,6 +178,7 @@ struct mageRenderer
 	
 	VkInstance 								Instance;
 	VkDevice								Device;
+	VkPhysicalDeviceMemoryProperties		PhysicalDeviceMemoryProperties;
 	
 	VkPhysicalDevice						PhysicalDevice;
 	VkSurfaceKHR 							Surface;
@@ -222,6 +223,8 @@ struct mageApplicationProps
 	double 									Version;
 	uint32_t 								Width;
 	uint32_t 								Height;
+	uint8_t									Fullscreen;
+	uint8_t									FixedResolution;
 	mageApplicationStartCallback 			StartMethod;
 	mageApplicationUpdateCallback 			UpdateMethod;
 	mageApplicationDestroyCallback 			DestroyMethod;
@@ -230,17 +233,18 @@ struct mageApplicationProps
 	char 						   			*Name;
 	const char 								*WindowIcon;
 };
+struct mageRendererProps
+{
+	struct mageShader						*RuntimeShaders;
+	uint32_t 								ShaderCount;
+};
 struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
 	struct mageApplicationProps 			Props;
+	struct mageRendererProps				RendererProps;
 	uint8_t 								Running;
-};
-struct mageRendererProps
-{
-	struct mageShader						*RuntimeShaders;
-	uint32_t 								ShaderCount;
 };
 struct mageShader
 {
@@ -250,12 +254,17 @@ struct mageShader
 };
 struct mageVertexBuffer
 {
-	struct vector2 							*Vertecies;
-	uint32_t 								PositionCount;
+	struct vector2 							Vertex;
+	struct vector3							Color;
+};
+struct mageBuffer
+{
 #if defined (MAGE_VULKAN)
-	VkBuffer 								Buffer;
+	VkBuffer								Buffer;
+	VkDeviceMemory							AllocatedMemory;
 #endif
 };
+
 
 
 extern mageResult mageEngineInitialise(
@@ -288,16 +297,13 @@ extern mageResult mageFileDumpContents(
 );
 extern mageResult mageWindowInitialise(
 	struct mageWindow *window, 
-	const int32_t xResolution, 
-	const int32_t yResolution, 
-	const char *title,
-	const char *icon
+	struct mageApplicationProps *props
 );
 extern void mageWindowTerminate(
 	struct mageWindow *window
 );
 extern void mageInputSetup(
-	struct mageWindow *window
+	struct mageApplication *application
 );
 extern void mageEventSetupMaster(
 
@@ -370,6 +376,11 @@ extern mageResult mageRendererInitialise(
 	struct mageWindow *window, 
 	struct mageRendererProps *props
 );	
+extern void mageRendererResize(
+	struct mageRenderer *renderer, 
+	struct mageWindow *window,
+	struct mageRendererProps *rendererProps
+);
 extern void mageRendererRender(
 	struct mageRenderer *renderer
 );
@@ -393,23 +404,30 @@ extern mageShaderType mageShaderTypeFromString(
 #if defined (MAGE_VULKAN)
 
 extern void mageVertexBufferInitialise(
-	struct mageVertexBuffer *buffer,
-	struct vector2 *verticies,
-	uint32_t count,
-	VkDevice device
+	struct mageVertexBuffer *buffer, 
+	struct vector2 vertex, 
+	struct vector3 color
 );
-extern void mageVertexBufferDestroy(
-	struct mageVertexBuffer *buffer,
-	VkDevice device
+extern void mageBufferAllocate(
+	struct mageBuffer *buffer,
+	void *data,
+	uint32_t dataSize,
+	const VkBufferUsageFlags bufferUsage,
+	struct mageRenderer *renderer
 );
+extern void mageBufferDestroy(
+	struct mageBuffer *buffer,
+	struct mageRenderer *renderer	
+);
+
 extern VkResult mageHandleVulkanResult(
 	const char *functionName,
 	VkResult functionResult
 );
-extern uint32_t mageFindMemoryTypeIndex(
-	const VkPhysicalDeviceMemoryProperties *gpuMemoryProperties, 
-	const VkMemoryRequirements *memoryRequirements, 
-	const VkMemoryPropertyFlags memoryProperties
+extern uint32_t mageFindMemoryType(
+	uint32_t typeFilter, 
+	VkMemoryPropertyFlags properties,
+	struct mageRenderer *renderer
 );
 extern VkShaderStageFlagBits mageShaderTypeToBit(
 	const mageShaderType shaderType
@@ -464,8 +482,8 @@ extern void mageSwapChainSupportDestroy(
 extern VkVertexInputBindingDescription mageVertexBindingDescription(
 	
 );
-extern VkVertexInputAttributeDescription mageVertexGetAttributeDescriptions(
-
+extern VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(
+	uint32_t *count
 );
 
 #endif
