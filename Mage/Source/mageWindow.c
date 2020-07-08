@@ -11,9 +11,9 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	MAGE_LOG_CORE_INFORM("Using GLFW as window mode\n", NULL);
 		
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
+
 	GLFWmonitor *monitor = NULL;
-
-
 	if (props->FixedResolution) { glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); }
 	if (props->Fullscreen) { monitor = glfwGetPrimaryMonitor(); }
 
