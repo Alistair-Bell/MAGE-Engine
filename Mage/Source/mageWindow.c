@@ -24,7 +24,6 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	uint32_t width, height;
 	uint8_t *image;
 	uint32_t error = lodepng_decode32_file(&image, &width, &height, props->WindowIcon);
-
 	if (error) 
 	{
     	MAGE_LOG_CORE_ERROR("Image decoder error %u: %s\n", error, lodepng_error_text(error));
@@ -50,6 +49,7 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 
 	glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
+	free(image);
 	return MAGE_SUCCESS;
 
 }
