@@ -2,16 +2,28 @@
 
 #if defined (MAGE_VULKAN)
 
-void mageVertexBufferInitialise(struct mageVertexBuffer *buffer, struct vector2 vertex, struct vector3 color)
+
+void mageVertexBufferCreate(struct mageVertexBuffer *buffer, struct mageVertex *vertexes, uint32_t vertexCount, struct mageRenderer *renderer)
 {
-    buffer->Vertex = vertex;
-    buffer->Color = color; 
+    buffer->Vertexes = calloc(vertexCount, sizeof(struct mageVertex));
+    buffer->Count = vertexCount;
+    memcpy(buffer->Vertexes, vertexes, sizeof(struct mageVertex) * vertexCount);
+    mageBufferAllocate(&buffer->MemoryBuffer, buffer->Vertexes, sizeof(struct mageVertex) * vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
 }
-void mageBufferAllocate(struct mageBuffer *buffer, void *data, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, struct mageRenderer *renderer)
+void mageVertexBufferDestroy(struct mageVertexBuffer *buffer, struct mageRenderer *renderer)
+{
+    mageBufferDestroy(&buffer->MemoryBuffer, renderer);
+    free(buffer->Vertexes);
+}
+void mageVertexInitialise(struct mageVertex *vertexInstance, struct vector2 vertex, struct vector3 color)
+{
+    vertexInstance->Vertex = vertex;
+    vertexInstance->Color = color; 
+}
+void mageBufferAllocate(struct mageBuffer *buffer, void *data, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, VkBufferUsageFlags flags, struct mageRenderer *renderer)
 {
     VkMemoryRequirements requirements;
-    memset(&requirements, 0, sizeof(VkMemoryRequirements));
-
+    
     VkBufferCreateInfo bufferInfo;
     memset(&bufferInfo, 0, sizeof(VkBufferCreateInfo));
 
@@ -27,7 +39,7 @@ void mageBufferAllocate(struct mageBuffer *buffer, void *data, uint32_t dataSize
     VkMemoryAllocateInfo allocateInfo;
     memset(&allocateInfo, 0, sizeof(VkMemoryAllocateInfo));
     allocateInfo.sType              = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocateInfo.memoryTypeIndex    = mageFindMemoryType(requirements.memoryTypeBits, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
+    allocateInfo.memoryTypeIndex    = mageFindMemoryType(requirements.memoryTypeBits, flags, renderer);
     allocateInfo.allocationSize     = requirements.size;
     MAGE_CHECK_VULKAN(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
 
@@ -43,13 +55,12 @@ void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
     vkDestroyBuffer(renderer->Device, buffer->Buffer, NULL);
     vkFreeMemory(renderer->Device, buffer->AllocatedMemory, NULL);
 }
-
 VkVertexInputBindingDescription mageVertexBindingDescription()
 {
     VkVertexInputBindingDescription bindingDescription;
     memset(&bindingDescription, 0, sizeof(VkVertexInputBindingDescription));
     bindingDescription.binding      = 0;
-    bindingDescription.stride       = sizeof(struct mageVertexBuffer);
+    bindingDescription.stride       = sizeof(struct mageVertex);
     bindingDescription.inputRate    = VK_VERTEX_INPUT_RATE_VERTEX;
     return bindingDescription;
 }
@@ -62,12 +73,12 @@ VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(uint32_t *
     attributeDescriptions[0].binding = 0;
     attributeDescriptions[0].location = 0;
     attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-    attributeDescriptions[0].offset = offsetof(struct mageVertexBuffer, Vertex);
+    attributeDescriptions[0].offset = offsetof(struct mageVertex, Vertex);
 
     attributeDescriptions[1].binding = 0;
     attributeDescriptions[1].location = 1;
     attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-    attributeDescriptions[1].offset = offsetof(struct mageVertexBuffer, Color);
+    attributeDescriptions[1].offset = offsetof(struct mageVertex, Color);
     return attributeDescriptions;
 }
 

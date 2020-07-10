@@ -84,7 +84,7 @@ filter "configurations:Release"
     defines "MAGE_RELEASE"
     runtime "Release"
     optimize "Speed"
-    symbols "On"
+
 
 project "Sandbox"
     location "%{prj.name}"
@@ -117,8 +117,8 @@ project "Sandbox"
     filter "configurations:Release"
         defines "SANDBOX_RELEASE"
         runtime "Release"
-        optimize "On"
-
+        optimize "Speed"
+        
 
 group "Externals"
     include "Mage/Externals/hypatia"

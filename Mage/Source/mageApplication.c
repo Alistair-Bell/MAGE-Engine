@@ -47,15 +47,18 @@ mageResult mageApplicationInitialise(struct mageApplication *application, struct
 
     application->Running = 1;
 
-    if (application->Props.StartMethod == NULL) application->Props.StartMethod = mageApplicationDefaultStart;
-    if (application->Props.UpdateMethod == NULL) application->Props.UpdateMethod = mageApplicationDefaultUpdate;
-    if (application->Props.DestroyMethod == NULL) application->Props.DestroyMethod = mageApplicationDefaultDestroy;
+    if (application->Props.StartMethod == NULL)    application->Props.StartMethod = mageApplicationDefaultStart;
+    if (application->Props.UpdateMethod == NULL)   application->Props.UpdateMethod = mageApplicationDefaultUpdate;
+    if (application->Props.DestroyMethod == NULL)  application->Props.DestroyMethod = mageApplicationDefaultDestroy;
 
     application->Renderer = malloc(sizeof(struct mageRenderer));
     application->Window = malloc(sizeof(struct mageWindow));
     char temp[255];
-    sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
-    application->Props.Name = temp;
+    if (application->Props.Version != 0.0)
+    {
+        sprintf(temp, "%s : Version %.2f", application->Props.Name, application->Props.Version);
+        application->Props.Name = temp;
+    }
 
     result = mageWindowInitialise(application->Window, &application->Props);
     

@@ -7,7 +7,6 @@ VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResul
     switch (functionResult)
     {
     case VK_SUCCESS:
-        MAGE_LOG_CORE_INFORM("%s was succesfull, program running normally\n", functionName);
         break;
     case VK_NOT_READY:
         MAGE_LOG_CORE_FATAL_ERROR("%s has failed, vulkan is not ready\n", functionName);

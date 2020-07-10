@@ -34,6 +34,8 @@
 	**************************/
 	#include <linux/kernel.h>
 	#include <linux/module.h>
+	#define __USE_XOPEN_EXTENDED
+	#include <unistd.h>
 
 	/*!************************
 		Checking if it is android as android uses the linux kernel

@@ -1,12 +1,11 @@
 #include "Sandbox.h"
 
-
 void ClientLoadProps(struct mageApplicationProps *applicationProps, struct mageRendererProps *rendererProps)
 {
     applicationProps->Width = 1920;
     applicationProps->Height = 1080;
-    applicationProps->Name = "Hello World";
-    applicationProps->Version = 1.0;   
+    applicationProps->Name = "Mage Engine";
+    applicationProps->Version = 0;   
     applicationProps->FixedResolution = 0;
     applicationProps->Fullscreen = 1;
     applicationProps->WindowIcon = "Mage/Resources/Textures/Vulkan/Vulkan_LogoBug_48px_Nov17.png";

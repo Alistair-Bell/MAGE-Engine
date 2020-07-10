@@ -252,7 +252,7 @@ struct mageShader
 	const char 								*FilePath;
 	const char 								*RuntimeFunctionName;
 };
-struct mageVertexBuffer
+struct mageVertex
 {
 	struct vector2 							Vertex;
 	struct vector3							Color;
@@ -263,6 +263,12 @@ struct mageBuffer
 	VkBuffer								Buffer;
 	VkDeviceMemory							AllocatedMemory;
 #endif
+};
+struct mageVertexBuffer
+{
+	struct mageBuffer						MemoryBuffer;
+	struct mageVertex						*Vertexes;
+	uint32_t								Count;
 };
 
 
@@ -400,11 +406,21 @@ extern mageResult mageShaderInitialise(
 extern mageShaderType mageShaderTypeFromString(
 	const char *name
 );
+extern void mageVertexBufferCreate(
+	struct mageVertexBuffer *buffer,
+	struct mageVertex *vertexes,
+	uint32_t vertexCount,
+	struct mageRenderer *renderer
+);
+extern void mageVertexBufferDestroy(
+	struct mageVertexBuffer *buffer,
+	struct mageRenderer *renderer
+);
 
 #if defined (MAGE_VULKAN)
 
-extern void mageVertexBufferInitialise(
-	struct mageVertexBuffer *buffer, 
+extern void mageVertexInitialise(
+	struct mageVertex *vertexInstance, 
 	struct vector2 vertex, 
 	struct vector3 color
 );
@@ -413,6 +429,7 @@ extern void mageBufferAllocate(
 	void *data,
 	uint32_t dataSize,
 	const VkBufferUsageFlags bufferUsage,
+	const VkBufferUsageFlags flags,
 	struct mageRenderer *renderer
 );
 extern void mageBufferDestroy(
