@@ -270,6 +270,12 @@ struct mageVertexBuffer
 	struct mageVertex						*Vertexes;
 	uint32_t								Count;
 };
+struct mageIndexBuffer
+{
+	struct mageBuffer						MemoryBuffer;
+	uint16_t								*Indexes;
+	uint16_t								Count;
+};
 
 
 
@@ -416,6 +422,17 @@ extern void mageVertexBufferDestroy(
 	struct mageVertexBuffer *buffer,
 	struct mageRenderer *renderer
 );
+extern void mageIndexBufferCreate(
+	struct mageIndexBuffer *buffer,
+	uint16_t *indexes,
+	uint32_t indexCount,
+	struct mageRenderer *renderer
+);
+extern void mageIndexBufferDestroy(
+	struct mageIndexBuffer *buffer,
+	struct mageRenderer *renderer
+);
+
 
 #if defined (MAGE_VULKAN)
 

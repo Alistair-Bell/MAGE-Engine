@@ -7,7 +7,7 @@ void ClientLoadProps(struct mageApplicationProps *applicationProps, struct mageR
     applicationProps->Name = "Mage Engine";
     applicationProps->Version = 0;   
     applicationProps->FixedResolution = 0;
-    applicationProps->Fullscreen = 1;
+    applicationProps->Fullscreen = 0;
     applicationProps->WindowIcon = "Mage/Resources/Textures/Vulkan/Vulkan_LogoBug_48px_Nov17.png";
     
     struct mageShader *shaders = calloc(2, sizeof(struct mageShader));
