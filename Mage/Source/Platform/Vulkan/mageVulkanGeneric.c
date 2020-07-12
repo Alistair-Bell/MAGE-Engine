@@ -180,12 +180,12 @@ mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice 
         VkPhysicalDeviceProperties properties;
         vkGetPhysicalDeviceProperties(device, &properties);
         MAGE_LOG_CORE_ERROR("Device %s, graphics or present index not found\n", properties.deviceName);
-        return MAGE_HARDWARE_INVALID;
+        return MAGE_RESULT_HARDWARE_INVALID;
     }
     
     mageIndiciesIndexesInitialise(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
     free(queueProperties);
-    return MAGE_SUCCESS;
+    return MAGE_RESULT_SUCCESS;
 }
 void mageSwapChainSupportInitialise(struct mageSwapChainSupportDetails *swapChainSupport, const VkSurfaceCapabilitiesKHR surfaceCapabilities, VkSurfaceFormatKHR *formats, const uint32_t formatCount, VkPresentModeKHR *presentModes, const uint32_t presentCount, VkExtent2D extent)
 {
@@ -213,7 +213,7 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
     if (formatCount <= 0 || presentCount <= 0)
     {
         MAGE_LOG_CORE_ERROR("Physical device has no surface formats or present modes supported\n", NULL);
-        return MAGE_HARDWARE_INVALID;
+        return MAGE_RESULT_HARDWARE_INVALID;
     }
     
     VkSurfaceFormatKHR *formats = calloc(formatCount, sizeof(VkSurfaceFormatKHR));
@@ -238,7 +238,7 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
 
     free(presents);
     free(formats);
-    return MAGE_SUCCESS;
+    return MAGE_RESULT_SUCCESS;
 }
 VkPresentModeKHR mageSwapChainSupportPickPresentMode(struct mageSwapChainSupportDetails *swapChainSupport)
 {

@@ -18,7 +18,7 @@ workspace "MAGE"
 -- Engine Project
 project "MageEngine"
     location "Mage"
-    kind "ConsoleApp"
+    kind "StaticLib"
     language "C"
     cdialect "C89"
 
@@ -42,33 +42,7 @@ project "MageEngine"
     {
         "Mage/Source/",
     }
-    flags
-    {
-        "LinkTimeOptimization",
-    }
-    links
-    {
-        "Sandbox",
-        "hypatia",
-        "GLFW",
-        "vulkan",
-        "lodepng",
-        "yaml"    
-    }
-
-
-    filter "system:windows"
-    systemversion "latest"
-
-    filter "system:linux"
-
-        links 
-        { 
-            "dl",
-            "pthread",
-            "m",
-        }
-
+    
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
     runtime "Debug"
@@ -88,8 +62,8 @@ filter "configurations:Release"
 
 project "Sandbox"
     location "%{prj.name}"
-    kind "StaticLib"
-    language "c"
+    kind "ConsoleApp"
+    language "C"
     cdialect "C89"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
@@ -108,6 +82,24 @@ project "Sandbox"
     {
         
     }
+    
+    links
+    {
+        "MageEngine",
+        "hypatia",
+        "GLFW",
+        "vulkan",
+        "lodepng",
+        "yaml"    
+    }
+
+    filter "system:linux"
+        links 
+        { 
+            "dl",
+            "pthread",
+            "m",
+        }
 
     filter "configurations:Debug"
         defines "SANDBOX_DEBUG"    

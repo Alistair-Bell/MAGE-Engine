@@ -25,7 +25,7 @@ mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFil
     shader->FilePath                = shaderFile;
     shader->ShaderType              = shaderType;
     shader->RuntimeFunctionName     = runtimeFunctionName;
-    return MAGE_SUCCESS;
+    return MAGE_RESULT_SUCCESS;
 }
 VkShaderModule mageShaderCreateModule(struct mageShader *shader, VkDevice device)
 {

@@ -145,7 +145,7 @@ static uint8_t mageIsDeviceSuitable(struct mageRenderer *renderer, VkPhysicalDev
 {
     struct mageIndiciesIndexes indicies;
     mageResult result = mageGetDeviceIndexes(renderer, device, &indicies);
-    if (result != MAGE_SUCCESS)
+    if (result != MAGE_RESULT_SUCCESS)
     {
         mageIndiciesIndexesDestroy(&indicies);
         return 0;
@@ -306,7 +306,7 @@ static VkResult mageFetchQueues(struct mageRenderer *renderer, struct mageWindow
 }
 static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererProps *props)
 {
-    if (mageGetSwapChainSupport(&renderer->SwapChainSupportInfo, window, renderer->PhysicalDevice, renderer->Surface) != MAGE_SUCCESS)
+    if (mageGetSwapChainSupport(&renderer->SwapChainSupportInfo, window, renderer->PhysicalDevice, renderer->Surface) != MAGE_RESULT_SUCCESS)
     {
         MAGE_LOG_CORE_FATAL_ERROR("Failed to create swap chain, hardware invalid\n", NULL);
     }
@@ -737,10 +737,10 @@ mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWind
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
     {
         VkResult result = functions[i](renderer, window, props);
-        if (result != VK_SUCCESS) return MAGE_UNKNOWN;
+        if (result != VK_SUCCESS) return MAGE_RESULT_UNKNOWN;
     }
     MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations\n", i, sizeof(functions) / sizeof(function));
-    return MAGE_SUCCESS;
+    return MAGE_RESULT_SUCCESS;
 }
 static void mageCleanupSwapChain(struct mageRenderer *renderer)
 {

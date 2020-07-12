@@ -27,65 +27,50 @@
 
 #define MAGE_CHECK_VULKAN(function) \
 	mageHandleVulkanResult(#function, function)
-
 #endif
 
+typedef uint32_t mageEventHandle;
 
-	
-struct mageApplication;
-struct mageApplicationProps;
-struct mageRendererProps;
-struct mageWindow;
-struct mageRenderer;
-struct mageIndiciesIndexes;
-struct mageSwapChainSupportDetails;
-struct mageVertex;
-
-typedef enum MAGE_RESULT_ENUM 					mageResult;
-typedef enum MAGE_EVENT_ENUM 					mageEventType;
-typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM 		mageEventCategoryBit;
-typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM mageEventRequiredByteSize;
-typedef enum MAGE_SHADER_TYPE_ENUM				mageShaderType;
-typedef enum MAGE_KEYCODE_ENUM					mageKeycode;
-
-typedef mageResult  (*mageApplicationStartCallback)		(struct mageApplication *);
-typedef void 		(*mageApplicationUpdateCallback)	(struct mageApplication *);
-typedef mageResult  (*mageApplicationDestroyCallback)	(struct mageApplication *);
-typedef void 		(*mageEventListenerCallback)		(void *, mageEventType);
-
-
-enum MAGE_RESULT_ENUM 
+typedef enum MAGE_STRUCTURE_TYPE_ENUM
 {
-	MAGE_UNKNOWN 								= -1,
-	MAGE_SUCCESS,
-	MAGE_LIBRARY_FAILURE,
-	MAGE_INVALID_INPUT,
-	MAGE_HARDWARE_INVALID,
-	MAGE_VULKAN_NOT_READY,
-	MAGE_CONTEXT_CREATION_FAILED,
-	MAGE_DEBUG_MESSENGER_FAILED,
-	MAGE_INSTANCE_CREATION_FAILURE,
-	MAGE_DEVICE_CREATION_FAILURE,
-	MAGE_SURFACE_CREATION_FAILURE,
-	MAGE_FENCE_CREATION_FAILURE,
-	MAGE_IMAGE_CREATION_FAILURE,
-	MAGE_IMAGE_VIEW_CREATION_FAILURE,
-	MAGE_SEMAPHORE_CREATION_FAILURE,
-	MAGE_COMMAND_POOL_CREATION_FAILURE,
-	MAGE_ALLOCATE_COMMAND_FAILURE,
-	MAGE_SWAPCHAIN_CREATION_FAILED,
-	MAGE_RENDER_PASS_CREATION_FAILURE,
-	MAGE_PIPELINE_CREATION_FAILURE,
-	MAGE_FRAME_BUFFER_CREATION_FAILED,
-	MAGE_GRAPHICS_PIPELINE_CREATION_FAILURE,
-	MAGE_QUEUE_SUBMITION_FAILURE,
-	MAGE_HARDWARE_NOT_PRESENT,
-	MAGE_SHADER_CREATION_FAILURE,
-	MAGE_START_METHOD_FAILURE,
-	MAGE_UPDATE_FAILURE,
-	MAGE_DESTROY_METHOD_FAILURE,
-};
-enum MAGE_EVENT_ENUM
+	MAGE_STRUCTURE_TYPE_APPLICATION,
+	MAGE_STRUCTURE_TYPE_RENDERER,
+
+} mageStructureType;
+
+typedef enum MAGE_RESULT_ENUM 
+{
+	MAGE_RESULT_UNKNOWN 								= -1,
+	MAGE_RESULT_SUCCESS,
+	MAGE_RESULT_LIBRARY_FAILURE,
+	MAGE_RESULT_INVALID_INPUT,
+	MAGE_RESULT_HARDWARE_INVALID,
+	MAGE_RESULT_VULKAN_NOT_READY,
+	MAGE_RESULT_CONTEXT_CREATION_FAILED,
+	MAGE_RESULT_DEBUG_MESSENGER_FAILED,
+	MAGE_RESULT_INSTANCE_CREATION_FAILURE,
+	MAGE_RESULT_DEVICE_CREATION_FAILURE,
+	MAGE_RESULT_SURFACE_CREATION_FAILURE,
+	MAGE_RESULT_FENCE_CREATION_FAILURE,
+	MAGE_RESULT_IMAGE_CREATION_FAILURE,
+	MAGE_RESULT_IMAGE_VIEW_CREATION_FAILURE,
+	MAGE_RESULT_SEMAPHORE_CREATION_FAILURE,
+	MAGE_RESULT_COMMAND_POOL_CREATION_FAILURE,
+	MAGE_RESULT_ALLOCATE_COMMAND_FAILURE,
+	MAGE_RESULT_SWAPCHAIN_CREATION_FAILED,
+	MAGE_RESULT_RENDER_PASS_CREATION_FAILURE,
+	MAGE_RESULT_PIPELINE_CREATION_FAILURE,
+	MAGE_RESULT_FRAME_BUFFER_CREATION_FAILED,
+	MAGE_RESULT_GRAPHICS_PIPELINE_CREATION_FAILURE,
+	MAGE_RESULT_QUEUE_SUBMITION_FAILURE,
+	MAGE_RESULT_HARDWARE_NOT_PRESENT,
+	MAGE_RESULT_SHADER_CREATION_FAILURE,
+	MAGE_RESULT_START_METHOD_FAILURE,
+	MAGE_RESULT_UPDATE_FAILURE,
+	MAGE_RESULT_DESTROY_METHOD_FAILURE,
+} mageResult;
+
+typedef enum MAGE_EVENT_ENUM
 {
     MAGE_NONE_EVENT                     		= 0,
     MAGE_WINDOW_CLOSE_EVENT             		= 1,
@@ -102,26 +87,28 @@ enum MAGE_EVENT_ENUM
     MAGE_MOUSE_BUTTON_RELEASED_EVENT    		= 12,
     MAGE_MOUSE_MOVED_EVENT              		= 13,
     MAGE_MOUSE_SCROLLED_EVENT           		= 14,
-};
-enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM
+} mageEventType;
+
+typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM
 {
 	MAGE_NONE_EVENT_BYTE_SIZE 					= 0,
-	MAGE_WINDOW_CLOSE_EVENT_BYTE_SIZE 			= sizeof(int16_t),
-	MAGE_WINDOW_FOCUS_EVENT_BYTE_SIZE 			= sizeof(uint16_t),
-	MAGE_WINDOW_LOST_FOCUS_EVENT_BYTE_SIZE		= sizeof(uint16_t),
-	MAGE_WINDOW_MOVED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + (sizeof(uint32_t) * 2),
-	MAGE_APPLICATION_TICK_EVENT_BYTE_SIZE 		= sizeof(uint16_t) + sizeof(int32_t),
-	MAGE_APPLICATION_UPDATE_EVENT_BYTE_SIZE 	= sizeof(uint16_t),
-	MAGE_APPLICATION_RENDER_EVENT_BYTE_SIZE 	= sizeof(uint16_t),
-	MAGE_KEY_PRESSED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + sizeof(uint8_t),
-	MAGE_KEY_REPEAT_EVENT_BYTE_SIZE				= sizeof(uint16_t) + sizeof(uint8_t),
-	MAGE_KEY_RELEASED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + sizeof(uint8_t),
-	MAGE_MOUSE_BUTTON_PRESSED_EVENT_BYTE_SIZE 	= sizeof(uint16_t) + sizeof(uint8_t),
-	MAGE_MOUSE_BUTTON_RELEASED_EVENT_BYTE_SIZE 	= sizeof(uint16_t) + sizeof(uint8_t),
-	MAGE_MOUSE_MOVED_EVENT_BYTE_SIZE 			= sizeof(uint16_t) + (sizeof(double) * 2),
-	MAGE_MOUSE_SCROLLED_EVENT_BYTE_SIZE 		= sizeof(uint16_t) + (sizeof(double) * 2),
-};
-enum MAGE_EVENT_CATEGORY_BITS_ENUM
+	MAGE_WINDOW_CLOSE_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle),
+	MAGE_WINDOW_FOCUS_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle),
+	MAGE_WINDOW_LOST_FOCUS_EVENT_BYTE_SIZE		= sizeof(mageEventHandle),
+	MAGE_WINDOW_MOVED_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle) + (sizeof(uint32_t) * 2),
+	MAGE_APPLICATION_TICK_EVENT_BYTE_SIZE 		= sizeof(mageEventHandle) + sizeof(int32_t),
+	MAGE_APPLICATION_UPDATE_EVENT_BYTE_SIZE 	= sizeof(mageEventHandle),
+	MAGE_APPLICATION_RENDER_EVENT_BYTE_SIZE 	= sizeof(mageEventHandle),
+	MAGE_KEY_PRESSED_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle) + sizeof(uint8_t),
+	MAGE_KEY_REPEAT_EVENT_BYTE_SIZE				= sizeof(mageEventHandle) + sizeof(uint8_t),
+	MAGE_KEY_RELEASED_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle) + sizeof(uint8_t),
+	MAGE_MOUSE_BUTTON_PRESSED_EVENT_BYTE_SIZE 	= sizeof(mageEventHandle) + sizeof(uint8_t),
+	MAGE_MOUSE_BUTTON_RELEASED_EVENT_BYTE_SIZE 	= sizeof(mageEventHandle) + sizeof(uint8_t),
+	MAGE_MOUSE_MOVED_EVENT_BYTE_SIZE 			= sizeof(mageEventHandle) + (sizeof(double) * 2),
+	MAGE_MOUSE_SCROLLED_EVENT_BYTE_SIZE 		= sizeof(mageEventHandle) + (sizeof(double) * 2),
+} mageEventRequiredByteSize;
+
+typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM
 {
 	MAGE_NONE_CATEGORY 							= -1,
 	MAGE_APPLICATION_CATEGORY					= 4,
@@ -129,8 +116,9 @@ enum MAGE_EVENT_CATEGORY_BITS_ENUM
 	MAGE_KEYBOARD_CATEGORY 						= 6,
 	MAGE_MOUSE_CATEGORY							= 7,
 	MAGE_MOUSE_BUTTON_CATEGORY					= 8,
-};
-enum MAGE_SHADER_TYPE_ENUM
+} mageEventCategoryBit;
+
+typedef enum MAGE_SHADER_TYPE_ENUM
 {
 	MAGE_VERTEX_SHADER							= 1,
 	MAGE_TESSELLATION_CONTROL_SHADER			= 2,
@@ -138,7 +126,9 @@ enum MAGE_SHADER_TYPE_ENUM
 	MAGE_GEOMETRY_SHADER						= 4,
 	MAGE_FRAGMENT_SHADER						= 5,
 	MAGE_COMPUTE_SHADER							= 6,
-};
+} mageShaderType;
+
+typedef (*mageEventListenerCallback)(void *, mageEventType);
 
 
 #if defined (MAGE_VULKAN)
@@ -225,9 +215,6 @@ struct mageApplicationProps
 	uint32_t 								Height;
 	uint8_t									Fullscreen;
 	uint8_t									FixedResolution;
-	mageApplicationStartCallback 			StartMethod;
-	mageApplicationUpdateCallback 			UpdateMethod;
-	mageApplicationDestroyCallback 			DestroyMethod;
 	mageEventListenerCallback				*Listeners;
 	uint32_t 								ListenerCount;
 	char 						   			*Name;
@@ -281,9 +268,6 @@ struct mageIndexBuffer
 
 extern mageResult mageEngineInitialise(
 
-);
-extern const char *mageToString(
-	mageResult result
 );
 extern void mageLogMessage(
 	const uint8_t user, 

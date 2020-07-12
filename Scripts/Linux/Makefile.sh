@@ -8,8 +8,8 @@ make config="$1"
 
 if [ "$1" == "debug" ]
 then 
-    ./Build/Binaries/MageEngine-Debug/MageEngine
+    ./Build/Binaries/Sandbox-Debug/Sandbox
 else
-    ./Build/Binaries/MageEngine-Release/MageEngine
+    ./Build/Binaries/Sandbox-Release/Sandbox
 fi
 

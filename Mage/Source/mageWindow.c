@@ -40,7 +40,7 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	{
 		glfwTerminate();
 		MAGE_LOG_CORE_FATAL_ERROR("GLFW context has failed to create\n", NULL);
-		return MAGE_CONTEXT_CREATION_FAILED;
+		return MAGE_RESULT_CONTEXT_CREATION_FAILED;
 	}
 	
 	MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
@@ -50,7 +50,7 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
 	free(image);
-	return MAGE_SUCCESS;
+	return MAGE_RESULT_SUCCESS;
 
 }
 void mageWindowTerminate(struct mageWindow *window)
