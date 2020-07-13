@@ -1,8 +1,6 @@
-#include <mageAPI.h>
+#include "mageVulkanAPI.h"
 
 #if defined (MAGE_VULKAN)
-
-
 
 static const char *mageRequiredExtensions[] = 
 {
@@ -12,16 +10,16 @@ static const char *const mageRequiredLayers[] =
 {
     "VK_LAYER_KHRONOS_validation",
 };
-static struct mageVertex vertexBuffers[] = { 
+static struct mageVertex vertexes[] = { 
     { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 0.0f} },
     { .Vertex = { .x = 0.5f, .y = -0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f} },
     { .Vertex = { .x = 0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },
     { .Vertex = { .x = -0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },  
 };
-static uint16_t vertexIndicies[] = { 0, 1, 2, 2, 3, 0 };
+static uint16_t indicies[] = { 0, 1, 2, 2, 3, 0 };
 
-struct mageVertexBuffer exampleVertexBuffer;
-struct mageIndexBuffer exampleIndexBuffer;
+struct mageBuffer exampleVertexBuffer;
+struct mageBuffer exampleIndexBuffer;
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *pUserData) 
 {
@@ -617,13 +615,13 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
 {
     
     uint32_t i;
-    mageVertexBufferCreate(&exampleVertexBuffer, vertexBuffers, 4, renderer);
-    mageIndexBufferCreate(&exampleIndexBuffer, vertexIndicies, 6, renderer);
+    mageBufferCreate(&exampleVertexBuffer, MAGE_BUFFER_TYPE_VERTEX, vertexes, sizeof(struct mageVertex) * 4, renderer);
+    mageBufferCreate(&exampleVertexBuffer, MAGE_BUFFER_TYPE_INDEX, indicies, sizeof(uint16_t) * 6, renderer);
 
 
     renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
 
-    VkBuffer useBuffers[]  = { exampleVertexBuffer.MemoryBuffer.Buffer };
+    VkBuffer useBuffers[]  = { exampleVertexBuffer.Wrapper.Buffer };
     VkDeviceSize offsets[] = { 0 };    
 
     VkCommandBufferAllocateInfo allocateInfo;
@@ -665,14 +663,10 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
 
         vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
             vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
-
             vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, useBuffers, offsets);
-            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], exampleIndexBuffer.MemoryBuffer.Buffer, 0, VK_INDEX_TYPE_UINT16);
-            vkCmdDrawIndexed(renderer->CommandBuffers[i], exampleIndexBuffer.Count, 1, 0, 0, 0);
-
-            /* vkCmdDraw(renderer->CommandBuffers[i], sizeof(vertexBuffers) / sizeof(struct mageVertex), 1, 0, 0); */
+            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], exampleIndexBuffer.Wrapper.Buffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdDrawIndexed(renderer->CommandBuffers[i], 6, 1, 0, 0, 0);
         vkCmdEndRenderPass(renderer->CommandBuffers[i]);
         VkResult result = MAGE_CHECK_VULKAN(vkEndCommandBuffer(renderer->CommandBuffers[i]));
         if (result != VK_SUCCESS) { return result; }
@@ -749,8 +743,8 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer)
     {
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
     }
-    mageVertexBufferDestroy(&exampleVertexBuffer, renderer);
-    mageIndexBufferDestroy(&exampleIndexBuffer, renderer);
+    mageBufferDestroy(&exampleVertexBuffer, renderer);
+    mageBufferDestroy(&exampleIndexBuffer, renderer);
     
     
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);

@@ -32,6 +32,7 @@ project "MageEngine"
     {
         "Mage/Source/*.h",
         "Mage/Source/*.c",
+        "Mage/Source/Platform/Vulkan/**.h",
         "Mage/Source/Platform/Vulkan/**.c",
     }
     defines

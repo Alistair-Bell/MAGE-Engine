@@ -1,4 +1,4 @@
-#include <mageAPI.h>
+#include "mageVulkanAPI.h"
 
 #if defined (MAGE_VULKAN)
 

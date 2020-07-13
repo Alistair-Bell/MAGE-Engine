@@ -1,49 +1,36 @@
-#include <mageAPI.h>
+#include "mageVulkanAPI.h"
 
 #if defined (MAGE_VULKAN)
 
 
-void mageVertexBufferCreate(struct mageVertexBuffer *buffer, struct mageVertex *vertexes, uint32_t vertexCount, struct mageRenderer *renderer)
+VkBufferUsageFlagBits mageBufferTypeToFlagBits(const mageBufferType type)
 {
-    buffer->Vertexes = calloc(vertexCount, sizeof(struct mageVertex));
-    buffer->Count = vertexCount;
-    memcpy(buffer->Vertexes, vertexes, sizeof(struct mageVertex) * vertexCount);
-    mageBufferAllocate(&buffer->MemoryBuffer, buffer->Vertexes, sizeof(struct mageVertex) * vertexCount, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
-
-    void *mappedData;
-    vkMapMemory(renderer->Device, buffer->MemoryBuffer.AllocatedMemory, 0, sizeof(struct mageVertex) * vertexCount, 0, &mappedData);
-    memcpy(mappedData, vertexes, sizeof(struct mageVertex) * vertexCount);
-    vkUnmapMemory(renderer->Device, buffer->MemoryBuffer.AllocatedMemory);
+    switch (type)
+    {
+        case MAGE_BUFFER_TYPE_INDEX:
+            return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+        case MAGE_BUFFER_TYPE_VERTEX:
+            return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        default:
+            MAGE_LOG_CORE_WARNING("Invalid buffer type %d\n", type);
+    }
 }
-void mageVertexBufferDestroy(struct mageVertexBuffer *buffer, struct mageRenderer *renderer)
+void mageBufferCreate(struct mageBuffer *buffer, mageBufferType bufferType, void *data, uint32_t dataByteSize, struct mageRenderer *renderer)
 {
-    mageBufferDestroy(&buffer->MemoryBuffer, renderer);
-    free(buffer->Vertexes);
+    buffer->StructureType = MAGE_STRUCTURE_TYPE_BUFFER;
+    mageBufferWrapperAllocate(&buffer->Wrapper, data, dataByteSize, mageBufferTypeToFlagBits(bufferType), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
 }
-void mageIndexBufferCreate(struct mageIndexBuffer *buffer, uint16_t *indexes, uint32_t indexCount, struct mageRenderer *renderer)
+void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
 {
-    buffer->Indexes = calloc(indexCount, sizeof(uint16_t));
-    buffer->Count = indexCount;
-    memcpy(buffer->Indexes, indexes, sizeof(uint16_t) * indexCount);
-    mageBufferAllocate(&buffer->MemoryBuffer, buffer->Indexes,  sizeof(uint16_t) * indexCount, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
-
-    void *mappedData;
-    vkMapMemory(renderer->Device, buffer->MemoryBuffer.AllocatedMemory, 0,  sizeof(uint16_t) * indexCount, 0, &mappedData);
-    memcpy(mappedData, indexes,  sizeof(uint16_t) * indexCount);
-    vkUnmapMemory(renderer->Device, buffer->MemoryBuffer.AllocatedMemory);
+    mageBufferWrapperDestroy(&buffer->Wrapper, renderer);
 }
-void mageIndexBufferDestroy(struct mageIndexBuffer *buffer, struct mageRenderer *renderer)
-{
-    mageBufferDestroy(&buffer->MemoryBuffer, renderer);
-    free(buffer->Indexes);
-}
-
 void mageVertexInitialise(struct mageVertex *vertexInstance, struct vector2 vertex, struct vector3 color)
 {
+    vertexInstance->StructureType = MAGE_STRUCTURE_TYPE_VERTEX;
     vertexInstance->Vertex = vertex;
     vertexInstance->Color = color; 
 }
-void mageBufferAllocate(struct mageBuffer *buffer, void *data, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, VkMemoryPropertyFlags flags, struct mageRenderer *renderer)
+void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, VkMemoryPropertyFlags flags, struct mageRenderer *renderer)
 {
     VkMemoryRequirements requirements;
     
@@ -67,8 +54,13 @@ void mageBufferAllocate(struct mageBuffer *buffer, void *data, uint32_t dataSize
     MAGE_CHECK_VULKAN(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
 
     MAGE_CHECK_VULKAN(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));
+
+    void *memory;
+    vkMapMemory(renderer->Device, buffer->AllocatedMemory, 0, dataSize, 0, &memory);
+        memcpy(memory, data, dataSize);
+    vkUnmapMemory(renderer->Device, buffer->AllocatedMemory);
 }
-void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
+void mageBufferWrapperDestroy(struct mageBufferWrapper *buffer, struct mageRenderer *renderer)
 {
     vkDestroyBuffer(renderer->Device, buffer->Buffer, NULL);
     vkFreeMemory(renderer->Device, buffer->AllocatedMemory, NULL);

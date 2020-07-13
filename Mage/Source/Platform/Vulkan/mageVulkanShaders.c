@@ -1,4 +1,4 @@
-#include <mageAPI.h>
+#include "mageVulkanAPI.h"
 
 #if defined (MAGE_VULKAN)
 
@@ -6,17 +6,17 @@ VkShaderStageFlagBits mageShaderTypeToBit(mageShaderType shaderType)
 {
     switch (shaderType)
     {
-        case MAGE_VERTEX_SHADER:
+        case MAGE_SHADER_TYPE_VERTEX:
             return VK_SHADER_STAGE_VERTEX_BIT;
-	    case MAGE_TESSELLATION_CONTROL_SHADER:
+	    case MAGE_SHADER_TYPE_TESSELLATION_CONTROL:
             return VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
-	    case MAGE_TESSELLATION_EVALUATION_SHADER:
+	    case MAGE_SHADER_TYPE_TESSELLATION_EVALUATION:
             return VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
-	    case MAGE_GEOMETRY_SHADER:
+	    case MAGE_SHADER_TYPE_GEOMETRY:
             return VK_SHADER_STAGE_GEOMETRY_BIT;
-	    case MAGE_FRAGMENT_SHADER:
+	    case MAGE_SHADER_TYPE_FRAGMENT:
             return VK_SHADER_STAGE_FRAGMENT_BIT;
-	    case MAGE_COMPUTE_SHADER:
+	    case MAGE_SHADER_TYPE_COMPUTE:
             return VK_SHADER_STAGE_COMPUTE_BIT;    
     }
 }

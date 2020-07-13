@@ -32,7 +32,7 @@ void mageLogInitialise(const char *outputFile)
         glfwSetErrorCallback(mageGLFWErrorCallback);
     #endif
 }
-void mageLogMessage(const uint8_t user, const uint8_t severity, const char *format, ...)
+void mageLogMessage(const mageLogUser user, const mageLogMode severity, const char *format, ...)
 {   
     const char *colors[] = 
     {
@@ -54,7 +54,9 @@ void mageLogMessage(const uint8_t user, const uint8_t severity, const char *form
 	case MAGE_LOG_MODE_FATAL_ERROR: 
 		Logger.ErrorCount++; 
 		break;
-	}
+    default:
+        break;
+    }
     printf("%s", colors[severity]);
 
     time(&Logger.Timer);
