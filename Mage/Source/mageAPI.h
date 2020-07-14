@@ -33,19 +33,6 @@
 typedef uint32_t mageEventHandle;
 
 
-typedef enum MAGE_STRUCTURE_TYPE_ENUM
-{
-	MAGE_STRUCTURE_TYPE_APPLICATION,
-	MAGE_STRUCTURE_TYPE_APPLICATION_PROPS,
-	MAGE_STRUCTURE_TYPE_RENDERER,
-	MAGE_STRUCTURE_TYPE_RENDERER_PROPS,
-	MAGE_STRUCTURE_TYPE_WINDOW,
-	MAGE_STRUCTURE_TYPE_INDICIES_INDEXES,
-	MAGE_STRUCTURE_TYPE_SHADER,
-	MAGE_STRUCTURE_TYPE_VERTEX,
-	MAGE_STRUCTURE_TYPE_BUFFER,
-} mageStructureType;
-
 typedef enum MAGE_LOG_MODE_ENUM
 {
 	MAGE_LOG_MODE_INFORM 		= 0,
@@ -298,7 +285,6 @@ typedef (*mageEventListenerCallback)(void *, mageEventType);
 
 struct mageWindow
 {
-	mageStructureType						StructureType;
 	int32_t 								Width;
 	int32_t 								Height;
 	uint32_t 								Running;	
@@ -307,15 +293,13 @@ struct mageWindow
 };
 struct mageIndiciesIndexes
 {
-	mageStructureType						StructureType;
 	uint32_t								*GraphicIndexes;
 	uint32_t								*PresentIndexes;
 	uint32_t								GraphicIndexesCount;
 	uint32_t								PresentIndexesCount;
 };
-struct mageApplicationProps
+struct mageApplicationCreateInfo
 {
-	mageStructureType						StructureType;
 	double 									Version;
 	uint32_t 								Width;
 	uint32_t 								Height;
@@ -324,31 +308,27 @@ struct mageApplicationProps
 	char 						   			*Name;
 	const char 								*WindowIcon;
 };
-struct mageRendererProps
+struct mageRendererCreateInfo
 {
-	mageStructureType						StructureType;
 	struct mageShader						*RuntimeShaders;
 	uint32_t 								ShaderCount;
 };
 struct mageApplication
 {
-	mageStructureType						StructureType;
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
-	struct mageApplicationProps 			Props;
-	struct mageRendererProps				RendererProps;
+	struct mageApplicationCreateInfo		CreateInfo;
+	struct mageRendererCreateInfo			RendererCreateInfo;
 	uint8_t 								Running;
 };
 struct mageShader
 {
-	mageStructureType						StructureType;
 	mageShaderType 							ShaderType;
 	const char 								*FilePath;
-	const char 								*RuntimeFunctionName;
+	const char 								*EntryPoint;
 };
 struct mageVertex
 {
-	mageStructureType						StructureType;
 	struct vector2 							Vertex;
 	struct vector3							Color;
 };
@@ -382,9 +362,9 @@ extern mageResult mageFileDumpContents(
 );
 extern mageResult mageWindowInitialise(
 	struct mageWindow *window, 
-	struct mageApplicationProps *props
+	struct mageApplicationCreateInfo *createInfo
 );
-extern void mageWindowTerminate(
+extern void mageWindowDestroy(
 	struct mageWindow *window
 );
 extern void mageInputSetup(
@@ -456,15 +436,17 @@ extern void mageEventFormatMouseWheelMoved(
 extern void mageEventDispatch(
 	void *event
 );
+extern void *mageRendererAllocate(
+);
 extern mageResult mageRendererInitialise(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window, 
-	struct mageRendererProps *props
+	struct mageRendererCreateInfo *props
 );	
 extern void mageRendererResize(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window,
-	struct mageRendererProps *rendererProps
+	struct mageRendererCreateInfo *rendererProps
 );
 extern void mageRendererRender(
 	struct mageRenderer *renderer
@@ -479,7 +461,7 @@ extern void mageRendererDestroy(
 extern mageResult mageShaderInitialise(
 	struct mageShader *shader, 
 	const char *shaderFile, 
-	const char *runtimeFunctionName, 
+	const char *entryPoint, 
 	const mageShaderType shaderType
 );
 extern mageShaderType mageShaderTypeFromString(
@@ -487,8 +469,8 @@ extern mageShaderType mageShaderTypeFromString(
 );
 extern mageResult mageApplicationInitialise(
 	struct mageApplication *application, 
-	struct mageApplicationProps engineProps, 
-	struct mageRendererProps rendererProps
+	struct mageApplicationCreateInfo applicationInfo, 
+	struct mageRendererCreateInfo rendererInfo
 );
 extern mageResult mageApplicationRun(
 	struct mageApplication *application

@@ -99,7 +99,7 @@ static void mageGLFWWindowResizeCallback(GLFWwindow *window, int32_t width, int3
     App->Window->Width = width;
     App->Window->Height = height;
     MAGE_LOG_CORE_INFORM("Width %d Height %d\n", width, height);
-    mageRendererResize(App->Renderer, App->Window, &App->RendererProps);
+    mageRendererResize(App->Renderer, App->Window, &App->RendererCreateInfo);
 }
 void mageInputSetup(struct mageApplication *application)
 {

@@ -20,11 +20,11 @@ VkShaderStageFlagBits mageShaderTypeToBit(mageShaderType shaderType)
             return VK_SHADER_STAGE_COMPUTE_BIT;    
     }
 }
-mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *runtimeFunctionName, const mageShaderType shaderType)
+mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *entryPoint, const mageShaderType shaderType)
 {
     shader->FilePath                = shaderFile;
     shader->ShaderType              = shaderType;
-    shader->RuntimeFunctionName     = runtimeFunctionName;
+    shader->EntryPoint              = entryPoint;
     return MAGE_RESULT_SUCCESS;
 }
 VkShaderModule mageShaderCreateModule(struct mageShader *shader, VkDevice device)

@@ -2,6 +2,11 @@
 
 #if defined (MAGE_VULKAN)
 
+void *mageRendererAllocate()
+{
+    return malloc(sizeof(struct mageRenderer));
+}
+
 VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResult)
 {
     switch (functionResult)

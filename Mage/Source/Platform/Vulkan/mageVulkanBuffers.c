@@ -3,7 +3,7 @@
 #if defined (MAGE_VULKAN)
 
 
-VkBufferUsageFlagBits mageBufferTypeToFlagBits(const mageBufferType type)
+VkBufferUsageFlags mageBufferTypeToFlag(const mageBufferType type)
 {
     switch (type)
     {
@@ -15,10 +15,12 @@ VkBufferUsageFlagBits mageBufferTypeToFlagBits(const mageBufferType type)
             MAGE_LOG_CORE_WARNING("Invalid buffer type %d\n", type);
     }
 }
-void mageBufferCreate(struct mageBuffer *buffer, mageBufferType bufferType, void *data, uint32_t dataByteSize, struct mageRenderer *renderer)
+void mageBufferCreate(struct mageBuffer *buffer, const mageBufferType bufferType, void *data, uint32_t dataByteSize, struct mageRenderer *renderer)
 {
-    buffer->StructureType = MAGE_STRUCTURE_TYPE_BUFFER;
-    mageBufferWrapperAllocate(&buffer->Wrapper, data, dataByteSize, mageBufferTypeToFlagBits(bufferType), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
+    buffer->Bytes = dataByteSize;
+    buffer->Data = data;
+    buffer->BufferType = bufferType;
+    mageBufferWrapperAllocate(&buffer->Wrapper, data, dataByteSize, mageBufferTypeToFlag(bufferType), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
 }
 void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
 {
@@ -26,7 +28,6 @@ void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
 }
 void mageVertexInitialise(struct mageVertex *vertexInstance, struct vector2 vertex, struct vector3 color)
 {
-    vertexInstance->StructureType = MAGE_STRUCTURE_TYPE_VERTEX;
     vertexInstance->Vertex = vertex;
     vertexInstance->Color = color; 
 }
@@ -52,7 +53,6 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uin
     allocateInfo.memoryTypeIndex    = mageFindMemoryType(requirements.memoryTypeBits, flags, renderer);
     allocateInfo.allocationSize     = requirements.size;
     MAGE_CHECK_VULKAN(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
-
     MAGE_CHECK_VULKAN(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));
 
     void *memory;

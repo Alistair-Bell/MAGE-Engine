@@ -7,7 +7,6 @@
 
 struct mageSwapChainSupportDetails
 {
-	mageStructureType						StructureType;
 	VkSurfaceCapabilitiesKHR 				Capabilities;
 	VkSurfaceFormatKHR 						*Formats;
 	VkPresentModeKHR						*PresentModes;
@@ -17,13 +16,12 @@ struct mageSwapChainSupportDetails
 };
 struct mageBufferWrapper
 {
-	mageStructureType						StructureType;
 	VkBuffer								Buffer;
 	VkDeviceMemory							AllocatedMemory;
 };
 struct mageBuffer
 {
-	mageStructureType 						StructureType;
+	mageBufferType							BufferType;
 	struct mageBufferWrapper				Wrapper;
 	void									*Data;
 	uint32_t								Bytes;
@@ -31,8 +29,6 @@ struct mageBuffer
 
 struct mageRenderer
 {
-    mageStructureType						StructureType;
-	
 	VkInstance 								Instance;
 	VkDevice								Device;
 	VkPhysicalDeviceMemoryProperties		PhysicalDeviceMemoryProperties;
@@ -68,6 +64,7 @@ struct mageRenderer
 	VkDebugUtilsMessengerEXT				DebugMessenger;
 	struct mageIndiciesIndexes				Indexes;
 	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
+	struct mageRendererCreateInfo			CreateInfo;
 
 	uint32_t 								SwapChainImageCount;
 	uint32_t								ConcurentFrames;
@@ -77,7 +74,7 @@ struct mageRenderer
 #define MAGE_CHECK_VULKAN(function) \
 	mageHandleVulkanResult(#function, function)
 
-extern VkBufferUsageFlagBits mageBufferTypeToFlagBits(
+extern VkBufferUsageFlags mageBufferTypeToFlag(
 	const mageBufferType type
 );
 

@@ -1,11 +1,10 @@
 #include "mageAPI.h"
 
-mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicationProps *props)
+mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicationCreateInfo *info)
 {
-
-	window->Height  = props->Height;
-	window->Width   = props->Width;
-	window->Title   = props->Name;
+	window->Height  = info->Height;
+	window->Width   = info->Width;
+	window->Title   = info->Name;
 	window->Running = 1;
 	
 	MAGE_LOG_CORE_INFORM("Using GLFW as window mode\n", NULL);
@@ -14,8 +13,8 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 
 
 	GLFWmonitor *monitor = NULL;
-	if (props->FixedResolution) { glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); }
-	if (props->Fullscreen) { monitor = glfwGetPrimaryMonitor(); }
+	if (info->FixedResolution) { glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); }
+	if (info->Fullscreen) { monitor = glfwGetPrimaryMonitor(); }
 
 	window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, monitor, NULL);
 
@@ -23,7 +22,7 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	uint8_t data;
 	uint32_t width, height;
 	uint8_t *image;
-	uint32_t error = lodepng_decode32_file(&image, &width, &height, props->WindowIcon);
+	uint32_t error = lodepng_decode32_file(&image, &width, &height, info->WindowIcon);
 	if (error) 
 	{
     	MAGE_LOG_CORE_ERROR("Image decoder error %u: %s\n", error, lodepng_error_text(error));
@@ -53,9 +52,8 @@ mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicatio
 	return MAGE_RESULT_SUCCESS;
 
 }
-void mageWindowTerminate(struct mageWindow *window)
-{
-	glfwDestroyWindow(window->Context);
+void mageWindowDestroy(struct mageWindow *window)
+{	
 	glfwTerminate();	
 	MAGE_LOG_CORE_INFORM("Window has been terminated\n", NULL);
 }
