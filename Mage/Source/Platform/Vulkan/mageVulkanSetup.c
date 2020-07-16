@@ -11,7 +11,7 @@ static const char *const mageRequiredLayers[] =
     "VK_LAYER_KHRONOS_validation",
 };
 static struct mageVertex vertexes[] = { 
-    { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 0.0f} },
+    { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 1.0f} },
     { .Vertex = { .x = 0.5f, .y = -0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f} },
     { .Vertex = { .x = 0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },
     { .Vertex = { .x = -0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },  
@@ -432,17 +432,17 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
         uint32_t i;
         for (i = 0; i < rendererInfo->ShaderCount; i++)
         {
-            VkShaderModule module = mageShaderCreateModule(&rendererInfo->RuntimeShaders[i], renderer->Device);
+            VkShaderModule module = mageShaderCreateModule(&rendererInfo->PipelineShaders[i], renderer->Device);
 
             VkPipelineShaderStageCreateInfo stageCreateInfo;
             memset(&stageCreateInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
             stageCreateInfo.sType     = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-            stageCreateInfo.stage     = mageShaderTypeToBit(rendererInfo->RuntimeShaders[i].ShaderType);
+            stageCreateInfo.stage     = mageShaderTypeToBit(rendererInfo->PipelineShaders[i].ShaderType);
             stageCreateInfo.module    = module;
-            stageCreateInfo.pName     = rendererInfo->RuntimeShaders[i].EntryPoint;
+            stageCreateInfo.pName     = rendererInfo->PipelineShaders[i].EntryPoint;
             pipelineShaderStages[i]   = stageCreateInfo;
             pipelineShaderModules[i]  = module;
-            MAGE_LOG_CORE_INFORM("Creating shader %s with entry point of %s, shader %d of %d\n", rendererInfo->RuntimeShaders[i].FilePath, rendererInfo->RuntimeShaders[i].EntryPoint, i + 1, rendererInfo->ShaderCount);
+            MAGE_LOG_CORE_INFORM("Creating shader %s with entry point of %s, shader %d of %d\n", rendererInfo->PipelineShaders[i].FilePath, rendererInfo->PipelineShaders[i].EntryPoint, i + 1, rendererInfo->ShaderCount);
         }
     }
     
@@ -479,7 +479,7 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     VkRect2D scissor;
     memset(&scissor, 0, sizeof(VkRect2D));
 
-    scissor.offset = (VkOffset2D){ 0.0f, 0.0f };
+    scissor.offset = (VkOffset2D){ .x = 0, .y = 0.0f };
     scissor.extent = renderer->SwapChainSupportInfo.Extent;
 
     VkPipelineViewportStateCreateInfo viewportState;
@@ -618,7 +618,7 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     mageBufferCreate(&exampleIndexBuffer, MAGE_BUFFER_TYPE_INDEX, indicies, sizeof(uint16_t) * 6, renderer);
 
     renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
-    VkBuffer useBuffers[]  = { exampleVertexBuffer.Wrapper.Buffer };
+    VkBuffer useBuffers[]  = { mageBufferGetNativeBuffer(&exampleVertexBuffer) };
     VkDeviceSize offsets[] = { 0 };    
 
     VkCommandBufferAllocateInfo allocateInfo;
@@ -627,6 +627,13 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     allocateInfo.commandPool                = renderer->CommandPool;
     allocateInfo.level                      = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     allocateInfo.commandBufferCount         = (uint32_t) renderer->SwapChainImageCount;
+
+    memset(&renderer->ClearValue, 0, sizeof(VkClearValue));
+    renderer->ClearValue.color.float32[0] = 0.0f;
+    renderer->ClearValue.color.float32[1] = 0.0f;
+    renderer->ClearValue.color.float32[2] = 0.0f;
+    renderer->ClearValue.color.float32[3] = 0.0f;
+    
 
     VkResult result = vkAllocateCommandBuffers(renderer->Device, &allocateInfo, renderer->CommandBuffers);
     if (result != VK_SUCCESS) { return result; } 
@@ -637,31 +644,22 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 
-        VkClearValue clearValue;
-        memset(&clearValue, 0, sizeof(VkClearValue));
-        
-        clearValue.color.float32[0] = 0.0f;
-        clearValue.color.float32[1] = 0.0f;
-        clearValue.color.float32[2] = 0.0f;
-        clearValue.color.float32[3] = 0.0f;
-        
         VkRenderPassBeginInfo renderPassInfo;
         memset(&renderPassInfo, 0, sizeof(VkRenderPassBeginInfo));
-        
         renderPassInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         renderPassInfo.renderPass               = renderer->PrimaryRenderPass;
         renderPassInfo.framebuffer              = renderer->Framebuffers[i];
         renderPassInfo.renderArea.offset        = (VkOffset2D){ 0.f, 0.f };
         renderPassInfo.renderArea.extent        = renderer->SwapChainSupportInfo.Extent;
         renderPassInfo.clearValueCount          = 1;
-        renderPassInfo.pClearValues             = &clearValue;
+        renderPassInfo.pClearValues             = &renderer->ClearValue;
 
 
         vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
         vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
-            vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, &exampleVertexBuffer.Wrapper.Buffer, offsets);
-            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], exampleIndexBuffer.Wrapper.Buffer, 0, VK_INDEX_TYPE_UINT16);
+            vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, useBuffers, offsets);
+            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], mageBufferGetNativeBuffer(&exampleIndexBuffer), 0, VK_INDEX_TYPE_UINT16);
             vkCmdDrawIndexed(renderer->CommandBuffers[i], 6, 1, 0, 0, 0);
         vkCmdEndRenderPass(renderer->CommandBuffers[i]);
         MAGE_CHECK_VULKAN(vkEndCommandBuffer(renderer->CommandBuffers[i]));

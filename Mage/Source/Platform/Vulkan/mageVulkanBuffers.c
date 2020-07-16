@@ -22,6 +22,10 @@ void mageBufferCreate(struct mageBuffer *buffer, const mageBufferType bufferType
     buffer->BufferType = bufferType;
     mageBufferWrapperAllocate(&buffer->Wrapper, data, dataByteSize, mageBufferTypeToFlag(bufferType), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
 }
+VkBuffer mageBufferGetNativeBuffer(struct mageBuffer *buffer)
+{
+    return buffer->Wrapper.Buffer;
+}
 void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
 {
     mageBufferWrapperDestroy(&buffer->Wrapper, renderer);

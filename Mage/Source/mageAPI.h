@@ -269,6 +269,13 @@ typedef enum MAGE_SHADER_TYPE_ENUM
 	MAGE_SHADER_TYPE_COMPUTE							= 6,
 } mageShaderType;
 
+typedef enum MAGE_RENDERABLE_PIPELINE_MODE_ENUM
+{
+	MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY,
+	/* Todo: allow for custom rendering pipelines */
+
+} mageRenderablePipeLineMode;
+
 typedef enum MAGE_BUFFER_TYPE_ENUM
 {
 	MAGE_BUFFER_TYPE_VERTEX,
@@ -278,9 +285,10 @@ typedef enum MAGE_BUFFER_TYPE_ENUM
 
 struct mageRenderer;
 struct mageSwapChainSupportDetails;
+struct mageRenderable;
 struct mageBuffer;
 
-typedef (*mageEventListenerCallback)(void *, mageEventType);
+typedef void (*mageEventListenerCallback)(void *, mageEventType);
 
 
 struct mageWindow
@@ -300,7 +308,6 @@ struct mageIndiciesIndexes
 };
 struct mageApplicationCreateInfo
 {
-	double 									Version;
 	uint32_t 								Width;
 	uint32_t 								Height;
 	uint8_t									Fullscreen;
@@ -310,16 +317,8 @@ struct mageApplicationCreateInfo
 };
 struct mageRendererCreateInfo
 {
-	struct mageShader						*RuntimeShaders;
+	struct mageShader						*PipelineShaders;
 	uint32_t 								ShaderCount;
-};
-struct mageApplication
-{
-	struct mageRenderer 					*Renderer;
-	struct mageWindow 						*Window;
-	struct mageApplicationCreateInfo		CreateInfo;
-	struct mageRendererCreateInfo			RendererCreateInfo;
-	uint8_t 								Running;
 };
 struct mageShader
 {
@@ -331,6 +330,21 @@ struct mageVertex
 {
 	struct vector2 							Vertex;
 	struct vector3							Color;
+};
+struct mageTransform
+{
+	struct vector3 							Position;
+	struct vector3							Scale;
+	struct vector3							Rotation;
+};
+
+struct mageApplication
+{
+	struct mageRenderer 					*Renderer;
+	struct mageWindow 						*Window;
+	struct mageApplicationCreateInfo		CreateInfo;
+	struct mageRendererCreateInfo			RendererCreateInfo;
+	uint8_t 								Running;
 };
 
 
@@ -467,6 +481,8 @@ extern mageResult mageShaderInitialise(
 extern mageShaderType mageShaderTypeFromString(
 	const char *name
 );
+
+
 extern mageResult mageApplicationInitialise(
 	struct mageApplication *application, 
 	struct mageApplicationCreateInfo applicationInfo, 

@@ -25,7 +25,12 @@ struct mageBuffer
 	struct mageBufferWrapper				Wrapper;
 	void									*Data;
 	uint32_t								Bytes;
-};	
+};
+struct mageRenderable
+{
+	struct mageBuffer						IndexBuffer;
+	struct mageBuffer						VertexBuffer;
+};
 
 struct mageRenderer
 {
@@ -51,6 +56,8 @@ struct mageRenderer
 	VkRenderPass							PrimaryRenderPass;
 	VkFramebuffer							*Framebuffers;
 	VkCommandPool							CommandPool;
+
+	VkClearValue							ClearValue;
 	
 	VkCommandBuffer							*CommandBuffers;
 
@@ -102,12 +109,22 @@ extern void mageBufferCreate(
 	uint32_t dataByteSize,
 	struct mageRenderer *renderer
 );
+extern VkBuffer mageBufferGetNativeBuffer(
+	struct mageBuffer *buffer
+);
 extern void mageBufferDestroy(
 	struct mageBuffer *buffer,
 	struct mageRenderer *renderer
 );
-
-
+extern mageResult mageRendererableCreate(
+	struct mageRenderable *renderable,
+	mageRenderablePipeLineMode pipelineMode,
+	struct mageRenderer *renderer
+);
+extern void mageRenderableDestroy(
+	struct mageRenderable *renderable,
+	struct mageRenderer *renderer
+);
 extern VkResult mageHandleVulkanResult(
 	const char *functionName,
 	VkResult functionResult
