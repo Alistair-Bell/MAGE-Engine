@@ -1,18 +1,16 @@
 #ifndef __MAGE_CORE__
 #define __MAGE_CORE__
 
-#if defined (MAGE_DIRECTX)
-	
-#else 
-	#define MAGE_VULKAN
-	#include "../Externals/Vulkan-Headers/include/vulkan/vulkan.h"
-#endif
+
+#define MAGE_VULKAN
+#include "../Externals/Vulkan-Headers/include/vulkan/vulkan.h"
 
 #define GLFW_INCLUDE_NONE
 #define MAGE_GLFW
 #if defined (MAGE_VULKAN) 
 	#define GLFW_INCLUDE_VULKAN
 #endif
+
 #include "../Externals/glfw3/include/GLFW/glfw3.h"
 
 

@@ -1,6 +1,5 @@
-#include "mageVulkanAPI.h"
+#include <mageAPI.h>
 
-#if defined (MAGE_VULKAN)
 
 static const char *mageRequiredExtensions[] = 
 {
@@ -10,16 +9,8 @@ static const char *const mageRequiredLayers[] =
 {
     "VK_LAYER_KHRONOS_validation",
 };
-static struct mageVertex vertexes[] = { 
-    { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 1.0f} },
-    { .Vertex = { .x = 0.5f, .y = -0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f} },
-    { .Vertex = { .x = 0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },
-    { .Vertex = { .x = -0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },  
-};
-static uint16_t indicies[] = { 0, 1, 2, 2, 3, 0 };
 
-struct mageBuffer exampleVertexBuffer;
-struct mageBuffer exampleIndexBuffer;
+struct mageRenderable exampleRenderable;
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *pUserData) 
 {
@@ -136,7 +127,7 @@ static void magePopulateValidationLayerCallback(VkDebugUtilsMessengerCreateInfoE
 static VkResult mageSetupValidationLayerCallback(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {
     magePopulateValidationLayerCallback(&renderer->DebugMessengerCreateInfo);
-    VkResult result = MAGE_CHECK_VULKAN(mageCreateDebugUtilsMessengerEXT(renderer->Instance, &renderer->DebugMessengerCreateInfo, NULL, &renderer->DebugMessenger)); 
+    VkResult result = MAGE_VULKAN_CHECK(mageCreateDebugUtilsMessengerEXT(renderer->Instance, &renderer->DebugMessengerCreateInfo, NULL, &renderer->DebugMessenger)); 
     return result;
 }
 static uint8_t mageIsDeviceSuitable(struct mageRenderer *renderer, VkPhysicalDevice device)
@@ -236,13 +227,13 @@ static VkResult mageCreateInstance(struct mageRenderer *renderer, struct mageWin
     instanceCreateInfo.enabledLayerCount            = 0;
 #endif
 
-    VkResult result = MAGE_CHECK_VULKAN(vkCreateInstance(&instanceCreateInfo, NULL, &renderer->Instance));
+    VkResult result = MAGE_VULKAN_CHECK(vkCreateInstance(&instanceCreateInfo, NULL, &renderer->Instance));
     free(extensions);
     return result;
 }
 static VkResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {
-    VkResult result = MAGE_CHECK_VULKAN(glfwCreateWindowSurface(renderer->Instance, window->Context, NULL, &renderer->Surface));
+    VkResult result = MAGE_VULKAN_CHECK(glfwCreateWindowSurface(renderer->Instance, window->Context, NULL, &renderer->Surface));
     return result;
 }
 static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -293,7 +284,7 @@ static VkResult mageCreateDevice(struct mageRenderer *renderer, struct mageWindo
     deviceCreateInfo.pQueueCreateInfos          = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount       = 1;
 
-    VkResult result = MAGE_CHECK_VULKAN(vkCreateDevice(renderer->PhysicalDevice, &deviceCreateInfo, NULL, &renderer->Device));
+    VkResult result = MAGE_VULKAN_CHECK(vkCreateDevice(renderer->PhysicalDevice, &deviceCreateInfo, NULL, &renderer->Device));
     return result;
 }
 static VkResult mageFetchQueues(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -341,7 +332,7 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
         createInfo.imageSharingMode         = VK_SHARING_MODE_EXCLUSIVE;
     }
     
-    VkResult result = MAGE_CHECK_VULKAN(vkCreateSwapchainKHR(renderer->Device, &createInfo, NULL, &renderer->SwapChain)); 
+    VkResult result = MAGE_VULKAN_CHECK(vkCreateSwapchainKHR(renderer->Device, &createInfo, NULL, &renderer->SwapChain)); 
     return result;
 }
 static VkResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -372,7 +363,7 @@ static VkResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct 
         createInfo.subresourceRange.baseArrayLayer  = 0;
         createInfo.subresourceRange.layerCount      = 1;
 
-        VkResult result = MAGE_CHECK_VULKAN(vkCreateImageView(renderer->Device, &createInfo, NULL, &renderer->SwapChainImageViews[i]));
+        VkResult result = MAGE_VULKAN_CHECK(vkCreateImageView(renderer->Device, &createInfo, NULL, &renderer->SwapChainImageViews[i]));
         if (result != VK_SUCCESS) return result;
     }
 
@@ -422,7 +413,7 @@ static VkResult mageCreateRenderPass(struct mageRenderer *renderer, struct mageW
     createInfo.dependencyCount      = 1;
     createInfo.pDependencies        = &dependency;
 
-    return MAGE_CHECK_VULKAN(vkCreateRenderPass(renderer->Device, &createInfo, NULL, &renderer->PrimaryRenderPass));
+    return MAGE_VULKAN_CHECK(vkCreateRenderPass(renderer->Device, &createInfo, NULL, &renderer->PrimaryRenderPass));
 }
 static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {
@@ -536,7 +527,7 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     pipelineLayoutInfo.setLayoutCount           = 0;
     pipelineLayoutInfo.pushConstantRangeCount   = 0;
 
-    VkResult result = MAGE_CHECK_VULKAN(vkCreatePipelineLayout(renderer->Device, &pipelineLayoutInfo, NULL, &renderer->GraphicsPipelineLayout));
+    VkResult result = MAGE_VULKAN_CHECK(vkCreatePipelineLayout(renderer->Device, &pipelineLayoutInfo, NULL, &renderer->GraphicsPipelineLayout));
     
     if (result != VK_SUCCESS)
     {
@@ -567,7 +558,7 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     pipelineInfo.renderPass             = renderer->PrimaryRenderPass;
     pipelineInfo.subpass                = 0;
 
-    result = MAGE_CHECK_VULKAN(vkCreateGraphicsPipelines(renderer->Device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &renderer->GraphicsPipeline));
+    result = MAGE_VULKAN_CHECK(vkCreateGraphicsPipelines(renderer->Device, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &renderer->GraphicsPipeline));
 
     uint32_t i;
     for (i = 0; i < rendererInfo->ShaderCount; i++)
@@ -597,7 +588,7 @@ static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mag
         createInfo.height               = renderer->SwapChainSupportInfo.Extent.height;
         createInfo.layers               = 1;
 
-        MAGE_CHECK_VULKAN(vkCreateFramebuffer(renderer->Device, &createInfo, NULL, &renderer->Framebuffers[i]));
+        MAGE_VULKAN_CHECK(vkCreateFramebuffer(renderer->Device, &createInfo, NULL, &renderer->Framebuffers[i]));
     }
     return VK_SUCCESS;
 }
@@ -609,16 +600,16 @@ static VkResult mageCreateCommandPool(struct mageRenderer *renderer, struct mage
     createInfo.sType                = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     createInfo.queueFamilyIndex     = renderer->Indexes.GraphicIndexes[renderer->Indexes.GraphicIndexesCount - 1];
     
-    return MAGE_CHECK_VULKAN(vkCreateCommandPool(renderer->Device, &createInfo, NULL, &renderer->CommandPool));
+    return MAGE_VULKAN_CHECK(vkCreateCommandPool(renderer->Device, &createInfo, NULL, &renderer->CommandPool));
 }
 static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {    
     uint32_t i;
-    mageBufferCreate(&exampleVertexBuffer, MAGE_BUFFER_TYPE_VERTEX, vertexes, sizeof(struct mageVertex) * 4, renderer);
-    mageBufferCreate(&exampleIndexBuffer, MAGE_BUFFER_TYPE_INDEX, indicies, sizeof(uint16_t) * 6, renderer);
+    mageRendererableCreate(&exampleRenderable, MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY, renderer);
+    
 
     renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
-    VkBuffer useBuffers[]  = { mageBufferGetNativeBuffer(&exampleVertexBuffer) };
+    VkBuffer useBuffers[]  = { mageBufferGetNativeBuffer(&exampleRenderable.VertexBuffer) };
     VkDeviceSize offsets[] = { 0 };    
 
     VkCommandBufferAllocateInfo allocateInfo;
@@ -659,10 +650,10 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
         vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
             vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, useBuffers, offsets);
-            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], mageBufferGetNativeBuffer(&exampleIndexBuffer), 0, VK_INDEX_TYPE_UINT16);
+            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], mageBufferGetNativeBuffer(&exampleRenderable.IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
             vkCmdDrawIndexed(renderer->CommandBuffers[i], 6, 1, 0, 0, 0);
         vkCmdEndRenderPass(renderer->CommandBuffers[i]);
-        MAGE_CHECK_VULKAN(vkEndCommandBuffer(renderer->CommandBuffers[i]));
+        MAGE_VULKAN_CHECK(vkEndCommandBuffer(renderer->CommandBuffers[i]));
     }
     return VK_SUCCESS;
 }
@@ -686,15 +677,15 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
 
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {
-        MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->ImageAvailableSemaphores[i]));
-        MAGE_CHECK_VULKAN(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->RenderFinishedSemaphores[i]));
-        MAGE_CHECK_VULKAN(vkCreateFence(renderer->Device, &fenceCreateInfo, NULL, &renderer->ConcurentFences[i]));
+        MAGE_VULKAN_CHECK(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->ImageAvailableSemaphores[i]));
+        MAGE_VULKAN_CHECK(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->RenderFinishedSemaphores[i]));
+        MAGE_VULKAN_CHECK(vkCreateFence(renderer->Device, &fenceCreateInfo, NULL, &renderer->ConcurentFences[i]));
         renderer->ConcurrentImages[i] = VK_NULL_HANDLE;
     }
     return VK_SUCCESS;
 }
 
-mageResult mageRendererInitialise(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
+mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {   
     renderer->ConcurentFrames = 2;    
     renderer->CurrentFrame = 0;
@@ -736,9 +727,7 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer)
     {
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
     }
-    mageBufferDestroy(&exampleVertexBuffer, renderer);
-    mageBufferDestroy(&exampleIndexBuffer, renderer);
-    
+    mageRenderableDestroy(&exampleRenderable, renderer);
     
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
     vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
@@ -808,6 +797,3 @@ void mageRendererDestroy(struct mageRenderer *renderer)
     free(renderer->ConcurentFences);
     free(renderer->ConcurrentImages);
 }   
-
-
-#endif

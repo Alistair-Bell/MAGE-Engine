@@ -1,7 +1,7 @@
 
 BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}"
 BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}"
-    
+
 
 workspace "MAGE"
     architecture "x64"
@@ -91,7 +91,7 @@ project "Sandbox"
         "GLFW",
         "vulkan",
         "lodepng",
-        "yaml"    
+        "yaml",
     }
 
     filter "system:linux"

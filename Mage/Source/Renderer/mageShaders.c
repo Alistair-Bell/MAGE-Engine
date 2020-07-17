@@ -1,6 +1,4 @@
-#include "mageVulkanAPI.h"
-
-#if defined (MAGE_VULKAN)
+#include <mageAPI.h>
 
 VkShaderStageFlagBits mageShaderTypeToBit(mageShaderType shaderType)
 {
@@ -20,7 +18,7 @@ VkShaderStageFlagBits mageShaderTypeToBit(mageShaderType shaderType)
             return VK_SHADER_STAGE_COMPUTE_BIT;    
     }
 }
-mageResult mageShaderInitialise(struct mageShader *shader, const char *shaderFile, const char *entryPoint, const mageShaderType shaderType)
+mageResult mageShaderCreate(struct mageShader *shader, const char *shaderFile, const char *entryPoint, const mageShaderType shaderType)
 {
     shader->FilePath                = shaderFile;
     shader->ShaderType              = shaderType;
@@ -39,8 +37,6 @@ VkShaderModule mageShaderCreateModule(struct mageShader *shader, VkDevice device
     createInfo.pCode = (uint32_t *)code;
     createInfo.codeSize = codeSize;
     
-    VkResult result = MAGE_CHECK_VULKAN(vkCreateShaderModule(device, &createInfo, NULL, &module));
+    VkResult result = MAGE_VULKAN_CHECK(vkCreateShaderModule(device, &createInfo, NULL, &module));
     return module;
 }
-
-#endif

@@ -1,7 +1,4 @@
-#include "mageVulkanAPI.h"
-
-#if defined (MAGE_VULKAN)
-
+#include <mageAPI.h>
 
 VkBufferUsageFlags mageBufferTypeToFlag(const mageBufferType type)
 {
@@ -47,7 +44,7 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uin
     bufferInfo.usage        = bufferUsage;
     bufferInfo.sharingMode  = VK_SHARING_MODE_EXCLUSIVE;
 
-    MAGE_CHECK_VULKAN(vkCreateBuffer(renderer->Device, &bufferInfo, NULL, &buffer->Buffer));
+    MAGE_VULKAN_CHECK(vkCreateBuffer(renderer->Device, &bufferInfo, NULL, &buffer->Buffer));
 
     vkGetBufferMemoryRequirements(renderer->Device, buffer->Buffer, &requirements);
 
@@ -56,8 +53,8 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uin
     allocateInfo.sType              = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     allocateInfo.memoryTypeIndex    = mageFindMemoryType(requirements.memoryTypeBits, flags, renderer);
     allocateInfo.allocationSize     = requirements.size;
-    MAGE_CHECK_VULKAN(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
-    MAGE_CHECK_VULKAN(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));
+    MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
+    MAGE_VULKAN_CHECK(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));
 
     void *memory;
     vkMapMemory(renderer->Device, buffer->AllocatedMemory, 0, dataSize, 0, &memory);
@@ -95,5 +92,3 @@ VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(uint32_t *
     attributeDescriptions[1].offset = offsetof(struct mageVertex, Color);
     return attributeDescriptions;
 }
-
-#endif

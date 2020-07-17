@@ -27,7 +27,8 @@
 **************************/
 
 #define MAGE_SET_BIT(input, index, value) (input |= value << index)
-
+#define MAGE_VULKAN_CHECK(function) \
+	mageHandleVulkanResult(#function, function)
 #define MAGE_BIT(index) (1 << index) 
 
 typedef uint32_t mageEventHandle;
@@ -273,7 +274,6 @@ typedef enum MAGE_RENDERABLE_PIPELINE_MODE_ENUM
 {
 	MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY,
 	/* Todo: allow for custom rendering pipelines */
-
 } mageRenderablePipeLineMode;
 
 typedef enum MAGE_BUFFER_TYPE_ENUM
@@ -282,11 +282,13 @@ typedef enum MAGE_BUFFER_TYPE_ENUM
 	MAGE_BUFFER_TYPE_INDEX,
 } mageBufferType;
 
-
-struct mageRenderer;
-struct mageSwapChainSupportDetails;
-struct mageRenderable;
-struct mageBuffer;
+typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
+{
+	MAGE_TEXTURE_SAMPLER_REPEAT,
+	MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT,
+	MAGE_TEXTURE_SAMPLER_CLAMP_TO_EDGE,
+	MAGE_TEXTURE_SAMPLER_CLAMP_TO_BORDER
+} mageTextureSamplerMode;
 
 typedef void (*mageEventListenerCallback)(void *, mageEventType);
 
@@ -337,6 +339,89 @@ struct mageTransform
 	struct vector3							Scale;
 	struct vector3							Rotation;
 };
+struct mageSwapChainSupportDetails
+{
+	VkSurfaceCapabilitiesKHR 				Capabilities;
+	VkSurfaceFormatKHR 						*Formats;
+	VkPresentModeKHR						*PresentModes;
+	VkExtent2D								Extent;
+	uint32_t								FormatCount;
+	uint32_t								PresentCount;
+};
+struct mageBufferWrapper
+{
+	VkBuffer								Buffer;
+	VkDeviceMemory							AllocatedMemory;
+};
+struct mageBuffer
+{
+	mageBufferType							BufferType;
+	struct mageBufferWrapper				Wrapper;
+	void									*Data;
+	uint32_t								Bytes;
+};
+struct mageTexture
+{
+	VkSampler 								Sampler;
+	VkImage									Image;
+	VkImageView								View;
+	VkImageLayout 							ImageLayout;
+	VkDeviceMemory 							DeviceMemory;
+	uint32_t								Width;
+	uint32_t								Height;
+
+};
+struct mageRenderable
+{
+	struct mageBuffer						IndexBuffer;
+	struct mageBuffer						VertexBuffer;
+	struct mageTexture						Texture;
+};
+struct mageRenderer
+{
+	VkInstance 								Instance;
+	VkDevice								Device;
+	VkPhysicalDeviceMemoryProperties		PhysicalDeviceMemoryProperties;
+	
+	VkPhysicalDevice						PhysicalDevice;
+	VkSurfaceKHR 							Surface;
+	VkQueue 								PresentQueue;
+	VkQueue									GraphicalQueue;
+	
+	VkSwapchainKHR							SwapChain;
+	VkImage									*SwapChainImages;
+	VkImageView								*SwapChainImageViews;
+
+	VkExtent2D								SwapChainExtent;
+	VkFormat								SwapChainFormat;
+
+	VkPipelineLayout 						GraphicsPipelineLayout;
+	VkPipeline								GraphicsPipeline;
+
+	VkRenderPass							PrimaryRenderPass;
+	VkFramebuffer							*Framebuffers;
+	VkCommandPool							CommandPool;
+
+	VkClearValue							ClearValue;
+	
+	VkCommandBuffer							*CommandBuffers;
+
+	VkSemaphore								*ImageAvailableSemaphores;
+	VkSemaphore								*RenderFinishedSemaphores;
+	VkFence									*ConcurentFences;
+	VkFence									*ConcurrentImages;
+
+
+	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
+	VkDebugUtilsMessengerEXT				DebugMessenger;
+	struct mageIndiciesIndexes				Indexes;
+	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
+	struct mageRendererCreateInfo			CreateInfo;
+
+	uint32_t 								SwapChainImageCount;
+	uint32_t								ConcurentFrames;
+	uint32_t								CurrentFrame;
+};
 
 struct mageApplication
 {
@@ -358,12 +443,18 @@ extern void mageLogMessage(
 	const char *format, 
 	...
 );
+extern VkResult mageHandleVulkanResult(
+	const char *functionName,
+	VkResult functionResult
+);
 extern void mageLogEnd(
 
 );
 extern void mageLogInitialise(
 	const char *outputFile
 );
+
+/* File IO */
 extern char *mageFileReadContents(
 	const char *file, 
 	const char *readmode, 
@@ -374,18 +465,21 @@ extern mageResult mageFileDumpContents(
 	const char *buffer, 
 	const uint8_t clean
 );
-extern mageResult mageWindowInitialise(
+
+/* Window */
+extern mageResult mageWindowCreate(
 	struct mageWindow *window, 
 	struct mageApplicationCreateInfo *createInfo
 );
 extern void mageWindowDestroy(
 	struct mageWindow *window
 );
+
+/* Event system */ 
 extern void mageInputSetup(
 	struct mageApplication *application
 );
 extern void mageEventSetupMaster(
-
 );
 extern mageEventCategoryBit *mageEventGenerateCategories(
 	const mageEventType type
@@ -450,9 +544,133 @@ extern void mageEventFormatMouseWheelMoved(
 extern void mageEventDispatch(
 	void *event
 );
-extern void *mageRendererAllocate(
+
+/* Vertexes */
+extern void mageVertexCreate(
+	struct mageVertex *vertexInstance, 
+	struct vector2 vertex, 
+	struct vector3 color
 );
-extern mageResult mageRendererInitialise(
+extern VkVertexInputBindingDescription mageVertexBindingDescription(
+);
+extern VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(
+	uint32_t *count
+);
+
+/* Buffers */
+extern VkBufferUsageFlags mageBufferTypeToFlag(
+	const mageBufferType type
+);
+extern void mageBufferWrapperAllocate(
+	struct mageBufferWrapper *buffer,
+	void *data,
+	uint32_t dataSize,
+	const VkBufferUsageFlags bufferUsage,
+	const VkBufferUsageFlags flags,
+	struct mageRenderer *renderer
+);
+extern void mageBufferWrapperDestroy(
+	struct mageBufferWrapper *buffer,
+	struct mageRenderer *renderer	
+);
+extern void mageBufferCreate(
+	struct mageBuffer *buffer,
+	mageBufferType bufferType,
+	void *data,
+	uint32_t dataByteSize,
+	struct mageRenderer *renderer
+);
+extern VkBuffer mageBufferGetNativeBuffer(
+	struct mageBuffer *buffer
+);
+extern void mageBufferDestroy(
+	struct mageBuffer *buffer,
+	struct mageRenderer *renderer
+);
+
+/* Textures */ 
+extern void mageTextureCreate(
+	struct mageTexture *texture,
+	const char *texturePath,
+	mageTextureSamplerMode samplerMode,
+	struct mageRenderer *renderer
+);
+extern void mageTextureDestroy(
+	struct mageTexture *texture,
+	struct mageRenderer *renderer
+);
+
+/* Shaders */
+extern mageResult mageShaderCreate(
+	struct mageShader *shader, 
+	const char *shaderFile, 
+	const char *entryPoint, 
+	const mageShaderType shaderType
+);
+extern mageShaderType mageShaderTypeFromString(
+	const char *name
+);
+extern VkShaderStageFlagBits mageShaderTypeToBit(
+	const mageShaderType shaderType
+);
+extern VkFramebuffer mageRendererGetActiveFrameBuffer(
+	struct mageRenderer *renderer
+);
+extern VkShaderModule mageShaderCreateModule(
+	struct mageShader *shader, 
+	VkDevice device
+);
+
+/* Swap chain support */
+extern void mageSwapChainSupportCreate(
+	struct mageSwapChainSupportDetails *swapChainSupport,
+	const VkSurfaceCapabilitiesKHR surfaceCapabilities,
+	VkSurfaceFormatKHR *formats,
+	const uint32_t formatCount,
+	VkPresentModeKHR *presentModes,
+	const uint32_t presentCount,
+	VkExtent2D extent
+);
+extern mageResult mageGetSwapChainSupport(
+	struct mageSwapChainSupportDetails *swapChainSupport,
+	struct mageWindow *window,
+	VkPhysicalDevice physicalDevice,
+	VkSurfaceKHR surface
+);
+extern VkPresentModeKHR mageSwapChainSupportPickPresentMode(
+	struct mageSwapChainSupportDetails *swapChainSupport
+);
+extern VkSurfaceFormatKHR mageSwapChainSupportPickSurfaceFormat(
+	struct mageSwapChainSupportDetails *swapChainDetails
+);
+extern void mageSwapChainSupportDestroy(
+	struct mageSwapChainSupportDetails *swapChainSupport
+);
+
+/* Graphics card indexes */
+extern mageResult mageGetDeviceIndexes(
+	struct mageRenderer *renderer,
+	VkPhysicalDevice device,
+	struct mageIndiciesIndexes *indicies
+);
+extern void mageIndiciesIndexesCreate(
+	struct mageIndiciesIndexes *indicies, 
+	const uint32_t *graphics, 
+	const uint32_t graphicCount, 
+	const uint32_t *presents, 
+	const uint32_t presentCount
+);
+extern void mageIndiciesIndexesDestroy(
+	struct mageIndiciesIndexes *indicies
+);
+extern uint32_t mageFindMemoryType(
+	uint32_t typeFilter, 
+	VkMemoryPropertyFlags properties,
+	struct mageRenderer *renderer
+);
+
+/* Renderer */
+extern mageResult mageRendererCreate(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window, 
 	struct mageRendererCreateInfo *props
@@ -472,29 +690,26 @@ extern void mageRendererDestroy(
 	struct mageRenderer *renderer
 );
 
-extern mageResult mageShaderInitialise(
-	struct mageShader *shader, 
-	const char *shaderFile, 
-	const char *entryPoint, 
-	const mageShaderType shaderType
+/* Renderables */
+extern mageResult mageRendererableCreate(
+	struct mageRenderable *renderable,
+	mageRenderablePipeLineMode pipelineMode,
+	struct mageRenderer *renderer
 );
-extern mageShaderType mageShaderTypeFromString(
-	const char *name
+extern void mageRenderableDestroy(
+	struct mageRenderable *renderable,
+	struct mageRenderer *renderer
 );
 
 
-extern mageResult mageApplicationInitialise(
+extern mageResult mageApplicationCreate(
 	struct mageApplication *application, 
 	struct mageApplicationCreateInfo applicationInfo, 
 	struct mageRendererCreateInfo rendererInfo
 );
-extern mageResult mageApplicationRun(
-	struct mageApplication *application
-);
 extern void mageApplicationDestroy(
 	struct mageApplication *application
 );
-
 
 
 #endif  

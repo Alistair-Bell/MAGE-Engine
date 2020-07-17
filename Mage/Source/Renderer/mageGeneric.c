@@ -1,11 +1,4 @@
-#include "mageVulkanAPI.h"
-
-#if defined (MAGE_VULKAN)
-
-void *mageRendererAllocate()
-{
-    return malloc(sizeof(struct mageRenderer));
-}
+#include <mageAPI.h>
 
 VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResult)
 {
@@ -131,7 +124,7 @@ VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResul
     return functionResult;
 }
 
-void mageIndiciesIndexesInitialise(struct mageIndiciesIndexes *indicies, const uint32_t *graphics, const uint32_t graphicCount, const uint32_t *presents, const uint32_t presentCount)
+void mageIndiciesIndexesCreate(struct mageIndiciesIndexes *indicies, const uint32_t *graphics, const uint32_t graphicCount, const uint32_t *presents, const uint32_t presentCount)
 {
     indicies->GraphicIndexes = calloc(graphicCount, sizeof(uint32_t));
     indicies->PresentIndexes = calloc(presentCount, sizeof(uint32_t));
@@ -156,7 +149,6 @@ mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice 
     uint32_t graphicsIndex, presentIndex, i;
     uint32_t graphicsFound = 0;
     uint32_t presentFound = 0;
-
 
     for (i = 0; i < queueCount; i++)
     {
@@ -188,7 +180,7 @@ mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice 
         return MAGE_RESULT_HARDWARE_INVALID;
     }
     
-    mageIndiciesIndexesInitialise(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
+    mageIndiciesIndexesCreate(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
     free(queueProperties);
     return MAGE_RESULT_SUCCESS;
 }
@@ -293,6 +285,3 @@ uint32_t mageFindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags propertie
 }
 
 
-
-
-#endif

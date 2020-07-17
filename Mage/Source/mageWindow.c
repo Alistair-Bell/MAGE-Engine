@@ -1,6 +1,6 @@
 #include "mageAPI.h"
 
-mageResult mageWindowInitialise(struct mageWindow *window, struct mageApplicationCreateInfo *info)
+mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCreateInfo *info)
 {
 	window->Height  = info->Height;
 	window->Width   = info->Width;

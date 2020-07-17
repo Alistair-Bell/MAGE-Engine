@@ -1,6 +1,4 @@
-#include "mageVulkanAPI.h"
-
-#if defined (MAGE_VULKAN)
+#include <mageAPI.h>
 
 void mageRendererRender(struct mageRenderer *renderer)
 {
@@ -47,23 +45,3 @@ void mageRendererRender(struct mageRenderer *renderer)
     renderer->CurrentFrame = (renderer->CurrentFrame + 1) % renderer->ConcurentFrames;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
