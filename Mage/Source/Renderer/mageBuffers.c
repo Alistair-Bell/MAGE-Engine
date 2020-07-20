@@ -8,16 +8,42 @@ VkBufferUsageFlags mageBufferTypeToFlag(const mageBufferType type)
             return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
         case MAGE_BUFFER_TYPE_VERTEX:
             return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+        case MAGE_BUFFER_TYPE_SOURCE:
+            return VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+	    case MAGE_BUFFER_TYPE_TRANSFER:
+            return VK_BUFFER_USAGE_TRANSFER_DST_BIT;
         default:
             MAGE_LOG_CORE_WARNING("Invalid buffer type %d\n", type);
     }
+}
+static void mageBufferCopy(VkBuffer sourceBuffer, VkBuffer destinationBuffer, VkDeviceSize size, struct mageRenderer *renderer)
+{
+    VkCommandBuffer commandBuffer = mageCommandBufferBegin(renderer);
+        VkBufferCopy copyRegion;
+        memset(&copyRegion, 0, sizeof(VkBufferCopy));
+        copyRegion.size = size;
+        vkCmdCopyBuffer(commandBuffer, sourceBuffer, destinationBuffer, 1, &copyRegion);
+    mageCommandBufferEnd(commandBuffer, renderer);    
 }
 void mageBufferCreate(struct mageBuffer *buffer, const mageBufferType bufferType, void *data, uint32_t dataByteSize, struct mageRenderer *renderer)
 {
     buffer->Bytes = dataByteSize;
     buffer->Data = data;
     buffer->BufferType = bufferType;
-    mageBufferWrapperAllocate(&buffer->Wrapper, data, dataByteSize, mageBufferTypeToFlag(bufferType), VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
+    struct mageBufferWrapper stagingBuffer;
+
+    mageBufferWrapperAllocate(&stagingBuffer, dataByteSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
+
+    void *memory;
+    vkMapMemory(renderer->Device, stagingBuffer.AllocatedMemory, 0, dataByteSize, 0, &memory);
+        memcpy(memory, data, dataByteSize);
+    vkUnmapMemory(renderer->Device, stagingBuffer.AllocatedMemory);
+
+    mageBufferWrapperAllocate(&buffer->Wrapper, dataByteSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | mageBufferTypeToFlag(bufferType), VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, renderer);    
+
+    mageBufferCopy(stagingBuffer.Buffer, buffer->Wrapper.Buffer, dataByteSize, renderer);
+
+    mageBufferWrapperDestroy(&stagingBuffer, renderer);
 }
 VkBuffer mageBufferGetNativeBuffer(struct mageBuffer *buffer)
 {
@@ -32,7 +58,7 @@ void mageVertexInitialise(struct mageVertex *vertexInstance, struct vector2 vert
     vertexInstance->Vertex = vertex;
     vertexInstance->Color = color; 
 }
-void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, VkMemoryPropertyFlags flags, struct mageRenderer *renderer)
+void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, uint32_t dataSize, const VkBufferUsageFlags bufferUsage, VkMemoryPropertyFlags flags, struct mageRenderer *renderer)
 {
     VkMemoryRequirements requirements;
     
@@ -55,11 +81,6 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, void *data, uin
     allocateInfo.allocationSize     = requirements.size;
     MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
     MAGE_VULKAN_CHECK(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));
-
-    void *memory;
-    vkMapMemory(renderer->Device, buffer->AllocatedMemory, 0, dataSize, 0, &memory);
-        memcpy(memory, data, dataSize);
-    vkUnmapMemory(renderer->Device, buffer->AllocatedMemory);
 }
 void mageBufferWrapperDestroy(struct mageBufferWrapper *buffer, struct mageRenderer *renderer)
 {

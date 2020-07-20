@@ -27,12 +27,24 @@
 **************************/
 
 #define MAGE_SET_BIT(input, index, value) (input |= value << index)
+
 #define MAGE_VULKAN_CHECK(function) \
 	mageHandleVulkanResult(#function, function)
+
+#define MAGE_PNG_LOADE_CHECK(function, data)\
+	uint32_t error = function; \
+	if (error) { MAGE_LOG_CORE_ERROR("PNG Error %d, %s was a bad file\n", error, lodepng_error_text(error)); free(data); }
+
+#define MAGE_ECS_REGISTER_COMPONENT(scene, component) \
+	mageEntityRegisterComponent(scene, #component, sizeof(component))
+#define MAGE_ECS_BIND_COMPONENT(scene, entity, ...) \
+	mageEntityBindComponents(scene, entity, __VA_ARGS__);
+
 #define MAGE_BIT(index) (1 << index) 
 
 typedef uint32_t mageEventHandle;
-
+typedef uint64_t mageEntity;
+typedef uint64_t mageComponentID;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -280,6 +292,8 @@ typedef enum MAGE_BUFFER_TYPE_ENUM
 {
 	MAGE_BUFFER_TYPE_VERTEX,
 	MAGE_BUFFER_TYPE_INDEX,
+	MAGE_BUFFER_TYPE_SOURCE,
+	MAGE_BUFFER_TYPE_TRANSFER,
 } mageBufferType;
 
 typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
@@ -290,16 +304,53 @@ typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
 	MAGE_TEXTURE_SAMPLER_CLAMP_TO_BORDER
 } mageTextureSamplerMode;
 
-typedef void (*mageEventListenerCallback)(void *, mageEventType);
-
-
-struct mageWindow
+typedef enum MAGE_TEXTURE_FILE_FORMAT_ENUM
 {
-	int32_t 								Width;
-	int32_t 								Height;
-	uint32_t 								Running;	
-	const char 							   *Title;
-	GLFWwindow 							   	*Context;
+	MAGE_TEXTURE_FILE_FORMAT_JPEG,
+	MAGE_TEXTURE_FILE_FORMAT_PNG,
+} mageTextureFileFormat;
+
+typedef void (*mageEventListenerCallback)(void *, mageEventType);
+typedef void *(*mageMemoryAllocaterMethod)(uint64_t);
+typedef void (*mageMemoryFreeMethod)(void *);
+typedef void *(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
+typedef void *(*mageMemoryReallocater)(void *, uint64_t);
+
+struct mageQueue
+{
+	uint32_t Count;
+    uint32_t DataSize;
+	void **Data;
+};
+struct mageHeapAllocater
+{
+	mageMemoryAllocaterMethod 				Allocate;
+	mageMemoryFreeMethod 					Free;
+	mageMemoryListAllocaterMethod 			ListAllocater;
+	mageMemoryReallocater 					Reallocater;
+};
+struct mageComponentTable
+{
+    const char 								*Tag;
+    uint64_t 								Count;
+    uint64_t 								ByteSize;
+    uint64_t 								ComponentMask;
+    void 									**Components;
+};
+struct mageEntityPool
+{
+    mageEntity 								*Pooled;
+	struct mageQueue						AvailableQueue;
+	struct mageComponentTable 				*ComponentTables;
+    uint64_t 								EntityPooledCount;
+	uint64_t								ComponentTableCount;
+	uint64_t								QueueCount;
+};
+struct mageScene
+{
+    struct mageEntityPool 					Pool;
+	struct mageHeapAllocater 				Allocater;
+	const char *Tag;
 };
 struct mageIndiciesIndexes
 {
@@ -308,20 +359,7 @@ struct mageIndiciesIndexes
 	uint32_t								GraphicIndexesCount;
 	uint32_t								PresentIndexesCount;
 };
-struct mageApplicationCreateInfo
-{
-	uint32_t 								Width;
-	uint32_t 								Height;
-	uint8_t									Fullscreen;
-	uint8_t									FixedResolution;
-	char 						   			*Name;
-	const char 								*WindowIcon;
-};
-struct mageRendererCreateInfo
-{
-	struct mageShader						*PipelineShaders;
-	uint32_t 								ShaderCount;
-};
+
 struct mageShader
 {
 	mageShaderType 							ShaderType;
@@ -369,13 +407,36 @@ struct mageTexture
 	VkDeviceMemory 							DeviceMemory;
 	uint32_t								Width;
 	uint32_t								Height;
-
 };
 struct mageRenderable
 {
 	struct mageBuffer						IndexBuffer;
 	struct mageBuffer						VertexBuffer;
 	struct mageTexture						Texture;
+};
+
+struct mageWindow
+{
+	int32_t 								Width;
+	int32_t 								Height;
+	uint32_t 								Running;	
+	const char 							   	*Title;
+	GLFWwindow 							   	*Context;
+};
+struct mageApplicationCreateInfo
+{
+	uint32_t 								Width;
+	uint32_t 								Height;
+	uint8_t									Fullscreen;
+	uint8_t									FixedResolution;
+	char 						   			*Name;
+	const char 								*WindowIcon;
+};
+struct mageRendererCreateInfo
+{
+	struct mageShader						*PipelineShaders;
+	struct mageRenderable					*Renderable;
+	uint32_t 								ShaderCount;
 };
 struct mageRenderer
 {
@@ -416,13 +477,11 @@ struct mageRenderer
 	VkDebugUtilsMessengerEXT				DebugMessenger;
 	struct mageIndiciesIndexes				Indexes;
 	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
-	struct mageRendererCreateInfo			CreateInfo;
 
 	uint32_t 								SwapChainImageCount;
 	uint32_t								ConcurentFrames;
 	uint32_t								CurrentFrame;
 };
-
 struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
@@ -432,8 +491,65 @@ struct mageApplication
 	uint8_t 								Running;
 };
 
+/* Allocater */
+struct mageHeapAllocater mageHeapAllocaterDefault(
+);
+
+/* Defined data structures */
+extern void mageQueueCreate(
+	struct mageQueue *queue, 
+	const uint32_t dataSize, 
+	const struct mageHeapAllocater *allocater
+);
+extern void mageQueuePush(
+	struct mageQueue *queue, 
+	void *data, 
+	const struct mageHeapAllocater *allocater
+);
+extern void *mageQueuePop(
+	struct mageQueue *queue, 
+	const struct mageHeapAllocater *allocater
+);
+extern void mageQueueDestroy(struct mageQueue *queue, 
+	const struct mageHeapAllocater *allocater
+);
 
 
+/* Entity component system */
+extern void mageSceneCreate(
+	struct mageScene *scene,
+	const char *sceneTag,
+	const struct mageHeapAllocater *allocater
+);
+extern void mageSceneDisplayInformation(
+	const struct mageScene *scene
+);
+extern mageEntity mageEntityCreate(
+	struct mageScene *scene
+);
+extern void mageEntityBindComponents(
+	struct mageScene *scene,
+	mageEntity entity,
+	...
+);
+extern void mageEntityDestroy(
+	struct mageScene *scene,
+	const mageEntity entity
+);
+extern void mageEntityRegisterComponent(
+	struct mageScene *scene,
+	const char *id, 
+	const uint64_t size
+);
+extern void mageComponentTableFree(
+	struct mageHeapAllocater *allocater, 
+	struct mageComponentTable *table
+);
+extern void mageSceneDestroy(
+	struct mageScene *scene
+);
+
+/* Generic */
 extern mageResult mageEngineInitialise(
 
 );
@@ -563,7 +679,6 @@ extern VkBufferUsageFlags mageBufferTypeToFlag(
 );
 extern void mageBufferWrapperAllocate(
 	struct mageBufferWrapper *buffer,
-	void *data,
 	uint32_t dataSize,
 	const VkBufferUsageFlags bufferUsage,
 	const VkBufferUsageFlags flags,
@@ -589,10 +704,11 @@ extern void mageBufferDestroy(
 );
 
 /* Textures */ 
-extern void mageTextureCreate(
+extern mageResult mageTextureCreate(
 	struct mageTexture *texture,
 	const char *texturePath,
 	mageTextureSamplerMode samplerMode,
+	mageTextureFileFormat format,
 	struct mageRenderer *renderer
 );
 extern void mageTextureDestroy(
@@ -669,6 +785,15 @@ extern uint32_t mageFindMemoryType(
 	struct mageRenderer *renderer
 );
 
+/* Command buffers */
+extern VkCommandBuffer mageCommandBufferBegin(
+	struct mageRenderer *renderer
+);
+extern void mageCommandBufferEnd(
+	VkCommandBuffer commandBuffer,
+	struct mageRenderer *renderer
+);
+
 /* Renderer */
 extern mageResult mageRendererCreate(
 	struct mageRenderer *renderer, 
@@ -680,6 +805,10 @@ extern void mageRendererResize(
 	struct mageWindow *window,
 	struct mageRendererCreateInfo *rendererProps
 );
+extern void mageRendererSubmit(
+	struct mageRenderer *renderer, 
+	struct mageRenderable *renderable
+);
 extern void mageRendererRender(
 	struct mageRenderer *renderer
 );
@@ -687,7 +816,8 @@ extern void mageRendererClear(
 	struct mageRenderer *renderer
 );
 extern void mageRendererDestroy(
-	struct mageRenderer *renderer
+	struct mageRenderer *renderer,
+	struct mageRendererCreateInfo *rendererInfo
 );
 
 /* Renderables */

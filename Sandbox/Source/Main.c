@@ -3,6 +3,8 @@
 /* Application instance */
 static struct mageApplication *SandboxApplication;
 static struct mageShader shaders[2];
+static struct mageScene currentScene;
+static struct mageRenderable renderable;
 
 void CreateShaders()
 {
@@ -12,9 +14,9 @@ void CreateShaders()
 
 int32_t main(const int32_t argumentCount, char **arguments)
 {
+    SandboxApplication = malloc(sizeof(struct mageApplication));
     mageLogInitialise("Logs/mage.log");
     CreateShaders();    
-    SandboxApplication = malloc(sizeof(struct mageApplication));
 
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
@@ -31,18 +33,24 @@ int32_t main(const int32_t argumentCount, char **arguments)
 
     rendererCreateInfo.PipelineShaders          = shaders;
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
-    if (mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo) != MAGE_RESULT_SUCCESS)
-    {
-        return -1;
-    }
+    rendererCreateInfo.Renderable               = &renderable;
     
-    while (SandboxApplication->Running)
+    mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
+    
+    while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
-        mageRendererRender(SandboxApplication->Renderer);
-        SandboxApplication->Running = !(glfwWindowShouldClose(SandboxApplication->Window->Context));
+        /* mageRendererSubmit(SandboxApplication->Renderer, NULL); */
+        mageRendererRender(SandboxApplication->Renderer);    
     }
     mageApplicationDestroy(SandboxApplication);
+
+
+    /*
+    mageSceneCreate(&currentScene, "Current Scene", NULL);
+    uint32_t i;
+    mageSceneDestroy(&currentScene);
+    */
     free(SandboxApplication);
     mageLogEnd();
     return 1;

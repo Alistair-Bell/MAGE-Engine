@@ -32,8 +32,10 @@ project "MageEngine"
     {
         "Mage/Source/*.h",
         "Mage/Source/*.c",
-        "Mage/Source/Platform/Vulkan/**.h",
-        "Mage/Source/Platform/Vulkan/**.c",
+        "Mage/Source/Renderer/**.h",
+        "Mage/Source/Renderer/**.c",
+        "Mage/Source/ECS/**.h",
+        "Mage/Source/ECS/**.c",
     }
     defines
     {

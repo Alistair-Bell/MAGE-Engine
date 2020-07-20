@@ -50,5 +50,10 @@
         "cinttypes": "c",
         "typeinfo": "c"
     },
-    "python.pythonPath": "/bin/python3.7"
+    "python.pythonPath": "/bin/python3.7",
+    // Controls the font family.
+    "editor.fontFamily": "Courier New",
+
+    // Controls the font size.
+    "editor.fontSize": 13
 }
