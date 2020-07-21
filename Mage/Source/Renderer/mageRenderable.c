@@ -21,18 +21,3 @@ void mageRenderableDestroy(struct mageRenderable *renderable, struct mageRendere
     mageBufferDestroy(&renderable->VertexBuffer, renderer);
     mageTextureDestroy(&renderable->Texture, renderer);
 }
-
-
-.appveyor.yml
-.gitignore
-.indent.pro
-.makefile
-.travis.yml
-CMakeLists.txt
-Changes
-Makefile.am
-announcement.msg
-bootstrap
-configure.ac
-yaml-0.1.pc.in
-yamlConfig.cmake.in 
