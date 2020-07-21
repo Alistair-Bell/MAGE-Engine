@@ -35,23 +35,75 @@ void mageCommandBufferEnd(VkCommandBuffer commandBuffer, struct mageRenderer *re
 
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, 1, &commandBuffer);
 }   
-void mageRendererRender(struct mageRenderer *renderer)
+void mageRendererRecord(struct mageRenderer *renderer, struct mageRenderable *renderable)
+{
+    /*
+    VkBuffer useBuffers[] = { mageBufferGetNativeBuffer(&renderable->VertexBuffer) };
+    VkDeviceSize offsets[] = { 0 };
+    VkCommandBufferBeginInfo bufferBeginInfo;
+    memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
+    bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    
+    VkRenderPassBeginInfo passBeginInfo;
+    memset(&passBeginInfo, 0, sizeof(VkRenderPassBeginInfo));
+    passBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    passBeginInfo.framebuffer       = renderer->Framebuffers[0];
+    passBeginInfo.clearValueCount   = 1;
+    passBeginInfo.pClearValues      = &renderer->ClearValue;
+    passBeginInfo.renderPass        = renderer->PrimaryRenderPass;
+    passBeginInfo.renderArea        = renderer->RenderArea;
+
+    vkBeginCommandBuffer(renderer->CommandBuffers[0], &bufferBeginInfo);
+    vkCmdBeginRenderPass(renderer->CommandBuffers[0], &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(renderer->CommandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+        vkCmdBindVertexBuffers(renderer->CommandBuffers[0], 0, 1, useBuffers, offsets);
+        vkCmdBindIndexBuffer(renderer->CommandBuffers[0], mageBufferGetNativeBuffer(&renderable->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdDrawIndexed(renderer->CommandBuffers[0], 6, 1, 0, 0, 0);
+    vkCmdEndRenderPass(renderer->CommandBuffers[0]);
+    vkEndCommandBuffer(renderer->CommandBuffers[0]);
+    */
+}
+void mageRendererDraw(struct mageRenderer *renderer, struct mageRenderable *renderable)
 {
     uint32_t index;
-    register uint32_t currentFrame = renderer->CurrentFrame;
-    vkWaitForFences(renderer->Device, 1, &renderer->ConcurentFences[currentFrame], VK_TRUE, UINT64_MAX);
-    vkAcquireNextImageKHR(renderer->Device, renderer->SwapChain, UINT64_MAX, renderer->ImageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &index);
+    vkWaitForFences(renderer->Device, 1, &renderer->FencesInUse[renderer->CurrentFrame], VK_TRUE, UINT64_MAX);
+    vkAcquireNextImageKHR(renderer->Device, renderer->SwapChain, UINT64_MAX, renderer->WaitSemaphores[renderer->CurrentFrame], VK_NULL_HANDLE, &index);
     
-    if (renderer->ConcurrentImages[currentFrame] != VK_NULL_HANDLE)
+    VkBuffer useBuffers[] = { mageBufferGetNativeBuffer(&renderable->VertexBuffer) };
+    VkDeviceSize offsets[] = { 0 };
+    VkCommandBufferBeginInfo bufferBeginInfo;
+    memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
+    bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    
+    VkRenderPassBeginInfo passBeginInfo;
+    memset(&passBeginInfo, 0, sizeof(VkRenderPassBeginInfo));
+    passBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    passBeginInfo.framebuffer       = renderer->Framebuffers[index];
+    passBeginInfo.clearValueCount   = 1;
+    passBeginInfo.pClearValues      = &renderer->ClearValue;
+    passBeginInfo.renderPass        = renderer->PrimaryRenderPass;
+    passBeginInfo.renderArea        = renderer->RenderArea;
+
+    vkBeginCommandBuffer(renderer->CommandBuffers[index], &bufferBeginInfo);
+    vkCmdBeginRenderPass(renderer->CommandBuffers[index], &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(renderer->CommandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+        vkCmdBindVertexBuffers(renderer->CommandBuffers[index], 0, 1, useBuffers, offsets);
+        vkCmdBindIndexBuffer(renderer->CommandBuffers[index], mageBufferGetNativeBuffer(&renderable->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
+        vkCmdDrawIndexed(renderer->CommandBuffers[index], 6, 1, 0, 0, 0);
+    vkCmdEndRenderPass(renderer->CommandBuffers[index]);
+    vkEndCommandBuffer(renderer->CommandBuffers[index]);
+    
+
+    if (renderer->SwapChainImagesInUse[renderer->CurrentFrame] != VK_NULL_HANDLE)
     {
-        vkWaitForFences(renderer->Device, 1, &renderer->ConcurrentImages[currentFrame], VK_TRUE, UINT64_MAX);
+        vkWaitForFences(renderer->Device, 1, &renderer->SwapChainImagesInUse[renderer->CurrentFrame], VK_TRUE, UINT64_MAX);
     }
-    renderer->ConcurrentImages[currentFrame] = renderer->ConcurentFences[currentFrame];
+    renderer->SwapChainImagesInUse[renderer->CurrentFrame] = renderer->FencesInUse[renderer->CurrentFrame];
 
     VkSubmitInfo submitInfo;
     memset(&submitInfo, 0, sizeof(VkSubmitInfo));
-    VkSemaphore waitSemaphores[] = { renderer->ImageAvailableSemaphores[currentFrame] };
-    VkSemaphore signalSemaphores[] = { renderer->RenderFinishedSemaphores[currentFrame] };
+    VkSemaphore waitSemaphores[] = { renderer->WaitSemaphores[renderer->CurrentFrame] };
+    VkSemaphore signalSemaphores[] = { renderer->SignalSemaphores[renderer->CurrentFrame] };
     VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount   = 1;
@@ -61,8 +113,8 @@ void mageRendererRender(struct mageRenderer *renderer)
     submitInfo.pCommandBuffers      = &renderer->CommandBuffers[index];
     submitInfo.signalSemaphoreCount = 1;
     submitInfo.pSignalSemaphores    = signalSemaphores;
-    vkResetFences(renderer->Device, 1, &renderer->ConcurentFences[currentFrame]);
-    vkQueueSubmit(renderer->GraphicalQueue, 1, &submitInfo, renderer->ConcurrentImages[currentFrame]);
+    vkResetFences(renderer->Device, 1, &renderer->FencesInUse[renderer->CurrentFrame]);
+    vkQueueSubmit(renderer->GraphicalQueue, 1, &submitInfo, renderer->SwapChainImagesInUse[renderer->CurrentFrame]);
     
     VkPresentInfoKHR presentInfo;
     memset(&presentInfo, 0, sizeof(VkPresentInfoKHR));
@@ -78,6 +130,6 @@ void mageRendererRender(struct mageRenderer *renderer)
     
     vkQueuePresentKHR(renderer->PresentQueue, &presentInfo);
     
-    renderer->CurrentFrame = (currentFrame + 1) % renderer->ConcurentFrames;
+    renderer->CurrentFrame = (renderer->CurrentFrame + 1) % renderer->ConcurentFrames;
 }
 

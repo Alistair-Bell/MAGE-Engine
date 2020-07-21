@@ -297,7 +297,6 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
     {
         MAGE_LOG_CORE_FATAL_ERROR("Failed to create swap chain, hardware invalid\n", NULL);
     }
-    
     VkFormat format = mageSwapChainSupportPickSurfaceFormat(&renderer->SwapChainSupportInfo).format;;
     uint32_t imageCount = renderer->SwapChainSupportInfo.Capabilities.minImageCount + 1;
     uint32_t indicies[] = { renderer->Indexes.GraphicIndexes[0], renderer->Indexes.PresentIndexes[0] };
@@ -331,6 +330,12 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
     }
     
     VkResult result = MAGE_VULKAN_CHECK(vkCreateSwapchainKHR(renderer->Device, &createInfo, NULL, &renderer->SwapChain)); 
+    VkRect2D renderArea;
+    memset(&renderArea, 0, sizeof(VkRect2D));
+    renderArea.offset = (VkOffset2D){ .x = 0, .y = 0};
+    renderArea.extent = renderer->SwapChainSupportInfo.Extent;
+
+    renderer->RenderArea = renderArea;
     return result;
 }
 static VkResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -597,19 +602,16 @@ static VkResult mageCreateCommandPool(struct mageRenderer *renderer, struct mage
     
     createInfo.sType                = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     createInfo.queueFamilyIndex     = renderer->Indexes.GraphicIndexes[renderer->Indexes.GraphicIndexesCount - 1];
+    createInfo.flags                = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
     
     return MAGE_VULKAN_CHECK(vkCreateCommandPool(renderer->Device, &createInfo, NULL, &renderer->CommandPool));
 }
 static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {    
     uint32_t i;
-    mageRendererableCreate(rendererInfo->Renderable, MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY, renderer);
     
-
     renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
-    VkBuffer useBuffers[]  = { mageBufferGetNativeBuffer(&rendererInfo->Renderable->VertexBuffer) };
-    VkDeviceSize offsets[] = { 0 };    
-
+    
     VkCommandBufferAllocateInfo allocateInfo;
     memset(&allocateInfo, 0, sizeof(VkCommandBufferAllocateInfo));
     allocateInfo.sType                      = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -629,6 +631,7 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
 
     for (i = 0; i < renderer->SwapChainImageCount; i++)
     {
+        /*
         VkCommandBufferBeginInfo beginInfo;
         memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
         beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -652,6 +655,7 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
             vkCmdDrawIndexed(renderer->CommandBuffers[i], 6, 1, 0, 0, 0);
         vkCmdEndRenderPass(renderer->CommandBuffers[i]);
         MAGE_VULKAN_CHECK(vkEndCommandBuffer(renderer->CommandBuffers[i]));
+        */
     }
     return VK_SUCCESS;
 }
@@ -660,7 +664,6 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
     uint32_t i;
     VkSemaphoreCreateInfo semaphorecreateInfo;
     memset(&semaphorecreateInfo, 0, sizeof(VkSemaphoreCreateInfo));
-
     semaphorecreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
 
     VkFenceCreateInfo fenceCreateInfo;
@@ -668,18 +671,19 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    renderer->ImageAvailableSemaphores = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
-    renderer->RenderFinishedSemaphores = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
-    renderer->ConcurentFences = calloc(renderer->ConcurentFrames, sizeof(VkQueue));
-    renderer->ConcurrentImages = calloc(renderer->ConcurentFrames, sizeof(VkQueue));
+    renderer->SignalSemaphores      = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->WaitSemaphores        = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->FencesInUse           = calloc(renderer->ConcurentFrames, sizeof(VkFence));
+    renderer->SwapChainImagesInUse  = calloc(renderer->ConcurentFrames, sizeof(VkFence));
 
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {
-        MAGE_VULKAN_CHECK(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->ImageAvailableSemaphores[i]));
-        MAGE_VULKAN_CHECK(vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->RenderFinishedSemaphores[i]));
-        MAGE_VULKAN_CHECK(vkCreateFence(renderer->Device, &fenceCreateInfo, NULL, &renderer->ConcurentFences[i]));
-        renderer->ConcurrentImages[i] = VK_NULL_HANDLE;
+        vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->SignalSemaphores[i]);
+        vkCreateSemaphore(renderer->Device, &semaphorecreateInfo, NULL, &renderer->WaitSemaphores[i]);
+        vkCreateFence(renderer->Device, &fenceCreateInfo, NULL, &renderer->FencesInUse[i]);
+        memset(&renderer->SwapChainImagesInUse[i], 0, sizeof(VkFence));
     }
+    
     return VK_SUCCESS;
 }
 
@@ -725,8 +729,6 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
     {
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
     }
-    mageRenderableDestroy(rendererInfo->Renderable, renderer);
-    
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
     vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
     vkDestroyPipelineLayout(renderer->Device, renderer->GraphicsPipelineLayout, NULL);
@@ -768,13 +770,14 @@ void mageRendererDestroy(struct mageRenderer *renderer, struct mageRendererCreat
     uint32_t i;
     
     mageCleanupSwapChain(renderer, rendererInfo);
+
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {
-        vkDestroySemaphore(renderer->Device, renderer->ImageAvailableSemaphores[i], NULL);
-        vkDestroySemaphore(renderer->Device, renderer->RenderFinishedSemaphores[i], NULL);
-        vkDestroyFence(renderer->Device, renderer->ConcurentFences[i], NULL);
+        vkDestroySemaphore(renderer->Device, renderer->SignalSemaphores[i], NULL);
+        vkDestroySemaphore(renderer->Device, renderer->WaitSemaphores[i], NULL); 
+        vkDestroyFence(renderer->Device, renderer->FencesInUse[i], NULL);
     }
-    
+
     vkDestroySurfaceKHR(renderer->Instance, renderer->Surface, NULL);
     vkDestroyDevice(renderer->Device, NULL);
 
@@ -790,8 +793,8 @@ void mageRendererDestroy(struct mageRenderer *renderer, struct mageRendererCreat
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);
-    free(renderer->ImageAvailableSemaphores);
-    free(renderer->RenderFinishedSemaphores);
-    free(renderer->ConcurentFences);
-    free(renderer->ConcurrentImages);
+    free(renderer->SignalSemaphores);
+    free(renderer->WaitSemaphores);
+    free(renderer->FencesInUse);
+
 }   

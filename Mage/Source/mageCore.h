@@ -86,8 +86,15 @@
 
 
 /*!************************
-	Compiler checking 
+	Entry point 
 **************************/
+#if defined (MAGE_PLATFORM_WINDOWS_32) || defined (MAGE_PLATFORM_WINDOWS_64)
+	#define MAGE_ENTRY_POINT() \
+	 	int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previousInstance, PWSTR arguments, int32_t commandShow);
+#else
+	#define MAGE_ENTRY_POINT() \
+	 	int32_t main(const int32_t argumentCount, char **arguments)
+#endif
 
 
 /*!************************

@@ -45,17 +45,19 @@ project "MageEngine"
     {
         "Mage/Source/",
     }
+    flags
+    {
+        "FatalWarnings",
+        "FatalCompileWarnings",
+        "FatalLinkWarnings",
+    }
+
     
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
     runtime "Debug"
     symbols "On"
     
-    flags
-    {
-        "FatalWarnings",
-        "FatalCompileWarnings",
-    }
 
 filter "configurations:Release"
     defines "MAGE_RELEASE"
@@ -97,13 +99,14 @@ project "Sandbox"
     }
 
     filter "system:linux"
+    
         links 
         { 
             "dl",
             "pthread",
             "m",
         }
-
+    
     filter "configurations:Debug"
         defines "SANDBOX_DEBUG"    
         runtime "Debug"

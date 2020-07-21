@@ -12,10 +12,11 @@ void CreateShaders()
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
 
-int32_t main(const int32_t argumentCount, char **arguments)
+MAGE_ENTRY_POINT()
 {
     SandboxApplication = malloc(sizeof(struct mageApplication));
     mageLogInitialise("Logs/mage.log");
+    mageFileDumpContents("Logs/mage.log", "", 1);
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -33,24 +34,21 @@ int32_t main(const int32_t argumentCount, char **arguments)
 
     rendererCreateInfo.PipelineShaders          = shaders;
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
-    rendererCreateInfo.Renderable               = &renderable;
     
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
-    
+    mageRenderableCreate(&renderable, MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY, SandboxApplication->Renderer);
+
+
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
-        /* mageRendererSubmit(SandboxApplication->Renderer, NULL); */
-        mageRendererRender(SandboxApplication->Renderer);    
+        mageRendererDraw(SandboxApplication->Renderer, &renderable);
+        
     }
-    mageApplicationDestroy(SandboxApplication);
+    vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
+    mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
 
-
-    /*
-    mageSceneCreate(&currentScene, "Current Scene", NULL);
-    uint32_t i;
-    mageSceneDestroy(&currentScene);
-    */
+    mageApplicationDestroy(SandboxApplication);    
     free(SandboxApplication);
     mageLogEnd();
     return 1;

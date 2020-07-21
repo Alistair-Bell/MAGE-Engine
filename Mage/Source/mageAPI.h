@@ -320,7 +320,7 @@ struct mageQueue
 {
 	uint32_t Count;
     uint32_t DataSize;
-	void **Data;
+	void *Data;
 };
 struct mageHeapAllocater
 {
@@ -344,7 +344,6 @@ struct mageEntityPool
 	struct mageComponentTable 				*ComponentTables;
     uint64_t 								EntityPooledCount;
 	uint64_t								ComponentTableCount;
-	uint64_t								QueueCount;
 };
 struct mageScene
 {
@@ -435,7 +434,6 @@ struct mageApplicationCreateInfo
 struct mageRendererCreateInfo
 {
 	struct mageShader						*PipelineShaders;
-	struct mageRenderable					*Renderable;
 	uint32_t 								ShaderCount;
 };
 struct mageRenderer
@@ -464,13 +462,15 @@ struct mageRenderer
 	VkCommandPool							CommandPool;
 
 	VkClearValue							ClearValue;
+	VkRect2D								RenderArea;
 	
 	VkCommandBuffer							*CommandBuffers;
 
-	VkSemaphore								*ImageAvailableSemaphores;
-	VkSemaphore								*RenderFinishedSemaphores;
-	VkFence									*ConcurentFences;
-	VkFence									*ConcurrentImages;
+	VkSemaphore								*WaitSemaphores;
+	VkSemaphore								*SignalSemaphores;
+
+	VkFence									*FencesInUse;
+	VkFence									*SwapChainImagesInUse;
 
 
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
@@ -501,16 +501,25 @@ extern void mageQueueCreate(
 	const uint32_t dataSize, 
 	const struct mageHeapAllocater *allocater
 );
+extern void mageQueueCreateFromSet(
+	struct mageQueue *queue,
+	uint32_t elementCount,
+	uint32_t elementSize,
+	void *data,
+	struct mageHeapAllocater *allocater 
+);
 extern void mageQueuePush(
 	struct mageQueue *queue, 
 	void *data, 
 	const struct mageHeapAllocater *allocater
 );
-extern void *mageQueuePop(
-	struct mageQueue *queue, 
+extern void mageQueuePop(
+	struct mageQueue *queue,
+	void *buffer,
 	const struct mageHeapAllocater *allocater
 );
-extern void mageQueueDestroy(struct mageQueue *queue, 
+extern void mageQueueDestroy(
+	struct mageQueue *queue, 
 	const struct mageHeapAllocater *allocater
 );
 
@@ -805,15 +814,13 @@ extern void mageRendererResize(
 	struct mageWindow *window,
 	struct mageRendererCreateInfo *rendererProps
 );
-extern void mageRendererSubmit(
-	struct mageRenderer *renderer, 
+extern void mageRendererRecord(
+	struct mageRenderer *renderer,
 	struct mageRenderable *renderable
 );
-extern void mageRendererRender(
-	struct mageRenderer *renderer
-);
-extern void mageRendererClear(
-	struct mageRenderer *renderer
+extern void mageRendererDraw(
+	struct mageRenderer *renderer,
+	struct mageRenderable *renderable
 );
 extern void mageRendererDestroy(
 	struct mageRenderer *renderer,
@@ -821,7 +828,7 @@ extern void mageRendererDestroy(
 );
 
 /* Renderables */
-extern mageResult mageRendererableCreate(
+extern mageResult mageRenderableCreate(
 	struct mageRenderable *renderable,
 	mageRenderablePipeLineMode pipelineMode,
 	struct mageRenderer *renderer
@@ -840,7 +847,6 @@ extern mageResult mageApplicationCreate(
 extern void mageApplicationDestroy(
 	struct mageApplication *application
 );
-
 
 #endif  
 
