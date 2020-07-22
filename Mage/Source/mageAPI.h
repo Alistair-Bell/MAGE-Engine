@@ -35,16 +35,18 @@
 	uint32_t error = function; \
 	if (error) { MAGE_LOG_CORE_ERROR("PNG Error %d, %s was a bad file\n", error, lodepng_error_text(error)); free(data); }
 
+/* ECS Macros*/ 
 #define MAGE_ECS_REGISTER_COMPONENT(scene, component) \
-	mageEntityRegisterComponent(scene, #component, sizeof(component))
-#define MAGE_ECS_BIND_COMPONENT(scene, entity, ...) \
-	mageEntityBindComponents(scene, entity, __VA_ARGS__);
+	mageComponentRegister(scene, #component, sizeof(component))
+
+#define MAGE_ECS_BIND_COMPONENT(scene, entity, component, value) \
+	mageEntityBindComponent(scene, entity, #component, value);
 
 #define MAGE_BIT(index) (1 << index) 
 
 typedef uint32_t mageEventHandle;
 typedef uint64_t mageEntity;
-typedef uint64_t mageComponentID;
+typedef uint64_t mageComponent;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -87,9 +89,7 @@ typedef enum MAGE_RESULT_ENUM
 	MAGE_RESULT_QUEUE_SUBMITION_FAILURE,
 	MAGE_RESULT_HARDWARE_NOT_PRESENT,
 	MAGE_RESULT_SHADER_CREATION_FAILURE,
-	MAGE_RESULT_START_METHOD_FAILURE,
-	MAGE_RESULT_UPDATE_FAILURE,
-	MAGE_RESULT_DESTROY_METHOD_FAILURE,
+	MAGE_RESULT_DATA_NOT_PRESENT
 } mageResult;
 
 typedef enum MAGE_KEYCODE_ENUM
@@ -340,9 +340,11 @@ struct mageComponentTable
 struct mageEntityPool
 {
     mageEntity 								*Pooled;
+	mageComponent							*ComponentHandles;
 	struct mageQueue						AvailableQueue;
 	struct mageComponentTable 				*ComponentTables;
     uint64_t 								EntityPooledCount;
+	uint64_t								EntityLimit;
 	uint64_t								ComponentTableCount;
 };
 struct mageScene
@@ -513,7 +515,7 @@ extern void mageQueuePush(
 	void *data, 
 	const struct mageHeapAllocater *allocater
 );
-extern void mageQueuePop(
+extern mageResult mageQueuePop(
 	struct mageQueue *queue,
 	void *buffer,
 	const struct mageHeapAllocater *allocater
@@ -527,6 +529,7 @@ extern void mageQueueDestroy(
 /* Entity component system */
 extern void mageSceneCreate(
 	struct mageScene *scene,
+	const uint32_t enitityLimit,
 	const char *sceneTag,
 	const struct mageHeapAllocater *allocater
 );
@@ -536,23 +539,24 @@ extern void mageSceneDisplayInformation(
 extern mageEntity mageEntityCreate(
 	struct mageScene *scene
 );
-extern void mageEntityBindComponents(
+extern void mageEntityBindComponent(
 	struct mageScene *scene,
 	mageEntity entity,
-	...
+	const char *componentReference,
+	void *component
 );
 extern void mageEntityDestroy(
 	struct mageScene *scene,
-	const mageEntity entity
+	mageEntity entity
 );
-extern void mageEntityRegisterComponent(
+extern uint64_t mageComponentRegister(
 	struct mageScene *scene,
 	const char *id, 
 	const uint64_t size
 );
 extern void mageComponentTableFree(
-	struct mageHeapAllocater *allocater, 
-	struct mageComponentTable *table
+	struct mageComponentTable *table, 
+	struct mageHeapAllocater *allocater
 );
 extern void mageSceneDestroy(
 	struct mageScene *scene

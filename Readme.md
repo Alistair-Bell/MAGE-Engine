@@ -6,8 +6,3 @@ MAGE is in currently unusable as an engine and will be for a good while so come 
 ## Getting Started
 
 Please consult the wiki hosted on the github for compiling on your platform
-
-
-
-
-

@@ -15,17 +15,23 @@ void mageQueueCreateFromSet(struct mageQueue *queue, uint32_t elementCount, uint
 }
 void mageQueuePush(struct mageQueue *queue, void *data, const struct mageHeapAllocater *allocater)
 {
-    uint32_t index = queue->DataSize * queue->Count;
+    uint64_t index = queue->DataSize * queue->Count;
     queue->Count++;
 	queue->Data = allocater->Reallocater(queue->Data, queue->DataSize * queue->Count);
 	memcpy(queue->Data + index, data, queue->DataSize);
 }
-void mageQueuePop(struct mageQueue *queue, void *buffer, const struct mageHeapAllocater *allocater)
+mageResult mageQueuePop(struct mageQueue *queue, void *buffer, const struct mageHeapAllocater *allocater)
 {
+    if (queue->Count <= 0)
+    {
+        MAGE_LOG_CORE_WARNING("Queue (%p) has nothing to pop\n", queue);
+        return MAGE_RESULT_DATA_NOT_PRESENT;
+    }
     queue->Count--;
-    uint32_t index = queue->DataSize * queue->Count;
+    uint64_t index = queue->DataSize * queue->Count;
     memcpy(buffer, queue->Data + index, queue->DataSize);
     queue->Data = allocater->Reallocater(queue->Data, queue->DataSize * queue->Count);
+    return MAGE_RESULT_SUCCESS;
 }
 void mageQueueDestroy(struct mageQueue *queue, const struct mageHeapAllocater *allocater)
 {

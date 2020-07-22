@@ -29,6 +29,7 @@ void mageLogInitialise(const char *outputFile)
         Logger.WarningCount = 0;
         Logger.ErrorCount = 0;   
         Logger.DebugFile = fopen(Logger.OuputName, "a");
+        mageFileDumpContents(Logger.OuputName, "", 1);
         glfwSetErrorCallback(mageGLFWErrorCallback);
     #endif
 }

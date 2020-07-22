@@ -1,10 +1,15 @@
-#include <mageAPI.h>
+#include "Core.h"
 
 /* Application instance */
 static struct mageApplication *SandboxApplication;
 static struct mageShader shaders[2];
 static struct mageScene currentScene;
 static struct mageRenderable renderable;
+
+typedef struct
+{
+    uint32_t data;
+} foo; 
 
 void CreateShaders()
 {
@@ -16,7 +21,7 @@ MAGE_ENTRY_POINT()
 {
     SandboxApplication = malloc(sizeof(struct mageApplication));
     mageLogInitialise("Logs/mage.log");
-    mageFileDumpContents("Logs/mage.log", "", 1);
+#if 0
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -47,8 +52,29 @@ MAGE_ENTRY_POINT()
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
-
     mageApplicationDestroy(SandboxApplication);    
+
+
+#endif
+    struct mageHeapAllocater allocater = mageHeapAllocaterDefault();
+    mageSceneCreate(&currentScene, 256, "Current Scene", &allocater);
+    mageEntity e = mageEntityCreate(&currentScene);
+    
+    
+    
+    
+    MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct mageTexture);
+    MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct mageRenderable);
+    MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct mageRenderer);
+
+    
+    
+    
+
+
+    mageEntityDestroy(&currentScene, e);
+    mageSceneDestroy(&currentScene);
+    
     free(SandboxApplication);
     mageLogEnd();
     return 1;
