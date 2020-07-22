@@ -50,3 +50,14 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
 - Version `1.2`
 - Sourced from `https://github.com/KhronosGroup/Vulkan-Headers`
 
+## Vulkan-Headers
+- Maintained under the `BSD-3-Clause`
+- Changes
+  - Removed `cmake`, `doc`, `m4`, `macosx` and `win32` directories
+  - Removed `aclocal.m4`, `CMakeLists.txt`, `compile`, `config.guess`, `config.sub`, `configure`, `configure.ac`, `depcomp`, `install-sh`, `libogg.spec`, `libogg.spec.in`, `ltmain.sh`, `Makefile.am`, `Makefile.in`, `missing`, `ogg.m4`, `ogg.pc.in` and`ogg-uninstalled.pc.in` files from root
+  - Removed `include/Makefile.am`, `include/Makefile.in`, `include/ogg/Makefile.am`, `include/ogg/Makefile.in`, `include/config_types.h.in`, `src/Makefile.am` and `src/Makefile.in`
+  - Added `premake5` build support
+  - Added `ogg_types` defining the ogg integer types
+  - Changed include directories to local includes rather than system wide
+- Version `1.3.4`
+- Sourced from `https://www.xiph.org/ogg/`

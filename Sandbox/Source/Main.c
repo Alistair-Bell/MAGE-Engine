@@ -79,3 +79,4 @@ MAGE_ENTRY_POINT()
     mageLogEnd();
     return 1;
 }
+
