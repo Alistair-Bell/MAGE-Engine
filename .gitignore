@@ -1,6 +1,15 @@
 Build*
 Logs/*.*
-Documentation/*.*
+
+# Linux generated build files
 Makefile*
-mono_crash*
-.blob
+
+# Windows generated build files
+*.vsproj
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
+# Macos generated build files
+*.pbxproj
+*.xcworkspacedata
