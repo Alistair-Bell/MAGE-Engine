@@ -50,7 +50,7 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
 - Version `1.2`
 - Sourced from `https://github.com/KhronosGroup/Vulkan-Headers`
 
-## Vulkan-Headers
+## libogg
 - Maintained under the `BSD-3-Clause`
 - Changes
   - Removed `cmake`, `doc`, `m4`, `macosx` and `win32` directories
