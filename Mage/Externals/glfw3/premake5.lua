@@ -1,3 +1,6 @@
+-- Sourced from https://github.com/TheCherno/glfw/blob/9bed794ab7c1b961aaca259403695bbd3870d3b3/premake5.lua
+-- Thanks Chenro for this premake file so I dont have to write one myself, some modifications were made
+
 project "GLFW"
 	kind "StaticLib"
 	language "C"
