@@ -10,6 +10,19 @@ uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const ui
 {
     assert(scene != NULL);
     uint64_t mask = mageGenerateBitMask(scene);
+
+    uint32_t i;
+    uint8_t found = 0;
+    for (i = 0; i < scene->Pool.ComponentTableCount; i++)
+    {
+        if (strcmp(id, scene->Pool.ComponentTables[i].Tag) == 0)
+        {
+            MAGE_LOG_CORE_ERROR("%s has already been registered, only register components once per scene\n", id);
+            found = 1;
+        }
+    }
+    assert(!found);
+    
     assert(scene->Pool.ComponentTableCount < 64);
     scene->Pool.ComponentTableCount++;
     scene->Pool.ComponentTables = scene->Allocater.Reallocater(scene->Pool.ComponentTables, sizeof(struct mageComponentTable) * scene->Pool.ComponentTableCount);
@@ -21,7 +34,7 @@ uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const ui
     table.Count         = 0;
     table.Components    = scene->Allocater.ListAllocater(0, table.ByteSize);
     
-    scene->Pool.ComponentTables[scene->Pool.ComponentTableCount - 1] = table;
+    memcpy(&scene->Pool.ComponentTables[scene->Pool.ComponentTableCount - 1], &table, sizeof(struct mageComponentTable));
     MAGE_LOG_CORE_INFORM("Registerning component %s, created table\n", id, mageGenerateBitMask(scene));
     return mask;
 }

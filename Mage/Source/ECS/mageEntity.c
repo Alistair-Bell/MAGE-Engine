@@ -1,7 +1,5 @@
 #include <mageAPI.h>
 
-static int f = 4;
-
 mageEntity mageEntityCreate(struct mageScene *scene)
 {
     mageEntity entity;
@@ -14,6 +12,7 @@ mageEntity mageEntityCreate(struct mageScene *scene)
 }
 void mageEntityBindComponent(struct mageScene *scene, mageEntity entity, const char *componentReference, void *component)
 {
+    /* Updating the entity's component handle */ 
     uint64_t i;
     uint8_t found = 0;
     for (i = 0; i < scene->Pool.ComponentTableCount; i++)
@@ -25,9 +24,16 @@ void mageEntityBindComponent(struct mageScene *scene, mageEntity entity, const c
             break;
         }
     }
+    struct mageComponentTable *table = &scene->Pool.ComponentTables[i];
+
     assert(found);
-    
-    MAGE_LOG_CORE_INFORM("Binding entity %d with %s, component handle of %lu\n", entity, componentReference, scene->Pool.ComponentHandles[entity]);   
+    table->Count++;
+
+    uint32_t size  =  table->ByteSize * table->Count;
+    uint32_t index =  table->Count - 1;
+    table->Components = scene->Allocater.Reallocater(table->Components, size);
+    table->Components[index] = scene->Allocater.Allocate(table->ByteSize);
+    MAGE_LOG_CORE_INFORM("Binding entity %d with %s, component handle of %lu\n", entity, componentReference, scene->Pool.ComponentHandles[entity]);
 }
 void mageEntityDestroy(struct mageScene *scene, mageEntity entity)
 {

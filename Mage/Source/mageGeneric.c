@@ -26,7 +26,7 @@ char *mageFileReadContents(const char *file, const char *readmode, uint32_t *fil
 mageResult mageFileDumpContents(const char *file, const char *buffer, const uint8_t clean)
 {
 	FILE *f;
-		switch(clean)
+	switch(clean)
 	{
 		case 1:
 			f = fopen(file, "w");

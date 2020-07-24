@@ -15,8 +15,6 @@ struct mageLoger
 
 static struct mageLoger Logger;
 
-
-
 static void mageGLFWErrorCallback(int error, const char *description)
 {
     MAGE_LOG_CORE_ERROR("GLFW Error %d : %s\n", error, description);
@@ -93,9 +91,7 @@ void mageLogEnd()
 	MAGE_LOG_CORE_INFORM("Logging Details:\nLog Count         -> %d\nWarning Count     -> %d\nError Count       -> %d\nFatal Error Count -> %d\n", Logger.LogCount, Logger.WarningCount, Logger.ErrorCount, Logger.FatalErrorCount);
 
     #if defined (MAGE_DEBUG)
-
         fclose(Logger.DebugFile);
-        
         printf("%s", "\x1b[0m");
     #endif
 }

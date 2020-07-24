@@ -34,7 +34,6 @@ void mageSceneDisplayInformation(const struct mageScene *scene)
 }
 void mageSceneDestroy(struct mageScene *scene)
 {
-    mageSceneDisplayInformation(scene);
     if (scene->Pool.EntityPooledCount)
     {
         MAGE_LOG_CORE_WARNING("Scene: %s (%p) has %lu entities still active, make sure they get destroyed\n", scene->Tag, scene, scene->Pool.EntityPooledCount);
@@ -47,7 +46,7 @@ void mageSceneDestroy(struct mageScene *scene)
         mageComponentTableFree(&scene->Pool.ComponentTables[i], &scene->Allocater);
     }
     scene->Allocater.Free(scene->Pool.ComponentHandles);
-    scene->Allocater.Free(scene->Pool.Pooled); 
+    scene->Allocater.Free(scene->Pool.Pooled);  
     scene->Allocater.Free(scene->Pool.ComponentTables);
     mageQueueDestroy(&scene->Pool.AvailableQueue, &scene->Allocater);
     MAGE_LOG_CORE_INFORM("Scene %s destroyed\n", scene->Tag); 

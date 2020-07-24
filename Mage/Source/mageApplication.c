@@ -29,7 +29,9 @@ mageResult mageApplicationCreate(struct mageApplication *application, struct mag
 void mageApplicationDestroy(struct mageApplication *application)
 {
     mageWindowDestroy(application->Window);
+    mageRendererDestroy(application->Renderer, &application->RendererCreateInfo);
     free(application->Window);
     free(application->Renderer);
+    
     MAGE_LOG_CORE_INFORM("Application has been cleaned up\n", NULL);
 }
