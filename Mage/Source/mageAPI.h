@@ -26,7 +26,8 @@
 
 **************************/
 
-#define MAGE_SET_BIT(input, index, value) (input |= value << index)
+#define MAGE_SET_BIT(input, index, value) \
+	(input |= value << index)
 
 #define MAGE_VULKAN_CHECK(function) \
 	mageHandleVulkanResult(#function, function)
@@ -45,8 +46,8 @@
 #define MAGE_BIT(index) (1 << index) 
 
 typedef uint32_t mageEventHandle;
-typedef uint64_t mageEntity;
-typedef uint64_t mageComponent;
+typedef uint32_t mageEntity;
+typedef uint64_t mageComponentHandle;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -91,6 +92,12 @@ typedef enum MAGE_RESULT_ENUM
 	MAGE_RESULT_SHADER_CREATION_FAILURE,
 	MAGE_RESULT_DATA_NOT_PRESENT
 } mageResult;
+
+typedef enum MAGE_COMPONENT_TYPE_ENUM
+{
+	MAGE_COMPONENT_TYPE_REQUIRED,
+	MAGE_COMPONENT_TYPE_OPTIONAL
+} mageComponentType;
 
 typedef enum MAGE_KEYCODE_ENUM
 {
@@ -332,26 +339,27 @@ struct mageHeapAllocater
 struct mageComponentTable
 {
     const char 								*Tag;
-    uint64_t 								Count;
+    uint32_t 								Count;
     uint64_t 								ByteSize;
-    uint64_t 								ComponentMask;
+    uint32_t 								ID;
+	struct mageQueue						IndexQueue;
     void 									**Components;
 };
 struct mageEntityPool
 {
     mageEntity 								*Pooled;
-	mageComponent							*ComponentHandles;
+	mageComponentHandle						**ComponentHandles;
 	struct mageQueue						AvailableQueue;
 	struct mageComponentTable 				*ComponentTables;
-    uint64_t 								EntityPooledCount;
-	uint64_t								EntityLimit;
-	uint64_t								ComponentTableCount;
+    uint32_t 								EntityPooledCount;
+	uint32_t								EntityLimit;
+	uint32_t								ComponentTableCount;
 };
 struct mageScene
 {
     struct mageEntityPool 					Pool;
 	struct mageHeapAllocater 				Allocater;
-	const char *Tag;
+	const char 								*Tag;
 };
 struct mageIndiciesIndexes
 {
@@ -551,7 +559,7 @@ extern void mageEntityDestroy(
 );
 extern uint64_t mageComponentRegister(
 	struct mageScene *scene,
-	const char *id, 
+	const char *id,
 	const uint64_t size
 );
 extern void mageComponentTableFree(

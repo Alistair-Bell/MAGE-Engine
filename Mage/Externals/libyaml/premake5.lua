@@ -17,7 +17,8 @@ project "yaml"
         "YAML_VERSION_MAJOR=0",
         "YAML_VERSION_MINOR=2",
         "YAML_VERSION_PATCH=5",
-        "YAML_VERSION_STRING=\"0.25\""
+        "YAML_VERSION_STRING=\"0.25\"",
+        "YAML_DECLARE_STATIC"
     }
 
     targetdir (BuildTargetPath)

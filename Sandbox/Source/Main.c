@@ -49,33 +49,49 @@ MAGE_ENTRY_POINT()
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
     mageApplicationDestroy(SandboxApplication);    
-
     */
+    
+    
     struct mageHeapAllocater allocater = mageHeapAllocaterDefault();
     mageSceneCreate(&currentScene, SANDBOX_ENTITY_COUNT, "Current Scene", &allocater);
+    /* Entities */
     mageEntity entities[SANDBOX_ENTITY_COUNT];
+    
+    /* 
+        Component registering 
+        For each scene components must be re registered, maybe in the future that may change
+    */
     MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct vector2);
-    struct vector2 vec = (struct vector2){ .x = 0.0f, .y = 0.0f };
+    
+    /* Binded data */ 
+    struct vector2 data;
+    data.v[0] = 0.0f;
+    data.v[1] = 2.0f;
 
     uint32_t i;
     for (i = 0; i < SANDBOX_ENTITY_COUNT; i++)
     {
+        /* Creating entities */
         entities[i] = mageEntityCreate(&currentScene);
-        struct vector2 *temp = malloc(sizeof(struct vector2));
-        temp->v[0] = (float)i;
-        temp->v[1] = (float)i;
-        MAGE_ECS_BIND_COMPONENT(&currentScene, entities[i], struct vector2, temp);
-        free(temp);
+        
+        /* Binding entitiy data */
+        MAGE_ECS_BIND_COMPONENT(&currentScene, entities[i], struct vector2, &data);
     }
+    
     for (i = 0; i < SANDBOX_ENTITY_COUNT; i++)
     {
+        /*
+            Whilst destroying the entities is not required, it is good practice to cleanup after yourself
+            If at runtime a entity is not needed then please destroy it too save on runtime memory
+        */
         mageEntityDestroy(&currentScene, entities[i]);
     }
 
+    /* Destroy the scene to free its allocated memory */
     mageSceneDestroy(&currentScene);
     
+    
     free(SandboxApplication);
-
     mageLogEnd();
     return 1;
 }

@@ -1,6 +1,11 @@
 #ifndef __MAGE_CORE__
 #define __MAGE_CORE__
 
+/*!************************
+	This file contains core macros used by the engine and handles the includes for the engine
+	If you are using the engine you should leave this file the way it is unless you want to
+	mageAPI.h is the main interface you should use and mageCore.h is included by mageAPI.h
+**************************/
 
 #define MAGE_VULKAN
 #include "../Externals/Vulkan-Headers/include/vulkan/vulkan.h"
@@ -130,8 +135,6 @@
 	#endif
 #endif
 
-
-
 /*!************************
 	C standard includes 
 **************************/
@@ -143,7 +146,7 @@
 #include <stdarg.h> 
 #include <math.h>
 #include <time.h>
-#include <signal.h> 
+#include <signal.h>
 #include <stdint.h>
 
 #define HYPATIA_SINGLE_PRECISION_FLOATS
@@ -151,21 +154,11 @@
 #include "../Externals/lodepng/src/lodepng.h"
 #include "../Externals/libyaml/include/yaml.h"
 
-
 #if defined (MAGE_DEBUG)
-
-	#if defined (MAGE_COMPILER_MVS)
-		#define MAGE_DEBUG_BREAK __debugbreak()
-	#elif defined(MAGE_PLATFORM_LINUX)
-		#define MAGE_DEBUG_BREAK raise(SIGABRT)
-	#else
-		#define MAGE_DEBUG_BREAK
-	#endif
-
-	#define MAGE_LOG_CORE_INFORM(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_WARNING(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_INFORM(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_WARNING(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_ERROR(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) 	mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
 #else
 	#define MAGE_LOG_CORE_INFORM(x, ...)
 	#define MAGE_LOG_CORE_WARNING(x, ...)

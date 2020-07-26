@@ -12,28 +12,45 @@ mageEntity mageEntityCreate(struct mageScene *scene)
 }
 void mageEntityBindComponent(struct mageScene *scene, mageEntity entity, const char *componentReference, void *component)
 {
-    /* Updating the entity's component handle */ 
-    uint64_t i;
+    uint32_t i;
     uint8_t found = 0;
     for (i = 0; i < scene->Pool.ComponentTableCount; i++)
     {
-        if (strcmp(componentReference, scene->Pool.ComponentTables[i].Tag) == 0)
+        if (strcmp(scene->Pool.ComponentTables[i].Tag, componentReference) == 0)
         {
-            scene->Pool.ComponentHandles[entity] += scene->Pool.ComponentTables[i].ComponentMask;
+            MAGE_LOG_CORE_INFORM("Binding entity %d with component %s\n", entity, componentReference);
             found = 1;
             break;
         }
     }
-    struct mageComponentTable *table = &scene->Pool.ComponentTables[i];
-
     assert(found);
+    struct mageComponentTable *table = &scene->Pool.ComponentTables[i];
+    mageComponentHandle *handle = scene->Pool.ComponentHandles[entity];
     table->Count++;
+    
+    if (table->IndexQueue.Count == 0)
+    {
+        uint32_t index = table->Count - 1;
+        table->Components = scene->Allocater.Reallocater(table->Components, sizeof(table->ByteSize) * table->Count);
+        table->Components[index] = scene->Allocater.Allocate(table->ByteSize);
+        memcpy(table->Components[index], component, table->ByteSize);
+    }
+    else
+    {   
+        uint32_t index;
+        mageQueuePop(&table->IndexQueue, &index, &scene->Allocater);
+        memcpy(table->Components[index], component, table->ByteSize);
+    }
+    
 
-    uint32_t size  =  table->ByteSize * table->Count;
-    uint32_t index =  table->Count - 1;
-    table->Components = scene->Allocater.Reallocater(table->Components, size);
-    table->Components[index] = scene->Allocater.Allocate(table->ByteSize);
-    MAGE_LOG_CORE_INFORM("Binding entity %d with %s, component handle of %lu\n", entity, componentReference, scene->Pool.ComponentHandles[entity]);
+    uint32_t highByte = table->ID;
+    uint32_t lowByte;
+    mageComponentHandle finalByte = highByte + lowByte;
+    handle[0]++;
+    uint64_t index = handle[0];
+    handle = scene->Allocater.Reallocater(handle, handle[0] * sizeof(mageComponentHandle));
+    memcpy(&handle[index], &finalByte, sizeof(uint64_t));
+
 }
 void mageEntityDestroy(struct mageScene *scene, mageEntity entity)
 {

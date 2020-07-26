@@ -96,6 +96,7 @@ project "Sandbox"
         "vulkan",
         "lodepng",
         "yaml",
+        "libogg"
     }
 
     filter "system:linux"
@@ -124,3 +125,4 @@ group "Externals"
     include "Mage/Externals/lodepng"
     include "Mage/Externals/libyaml"
     include "Mage/Externals/libogg"
+    include "Examples/"

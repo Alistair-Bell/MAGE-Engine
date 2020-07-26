@@ -13,11 +13,23 @@ mageResult mageEngineInitialise()
 }
 mageResult mageApplicationCreate(struct mageApplication *application, struct mageApplicationCreateInfo applicationInfo, struct mageRendererCreateInfo rendererInfo)
 {
-
     application->Window = malloc(sizeof(struct mageWindow));
     application->Renderer = malloc(sizeof(struct mageRenderer));
     application->RendererCreateInfo = rendererInfo;
 
+    if (applicationInfo.WindowIcon == NULL)
+    {
+        applicationInfo.WindowIcon = "Mage/Resources/Textures/MTEC/Logo.png";
+    }
+    if (rendererInfo.PipelineShaders == NULL || rendererInfo.ShaderCount <= 0)
+    {
+        MAGE_LOG_CORE_WARNING("Here\n", NULL);
+        struct mageShader defaultShaders[2];
+        mageShaderCreate(&defaultShaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
+        mageShaderCreate(&defaultShaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
+        rendererInfo.PipelineShaders    = defaultShaders;
+        rendererInfo.ShaderCount        = 2;
+    }
     application->Running = 1;
     mageResult returnCode = mageEngineInitialise();
     if (returnCode != MAGE_RESULT_SUCCESS) { return returnCode; }
