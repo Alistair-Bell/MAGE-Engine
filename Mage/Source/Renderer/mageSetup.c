@@ -422,7 +422,6 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
 {
     if (rendererInfo->PipelineShaders == NULL || rendererInfo->ShaderCount <= 0)
     {
-        MAGE_LOG_CORE_WARNING("Here\n", NULL);
         struct mageShader defaultShaders[2];
         mageShaderCreate(&defaultShaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
         mageShaderCreate(&defaultShaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);

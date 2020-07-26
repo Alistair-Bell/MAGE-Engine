@@ -46,5 +46,8 @@ MAGE_ENTRY_POINT()
 
     /* Give back what you borrow, good practice */
     free(HelloWorld);
+
+    /* Ending the log closes the file stream and resets the terminal colors displaying basic logging details */
+    mageLogEnd();
     return 1;
 }

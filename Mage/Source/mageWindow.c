@@ -2,6 +2,11 @@
 
 mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCreateInfo *info)
 {
+	if (info->WindowIcon == NULL)
+    {
+        info->WindowIcon = "Mage/Resources/Textures/MTEC/Logo.png";
+    }
+	
 	window->Height  = info->Height;
 	window->Width   = info->Width;
 	window->Title   = info->Name;
