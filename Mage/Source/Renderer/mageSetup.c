@@ -27,6 +27,8 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessa
             MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
             break;  
     }
+    assert(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT);
+    
     return VK_FALSE;
 }
 static VkResult mageCreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger) 
@@ -259,6 +261,8 @@ static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mag
     MAGE_LOG_CORE_INFORM("Device picked %s\n", properties.deviceName);
     mageGetDeviceIndexes(renderer, renderer->PhysicalDevice, &renderer->Indexes);
     vkGetPhysicalDeviceMemoryProperties(renderer->PhysicalDevice, &renderer->PhysicalDeviceMemoryProperties);
+    vkGetPhysicalDeviceFeatures(renderer->PhysicalDevice, &renderer->PhysicalDeviceFeatures);
+    renderer->PhysicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
     free(devices);
     free(scores);
     return VK_SUCCESS;
@@ -281,6 +285,7 @@ static VkResult mageCreateDevice(struct mageRenderer *renderer, struct mageWindo
     deviceCreateInfo.enabledExtensionCount      = 1;    
     deviceCreateInfo.pQueueCreateInfos          = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount       = 1;
+    deviceCreateInfo.pEnabledFeatures           = &renderer->PhysicalDeviceFeatures;
 
     VkResult result = MAGE_VULKAN_CHECK(vkCreateDevice(renderer->PhysicalDevice, &deviceCreateInfo, NULL, &renderer->Device));
     return result;
@@ -297,7 +302,7 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
     {
         MAGE_LOG_CORE_FATAL_ERROR("Failed to create swap chain, hardware invalid\n", NULL);
     }
-    VkFormat format = mageSwapChainSupportPickSurfaceFormat(&renderer->SwapChainSupportInfo).format;;
+    renderer->SwapChainFormat = mageSwapChainSupportPickSurfaceFormat(&renderer->SwapChainSupportInfo).format;;
     uint32_t imageCount = renderer->SwapChainSupportInfo.Capabilities.minImageCount + 1;
     uint32_t indicies[] = { renderer->Indexes.GraphicIndexes[0], renderer->Indexes.PresentIndexes[0] };
 
@@ -306,7 +311,7 @@ static VkResult mageCreateSwapChain(struct mageRenderer *renderer, struct mageWi
     
     createInfo.sType                        = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     createInfo.surface                      = renderer->Surface;
-    createInfo.imageFormat                  = format;
+    createInfo.imageFormat                  = renderer->SwapChainFormat;
     createInfo.imageColorSpace              = mageSwapChainSupportPickSurfaceFormat(&renderer->SwapChainSupportInfo).colorSpace;
     createInfo.imageExtent                  = renderer->SwapChainSupportInfo.Extent;
     createInfo.imageArrayLayers             = 1;
@@ -636,37 +641,7 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     
 
     VkResult result = vkAllocateCommandBuffers(renderer->Device, &allocateInfo, renderer->CommandBuffers);
-    if (result != VK_SUCCESS) { return result; } 
-
-    for (i = 0; i < renderer->SwapChainImageCount; i++)
-    {
-        /*
-        VkCommandBufferBeginInfo beginInfo;
-        memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
-        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-
-        VkRenderPassBeginInfo renderPassInfo;
-        memset(&renderPassInfo, 0, sizeof(VkRenderPassBeginInfo));
-        renderPassInfo.sType                    = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        renderPassInfo.renderPass               = renderer->PrimaryRenderPass;
-        renderPassInfo.framebuffer              = renderer->Framebuffers[i];
-        renderPassInfo.renderArea.offset        = (VkOffset2D){ 0.f, 0.f };
-        renderPassInfo.renderArea.extent        = renderer->SwapChainSupportInfo.Extent;
-        renderPassInfo.clearValueCount          = 1;
-        renderPassInfo.pClearValues             = &renderer->ClearValue;
-
-
-        vkBeginCommandBuffer(renderer->CommandBuffers[i], &beginInfo);
-        vkCmdBeginRenderPass(renderer->CommandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-            vkCmdBindPipeline(renderer->CommandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
-            vkCmdBindVertexBuffers(renderer->CommandBuffers[i], 0, 1, useBuffers, offsets);
-            vkCmdBindIndexBuffer(renderer->CommandBuffers[i], mageBufferGetNativeBuffer(&rendererInfo->Renderable->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
-            vkCmdDrawIndexed(renderer->CommandBuffers[i], 6, 1, 0, 0, 0);
-        vkCmdEndRenderPass(renderer->CommandBuffers[i]);
-        MAGE_VULKAN_CHECK(vkEndCommandBuffer(renderer->CommandBuffers[i]));
-        */
-    }
-    return VK_SUCCESS;
+    return result;
 }
 static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {
@@ -739,24 +714,26 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
     }
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
+    vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
     vkDestroyPipeline(renderer->Device, renderer->GraphicsPipeline, NULL); 
     vkDestroyPipelineLayout(renderer->Device, renderer->GraphicsPipelineLayout, NULL);
-
+    
     for (i = 0; i < renderer->SwapChainImageCount; i++)
     {
         vkDestroyImageView(renderer->Device, renderer->SwapChainImageViews[i], NULL);
     }
 
-    vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
     vkDestroySwapchainKHR(renderer->Device, renderer->SwapChain, NULL);
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
+    free(renderer->SwapChainImages);
+    free(renderer->SwapChainImageViews);
+    free(renderer->Framebuffers);
 }
 void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererProps)
 {
     MAGE_LOG_CORE_INFORM("Recreating rendering swapchain, window / surface resized\n", NULL);
     vkDeviceWaitIdle(renderer->Device);
     mageCleanupSwapChain(renderer, rendererProps);
-    
     typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererCreateInfo *);
     function functions[] = 
     {
@@ -799,9 +776,7 @@ void mageRendererDestroy(struct mageRenderer *renderer, struct mageRendererCreat
     
     mageIndiciesIndexesDestroy(&renderer->Indexes);
     mageSwapChainSupportDestroy(&renderer->SwapChainSupportInfo);
-    free(renderer->SwapChainImages);
-    free(renderer->SwapChainImageViews);
-    free(renderer->Framebuffers);
+
     free(renderer->SignalSemaphores);
     free(renderer->WaitSemaphores);
     free(renderer->FencesInUse);

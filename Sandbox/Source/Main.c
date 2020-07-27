@@ -1,6 +1,7 @@
 #include "Core.h"
+#include <AL/al.h>
 
-#define SANDBOX_ENTITY_COUNT 10
+#define SANDBOX_ENTITY_COUNT 3
 
 /* Application instance */
 static struct mageApplication *SandboxApplication;
@@ -17,7 +18,6 @@ MAGE_ENTRY_POINT()
 {
     SandboxApplication = malloc(sizeof(struct mageApplication));
     mageLogInitialise("Logs/mage.log");
-    /*
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -49,47 +49,39 @@ MAGE_ENTRY_POINT()
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
     mageApplicationDestroy(SandboxApplication);    
-    */
     
-    
+#if 0
     struct mageHeapAllocater allocater = mageHeapAllocaterDefault();
     mageSceneCreate(&currentScene, SANDBOX_ENTITY_COUNT, "Current Scene", &allocater);
-    /* Entities */
-    mageEntity entities[SANDBOX_ENTITY_COUNT];
     
-    /* 
-        Component registering 
-        For each scene components must be re registered, maybe in the future that may change
-    */
+    mageEntity entities[3];
+    
+    MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct vector3);
     MAGE_ECS_REGISTER_COMPONENT(&currentScene, struct vector2);
-    
-    /* Binded data */ 
+
     struct vector2 data;
     data.v[0] = 0.0f;
     data.v[1] = 2.0f;
 
+    struct vector3 other;
+    other.v[0] = 0.0f;
+    other.v[1] = 2.0f;
+    other.v[2] = 4.0f;
+    
     uint32_t i;
     for (i = 0; i < SANDBOX_ENTITY_COUNT; i++)
     {
-        /* Creating entities */
         entities[i] = mageEntityCreate(&currentScene);
-        
-        /* Binding entitiy data */
         MAGE_ECS_BIND_COMPONENT(&currentScene, entities[i], struct vector2, &data);
+        MAGE_ECS_BIND_COMPONENT(&currentScene, entities[i], struct vector3, &other);
     }
-    
     for (i = 0; i < SANDBOX_ENTITY_COUNT; i++)
     {
-        /*
-            Whilst destroying the entities is not required, it is good practice to cleanup after yourself
-            If at runtime a entity is not needed then please destroy it too save on runtime memory
-        */
         mageEntityDestroy(&currentScene, entities[i]);
     }
 
-    /* Destroy the scene to free its allocated memory */
     mageSceneDestroy(&currentScene);
-    
+#endif
     
     free(SandboxApplication);
     mageLogEnd();

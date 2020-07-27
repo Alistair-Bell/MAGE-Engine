@@ -308,7 +308,8 @@ typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
 	MAGE_TEXTURE_SAMPLER_REPEAT,
 	MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT,
 	MAGE_TEXTURE_SAMPLER_CLAMP_TO_EDGE,
-	MAGE_TEXTURE_SAMPLER_CLAMP_TO_BORDER
+	MAGE_TEXTURE_SAMPLER_CLAMP_TO_BORDER,
+	MAGE_TEXTURE_SAMPLER_MIRRORED_CLAMP_TO_EDGE,
 } mageTextureSamplerMode;
 
 typedef enum MAGE_TEXTURE_FILE_FORMAT_ENUM
@@ -450,9 +451,11 @@ struct mageRenderer
 {
 	VkInstance 								Instance;
 	VkDevice								Device;
-	VkPhysicalDeviceMemoryProperties		PhysicalDeviceMemoryProperties;
 	
 	VkPhysicalDevice						PhysicalDevice;
+	VkPhysicalDeviceMemoryProperties		PhysicalDeviceMemoryProperties;
+	VkPhysicalDeviceFeatures				PhysicalDeviceFeatures;
+
 	VkSurfaceKHR 							Surface;
 	VkQueue 								PresentQueue;
 	VkQueue									GraphicalQueue;
@@ -757,6 +760,27 @@ extern VkShaderModule mageShaderCreateModule(
 	struct mageShader *shader, 
 	VkDevice device
 );
+
+/* Vulkan images */
+VkResult mageImageCreate(
+	VkImage *image, 
+	VkDeviceMemory *memory, 
+	const uint32_t width, 
+	const uint32_t height, 
+	VkFormat format, 
+	VkImageTiling tilingMode, 
+	VkImageUsageFlags usage, 
+	VkMemoryPropertyFlags properties, 
+	struct mageRenderer *renderer
+);
+VkResult mageImageViewCreate(
+	VkImage image, 
+	VkImageView *view, 
+	VkFormat format, 
+	struct mageRenderer *renderer
+);
+
+
 
 /* Swap chain support */
 extern void mageSwapChainSupportCreate(

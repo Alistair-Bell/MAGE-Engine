@@ -3,7 +3,6 @@
 uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const uint64_t size)
 {
     assert(scene != NULL);
-    assert(scene->Pool.ComponentTableCount < 64);
     scene->Pool.ComponentTableCount++;
     scene->Pool.ComponentTables = scene->Allocater.Reallocater(scene->Pool.ComponentTables, sizeof(struct mageComponentTable) * scene->Pool.ComponentTableCount);
     
@@ -17,7 +16,7 @@ uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const ui
 
     memcpy(&scene->Pool.ComponentTables[scene->Pool.ComponentTableCount - 1], &table, sizeof(struct mageComponentTable));
     
-    MAGE_LOG_CORE_INFORM("Registerning component %s, created table\n", id);
+    MAGE_LOG_CORE_INFORM("Registerning component %s, created table with id %d\n", id, table.ID);
     return table.ID;
 }
 void mageComponentTableFree(struct mageComponentTable *table, struct mageHeapAllocater *allocater)
