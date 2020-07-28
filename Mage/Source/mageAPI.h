@@ -381,11 +381,11 @@ struct mageVertex
 	struct vector2 							Vertex;
 	struct vector3							Color;
 };
-struct mageTransform
+struct mageUniformObject
 {
-	struct vector3 							Position;
-	struct vector3							Scale;
-	struct vector3							Rotation;
+	struct matrix4 							View;
+	struct matrix4 							Projection;
+	struct matrix4							Model;
 };
 struct mageSwapChainSupportDetails
 {
@@ -408,6 +408,11 @@ struct mageBuffer
 	void									*Data;
 	uint32_t								Bytes;
 };
+struct mageTextureCreateInfo
+{
+	mageTextureSamplerMode					SamplerMode;
+	const char 								*TexturePath;
+};
 struct mageTexture
 {
 	VkSampler 								Sampler;
@@ -418,10 +423,20 @@ struct mageTexture
 	uint32_t								Width;
 	uint32_t								Height;
 };
+struct mageRenderableCreateInfo
+{
+	struct mageUniformObject				Uniform;
+	struct mageTextureCreateInfo			*TextureCreateInfo;
+	struct mageVertex						*Verticies;
+	uint16_t								*Indicies;
+	uint32_t								VertexCount;
+	uint32_t								IndexCount;
+};
 struct mageRenderable
 {
 	struct mageBuffer						IndexBuffer;
 	struct mageBuffer						VertexBuffer;
+	struct mageBuffer						UniformBuffer;
 	struct mageTexture						Texture;
 };
 
@@ -535,7 +550,6 @@ extern void mageQueueDestroy(
 	struct mageQueue *queue, 
 	const struct mageHeapAllocater *allocater
 );
-
 
 /* Entity component system */
 extern void mageSceneCreate(
@@ -866,7 +880,7 @@ extern void mageRendererDestroy(
 /* Renderables */
 extern mageResult mageRenderableCreate(
 	struct mageRenderable *renderable,
-	mageRenderablePipeLineMode pipelineMode,
+	struct mageRenderableCreateInfo *info,
 	struct mageRenderer *renderer
 );
 extern void mageRenderableDestroy(
@@ -885,5 +899,4 @@ extern void mageApplicationDestroy(
 );
 
 #endif  
-
 

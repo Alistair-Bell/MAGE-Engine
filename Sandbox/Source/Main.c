@@ -37,7 +37,39 @@ MAGE_ENTRY_POINT()
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
     
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
-    mageRenderableCreate(&renderable, MAGE_RENDERABLE_PIPELINE_MODE_PRIMARY, SandboxApplication->Renderer);
+    struct matrix4 model;
+    struct matrix4 projection;
+    struct matrix4 view;
+    memset(&model, 0, sizeof(struct matrix4));
+    memset(&projection, 0, sizeof(struct matrix4));
+    memset(&view, 0, sizeof(struct matrix4));
+
+
+    mageRenderableCreate(
+        &renderable, 
+        &(struct mageRenderableCreateInfo)
+        {
+            .IndexCount     = 6,
+            .Indicies       = (uint16_t[]) { 0, 1, 2, 2, 3, 0 },
+            .VertexCount    = 4,
+            .Verticies      = (struct mageVertex[]) 
+            { 
+                { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 0.0f} },
+                { .Vertex = { .x = 0.5f, .y = -0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f} },
+                { .Vertex = { .x = 0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} },
+                { .Vertex = { .x = -0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f} }
+            },
+            .Uniform        = (struct mageUniformObject) 
+                { .View = view, .Model = model, .Projection = projection },
+            
+            .TextureCreateInfo = &(struct mageTextureCreateInfo)
+            {
+                .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT,
+                .TexturePath = "Mage/Resources/Textures/Vulkan/Vulkan_White_170px_Dec16.png",
+            }
+        },
+        SandboxApplication->Renderer
+    );
 
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))

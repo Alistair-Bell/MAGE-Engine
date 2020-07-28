@@ -25,17 +25,10 @@ project "MageEngine"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
-    pchheader "Mage/Source/mageAPI.h"
-    pchsource "Mage/Source/mageAPI.c"
-
     files
     {
-        "Mage/Source/*.h",
-        "Mage/Source/*.c",
-        "Mage/Source/Renderer/**.h",
-        "Mage/Source/Renderer/**.c",
-        "Mage/Source/ECS/**.h",
-        "Mage/Source/ECS/**.c",
+        "Mage/Source/**.h",
+        "Mage/Source/**.c"
     }
     defines
     {
@@ -52,6 +45,9 @@ project "MageEngine"
         "FatalLinkWarnings",
     }
 
+filter "system:linux"
+    pchheader "Mage/Source/mageAPI.h"
+    pchsource "Mage/Source/mageAPI.c"
     
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
@@ -83,11 +79,7 @@ project "Sandbox"
         "%{prj.name}/**.h",   
         "%{prj.name}/**.c",
     }
-    defines
-    {
-        
-    }
-    
+
     links
     {
         "MageEngine",
