@@ -4,7 +4,7 @@
 #include "mageCore.h"
 
 
-/*!************************
+/*
 	 __  __          _____ ______   ______             _            
 	|  \/  |   /\   / ____|  ____| |  ____|           (_)           
 	| \  / |  /  \ | |  __| |__    | |__   _ __   __ _ _ _ __   ___ 
@@ -24,7 +24,7 @@
 	To contribute go to https://github.com/MTECGamesStudio/MAGE-Engine
 	For use please read the license
 
-**************************/
+*/
 
 #define MAGE_SET_BIT(input, index, value) \
 	(input |= value << index)
@@ -44,10 +44,22 @@
 	mageEntityBindComponent(scene, entity, #component, value);
 
 #define MAGE_BIT(index) (1 << index) 
+#define MAGE_PI 		3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f
+#define MAGE_PI_HALF	1.5707963267948966f
+
+#if defined (MAGE_USE_GLSL_STRUCTURES)
+	#define vec2 struct mageVector2
+	#define vec3 struct mageVector3
+	#define vec4 struct mageVector4
+	#define mat3 struct mageMatrix3
+	#define mat4 struct mageMatrix4
+#endif
+
 
 typedef uint32_t mageEventHandle;
 typedef uint32_t mageEntity;
 typedef uint64_t mageComponentHandle;
+typedef void 	*mageThread;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -323,6 +335,68 @@ typedef void *(*mageMemoryAllocaterMethod)(uint64_t);
 typedef void (*mageMemoryFreeMethod)(void *);
 typedef void *(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
 typedef void *(*mageMemoryReallocater)(void *, uint64_t);
+typedef void *(*mageThreadJobCallback)(void *);
+
+struct mageVector2
+{
+	union
+	{
+		float Values[2];
+		struct
+		{
+			float X;
+			float Y;
+		};
+	};
+};
+struct mageVector3
+{
+	union
+	{
+		float Values[3];
+		struct
+		{
+			float X;
+			float Y;
+			float Z;
+		};
+	};
+};
+struct mageVector4
+{
+	union
+	{
+		float Values[4];
+		float X;
+		float Y;
+		float Z;
+		float W;
+	};
+};
+struct mageMatrix3
+{
+	union
+	{
+		float Elements[9];
+		struct
+		{
+			struct mageVector3 Rows[3];
+		};
+	};
+};
+struct mageMatrix4
+{
+	union
+	{
+		float Elements[16];
+		struct
+		{
+			struct mageVector4 Rows[4];
+		};
+	};
+};
+
+
 
 struct mageQueue
 {
@@ -378,14 +452,28 @@ struct mageShader
 };
 struct mageVertex
 {
-	struct vector2 							Vertex;
-	struct vector3							Color;
+	struct mageVector2						Vertex;
+	struct mageVector3						Color;
 };
+struct mageTransform
+{
+	struct mageVector3						Position;
+	struct mageVector3						Location;
+	struct mageVector3						Rotation;
+};
+struct mageOrthographicCamera
+{
+	struct mageTransform					Transform;
+	struct mageMatrix4 						ProjectionMatrix;
+	struct mageMatrix4						ViewMatrix;
+	struct mageMatrix4						ViewProjectionMatrix;
+};
+
 struct mageUniformObject
 {
-	struct matrix4 							View;
-	struct matrix4 							Projection;
-	struct matrix4							Model;
+	struct mageMatrix4 						View;
+	struct mageMatrix4 						Projection;
+	struct mageMatrix4						Model;
 };
 struct mageSwapChainSupportDetails
 {
@@ -405,7 +493,6 @@ struct mageBuffer
 {
 	mageBufferType							BufferType;
 	struct mageBufferWrapper				Wrapper;
-	void									*Data;
 	uint32_t								Bytes;
 };
 struct mageTextureCreateInfo
@@ -425,7 +512,6 @@ struct mageTexture
 };
 struct mageRenderableCreateInfo
 {
-	struct mageUniformObject				Uniform;
 	struct mageTextureCreateInfo			*TextureCreateInfo;
 	struct mageVertex						*Verticies;
 	uint16_t								*Indicies;
@@ -439,7 +525,6 @@ struct mageRenderable
 	struct mageBuffer						UniformBuffer;
 	struct mageTexture						Texture;
 };
-
 struct mageWindow
 {
 	int32_t 								Width;
@@ -500,6 +585,8 @@ struct mageRenderer
 	VkFence									*FencesInUse;
 	VkFence									*SwapChainImagesInUse;
 
+	VkDescriptorSetLayout					UniformLayout;
+	struct mageBufferWrapper				*UniformBuffers;
 
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
 	VkDebugUtilsMessengerEXT				DebugMessenger;
@@ -519,11 +606,208 @@ struct mageApplication
 	uint8_t 								Running;
 };
 
-/* Allocater */
-struct mageHeapAllocater mageHeapAllocaterDefault(
+/* Math formulas */
+extern float mageDegreesToRadians(
+	const float degress
+);
+extern float mageRadiansToDegrees(
+	const float radians
 );
 
-/* Defined data structures */
+/* Vectors */
+extern void mageVector2CreateDefault(
+	struct mageVector2 *vector
+);
+extern void mageVector2CreateFromFloats(
+	struct mageVector2 *vector,
+	const float x,
+	const float y
+);
+extern void mageVector2CreateFromCopy(
+	struct mageVector2 *destination,
+	struct mageVector2 *source
+);
+extern void mageVector2Add(
+	struct mageVector2 *destination,
+	struct mageVector2 *other
+);
+extern void mageVector2Subtract(
+	struct mageVector2 *destination,
+	struct mageVector2 *other
+);
+extern void mageVector2Multiply(
+	struct mageVector2 *destination,
+	struct mageVector2 *other
+);
+extern void mageVector2Divide(
+	struct mageVector2 *destination,
+	struct mageVector2 *other
+);
+extern void mageVector2Log(
+	const struct mageVector2 *vector,
+	const char *name
+);
+
+extern void mageVector3CreateDefault(
+	struct mageVector3 *vector
+);
+extern void mageVector3CreateFromFloats(
+	struct mageVector3 *vector,
+	const float x,
+	const float y,
+	const float z
+);
+extern void mageVector3CreateFromVector2AndFloat(
+	struct mageVector3 *vector,
+	const struct mageVector2 *xy,
+	const float z 
+);
+extern void mageVector3CreateFromCopy(
+	struct mageVector3 *destination,
+	struct mageVector3 *source
+);
+extern void mageVector3Add(
+	struct mageVector3 *destination,
+	struct mageVector3 *other
+);
+extern void mageVector3Subtract(
+	struct mageVector3 *destination,
+	struct mageVector3 *other
+);
+extern void mageVector3Multiply(
+	struct mageVector3 *destination,
+	struct mageVector3 *other
+);
+extern void mageVector3Divide(
+	struct mageVector3 *destination,
+	struct mageVector3 *other
+);
+extern void mageVector3Log(
+	const struct mageVector3 *vector,
+	const char *name
+);
+
+extern void mageVector4CreateDefault(
+	struct mageVector4 *vector
+);
+extern void mageVector4CreateFromFloats(
+	struct mageVector4 *vector,
+	const float x,
+	const float y,
+	const float z,
+    const float w
+);
+extern void mageVector4CreateFrom2Vector2(
+	struct mageVector4 *vector,
+	const struct mageVector2 *xy,
+	const struct mageVector2 *zw
+);
+extern void mageVector4CreateFromVector3AndFloat(
+	struct mageVector4 *vector,
+	const struct mageVector3 *xyz,
+	const float w
+);
+extern void mageVector4CreateFromCopy(
+	struct mageVector4 *destination,
+	struct mageVector4 *source
+);
+extern void mageVector4Add(
+	struct mageVector4 *destination,
+	struct mageVector4 *other
+);
+extern void mageVector4Subtract(
+	struct mageVector4 *destination,
+	struct mageVector4 *other
+);
+extern void mageVector4Multiply(
+	struct mageVector4 *destination,
+	struct mageVector4 *other
+);
+extern void mageVector4Divide(
+	struct mageVector4 *destination,
+	struct mageVector4 *other
+);
+void mageVector4Log(
+	const struct mageVector4 *vector,
+	const char *name
+);
+
+/* Matrix's */
+extern void mageMatrix4CreateDefault(
+	struct mageMatrix4 *matrix
+);
+extern void mageMatrix4CreateFromRows(
+	struct mageMatrix4 *matrix,
+	const struct mageVector4 *row0,
+	const struct mageVector4 *row1,
+	const struct mageVector4 *row2,
+	const struct mageVector4 *row3
+);
+extern void mageMatrix4CreateFromSet(
+	struct mageMatrix4 *matrix,
+	const float *set,
+	const uint32_t setCount
+);
+extern void mageMatrix4CreateDiagonal(
+	struct mageMatrix4 *matrix,
+	const float diagonal
+);
+extern struct mageVector4 mageMatrix4GetRow(
+	const struct mageMatrix4 *matrix,
+	const uint32_t index
+);
+extern struct mageVector4 mageMatrix4GetColumn(
+	const struct mageMatrix4 *matrix,
+	const uint32_t index
+);
+extern void mageMatrix4Multiply(
+	struct mageMatrix4 *destination,
+	const struct mageMatrix4 *source
+);
+extern void mageMatrix4ApplyOrthographicProjection(
+	struct mageMatrix4 *destination,
+	const float left,
+	const float right,
+	const float bottom,
+	const float top,
+	const float near,
+	const float far
+);
+extern void mageMatrix4ApplyPerspectiveProjection(
+	struct mageMatrix4 *destination,
+	const float fieldOfView,
+	const float aspectRatio,
+	const float near,
+	const float far
+);
+extern void mageMatrix4TranslateVector3(
+	struct mageMatrix4 *destination,
+	const struct mageVector3 *translation
+);
+extern void mageMatrix4RotateAxis(
+	struct mageMatrix4 *destination,
+	const float angle,
+	const struct mageVector3 *axis
+);
+extern void mageMatrix4ScaleVector3(
+	struct mageMatrix4 *destination,
+	const struct mageVector3 *scale
+);
+extern void mageMatrix4Inverse(
+	struct mageMatrix4 *destination
+);
+extern void mageMatrix4Log(
+	const struct mageMatrix4 *matrix,
+	const char *name
+);
+
+
+/* Allocater */
+struct mageHeapAllocater mageHeapAllocaterDefault(
+	void
+);
+
+/* Queues */
 extern void mageQueueCreate(
 	struct mageQueue *queue, 
 	const uint32_t dataSize, 
@@ -587,9 +871,22 @@ extern void mageSceneDestroy(
 	struct mageScene *scene
 );
 
+/* Threads, abstraction of the native platform thread system */
+extern void *mageThreadCreate(
+	void
+);
+extern void mageThreadBegin(
+	mageThread thread,
+	mageThreadJobCallback callback,
+	void *data
+);
+extern void mageThreadDestroy(
+	mageThread thread
+);
+
 /* Generic */
 extern mageResult mageEngineInitialise(
-
+	void
 );
 extern void mageLogMessage(
 	const mageLogUser user, 
@@ -602,7 +899,7 @@ extern VkResult mageHandleVulkanResult(
 	VkResult functionResult
 );
 extern void mageLogEnd(
-
+	void
 );
 extern void mageLogInitialise(
 	const char *outputFile
@@ -634,6 +931,7 @@ extern void mageInputSetup(
 	struct mageApplication *application
 );
 extern void mageEventSetupMaster(
+	void
 );
 extern mageEventCategoryBit *mageEventGenerateCategories(
 	const mageEventType type
@@ -702,8 +1000,8 @@ extern void mageEventDispatch(
 /* Vertexes */
 extern void mageVertexCreate(
 	struct mageVertex *vertexInstance, 
-	struct vector2 vertex, 
-	struct vector3 color
+	struct mageVector2 vertex, 
+	struct mageVector3 color
 );
 extern VkVertexInputBindingDescription mageVertexBindingDescription(
 );
@@ -735,6 +1033,12 @@ extern void mageBufferCreate(
 );
 extern VkBuffer mageBufferGetNativeBuffer(
 	struct mageBuffer *buffer
+);
+extern void mageBufferUpdate(
+	struct mageBuffer *buffer,
+	void *memory,
+	uint32_t dataSize,
+	struct mageRenderer *renderer	
 );
 extern void mageBufferDestroy(
 	struct mageBuffer *buffer,
@@ -794,8 +1098,6 @@ VkResult mageImageViewCreate(
 	struct mageRenderer *renderer
 );
 
-
-
 /* Swap chain support */
 extern void mageSwapChainSupportCreate(
 	struct mageSwapChainSupportDetails *swapChainSupport,
@@ -853,6 +1155,11 @@ extern void mageCommandBufferEnd(
 	struct mageRenderer *renderer
 );
 
+/* Descriptor set */
+VkDescriptorSetLayout mageDescriptorSetLayoutCreate(
+	struct mageRenderer *renderer
+);
+
 /* Renderer */
 extern mageResult mageRendererCreate(
 	struct mageRenderer *renderer, 
@@ -877,6 +1184,25 @@ extern void mageRendererDestroy(
 	struct mageRendererCreateInfo *rendererInfo
 );
 
+/* Orthographic camera */
+extern void mageOrthographicCameraCreate(
+	struct mageOrthographicCamera *camera,
+	const float left,
+	const float right,
+	const float bottom,
+	const float top
+);
+extern void mageOrthographicCameraCalculateViewMatrix(
+	struct mageOrthographicCamera *camera
+);
+extern void mageOrthographicCameraSetProjection(
+	struct mageOrthographicCamera *camera,
+	const float left,
+	const float right,
+	const float bottom,
+	const float top
+);
+
 /* Renderables */
 extern mageResult mageRenderableCreate(
 	struct mageRenderable *renderable,
@@ -888,7 +1214,7 @@ extern void mageRenderableDestroy(
 	struct mageRenderer *renderer
 );
 
-
+/* Application */
 extern mageResult mageApplicationCreate(
 	struct mageApplication *application, 
 	struct mageApplicationCreateInfo applicationInfo, 

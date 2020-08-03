@@ -13,7 +13,7 @@ project "Hello-World"
     links
     {
         "MageEngine",
-        "hypatia",
+        -- "hypatia",
         "GLFW",
         "vulkan",
         "lodepng",

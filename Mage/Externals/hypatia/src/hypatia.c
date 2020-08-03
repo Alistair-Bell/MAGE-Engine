@@ -9,7 +9,7 @@
  * @brief This checks for mathematical equality within HYP_EPSILON.
  *
  */
-HYPAPI short scalar_equalsf(const HYP_FLOAT f1, const HYP_FLOAT f2)
+short scalar_equalsf(const HYP_FLOAT f1, const HYP_FLOAT f2)
 {
 	return scalar_equals_epsilonf(f1, f2, HYP_EPSILON);
 }
@@ -18,7 +18,7 @@ HYPAPI short scalar_equalsf(const HYP_FLOAT f1, const HYP_FLOAT f2)
  * @brief This checks for mathematical equality within a custom epsilon.
  *
  */
-HYPAPI short scalar_equals_epsilonf(const HYP_FLOAT f1, const HYP_FLOAT f2, const HYP_FLOAT epsilon)
+short scalar_equals_epsilonf(const HYP_FLOAT f1, const HYP_FLOAT f2, const HYP_FLOAT epsilon)
 {
 	if ((HYP_ABS(f1 - f2) < epsilon) == 0)
 	{
@@ -45,7 +45,7 @@ static struct vector2 _vector2_unit_x_negative = { { {-1.0f, 0.0f} } };
 static struct vector2 _vector2_unit_y_negative = { { {0.0f, -1.0f} } };
 
 
-HYPAPI const struct vector2 *vector2_get_reference_vector2(int id)
+const struct vector2 *vector2_get_reference_vector2(int id)
 {
 	switch (id)
 	{
@@ -68,7 +68,7 @@ HYPAPI const struct vector2 *vector2_get_reference_vector2(int id)
 }
 
 
-HYPAPI struct vector2 *vector2_set(struct vector2 *self, const struct vector2 *vT)
+struct vector2 *vector2_set(struct vector2 *self, const struct vector2 *vT)
 {
 	self->x = vT->x;
 	self->y = vT->y;
@@ -76,7 +76,7 @@ HYPAPI struct vector2 *vector2_set(struct vector2 *self, const struct vector2 *v
 }
 
 
-HYPAPI struct vector2 *vector2_setf2(struct vector2 *self, HYP_FLOAT xT, HYP_FLOAT yT)
+struct vector2 *vector2_setf2(struct vector2 *self, HYP_FLOAT xT, HYP_FLOAT yT)
 {
 	self->x = xT;
 	self->y = yT;
@@ -84,19 +84,19 @@ HYPAPI struct vector2 *vector2_setf2(struct vector2 *self, HYP_FLOAT xT, HYP_FLO
 }
 
 
-HYPAPI struct vector2 *vector2_zero(struct vector2 *self)
+struct vector2 *vector2_zero(struct vector2 *self)
 {
 	return vector2_setf2(self, 0.0f, 0.0f);
 }
 
 
-HYPAPI int vector2_equals(const struct vector2 *self, const struct vector2 *vT)
+int vector2_equals(const struct vector2 *self, const struct vector2 *vT)
 {
 	return scalar_equals(self->x, vT->x) && scalar_equals(self->y, vT->y);
 }
 
 
-HYPAPI struct vector2 *vector2_negate(struct vector2 *self)
+struct vector2 *vector2_negate(struct vector2 *self)
 {
 	self->v[0] = -self->v[0];
 	self->v[1] = -self->v[1];
@@ -104,7 +104,7 @@ HYPAPI struct vector2 *vector2_negate(struct vector2 *self)
 }
 
 
-HYPAPI struct vector2 *vector2_add(struct vector2 *self, const struct vector2 *vT)
+struct vector2 *vector2_add(struct vector2 *self, const struct vector2 *vT)
 {
 	self->v[0] += vT->v[0];
 	self->v[1] += vT->v[1];
@@ -112,7 +112,7 @@ HYPAPI struct vector2 *vector2_add(struct vector2 *self, const struct vector2 *v
 }
 
 
-HYPAPI struct vector2 *vector2_addf(struct vector2 *self, HYP_FLOAT fT)
+struct vector2 *vector2_addf(struct vector2 *self, HYP_FLOAT fT)
 {
 	self->v[0] += fT;
 	self->v[1] += fT;
@@ -120,7 +120,7 @@ HYPAPI struct vector2 *vector2_addf(struct vector2 *self, HYP_FLOAT fT)
 }
 
 
-HYPAPI struct vector2 *vector2_subtract(struct vector2 *self, const struct vector2 *vT)
+struct vector2 *vector2_subtract(struct vector2 *self, const struct vector2 *vT)
 {
 	self->v[0] -= vT->v[0];
 	self->v[1] -= vT->v[1];
@@ -128,7 +128,7 @@ HYPAPI struct vector2 *vector2_subtract(struct vector2 *self, const struct vecto
 }
 
 
-HYPAPI struct vector2 *vector2_subtractf(struct vector2 *self, HYP_FLOAT fT)
+struct vector2 *vector2_subtractf(struct vector2 *self, HYP_FLOAT fT)
 {
 	self->v[0] -= fT;
 	self->v[1] -= fT;
@@ -136,7 +136,7 @@ HYPAPI struct vector2 *vector2_subtractf(struct vector2 *self, HYP_FLOAT fT)
 }
 
 
-HYPAPI struct vector2 *vector2_multiply(struct vector2 *self, const struct vector2 *vT)
+struct vector2 *vector2_multiply(struct vector2 *self, const struct vector2 *vT)
 {
 	self->v[0] *= vT->v[0];
 	self->v[1] *= vT->v[1];
@@ -144,7 +144,7 @@ HYPAPI struct vector2 *vector2_multiply(struct vector2 *self, const struct vecto
 }
 
 
-HYPAPI struct vector2 *vector2_multiplyf(struct vector2 *self, HYP_FLOAT fT)
+struct vector2 *vector2_multiplyf(struct vector2 *self, HYP_FLOAT fT)
 {
 	self->v[0] *= fT;
 	self->v[1] *= fT;
@@ -152,7 +152,7 @@ HYPAPI struct vector2 *vector2_multiplyf(struct vector2 *self, HYP_FLOAT fT)
 }
 
 
-HYPAPI struct vector2 *vector2_divide(struct vector2 *self, const struct vector2 *vT)
+struct vector2 *vector2_divide(struct vector2 *self, const struct vector2 *vT)
 {
 	self->v[0] /= vT->v[0];
 	self->v[1] /= vT->v[1];
@@ -160,7 +160,7 @@ HYPAPI struct vector2 *vector2_divide(struct vector2 *self, const struct vector2
 }
 
 
-HYPAPI struct vector2 *vector2_dividef(struct vector2 *self, HYP_FLOAT fT)
+struct vector2 *vector2_dividef(struct vector2 *self, HYP_FLOAT fT)
 {
 	self->v[0] /= fT;
 	self->v[1] /= fT;
@@ -168,13 +168,13 @@ HYPAPI struct vector2 *vector2_dividef(struct vector2 *self, HYP_FLOAT fT)
 }
 
 
-HYPAPI HYP_FLOAT vector2_magnitude(const struct vector2 *self)
+HYP_FLOAT vector2_magnitude(const struct vector2 *self)
 {
 	return HYP_SQRT((self->x*self->x) + (self->y*self->y));
 }
 
 
-HYPAPI struct vector2 *vector2_normalize(struct vector2 *self)
+struct vector2 *vector2_normalize(struct vector2 *self)
 {
 	HYP_FLOAT mag = vector2_magnitude(self);
 
@@ -184,13 +184,13 @@ HYPAPI struct vector2 *vector2_normalize(struct vector2 *self)
 }
 
 
-HYPAPI HYP_FLOAT vector2_dot_product(const struct vector2 *self, const struct vector2 *vT)
+HYP_FLOAT vector2_dot_product(const struct vector2 *self, const struct vector2 *vT)
 {
 	return (self->x * vT->x) + (self->y * vT->y);
 }
 
 
-HYPAPI struct vector2 *vector2_cross_product(struct vector2 *vR, const struct vector2 *vT1, const struct vector2 *vT2)
+struct vector2 *vector2_cross_product(struct vector2 *vR, const struct vector2 *vT1, const struct vector2 *vT2)
 {
 	vR->x = (vT1->x * vT2->y) - (vT1->y * vT2->x);
 	vR->y = (vT1->y * vT2->x) - (vT1->x * vT2->y);
@@ -198,13 +198,13 @@ HYPAPI struct vector2 *vector2_cross_product(struct vector2 *vR, const struct ve
 }
 
 
-HYPAPI HYP_FLOAT vector2_angle_between(const struct vector2 *self, const struct vector2 *vT)
+HYP_FLOAT vector2_angle_between(const struct vector2 *self, const struct vector2 *vT)
 {
 	return vector2_dot_product(self, vT) / (vector2_magnitude(self) * vector2_magnitude(vT));
 }
 
 
-HYPAPI struct vector2 *vector2_find_normal_axis_between(struct vector2 *vR, const struct vector2 *vT1, const struct vector2 *vT2)
+struct vector2 *vector2_find_normal_axis_between(struct vector2 *vR, const struct vector2 *vT1, const struct vector2 *vT2)
 {
 	return vector2_normalize(vector2_cross_product(vR, vT1, vT2));
 }
@@ -217,7 +217,7 @@ HYPAPI struct vector2 *vector2_find_normal_axis_between(struct vector2 *vR, cons
  *
  * https://en.wikipedia.org/wiki/Distance
  */
-HYPAPI HYP_FLOAT vector2_distance(const struct vector2 *v1, const struct vector2 *v2)
+HYP_FLOAT vector2_distance(const struct vector2 *v1, const struct vector2 *v2)
 {
 	return HYP_SQRT((v2->x - v1->x) * (v2->x - v1->x) + (v2->y - v1->y) * (v2->y - v1->y));
 }
@@ -229,7 +229,7 @@ HYPAPI HYP_FLOAT vector2_distance(const struct vector2 *v1, const struct vector2
  * @param self The vector being multiplied
  * @param mT The matrix used to do the multiplication
  */
-HYPAPI struct vector2 *vector2_multiplym3(struct vector2 *self, const struct matrix3 *mT)
+struct vector2 *vector2_multiplym3(struct vector2 *self, const struct matrix3 *mT)
 {
 	struct vector2 vR;
 
@@ -245,7 +245,7 @@ HYPAPI struct vector2 *vector2_multiplym3(struct vector2 *self, const struct mat
 
 
 #ifndef HYP_NO_STDIO
-HYPAPI void _vector2_print(const struct vector2 *self)
+void _vector2_print(const struct vector2 *self)
 {
 	printf("x:%10f, y:%10f\r\n", self->x, self->y);
 }
@@ -257,7 +257,7 @@ HYPAPI void _vector2_print(const struct vector2 *self)
  * @brief Randomly fills the vector with values. Good for testing.
  *
  */
-HYPAPI struct vector2 *_vector2_set_random(struct vector2 *self)
+struct vector2 *_vector2_set_random(struct vector2 *self)
 {
 	self->x = HYP_RANDOM_FLOAT;
 	self->y = HYP_RANDOM_FLOAT;
@@ -283,7 +283,7 @@ static struct vector3 _vector3_unit_y_negative = { { {0.0f, -1.0f,  0.0f} } };
 static struct vector3 _vector3_unit_z_negative = { { {0.0f,  0.0f, -1.0f} } };
 
 
-HYPAPI const struct vector3 *vector3_get_reference_vector3(int id)
+const struct vector3 *vector3_get_reference_vector3(int id)
 {
 	switch (id)
 	{
@@ -314,7 +314,7 @@ HYPAPI const struct vector3 *vector3_get_reference_vector3(int id)
  * @ingroup vector3
  * @brief initializes the vertex with specific values
  */
-HYPAPI struct vector3 *vector3_setf3(struct vector3 *self, HYP_FLOAT xT, HYP_FLOAT yT, HYP_FLOAT zT)
+struct vector3 *vector3_setf3(struct vector3 *self, HYP_FLOAT xT, HYP_FLOAT yT, HYP_FLOAT zT)
 {
 	self->x = xT;
 	self->y = yT;
@@ -327,7 +327,7 @@ HYPAPI struct vector3 *vector3_setf3(struct vector3 *self, HYP_FLOAT xT, HYP_FLO
  * @ingroup vector3
  * @brief initializes the vertex with values from another vector
  */
-HYPAPI struct vector3 *vector3_set(struct vector3 *self, const struct vector3 *vT)
+struct vector3 *vector3_set(struct vector3 *self, const struct vector3 *vT)
 {
 	self->x = vT->x;
 	self->y = vT->y;
@@ -340,7 +340,7 @@ HYPAPI struct vector3 *vector3_set(struct vector3 *self, const struct vector3 *v
  * @ingroup vector3
  * @brief initializes the vertex with zeros
  */
-HYPAPI struct vector3 *vector3_zero(struct vector3 *self)
+struct vector3 *vector3_zero(struct vector3 *self)
 {
 	return vector3_setf3(self, 0.0f, 0.0f, 0.0f);
 }
@@ -350,7 +350,7 @@ HYPAPI struct vector3 *vector3_zero(struct vector3 *self)
  * @ingroup vector3
  * @brief compares two vectors.  Uses epsilon to deal with rounding errors
  */
-HYPAPI int vector3_equals(const struct vector3 *self, const struct vector3 *vT)
+int vector3_equals(const struct vector3 *self, const struct vector3 *vT)
 {
 	return  HYP_ABS(self->x - vT->x) < HYP_EPSILON &&
 		HYP_ABS(self->y - vT->y) < HYP_EPSILON &&
@@ -362,7 +362,7 @@ HYPAPI int vector3_equals(const struct vector3 *self, const struct vector3 *vT)
  * @ingroup vector3
  * @brief switches the sign on each component of the vector
  */
-HYPAPI struct vector3 *vector3_negate(struct vector3 *self)
+struct vector3 *vector3_negate(struct vector3 *self)
 {
 	self->v[0] = -self->v[0];
 	self->v[1] = -self->v[1];
@@ -375,7 +375,7 @@ HYPAPI struct vector3 *vector3_negate(struct vector3 *self)
  * @ingroup vector3
  * @brief adds vectors using component-wise addition
  */
-HYPAPI struct vector3 *vector3_add(struct vector3 *self, const struct vector3 *vT)
+struct vector3 *vector3_add(struct vector3 *self, const struct vector3 *vT)
 {
 	self->v[0] += vT->v[0];
 	self->v[1] += vT->v[1];
@@ -388,7 +388,7 @@ HYPAPI struct vector3 *vector3_add(struct vector3 *self, const struct vector3 *v
  * @ingroup vector3
  * @brief add to each component of the vector using a scalar
  */
-HYPAPI struct vector3 *vector3_addf(struct vector3 *self, HYP_FLOAT f)
+struct vector3 *vector3_addf(struct vector3 *self, HYP_FLOAT f)
 {
 	self->v[0] += f;
 	self->v[1] += f;
@@ -401,7 +401,7 @@ HYPAPI struct vector3 *vector3_addf(struct vector3 *self, HYP_FLOAT f)
  * @ingroup vector3
  * @brief subtract two vectors using component-wise subtraction
  */
-HYPAPI struct vector3 *vector3_subtract(struct vector3 *self, const struct vector3 *vT)
+struct vector3 *vector3_subtract(struct vector3 *self, const struct vector3 *vT)
 {
 	self->v[0] -= vT->v[0];
 	self->v[1] -= vT->v[1];
@@ -414,7 +414,7 @@ HYPAPI struct vector3 *vector3_subtract(struct vector3 *self, const struct vecto
  * @ingroup vector3
  * @brief subtract each vector's component by a scalar
  */
-HYPAPI struct vector3 *vector3_subtractf(struct vector3 *self, HYP_FLOAT f)
+struct vector3 *vector3_subtractf(struct vector3 *self, HYP_FLOAT f)
 {
 	self->v[0] -= f;
 	self->v[1] -= f;
@@ -427,7 +427,7 @@ HYPAPI struct vector3 *vector3_subtractf(struct vector3 *self, HYP_FLOAT f)
  * @ingroup vector3
  * @brief multiplies two vectors using component-wise multiplication
  */
-HYPAPI struct vector3 *vector3_multiply(struct vector3 *self, const struct vector3 *vT)
+struct vector3 *vector3_multiply(struct vector3 *self, const struct vector3 *vT)
 {
 	self->v[0] *= vT->v[0];
 	self->v[1] *= vT->v[1];
@@ -440,7 +440,7 @@ HYPAPI struct vector3 *vector3_multiply(struct vector3 *self, const struct vecto
  * @ingroup vector3
  * @brief multiplies each component of the vector by a scalar
  */
-HYPAPI struct vector3 *vector3_multiplyf(struct vector3 *self, HYP_FLOAT f)
+struct vector3 *vector3_multiplyf(struct vector3 *self, HYP_FLOAT f)
 {
 	self->v[0] *= f;
 	self->v[1] *= f;
@@ -454,7 +454,7 @@ HYPAPI struct vector3 *vector3_multiplyf(struct vector3 *self, HYP_FLOAT f)
  * @brief divides one vector into another using component-wise division
  *
  */
-HYPAPI struct vector3 *vector3_divide(struct vector3 *self, const struct vector3 *vT)
+struct vector3 *vector3_divide(struct vector3 *self, const struct vector3 *vT)
 {
 	self->v[0] /= vT->v[0];
 	self->v[1] /= vT->v[1];
@@ -467,7 +467,7 @@ HYPAPI struct vector3 *vector3_divide(struct vector3 *self, const struct vector3
  * @ingroup vector3
  * @brief calculates the magnitude of the vector
  */
-HYPAPI HYP_FLOAT vector3_magnitude(const struct vector3 *self)
+HYP_FLOAT vector3_magnitude(const struct vector3 *self)
 {
 	return HYP_SQRT((self->x*self->x) + (self->y*self->y) + (self->z*self->z));
 }
@@ -477,7 +477,7 @@ HYPAPI HYP_FLOAT vector3_magnitude(const struct vector3 *self)
  * @ingroup vector3
  * @brief normalizes the vector by dividing each component by the magnitude
  */
-HYPAPI struct vector3 *vector3_normalize(struct vector3 *self)
+struct vector3 *vector3_normalize(struct vector3 *self)
 {
 	HYP_FLOAT mag;
 
@@ -503,7 +503,7 @@ HYPAPI struct vector3 *vector3_normalize(struct vector3 *self)
  * @ingroup vector3
  * @brief computes the dot product of two vectors
  */
-HYPAPI HYP_FLOAT vector3_dot_product(const struct vector3 *self, const struct vector3 *vT)
+HYP_FLOAT vector3_dot_product(const struct vector3 *self, const struct vector3 *vT)
 {
 	return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z);
 }
@@ -513,7 +513,7 @@ HYPAPI HYP_FLOAT vector3_dot_product(const struct vector3 *self, const struct ve
  * @ingroup vector3
  * @brief computes the cross-product between two vectors
  */
-HYPAPI struct vector3 *vector3_cross_product(struct vector3 *vR, const struct vector3 *vT1, const struct vector3 *vT2)
+struct vector3 *vector3_cross_product(struct vector3 *vR, const struct vector3 *vT1, const struct vector3 *vT2)
 {
 	vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
 	vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
@@ -527,7 +527,7 @@ HYPAPI struct vector3 *vector3_cross_product(struct vector3 *vR, const struct ve
  * normalized vector only
  *
  */
-HYPAPI HYP_FLOAT vector3_angle_between(const struct vector3 *vT1, const struct vector3 *vT2)
+HYP_FLOAT vector3_angle_between(const struct vector3 *vT1, const struct vector3 *vT2)
 {
 	HYP_FLOAT c; /* cosine */
 
@@ -542,7 +542,7 @@ HYPAPI HYP_FLOAT vector3_angle_between(const struct vector3 *vT1, const struct v
  * @brief finds the vector describing the normal between two vectors
  *
  */
-HYPAPI struct vector3 *vector3_find_normal_axis_between(struct vector3 *vR, const struct vector3 *vT1, const struct vector3 *vT2)
+struct vector3 *vector3_find_normal_axis_between(struct vector3 *vR, const struct vector3 *vT1, const struct vector3 *vT2)
 {
 	vector3_cross_product(vR, vT1, vT2);
 	vector3_normalize(vR);
@@ -557,7 +557,7 @@ HYPAPI struct vector3 *vector3_find_normal_axis_between(struct vector3 *vR, cons
  *
  * https://en.wikipedia.org/wiki/Distance
  */
-HYPAPI HYP_FLOAT vector3_distance(const struct vector3 *v1, const struct vector3 *v2)
+HYP_FLOAT vector3_distance(const struct vector3 *v1, const struct vector3 *v2)
 {
 	return HYP_SQRT((v2->x - v1->x) * (v2->x - v1->x) + (v2->y - v1->y) * (v2->y - v1->y) + (v2->z - v1->z) * (v2->z - v1->z));
 }
@@ -569,7 +569,7 @@ HYPAPI HYP_FLOAT vector3_distance(const struct vector3 *v1, const struct vector3
  * @param self The vector being multiplied
  * @param mT The matrix used to do the multiplication
  */
-HYPAPI struct vector3 *vector3_multiplym4(struct vector3 *self, const struct matrix4 *mT)
+struct vector3 *vector3_multiplym4(struct vector3 *self, const struct matrix4 *mT)
 {
 	struct vector3 vR;
 
@@ -584,7 +584,7 @@ HYPAPI struct vector3 *vector3_multiplym4(struct vector3 *self, const struct mat
 
 
 #ifndef HYP_NO_STDIO
-HYPAPI void _vector3_print(const struct vector3 *self)
+void _vector3_print(const struct vector3 *self)
 {
 	printf("x:%10f, y:%10f, z:%10f\r\n", self->x, self->y, self->z);
 }
@@ -601,7 +601,7 @@ HYPAPI void _vector3_print(const struct vector3 *self)
  * @param qT the quaternion
  *
  */
-HYPAPI struct vector3 *vector3_rotate_by_quaternion(struct vector3 *self, const struct quaternion *qT)
+struct vector3 *vector3_rotate_by_quaternion(struct vector3 *self, const struct quaternion *qT)
 {
 	struct quaternion qconj;
 	struct quaternion q;
@@ -633,7 +633,7 @@ HYPAPI struct vector3 *vector3_rotate_by_quaternion(struct vector3 *self, const 
  * @param self the starting point that is rotated by qT
  *
  */
-HYPAPI struct vector3 *vector3_reflect_by_quaternion(struct vector3 *self, const struct quaternion *qT)
+struct vector3 *vector3_reflect_by_quaternion(struct vector3 *self, const struct quaternion *qT)
 {
 	struct quaternion q;
 
@@ -657,7 +657,7 @@ HYPAPI struct vector3 *vector3_reflect_by_quaternion(struct vector3 *self, const
  * @brief Randomly fills the vector with values. Good for testing.
  *
  */
-HYPAPI struct vector3 *_vector3_set_random(struct vector3 *self)
+struct vector3 *_vector3_set_random(struct vector3 *self)
 {
 	self->x = HYP_RANDOM_FLOAT;
 	self->y = HYP_RANDOM_FLOAT;
@@ -684,7 +684,7 @@ static struct vector4 _vector4_unit_y_negative = { { {0.0f, -1.0f,  0.0f, 0.0f} 
 static struct vector4 _vector4_unit_z_negative = { { {0.0f,  0.0f, -1.0f, 0.0f} } };
 
 
-HYPAPI const struct vector4 *vector4_get_reference_vector4(int id)
+const struct vector4 *vector4_get_reference_vector4(int id)
 {
 	switch (id)
 	{
@@ -715,7 +715,7 @@ HYPAPI const struct vector4 *vector4_get_reference_vector4(int id)
  * @ingroup vector4
  * @brief initializes the vertex with specific values
  */
-HYPAPI struct vector4 *vector4_setf4(struct vector4 *self, HYP_FLOAT xT, HYP_FLOAT yT, HYP_FLOAT zT, HYP_FLOAT wT)
+struct vector4 *vector4_setf4(struct vector4 *self, HYP_FLOAT xT, HYP_FLOAT yT, HYP_FLOAT zT, HYP_FLOAT wT)
 {
 	self->x = xT;
 	self->y = yT;
@@ -729,7 +729,7 @@ HYPAPI struct vector4 *vector4_setf4(struct vector4 *self, HYP_FLOAT xT, HYP_FLO
  * @ingroup vector4
  * @brief initializes the vertex with values from another vector
  */
-HYPAPI struct vector4 *vector4_set(struct vector4 *self, const struct vector4 *vT)
+struct vector4 *vector4_set(struct vector4 *self, const struct vector4 *vT)
 {
 	self->x = vT->x;
 	self->y = vT->y;
@@ -742,7 +742,7 @@ HYPAPI struct vector4 *vector4_set(struct vector4 *self, const struct vector4 *v
  * @ingroup vector4
  * @brief initializes the vertex with zeros
  */
-HYPAPI struct vector4 *vector4_zero(struct vector4 *self)
+struct vector4 *vector4_zero(struct vector4 *self)
 {
 	return vector4_setf4(self, 0.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -752,7 +752,7 @@ HYPAPI struct vector4 *vector4_zero(struct vector4 *self)
  * @ingroup vector4
  * @brief compares two vectors.  Uses epsilon to deal with rounding errors
  */
-HYPAPI int vector4_equals(const struct vector4 *self, const struct vector4 *vT)
+int vector4_equals(const struct vector4 *self, const struct vector4 *vT)
 {
 	return  HYP_ABS(self->x - vT->x) < HYP_EPSILON &&
 		HYP_ABS(self->y - vT->y) < HYP_EPSILON &&
@@ -765,7 +765,7 @@ HYPAPI int vector4_equals(const struct vector4 *self, const struct vector4 *vT)
  * @ingroup vector4
  * @brief switches the sign on each component of the vector
  */
-HYPAPI struct vector4 *vector4_negate(struct vector4 *self)
+struct vector4 *vector4_negate(struct vector4 *self)
 {
 	self->v[0] = -self->v[0];
 	self->v[1] = -self->v[1];
@@ -779,7 +779,7 @@ HYPAPI struct vector4 *vector4_negate(struct vector4 *self)
  * @ingroup vector4
  * @brief adds vectors using component-wise addition
  */
-HYPAPI struct vector4 *vector4_add(struct vector4 *self, const struct vector4 *vT)
+struct vector4 *vector4_add(struct vector4 *self, const struct vector4 *vT)
 {
 	self->v[0] += vT->v[0];
 	self->v[1] += vT->v[1];
@@ -793,7 +793,7 @@ HYPAPI struct vector4 *vector4_add(struct vector4 *self, const struct vector4 *v
  * @ingroup vector4
  * @brief add to each component of the vector using a scalar
  */
-HYPAPI struct vector4 *vector4_addf(struct vector4 *self, HYP_FLOAT f)
+struct vector4 *vector4_addf(struct vector4 *self, HYP_FLOAT f)
 {
 	self->v[0] += f;
 	self->v[1] += f;
@@ -807,7 +807,7 @@ HYPAPI struct vector4 *vector4_addf(struct vector4 *self, HYP_FLOAT f)
  * @ingroup vector4
  * @brief subtract two vectors using component-wise subtraction
  */
-HYPAPI struct vector4 *vector4_subtract(struct vector4 *self, const struct vector4 *vT)
+struct vector4 *vector4_subtract(struct vector4 *self, const struct vector4 *vT)
 {
 	self->v[0] -= vT->v[0];
 	self->v[1] -= vT->v[1];
@@ -821,7 +821,7 @@ HYPAPI struct vector4 *vector4_subtract(struct vector4 *self, const struct vecto
  * @ingroup vector4
  * @brief subtract each vector's component by a scalar
  */
-HYPAPI struct vector4 *vector4_subtractf(struct vector4 *self, HYP_FLOAT f)
+struct vector4 *vector4_subtractf(struct vector4 *self, HYP_FLOAT f)
 {
 	self->x -= f;
 	self->y -= f;
@@ -835,7 +835,7 @@ HYPAPI struct vector4 *vector4_subtractf(struct vector4 *self, HYP_FLOAT f)
  * @ingroup vector4
  * @brief multiplies two vectors using component-wise multiplication
  */
-HYPAPI struct vector4 *vector4_multiply(struct vector4 *self, const struct vector4 *vT)
+struct vector4 *vector4_multiply(struct vector4 *self, const struct vector4 *vT)
 {
 	self->v[0] *= vT->v[0];
 	self->v[1] *= vT->v[1];
@@ -849,7 +849,7 @@ HYPAPI struct vector4 *vector4_multiply(struct vector4 *self, const struct vecto
  * @ingroup vector4
  * @brief multiplies each component of the vector by a scalar
  */
-HYPAPI struct vector4 *vector4_multiplyf(struct vector4 *self, HYP_FLOAT f)
+struct vector4 *vector4_multiplyf(struct vector4 *self, HYP_FLOAT f)
 {
 	self->v[0] *= f;
 	self->v[1] *= f;
@@ -864,7 +864,7 @@ HYPAPI struct vector4 *vector4_multiplyf(struct vector4 *self, HYP_FLOAT f)
  * @brief divides one vector into another using component-wise division
  *
  */
-HYPAPI struct vector4 *vector4_divide(struct vector4 *self, const struct vector4 *vT)
+struct vector4 *vector4_divide(struct vector4 *self, const struct vector4 *vT)
 {
 	self->v[0] /= vT->v[0];
 	self->v[1] /= vT->v[1];
@@ -878,7 +878,7 @@ HYPAPI struct vector4 *vector4_divide(struct vector4 *self, const struct vector4
  * @ingroup vector4
  * @brief calculates the magnitude of the vector
  */
-HYPAPI HYP_FLOAT vector4_magnitude(const struct vector4 *self)
+HYP_FLOAT vector4_magnitude(const struct vector4 *self)
 {
 	return HYP_SQRT((self->x*self->x) + (self->y*self->y) + (self->z*self->z) + (self->w*self->w));
 }
@@ -888,7 +888,7 @@ HYPAPI HYP_FLOAT vector4_magnitude(const struct vector4 *self)
  * @ingroup vector4
  * @brief normalizes the vector by dividing each component by the magnitude
  */
-HYPAPI struct vector4 *vector4_normalize(struct vector4 *self)
+struct vector4 *vector4_normalize(struct vector4 *self)
 {
 	HYP_FLOAT mag;
 
@@ -915,7 +915,7 @@ HYPAPI struct vector4 *vector4_normalize(struct vector4 *self)
  * @ingroup vector4
  * @brief computes the dot product of two vectors
  */
-HYPAPI HYP_FLOAT vector4_dot_product(const struct vector4 *self, const struct vector4 *vT)
+HYP_FLOAT vector4_dot_product(const struct vector4 *self, const struct vector4 *vT)
 {
 	return (self->x * vT->x) + (self->y * vT->y) + (self->z * vT->z) + (self->w * vT->w);
 }
@@ -925,7 +925,7 @@ HYPAPI HYP_FLOAT vector4_dot_product(const struct vector4 *self, const struct ve
  * @ingroup vector4
  * @brief computes the cross-product between two vectors
  */
-HYPAPI struct vector4 *vector4_cross_product(struct vector4 *vR, const struct vector4 *vT1, const struct vector4 *vT2)
+struct vector4 *vector4_cross_product(struct vector4 *vR, const struct vector4 *vT1, const struct vector4 *vT2)
 {
 	vR->x = (vT1->y * vT2->z) - (vT1->z * vT2->y);
 	vR->y = (vT1->z * vT2->x) - (vT1->x * vT2->z);
@@ -942,7 +942,7 @@ HYPAPI struct vector4 *vector4_cross_product(struct vector4 *vR, const struct ve
  *
  * https://en.wikipedia.org/wiki/Distance
  */
-HYPAPI HYP_FLOAT vector4_distance(const struct vector4 *v1, const struct vector4 *v2)
+HYP_FLOAT vector4_distance(const struct vector4 *v1, const struct vector4 *v2)
 {
 	return HYP_SQRT((v2->x - v1->x) * (v2->x - v1->x)
 		    + (v2->y - v1->y) * (v2->y - v1->y)
@@ -952,7 +952,7 @@ HYPAPI HYP_FLOAT vector4_distance(const struct vector4 *v1, const struct vector4
 
 
 #ifndef HYP_NO_STDIO
-HYPAPI void _vector4_print(const struct vector4 *self)
+void _vector4_print(const struct vector4 *self)
 {
 	printf("x:%10f, y:%10f, z:%10f, w:%10f\r\n", self->x, self->y, self->z, self->w);
 }
@@ -964,7 +964,7 @@ HYPAPI void _vector4_print(const struct vector4 *self)
  * @brief Randomly fills the vector with values. Good for testing.
  *
  */
-HYPAPI struct vector4 *_vector4_set_random(struct vector4 *self)
+struct vector4 *_vector4_set_random(struct vector4 *self)
 {
 	self->x = HYP_RANDOM_FLOAT;
 	self->y = HYP_RANDOM_FLOAT;
@@ -986,7 +986,7 @@ HYPAPI struct vector4 *_vector4_set_random(struct vector4 *self)
  * @ingroup matrix3
  * @brief Initializes the matrix with 0.0 in every element.
  */
-HYPAPI struct matrix3 *matrix3_zero(struct matrix3 *self)
+struct matrix3 *matrix3_zero(struct matrix3 *self)
 {
 	HYP_MEMSET(self, 0, sizeof(struct matrix3));
 	return self;
@@ -997,7 +997,7 @@ HYPAPI struct matrix3 *matrix3_zero(struct matrix3 *self)
  * @ingroup matrix3
  * @brief Initializes the matrix as an identity matrix.
  */
-HYPAPI struct matrix3 *matrix3_identity(struct matrix3 *m)
+struct matrix3 *matrix3_identity(struct matrix3 *m)
 {
 	m->c00 = 1.0f, m->c10 = 0.0f, m->c20 = 0.0f;
 	m->c01 = 0.0f, m->c11 = 1.0f, m->c21 = 0.0f;
@@ -1014,7 +1014,7 @@ HYPAPI struct matrix3 *matrix3_identity(struct matrix3 *m)
  * @param self The matrix to initialize
  * @param mT The matrix to copy
  */
-HYPAPI struct matrix3 *matrix3_set(struct matrix3 *self, const struct matrix3 *mT)
+struct matrix3 *matrix3_set(struct matrix3 *self, const struct matrix3 *mT)
 {
 	uint8_t i;
 
@@ -1032,7 +1032,7 @@ HYPAPI struct matrix3 *matrix3_set(struct matrix3 *self, const struct matrix3 *m
  * @brief Compares every element of the matrix.  Uses HYP_EPSILON for precision.
  * returns 1 if equal, 0 if different
  */
-HYPAPI int matrix3_equals(const struct matrix3 *self, const struct matrix3 *mT)
+int matrix3_equals(const struct matrix3 *self, const struct matrix3 *mT)
 {
 	uint8_t i;
 
@@ -1055,7 +1055,7 @@ HYPAPI int matrix3_equals(const struct matrix3 *self, const struct matrix3 *mT)
  * @param self The matrix being changed
  * @param mT The matrix to add
  */
-HYPAPI struct matrix3 *matrix3_add(struct matrix3 *self, const struct matrix3 *mT)
+struct matrix3 *matrix3_add(struct matrix3 *self, const struct matrix3 *mT)
 {
 	/* "add row and column to row and column" */
 	uint8_t i;
@@ -1076,7 +1076,7 @@ HYPAPI struct matrix3 *matrix3_add(struct matrix3 *self, const struct matrix3 *m
  * @param self The matrix being changed
  * @param mT The matrix to subtract from self (self = self - mT)
  */
-HYPAPI struct matrix3 *matrix3_subtract(struct matrix3 *self, const struct matrix3 *mT)
+struct matrix3 *matrix3_subtract(struct matrix3 *self, const struct matrix3 *mT)
 {
 	/* "subtract row and column from row and column" */
 	uint8_t i;
@@ -1097,7 +1097,7 @@ HYPAPI struct matrix3 *matrix3_subtract(struct matrix3 *self, const struct matri
  * @param self The matrix being changed
  * @param scalar The scalar factor being multiplied in
  */
-HYPAPI struct matrix3 *matrix3_multiplyf(struct matrix3 *self, HYP_FLOAT scalar)
+struct matrix3 *matrix3_multiplyf(struct matrix3 *self, HYP_FLOAT scalar)
 {
 	uint8_t i;
 
@@ -1119,7 +1119,7 @@ HYPAPI struct matrix3 *matrix3_multiplyf(struct matrix3 *self, HYP_FLOAT scalar)
  *
  * self = self * mT
  */
-HYPAPI struct matrix3 *matrix3_multiply(struct matrix3 *self, const struct matrix3 *mT)
+struct matrix3 *matrix3_multiply(struct matrix3 *self, const struct matrix3 *mT)
 {
 	/* mT is the multiplicand */
 
@@ -1154,7 +1154,7 @@ HYPAPI struct matrix3 *matrix3_multiply(struct matrix3 *self, const struct matri
  *
  * @param self The matrix being changed
  */
-HYPAPI struct matrix3 *matrix3_transpose(struct matrix3 *self)
+struct matrix3 *matrix3_transpose(struct matrix3 *self)
 {
 	return _matrix3_transpose_columnrow(self);
 }
@@ -1165,7 +1165,7 @@ HYPAPI struct matrix3 *matrix3_transpose(struct matrix3 *self)
  * @brief Swaps the row and column
  *
  */
-HYPAPI struct matrix3 *_matrix3_transpose_rowcolumn(struct matrix3 *self)
+struct matrix3 *_matrix3_transpose_rowcolumn(struct matrix3 *self)
 {
 	HYP_FLOAT tmp;
 
@@ -1182,7 +1182,7 @@ HYPAPI struct matrix3 *_matrix3_transpose_rowcolumn(struct matrix3 *self)
  * @brief Swaps the columns and row
  *
  */
-HYPAPI struct matrix3 *_matrix3_transpose_columnrow(struct matrix3 *self)
+struct matrix3 *_matrix3_transpose_columnrow(struct matrix3 *self)
 {
 	HYP_FLOAT tmp;
 
@@ -1200,7 +1200,7 @@ HYPAPI struct matrix3 *_matrix3_transpose_columnrow(struct matrix3 *self)
  * @brief Prints out the matrix using column and row notation
  *
  */
-HYPAPI void _matrix3_print_with_columnrow_indexer(struct matrix3 *self)
+void _matrix3_print_with_columnrow_indexer(struct matrix3 *self)
 {
 	printf("%10f, %10f, %10f\r\n", self->c00, self->c10, self->c20);
 	printf("%10f, %10f, %10f\r\n", self->c01, self->c11, self->c21);
@@ -1215,7 +1215,7 @@ HYPAPI void _matrix3_print_with_columnrow_indexer(struct matrix3 *self)
  * @brief Prints out the matrix using row and column notation
  *
  */
-HYPAPI void _matrix3_print_with_rowcolumn_indexer(struct matrix3 *self)
+void _matrix3_print_with_rowcolumn_indexer(struct matrix3 *self)
 {
 	printf("%10f, %10f, %10f\r\n", self->r00, self->r01, self->r02);
 	printf("%10f, %10f, %10f\r\n", self->r10, self->r11, self->r12);
@@ -1228,7 +1228,7 @@ HYPAPI void _matrix3_print_with_rowcolumn_indexer(struct matrix3 *self)
  * @brief Randomly fills the matrix with values. Good for testing.
  *
  */
-HYPAPI struct matrix3 *_matrix3_set_random(struct matrix3 *self)
+struct matrix3 *_matrix3_set_random(struct matrix3 *self)
 {
 	uint8_t i;
 
@@ -1246,7 +1246,7 @@ HYPAPI struct matrix3 *_matrix3_set_random(struct matrix3 *self)
  * @brief creates a translation matrix.  It's opinionated about what that means.
  *
  */
-HYPAPI struct matrix3 *matrix3_make_transformation_translationv2(struct matrix3 *self, const struct vector2 *translation)
+struct matrix3 *matrix3_make_transformation_translationv2(struct matrix3 *self, const struct vector2 *translation)
 {
 	matrix3_identity(self);
 
@@ -1262,7 +1262,7 @@ HYPAPI struct matrix3 *matrix3_make_transformation_translationv2(struct matrix3 
  * @brief creates a scaling matrix.  It's opinionated about what that means.
  *
  */
-HYPAPI struct matrix3 *matrix3_make_transformation_scalingv2(struct matrix3 *self, const struct vector2 *scale)
+struct matrix3 *matrix3_make_transformation_scalingv2(struct matrix3 *self, const struct vector2 *scale)
 {
 	matrix3_identity(self);
 
@@ -1280,7 +1280,7 @@ HYPAPI struct matrix3 *matrix3_make_transformation_scalingv2(struct matrix3 *sel
  *
  * multiply this matrix by another matrix to rotate the other matrix
  */
-HYPAPI struct matrix3 *matrix3_make_transformation_rotationf_z(struct matrix3 *m, HYP_FLOAT angle)
+struct matrix3 *matrix3_make_transformation_rotationf_z(struct matrix3 *m, HYP_FLOAT angle)
 {
 	HYP_FLOAT c = HYP_COS(angle);
 	HYP_FLOAT s = HYP_SIN(angle);
@@ -1305,7 +1305,7 @@ HYPAPI struct matrix3 *matrix3_make_transformation_rotationf_z(struct matrix3 *m
  * @param translation the translation vector
  *
  */
-HYPAPI struct matrix3 *matrix3_translatev2(struct matrix3 *self, const struct vector2 *translation)
+struct matrix3 *matrix3_translatev2(struct matrix3 *self, const struct vector2 *translation)
 {
 	struct matrix3 translationMatrix;
 
@@ -1324,7 +1324,7 @@ HYPAPI struct matrix3 *matrix3_translatev2(struct matrix3 *self, const struct ve
  * @param angle the angle of rotation in radians
  *
  */
-HYPAPI struct matrix3 *matrix3_rotate(struct matrix3 *self, HYP_FLOAT angle)
+struct matrix3 *matrix3_rotate(struct matrix3 *self, HYP_FLOAT angle)
 {
 	struct matrix3 rotationMatrix;
 
@@ -1342,7 +1342,7 @@ HYPAPI struct matrix3 *matrix3_rotate(struct matrix3 *self, HYP_FLOAT angle)
  * @param scale the scaling vector
  *
  */
-HYPAPI struct matrix3 *matrix3_scalev2(struct matrix3 *self, const struct vector2 *scale)
+struct matrix3 *matrix3_scalev2(struct matrix3 *self, const struct vector2 *scale)
 {
 	struct matrix3 scalingMatrix;
 
@@ -1386,7 +1386,7 @@ HYPAPI struct matrix3 *matrix3_scalev2(struct matrix3 *self, const struct vector
  * @ingroup matrix4
  * @brief Initializes the matrix with 0.0 in every element.
  */
-HYPAPI struct matrix4 *matrix4_zero(struct matrix4 *self)
+struct matrix4 *matrix4_zero(struct matrix4 *self)
 {
 	HYP_MEMSET(self, 0, sizeof(struct matrix4));
 	return self;
@@ -1397,7 +1397,7 @@ HYPAPI struct matrix4 *matrix4_zero(struct matrix4 *self)
  * @ingroup matrix4
  * @brief Initializes the matrix as an identity matrix.
  */
-HYPAPI struct matrix4 *matrix4_identity(struct matrix4 *m)
+struct matrix4 *matrix4_identity(struct matrix4 *m)
 {
 	m->c00 = 1.0f, m->c10 = 0.0f, m->c20 = 0.0f, m->c30 = 0.0f;
 	m->c01 = 0.0f, m->c11 = 1.0f, m->c21 = 0.0f, m->c31 = 0.0f;
@@ -1415,7 +1415,7 @@ HYPAPI struct matrix4 *matrix4_identity(struct matrix4 *m)
  * @param self The matrix to initialize
  * @param mT The matrix to copy
  */
-HYPAPI struct matrix4 *matrix4_set(struct matrix4 *self, const struct matrix4 *mT)
+struct matrix4 *matrix4_set(struct matrix4 *self, const struct matrix4 *mT)
 {
 	uint8_t i;
 
@@ -1433,7 +1433,7 @@ HYPAPI struct matrix4 *matrix4_set(struct matrix4 *self, const struct matrix4 *m
  * @brief Compares every element of the matrix.  Uses HYP_EPSILON for precision.
  * returns 1 if equal, 0 if different
  */
-HYPAPI int matrix4_equals(const struct matrix4 *self, const struct matrix4 *mT)
+int matrix4_equals(const struct matrix4 *self, const struct matrix4 *mT)
 {
 	uint8_t i;
 
@@ -1456,7 +1456,7 @@ HYPAPI int matrix4_equals(const struct matrix4 *self, const struct matrix4 *mT)
  * @param self The matrix being changed
  * @param mT The matrix to add
  */
-HYPAPI struct matrix4 *matrix4_add(struct matrix4 *self, const struct matrix4 *mT)
+struct matrix4 *matrix4_add(struct matrix4 *self, const struct matrix4 *mT)
 {
 	/* "add row and column to row and column" */
 	uint8_t i;
@@ -1477,7 +1477,7 @@ HYPAPI struct matrix4 *matrix4_add(struct matrix4 *self, const struct matrix4 *m
  * @param self The matrix being changed
  * @param mT The matrix to subtract from self (self = self - mT)
  */
-HYPAPI struct matrix4 *matrix4_subtract(struct matrix4 *self, const struct matrix4 *mT)
+struct matrix4 *matrix4_subtract(struct matrix4 *self, const struct matrix4 *mT)
 {
 	/* "subtract row and column from row and column" */
 	uint8_t i;
@@ -1498,7 +1498,7 @@ HYPAPI struct matrix4 *matrix4_subtract(struct matrix4 *self, const struct matri
  * @param self The matrix being changed
  * @param scalar The scalar factor being multiplied in
  */
-HYPAPI struct matrix4 *matrix4_multiplyf(struct matrix4 *self, HYP_FLOAT scalar)
+struct matrix4 *matrix4_multiplyf(struct matrix4 *self, HYP_FLOAT scalar)
 {
 	uint8_t i;
 
@@ -1520,7 +1520,7 @@ HYPAPI struct matrix4 *matrix4_multiplyf(struct matrix4 *self, HYP_FLOAT scalar)
  *
  * self = self * mT
  */
-HYPAPI struct matrix4 *matrix4_multiply(struct matrix4 *self, const struct matrix4 *mT)
+struct matrix4 *matrix4_multiply(struct matrix4 *self, const struct matrix4 *mT)
 {
 	/* mT is the multiplicand */
 
@@ -1568,7 +1568,7 @@ HYPAPI struct matrix4 *matrix4_multiply(struct matrix4 *self, const struct matri
  *
  * vR = vT * self
  */
-HYPAPI struct vector4 *matrix4_multiplyv4(const struct matrix4 *self, const struct vector4 *vT, struct vector4 *vR)
+struct vector4 *matrix4_multiplyv4(const struct matrix4 *self, const struct vector4 *vT, struct vector4 *vR)
 {
 	vR->x = vT->x * self->r00 + vT->y * self->r01 + vT->z * self->r02 + vT->w * self->r03;
 	vR->y = vT->x * self->r10 + vT->y * self->r11 + vT->z * self->r12 + vT->w * self->r13;
@@ -1586,7 +1586,7 @@ HYPAPI struct vector4 *matrix4_multiplyv4(const struct matrix4 *self, const stru
  * @param vT The vector being multiplied
  * @param vR The vector returned
  */
-HYPAPI struct vector3 *matrix4_multiplyv3(const struct matrix4 *self, const struct vector3 *vT, struct vector3 *vR)
+struct vector3 *matrix4_multiplyv3(const struct matrix4 *self, const struct vector3 *vT, struct vector3 *vR)
 {
 	vR->x = vT->x * self->r00 + vT->y * self->r01 + vT->z * self->r02 + self->r03;
 	vR->y = vT->x * self->r10 + vT->y * self->r11 + vT->z * self->r12 + self->r13;
@@ -1603,7 +1603,7 @@ HYPAPI struct vector3 *matrix4_multiplyv3(const struct matrix4 *self, const stru
  * @param vT The vector being multiplied
  * @param vR The vector returned
  */
-HYPAPI struct vector2 *matrix4_multiplyv2(const struct matrix4 *self, const struct vector2 *vT, struct vector2 *vR)
+struct vector2 *matrix4_multiplyv2(const struct matrix4 *self, const struct vector2 *vT, struct vector2 *vR)
 {
 	vR->x = vT->x * self->r00 + vT->y * self->r01 + self->r02 + self->r03;
 	vR->y = vT->x * self->r10 + vT->y * self->r11 + self->r12 + self->r13;
@@ -1618,7 +1618,7 @@ HYPAPI struct vector2 *matrix4_multiplyv2(const struct matrix4 *self, const stru
  *
  * @param self The matrix being changed
  */
-HYPAPI struct matrix4 *matrix4_transpose(struct matrix4 *self)
+struct matrix4 *matrix4_transpose(struct matrix4 *self)
 {
 	return _matrix4_transpose_columnrow(self);
 }
@@ -1629,7 +1629,7 @@ HYPAPI struct matrix4 *matrix4_transpose(struct matrix4 *self)
  * @brief Swaps the row and column
  *
  */
-HYPAPI struct matrix4 *_matrix4_transpose_rowcolumn(struct matrix4 *self)
+struct matrix4 *_matrix4_transpose_rowcolumn(struct matrix4 *self)
 {
 	HYP_FLOAT tmp;
 
@@ -1649,7 +1649,7 @@ HYPAPI struct matrix4 *_matrix4_transpose_rowcolumn(struct matrix4 *self)
  * @brief Swaps the columns and row
  *
  */
-HYPAPI struct matrix4 *_matrix4_transpose_columnrow(struct matrix4 *self)
+struct matrix4 *_matrix4_transpose_columnrow(struct matrix4 *self)
 {
 	HYP_FLOAT tmp;
 
@@ -1670,7 +1670,7 @@ HYPAPI struct matrix4 *_matrix4_transpose_columnrow(struct matrix4 *self)
  * @brief Prints out the matrix using column and row notation
  *
  */
-HYPAPI void _matrix4_print_with_columnrow_indexer(struct matrix4 *self)
+void _matrix4_print_with_columnrow_indexer(struct matrix4 *self)
 {
 	printf("%10f, %10f, %10f, %10f\r\n", self->c00, self->c10, self->c20, self->c30);
 	printf("%10f, %10f, %10f, %10f\r\n", self->c01, self->c11, self->c21, self->c31);
@@ -1684,7 +1684,7 @@ HYPAPI void _matrix4_print_with_columnrow_indexer(struct matrix4 *self)
  * @brief Prints out the matrix using row and column notation
  *
  */
-HYPAPI void _matrix4_print_with_rowcolumn_indexer(struct matrix4 *self)
+void _matrix4_print_with_rowcolumn_indexer(struct matrix4 *self)
 {
 	printf("%10f, %10f, %10f, %10f\r\n", self->r00, self->r01, self->r02, self->r03);
 	printf("%10f, %10f, %10f, %10f\r\n", self->r10, self->r11, self->r12, self->r13);
@@ -1699,7 +1699,7 @@ HYPAPI void _matrix4_print_with_rowcolumn_indexer(struct matrix4 *self)
  * @brief Randomly fills the matrix with values. Good for testing.
  *
  */
-HYPAPI struct matrix4 *_matrix4_set_random(struct matrix4 *self)
+struct matrix4 *_matrix4_set_random(struct matrix4 *self)
 {
 	uint8_t i;
 
@@ -1718,7 +1718,7 @@ HYPAPI struct matrix4 *_matrix4_set_random(struct matrix4 *self)
  * right hand rule)
  *
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_rotationq(struct matrix4 *self, const struct quaternion *qT)
+struct matrix4 *matrix4_make_transformation_rotationq(struct matrix4 *self, const struct quaternion *qT)
 {
 	struct matrix4 *m;
 	const struct quaternion *q;
@@ -1747,7 +1747,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_rotationq(struct matrix4 *sel
  * @brief creates a translation matrix.  It's opinionated about what that means.
  *
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_translationv3(struct matrix4 *self, const struct vector3 *translation)
+struct matrix4 *matrix4_make_transformation_translationv3(struct matrix4 *self, const struct vector3 *translation)
 {
 	matrix4_identity(self);
 
@@ -1764,7 +1764,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_translationv3(struct matrix4 
  * @brief creates a scaling matrix.  It's opinionated about what that means.
  *
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_scalingv3(struct matrix4 *self, const struct vector3 *scale)
+struct matrix4 *matrix4_make_transformation_scalingv3(struct matrix4 *self, const struct vector3 *scale)
 {
 	matrix4_identity(self);
 
@@ -1783,7 +1783,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_scalingv3(struct matrix4 *sel
  *
  * multiply this matrix by another matrix to rotate the other matrix
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_x(struct matrix4 *m, HYP_FLOAT angle)
+struct matrix4 *matrix4_make_transformation_rotationf_x(struct matrix4 *m, HYP_FLOAT angle)
 {
 	HYP_FLOAT c = HYP_COS(angle);
 	HYP_FLOAT s = HYP_SIN(angle);
@@ -1806,7 +1806,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_x(struct matrix4 *m
  *
  * multiply this matrix by another matrix to rotate the other matrix
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_y(struct matrix4 *m, HYP_FLOAT angle)
+struct matrix4 *matrix4_make_transformation_rotationf_y(struct matrix4 *m, HYP_FLOAT angle)
 {
 	HYP_FLOAT c = HYP_COS(angle);
 	HYP_FLOAT s = HYP_SIN(angle);
@@ -1830,7 +1830,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_y(struct matrix4 *m
  *
  * multiply this matrix by another matrix to rotate the other matrix
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_z(struct matrix4 *m, HYP_FLOAT angle)
+struct matrix4 *matrix4_make_transformation_rotationf_z(struct matrix4 *m, HYP_FLOAT angle)
 {
 	HYP_FLOAT c = HYP_COS(angle);
 	HYP_FLOAT s = HYP_SIN(angle);
@@ -1856,7 +1856,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_rotationf_z(struct matrix4 *m
  * @param translation the translation vector
  *
  */
-HYPAPI struct matrix4 *matrix4_translatev3(struct matrix4 *self, const struct vector3 *translation)
+struct matrix4 *matrix4_translatev3(struct matrix4 *self, const struct vector3 *translation)
 {
 	struct matrix4 translationMatrix;
 
@@ -1875,7 +1875,7 @@ HYPAPI struct matrix4 *matrix4_translatev3(struct matrix4 *self, const struct ve
  * @param angle the angle of rotation in radians
  *
  */
-HYPAPI struct matrix4 *matrix4_rotatev3(struct matrix4 *self, const struct vector3 *axis, HYP_FLOAT angle)
+struct matrix4 *matrix4_rotatev3(struct matrix4 *self, const struct vector3 *axis, HYP_FLOAT angle)
 {
 	struct matrix4 rotationMatrix;
 	struct quaternion q;
@@ -1895,7 +1895,7 @@ HYPAPI struct matrix4 *matrix4_rotatev3(struct matrix4 *self, const struct vecto
  * @param scale the scaling vector
  *
  */
-HYPAPI struct matrix4 *matrix4_scalev3(struct matrix4 *self, const struct vector3 *scale)
+struct matrix4 *matrix4_scalev3(struct matrix4 *self, const struct vector3 *scale)
 {
 	struct matrix4 scalingMatrix;
 
@@ -1911,7 +1911,7 @@ HYPAPI struct matrix4 *matrix4_scalev3(struct matrix4 *self, const struct vector
  * @param self The transformation matrix being questioned
  *
  */
-HYPAPI HYP_FLOAT matrix4_determinant(const struct matrix4 *self)
+HYP_FLOAT matrix4_determinant(const struct matrix4 *self)
 {
 	HYP_FLOAT determinant;
 
@@ -1937,7 +1937,7 @@ HYPAPI HYP_FLOAT matrix4_determinant(const struct matrix4 *self)
  * @param self The transformation matrix being inverted
  *
  */
-HYPAPI struct matrix4 *matrix4_invert(struct matrix4 *self)
+struct matrix4 *matrix4_invert(struct matrix4 *self)
 {
 	struct matrix4 inverse;
 	uint8_t i;
@@ -1962,7 +1962,7 @@ HYPAPI struct matrix4 *matrix4_invert(struct matrix4 *self)
  * @param mR the inverse of the matrix is returned here
  *
  */
-HYPAPI struct matrix4 *matrix4_inverse(struct matrix4 *self, struct matrix4 *mR)
+struct matrix4 *matrix4_inverse(struct matrix4 *self, struct matrix4 *mR)
 {
 	struct matrix4 inverse;
 	HYP_FLOAT determinant;
@@ -2025,7 +2025,7 @@ HYPAPI struct matrix4 *matrix4_inverse(struct matrix4 *self, struct matrix4 *mR)
  *
  * @snippet test_quaternion.c quaternion identity example
  */
-HYPAPI struct quaternion *quaternion_identity(struct quaternion *self)
+struct quaternion *quaternion_identity(struct quaternion *self)
 {
 	self->x = 0.0f;
 	self->y = 0.0f;
@@ -2040,7 +2040,7 @@ HYPAPI struct quaternion *quaternion_identity(struct quaternion *self)
  * @ingroup quaternion
  * @brief initializes the quaternion with the passed in x, y, z, w
  */
-HYPAPI struct quaternion *quaternion_setf4(struct quaternion *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, HYP_FLOAT w)
+struct quaternion *quaternion_setf4(struct quaternion *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, HYP_FLOAT w)
 {
 	self->x = x;
 	self->y = y;
@@ -2056,7 +2056,7 @@ HYPAPI struct quaternion *quaternion_setf4(struct quaternion *self, HYP_FLOAT x,
  * @brief initializes the quaternion by copying the data from qT.  This is
  * effectively a copy function.
  */
-HYPAPI struct quaternion *quaternion_set(struct quaternion *self, const struct quaternion *qT)
+struct quaternion *quaternion_set(struct quaternion *self, const struct quaternion *qT)
 {
 	return quaternion_setf4(self, qT->x, qT->y, qT->z, qT->w);
 }
@@ -2077,7 +2077,7 @@ HYPAPI struct quaternion *quaternion_set(struct quaternion *self, const struct q
  * q = cos(a/2) + i ( x * sin(a/2)) + j (y * sin(a/2)) + k ( z * sin(a/2))
  *
  */
-HYPAPI struct quaternion *quaternion_set_from_axis_anglef3(struct quaternion *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, HYP_FLOAT angle)
+struct quaternion *quaternion_set_from_axis_anglef3(struct quaternion *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, HYP_FLOAT angle)
 {
 	HYP_FLOAT s = HYP_SIN(angle / 2.0f);
 	HYP_FLOAT c = HYP_COS(angle / 2.0f);
@@ -2103,7 +2103,7 @@ HYPAPI struct quaternion *quaternion_set_from_axis_anglef3(struct quaternion *se
  * @param angle the angle is in radians
  *
  */
-HYPAPI struct quaternion *quaternion_set_from_axis_anglev3(struct quaternion *self, const struct vector3 *axis, HYP_FLOAT angle)
+struct quaternion *quaternion_set_from_axis_anglev3(struct quaternion *self, const struct vector3 *axis, HYP_FLOAT angle)
 {
 	return quaternion_set_from_axis_anglef3(self, axis->x, axis->y, axis->z, angle);
 }
@@ -2121,7 +2121,7 @@ HYPAPI struct quaternion *quaternion_set_from_axis_anglev3(struct quaternion *se
  * @param az the z axis
  *
  */
-HYPAPI struct quaternion *quaternion_set_from_euler_anglesf3(struct quaternion *self, HYP_FLOAT ax, HYP_FLOAT ay, HYP_FLOAT az)
+struct quaternion *quaternion_set_from_euler_anglesf3(struct quaternion *self, HYP_FLOAT ax, HYP_FLOAT ay, HYP_FLOAT az)
 {
 	self->w = HYP_COS(az / 2.0f) * HYP_COS(ay / 2.0f) * HYP_COS(ax / 2.0f) + HYP_SIN(az / 2.0f) * HYP_SIN(ay / 2.0f) * HYP_SIN(ax / 2.0f);
 	self->x = HYP_COS(az / 2.0f) * HYP_COS(ay / 2.0f) * HYP_SIN(ax / 2.0f) - HYP_SIN(az / 2.0f) * HYP_SIN(ay / 2.0f) * HYP_COS(ax / 2.0f);
@@ -2146,7 +2146,7 @@ HYPAPI struct quaternion *quaternion_set_from_euler_anglesf3(struct quaternion *
  * @param az the z axis
  *
  */
-HYPAPI void quaternion_get_euler_anglesf3(const struct quaternion *self, HYP_FLOAT *ax, HYP_FLOAT *ay, HYP_FLOAT *az)
+void quaternion_get_euler_anglesf3(const struct quaternion *self, HYP_FLOAT *ax, HYP_FLOAT *ay, HYP_FLOAT *az)
 {
 	HYP_FLOAT qx, qy, qz, qw;
 
@@ -2166,7 +2166,7 @@ HYPAPI void quaternion_get_euler_anglesf3(const struct quaternion *self, HYP_FLO
  * @brief Checks for mathematical equality within EPSILON.
  *
  */
-HYPAPI int quaternion_equals(const struct quaternion *self, const struct quaternion *qT)
+int quaternion_equals(const struct quaternion *self, const struct quaternion *qT)
 {
 	return HYP_ABS(self->x - qT->x) < HYP_EPSILON &&
 		HYP_ABS(self->y - qT->y) < HYP_EPSILON &&
@@ -2182,7 +2182,7 @@ HYPAPI int quaternion_equals(const struct quaternion *self, const struct quatern
  * \f$\|q\| = x^2+y^2+z^2+w^2\f$.
  *
  */
-HYPAPI HYP_FLOAT quaternion_norm(const struct quaternion *self)
+HYP_FLOAT quaternion_norm(const struct quaternion *self)
 {
 	return (self->x * self->x) + (self->y * self->y) + (self->z * self->z) + (self->w * self->w);
 }
@@ -2196,7 +2196,7 @@ HYPAPI HYP_FLOAT quaternion_norm(const struct quaternion *self)
  *
  * \f$\sqrt{\|q\|}\f$
  */
-HYPAPI HYP_FLOAT quaternion_magnitude(const struct quaternion *self)
+HYP_FLOAT quaternion_magnitude(const struct quaternion *self)
 {
 	return HYP_SQRT(quaternion_norm(self));
 }
@@ -2210,7 +2210,7 @@ HYPAPI HYP_FLOAT quaternion_magnitude(const struct quaternion *self)
  *
  * @snippet test_quaternion.c quaternion conjugate example
  */
-HYPAPI struct quaternion *quaternion_conjugate(struct quaternion *self)
+struct quaternion *quaternion_conjugate(struct quaternion *self)
 {
 	self->x = -self->x;
 	self->y = -self->y;
@@ -2226,7 +2226,7 @@ HYPAPI struct quaternion *quaternion_conjugate(struct quaternion *self)
  * @brief negates all parts of the quaternion
  *
  */
-HYPAPI struct quaternion *quaternion_negate(struct quaternion *self)
+struct quaternion *quaternion_negate(struct quaternion *self)
 {
 	self->x = -self->x;
 	self->y = -self->y;
@@ -2250,7 +2250,7 @@ HYPAPI struct quaternion *quaternion_negate(struct quaternion *self)
  *
  * @snippet test_quaternion.c quaternion inverse example
  */
-HYPAPI struct quaternion *quaternion_inverse(struct quaternion *self)
+struct quaternion *quaternion_inverse(struct quaternion *self)
 {
 	HYP_FLOAT norm;
 
@@ -2286,7 +2286,7 @@ HYPAPI struct quaternion *quaternion_inverse(struct quaternion *self)
  * values on the manifold.
  *
  */
-HYPAPI struct quaternion *quaternion_normalize(struct quaternion *self)
+struct quaternion *quaternion_normalize(struct quaternion *self)
 {
 	HYP_FLOAT mag;
 
@@ -2314,7 +2314,7 @@ HYPAPI struct quaternion *quaternion_normalize(struct quaternion *self)
  * @brief if the norm is 1.0, then the quaternion is said to be a 'unit
  * quaternion'
  */
-HYPAPI short quaternion_is_unit(struct quaternion *self)
+short quaternion_is_unit(struct quaternion *self)
 {
 	return scalar_equalsf(1.0f, quaternion_norm(self));
 }
@@ -2325,7 +2325,7 @@ HYPAPI short quaternion_is_unit(struct quaternion *self)
  * @brief if the scalar is 0.0 (w == 0.0), then the quaternion is said to be a
  * 'pure quaternion'
  */
-HYPAPI short quaternion_is_pure(struct quaternion *self)
+short quaternion_is_pure(struct quaternion *self)
 {
 	return scalar_equalsf(self->w, 0.0f);
 }
@@ -2344,7 +2344,7 @@ HYPAPI short quaternion_is_pure(struct quaternion *self)
  * @param qR The resulting new orientation.
  *
  */
-HYPAPI struct quaternion *quaternion_nlerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
+struct quaternion *quaternion_nlerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
 {
 	quaternion_lerp(start, end, percent, qR);
 	quaternion_normalize(qR);
@@ -2364,7 +2364,7 @@ HYPAPI struct quaternion *quaternion_nlerp(const struct quaternion *start, const
  * @param qR The resulting new orientation.
  *
  */
-HYPAPI struct quaternion *quaternion_lerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
+struct quaternion *quaternion_lerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
 {
 	HYP_FLOAT f1, f2;
 
@@ -2413,7 +2413,7 @@ HYPAPI struct quaternion *quaternion_lerp(const struct quaternion *start, const 
  * @param qR The resulting new orientation.
  *
  */
-HYPAPI struct quaternion *quaternion_slerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
+struct quaternion *quaternion_slerp(const struct quaternion *start, const struct quaternion *end, HYP_FLOAT percent, struct quaternion *qR)
 {
 	HYP_FLOAT dot;
 	HYP_FLOAT f1, f2;
@@ -2497,7 +2497,7 @@ HYPAPI struct quaternion *quaternion_slerp(const struct quaternion *start, const
  * computes a regular dot product on it
  *
  */
-HYPAPI HYP_FLOAT quaternion_dot_product(const struct quaternion *self, const struct quaternion *qT)
+HYP_FLOAT quaternion_dot_product(const struct quaternion *self, const struct quaternion *qT)
 {
 	return (self->x * qT->x) + (self->y * qT->y) + (self->z * qT->z) + (self->w * qT->w);
 }
@@ -2510,7 +2510,7 @@ HYPAPI HYP_FLOAT quaternion_dot_product(const struct quaternion *self, const str
  * To add quaternions, add each element one by one like a vector.
  *
  */
-HYPAPI struct quaternion *quaternion_add(struct quaternion *self, const struct quaternion *qT)
+struct quaternion *quaternion_add(struct quaternion *self, const struct quaternion *qT)
 {
 	self->x += qT->x;
 	self->y += qT->y;
@@ -2528,7 +2528,7 @@ HYPAPI struct quaternion *quaternion_add(struct quaternion *self, const struct q
  * to subtract quaternions, subtract each element one by one like a vector
  *
  */
-HYPAPI struct quaternion *quaternion_subtract(struct quaternion *self, const struct quaternion *qT)
+struct quaternion *quaternion_subtract(struct quaternion *self, const struct quaternion *qT)
 {
 	self->x -= qT->x;
 	self->y -= qT->y;
@@ -2546,7 +2546,7 @@ HYPAPI struct quaternion *quaternion_subtract(struct quaternion *self, const str
  * to multiply by a scalar, apply it to element one by one like a vector
  *
  */
-HYPAPI struct quaternion *quaternion_multiplyf(struct quaternion *self, HYP_FLOAT f)
+struct quaternion *quaternion_multiplyf(struct quaternion *self, HYP_FLOAT f)
 {
 	self->x *= f;
 	self->y *= f;
@@ -2561,7 +2561,7 @@ HYPAPI struct quaternion *quaternion_multiplyf(struct quaternion *self, HYP_FLOA
  * @ingroup quaternion
  * @brief in place multiplies the quaternion by a quaternion
  */
-HYPAPI struct quaternion *quaternion_multiply(struct quaternion *self, const struct quaternion *qT)
+struct quaternion *quaternion_multiply(struct quaternion *self, const struct quaternion *qT)
 {
 	/* qT is the multiplicand */
 
@@ -2582,7 +2582,7 @@ HYPAPI struct quaternion *quaternion_multiply(struct quaternion *self, const str
  * @ingroup quaternion
  * @brief multiplies the quaternion by the vector.
  */
-HYPAPI struct quaternion *quaternion_multiplyv3(struct quaternion *self, const struct vector3 *vT)
+struct quaternion *quaternion_multiplyv3(struct quaternion *self, const struct vector3 *vT)
 {
 	/* vT is the multiplicand */
 
@@ -2609,7 +2609,7 @@ HYPAPI struct quaternion *quaternion_multiplyv3(struct quaternion *self, const s
  * @param angle the angle in radians; will be filled with the angle value
  *
  */
-HYPAPI void quaternion_get_axis_anglev3(const struct quaternion *self, struct vector3 *vR, HYP_FLOAT *angle)
+void quaternion_get_axis_anglev3(const struct quaternion *self, struct vector3 *vR, HYP_FLOAT *angle)
 {
 	/* scale is not same as magnitude */
 	HYP_FLOAT scale = HYP_SQRT(1.0f - self->w * self->w);
@@ -2636,7 +2636,7 @@ HYPAPI void quaternion_get_axis_anglev3(const struct quaternion *self, struct ve
  * @ingroup quaternion
  * @brief initializes the quaternion with random values, then normalizes it
  */
-HYPAPI struct quaternion *_quaternion_set_random(struct quaternion *self)
+struct quaternion *_quaternion_set_random(struct quaternion *self)
 {
 	self->x = HYP_RANDOM_FLOAT;
 	self->y = HYP_RANDOM_FLOAT;
@@ -2654,7 +2654,7 @@ HYPAPI struct quaternion *_quaternion_set_random(struct quaternion *self)
  * @ingroup quaternion
  * @brief prints out the elements of the quaternion to stdout
  */
-HYPAPI void _quaternion_print(const struct quaternion *self)
+void _quaternion_print(const struct quaternion *self)
 {
 	printf("x:%10f, y:%10f, z:%10f, w:%10f\r\n", self->x, self->y, self->z, self->w);
 }
@@ -2671,7 +2671,7 @@ HYPAPI void _quaternion_print(const struct quaternion *self)
  * @param qR the resulting quaternion that gets you from the starting vector
  * to the ending vector
  */
-HYPAPI struct quaternion *quaternion_get_rotation_tov3(const struct vector3 *from, const struct vector3 *to, struct quaternion *qR)
+struct quaternion *quaternion_get_rotation_tov3(const struct vector3 *from, const struct vector3 *to, struct quaternion *qR)
 {
 	/* this code avoids sqrt and cos and sin and would be nice to
 	 * avoid division
@@ -2717,7 +2717,7 @@ HYPAPI struct quaternion *quaternion_get_rotation_tov3(const struct vector3 *fro
  * @param qT the other quaternion
  *
  */
-HYPAPI struct quaternion *quaternion_rotate_by_quaternion_EXP(struct quaternion *self, const struct quaternion *qT)
+struct quaternion *quaternion_rotate_by_quaternion_EXP(struct quaternion *self, const struct quaternion *qT)
 {
 	/* self = self * qT */
 	quaternion_multiply(self, qT);
@@ -2738,7 +2738,7 @@ HYPAPI struct quaternion *quaternion_rotate_by_quaternion_EXP(struct quaternion 
  * @param angle the transformed point
  *
  */
-HYPAPI struct quaternion *quaternion_rotate_by_axis_angle_EXP(struct quaternion *self, const struct vector3 *axis, HYP_FLOAT angle)
+struct quaternion *quaternion_rotate_by_axis_angle_EXP(struct quaternion *self, const struct vector3 *axis, HYP_FLOAT angle)
 {
 	struct quaternion qT;
 
@@ -2756,7 +2756,7 @@ HYPAPI struct quaternion *quaternion_rotate_by_axis_angle_EXP(struct quaternion 
  * between two quaternions
  *
  */
-HYPAPI HYP_FLOAT quaternion_difference_EXP(const struct quaternion *q1, const struct quaternion *q2)
+HYP_FLOAT quaternion_difference_EXP(const struct quaternion *q1, const struct quaternion *q2)
 {
 	struct quaternion diff;
 
@@ -2781,7 +2781,7 @@ HYPAPI HYP_FLOAT quaternion_difference_EXP(const struct quaternion *q1, const st
  * @param az roll
  *
  */
-HYPAPI struct quaternion *quaternion_rotate_by_euler_angles_EXP(struct quaternion *self, HYP_FLOAT ax, HYP_FLOAT ay, HYP_FLOAT az)
+struct quaternion *quaternion_rotate_by_euler_angles_EXP(struct quaternion *self, HYP_FLOAT ax, HYP_FLOAT ay, HYP_FLOAT az)
 {
 	struct quaternion qT;
 
@@ -2802,7 +2802,7 @@ HYPAPI struct quaternion *quaternion_rotate_by_euler_angles_EXP(struct quaternio
  * real portion.
  *
  */
-HYPAPI struct quaternion quaternion_cross_product_EXP(const struct quaternion *self, const struct quaternion *vT)
+struct quaternion quaternion_cross_product_EXP(const struct quaternion *self, const struct quaternion *vT)
 {
 	/*
 	 * The code is suspect (missing w element in this whole thing)
@@ -2827,7 +2827,7 @@ HYPAPI struct quaternion quaternion_cross_product_EXP(const struct quaternion *s
  *  * \f$angle= 2 * acos((self \cdot qT) / (||self|| * ||qT||))\f$
  *
  */
-HYPAPI HYP_FLOAT quaternion_angle_between_EXP(const struct quaternion *self, const struct quaternion *qT)
+HYP_FLOAT quaternion_angle_between_EXP(const struct quaternion *self, const struct quaternion *qT)
 {
 	HYP_FLOAT c; /* cosine */
 
@@ -2843,7 +2843,7 @@ HYPAPI HYP_FLOAT quaternion_angle_between_EXP(const struct quaternion *self, con
  * and then computes the cross-product between them.
  *
  */
-HYPAPI void quaternion_axis_between_EXP(const struct quaternion *self, const struct quaternion *qT, struct quaternion *qR)
+void quaternion_axis_between_EXP(const struct quaternion *self, const struct quaternion *qT, struct quaternion *qR)
 {
 	struct quaternion axis;
 
@@ -2858,7 +2858,7 @@ HYPAPI void quaternion_axis_between_EXP(const struct quaternion *self, const str
  * @brief creates an perspective projection matrix using the RH system with a
  * FOV about the Y-axis.  It's opinionated about what that means.
  */
-HYPAPI struct matrix4 *matrix4_projection_perspective_fovy_rh_EXP(struct matrix4 *self, HYP_FLOAT fovy, HYP_FLOAT aspect, HYP_FLOAT zNear, HYP_FLOAT zFar)
+struct matrix4 *matrix4_projection_perspective_fovy_rh_EXP(struct matrix4 *self, HYP_FLOAT fovy, HYP_FLOAT aspect, HYP_FLOAT zNear, HYP_FLOAT zFar)
 {
 	HYP_FLOAT h;
 	HYP_FLOAT w;
@@ -2887,7 +2887,7 @@ HYPAPI struct matrix4 *matrix4_projection_perspective_fovy_rh_EXP(struct matrix4
  * @ingroup experimental
  * @brief make an orthographic projection matrix with right handed coordinates
  */
-HYPAPI struct matrix4 *matrix4_projection_ortho3d_rh_EXP(struct matrix4 *self,
+struct matrix4 *matrix4_projection_ortho3d_rh_EXP(struct matrix4 *self,
 							 HYP_FLOAT xmin, HYP_FLOAT xmax,
 							 HYP_FLOAT ymin, HYP_FLOAT ymax,
 							 HYP_FLOAT zNear, HYP_FLOAT zFar)
@@ -2918,7 +2918,7 @@ HYPAPI struct matrix4 *matrix4_projection_ortho3d_rh_EXP(struct matrix4 *self,
  * @param vT The vector being multiplied
  * @param vR The result
  */
-HYPAPI struct vector3 *matrix4_multiplyv3_EXP(const struct matrix4 *m, const struct vector3 *vT, struct vector3 *vR)
+struct vector3 *matrix4_multiplyv3_EXP(const struct matrix4 *m, const struct vector3 *vT, struct vector3 *vR)
 {
 	vR->x = vT->x * m->c00 + vT->y * m->c01 + vT->z * m->c02 + m->c03;
 	vR->y = vT->x * m->c10 + vT->y * m->c11 + vT->z * m->c12 + m->c13;
@@ -2940,7 +2940,7 @@ HYPAPI struct vector3 *matrix4_multiplyv3_EXP(const struct matrix4 *m, const str
  * @param angle the angle in radians
  *
  */
-HYPAPI struct matrix4 *matrix4_set_from_axisf3_angle_EXP(struct matrix4 *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, const HYP_FLOAT angle)
+struct matrix4 *matrix4_set_from_axisf3_angle_EXP(struct matrix4 *self, HYP_FLOAT x, HYP_FLOAT y, HYP_FLOAT z, const HYP_FLOAT angle)
 {
 	HYP_FLOAT c = HYP_COS(angle);
 	HYP_FLOAT s = HYP_SIN(angle);
@@ -2979,13 +2979,13 @@ HYPAPI struct matrix4 *matrix4_set_from_axisf3_angle_EXP(struct matrix4 *self, H
  * @param angle the angle in radians
  *
  */
-HYPAPI struct matrix4 *matrix4_set_from_axisv3_angle_EXP(struct matrix4 *self, const struct vector3 *axis, HYP_FLOAT angle)
+struct matrix4 *matrix4_set_from_axisv3_angle_EXP(struct matrix4 *self, const struct vector3 *axis, HYP_FLOAT angle)
 {
 	return matrix4_set_from_axisf3_angle_EXP(self, axis->x, axis->y, axis->z, angle);
 }
 
 
-HYPAPI struct matrix4 *matrix4_set_from_euler_anglesf3_EXP(struct matrix4 *self, const HYP_FLOAT x, const HYP_FLOAT y, const HYP_FLOAT z)
+struct matrix4 *matrix4_set_from_euler_anglesf3_EXP(struct matrix4 *self, const HYP_FLOAT x, const HYP_FLOAT y, const HYP_FLOAT z)
 {
 	HYP_FLOAT A = HYP_COS(x);
 	HYP_FLOAT B = HYP_SIN(x);
@@ -3021,7 +3021,7 @@ HYPAPI struct matrix4 *matrix4_set_from_euler_anglesf3_EXP(struct matrix4 *self,
 }
 
 
-HYPAPI struct vector3 *matrix4_get_translation_EXP(const struct matrix4 *self, struct vector3 *vT)
+struct vector3 *matrix4_get_translation_EXP(const struct matrix4 *self, struct vector3 *vT)
 {
 	vT->x = self->c30;
 	vT->y = self->c31;
@@ -3035,7 +3035,7 @@ HYPAPI struct vector3 *matrix4_get_translation_EXP(const struct matrix4 *self, s
  * @ingroup experimental
  * @brief creates a look at matrix using the RH system.
  */
-HYPAPI struct matrix4 *matrix4_view_lookat_rh_EXP(struct matrix4 *self, const struct vector3 *eye, const struct vector3 *target, const struct vector3 *up)
+struct matrix4 *matrix4_view_lookat_rh_EXP(struct matrix4 *self, const struct vector3 *eye, const struct vector3 *target, const struct vector3 *up)
 {
 	struct vector3 yaxis;
 	struct vector3 zaxis;
@@ -3084,7 +3084,7 @@ HYPAPI struct matrix4 *matrix4_view_lookat_rh_EXP(struct matrix4 *self, const st
  * @param vR the euler angles
  *
  */
-HYPAPI struct matrix4 *matrix4_make_transformation_rotationv3_EXP(struct matrix4 *self, const struct vector3 *vR)
+struct matrix4 *matrix4_make_transformation_rotationv3_EXP(struct matrix4 *self, const struct vector3 *vR)
 {
 	struct matrix4 scratchMatrix;
 
@@ -3095,7 +3095,7 @@ HYPAPI struct matrix4 *matrix4_make_transformation_rotationv3_EXP(struct matrix4
 }
 
 
-HYPAPI struct matrix4 *matrix4_transformation_compose_EXP(struct matrix4 *self, const struct vector3 *scale, const struct quaternion *rotation, const struct vector3 *translation)
+struct matrix4 *matrix4_transformation_compose_EXP(struct matrix4 *self, const struct vector3 *scale, const struct quaternion *rotation, const struct vector3 *translation)
 {
 	struct matrix4 scaleM, rotateM;
 
@@ -3115,7 +3115,7 @@ HYPAPI struct matrix4 *matrix4_transformation_compose_EXP(struct matrix4 *self, 
 	return self;
 }
 
-HYPAPI uint8_t matrix4_transformation_decompose_EXP(struct matrix4 *self, struct vector3 *scale, struct quaternion *rotation, struct vector3 *translation)
+uint8_t matrix4_transformation_decompose_EXP(struct matrix4 *self, struct vector3 *scale, struct quaternion *rotation, struct vector3 *translation)
 {
 	HYP_FLOAT signx, signy, signz;
 

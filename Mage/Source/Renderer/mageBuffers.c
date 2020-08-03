@@ -28,7 +28,6 @@ static void mageBufferCopy(VkBuffer sourceBuffer, VkBuffer destinationBuffer, Vk
 void mageBufferCreate(struct mageBuffer *buffer, const mageBufferType bufferType, void *data, uint32_t dataByteSize, struct mageRenderer *renderer)
 {
     buffer->Bytes = dataByteSize;
-    buffer->Data = data;
     buffer->BufferType = bufferType;
     struct mageBufferWrapper stagingBuffer;
 
@@ -49,11 +48,31 @@ VkBuffer mageBufferGetNativeBuffer(struct mageBuffer *buffer)
 {
     return buffer->Wrapper.Buffer;
 }
+void mageBufferUpdate(struct mageBuffer *buffer, void *data, uint32_t size, struct mageRenderer *renderer)
+{
+
+    if (buffer->Bytes != size)
+    {
+        /* Reallocate the buffer */
+        mageBufferDestroy(buffer, renderer);
+        mageBufferCreate(buffer, buffer->BufferType, data, size, renderer);
+    }
+    struct mageBufferWrapper stagingBuffer;
+    mageBufferWrapperAllocate(&stagingBuffer, size, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
+    
+    void *memory;
+    vkMapMemory(renderer->Device, stagingBuffer.AllocatedMemory, 0, size, 0, &memory);
+        memcpy(memory, data, size);
+    vkUnmapMemory(renderer->Device, stagingBuffer.AllocatedMemory);
+
+    mageBufferCopy(stagingBuffer.Buffer, buffer->Wrapper.Buffer, size, renderer);
+    mageBufferWrapperDestroy(&stagingBuffer, renderer);
+}
 void mageBufferDestroy(struct mageBuffer *buffer, struct mageRenderer *renderer)
 {
     mageBufferWrapperDestroy(&buffer->Wrapper, renderer);
 }
-void mageVertexInitialise(struct mageVertex *vertexInstance, struct vector2 vertex, struct vector3 color)
+void mageVertexInitialise(struct mageVertex *vertexInstance, struct mageVector2 vertex, struct mageVector3 color)
 {
     vertexInstance->Vertex = vertex;
     vertexInstance->Color = color; 
@@ -84,8 +103,8 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, uint32_t dataSi
 }
 void mageBufferWrapperDestroy(struct mageBufferWrapper *buffer, struct mageRenderer *renderer)
 {
-    vkDestroyBuffer(renderer->Device, buffer->Buffer, NULL);
     vkFreeMemory(renderer->Device, buffer->AllocatedMemory, NULL);
+    vkDestroyBuffer(renderer->Device, buffer->Buffer, NULL);
 }
 VkVertexInputBindingDescription mageVertexBindingDescription()
 {

@@ -589,9 +589,11 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
 }
 static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {   
-    renderer->Framebuffers = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
-    uint32_t i;
+    renderer->UniformLayout     = mageDescriptorSetLayoutCreate(renderer);
+    renderer->Framebuffers      = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
+    renderer->UniformBuffers    = calloc(renderer->SwapChainImageCount, sizeof(struct mageBufferWrapper));
 
+    uint32_t i;
     for (i = 0; i < renderer->SwapChainImageCount; i++)
     {
         VkFramebufferCreateInfo createInfo;
@@ -606,6 +608,7 @@ static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mag
         createInfo.layers               = 1;
 
         MAGE_VULKAN_CHECK(vkCreateFramebuffer(renderer->Device, &createInfo, NULL, &renderer->Framebuffers[i]));
+        mageBufferWrapperAllocate(&renderer->UniformBuffers[i], sizeof(struct mageUniformObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
     }
     return VK_SUCCESS;
 }
@@ -709,9 +712,12 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
 static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRendererCreateInfo *rendererInfo)
 {
     uint32_t i;
+    
+    vkDestroyDescriptorSetLayout(renderer->Device, renderer->UniformLayout, NULL);
     for (i = 0; i < renderer->SwapChainImageCount; i++)
     {
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
+        mageBufferWrapperDestroy(&renderer->UniformBuffers[i], renderer);
     }
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
     vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
@@ -725,6 +731,7 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
 
     vkDestroySwapchainKHR(renderer->Device, renderer->SwapChain, NULL);
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
+    free(renderer->UniformBuffers);
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);

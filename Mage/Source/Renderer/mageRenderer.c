@@ -34,34 +34,6 @@ void mageCommandBufferEnd(VkCommandBuffer commandBuffer, struct mageRenderer *re
     vkQueueWaitIdle(renderer->GraphicalQueue);
 
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, 1, &commandBuffer);
-}   
-void mageRendererRecord(struct mageRenderer *renderer, struct mageRenderable *renderable)
-{
-    /*
-    VkBuffer useBuffers[] = { mageBufferGetNativeBuffer(&renderable->VertexBuffer) };
-    VkDeviceSize offsets[] = { 0 };
-    VkCommandBufferBeginInfo bufferBeginInfo;
-    memset(&bufferBeginInfo, 0, sizeof(VkCommandBufferBeginInfo));
-    bufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    
-    VkRenderPassBeginInfo passBeginInfo;
-    memset(&passBeginInfo, 0, sizeof(VkRenderPassBeginInfo));
-    passBeginInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    passBeginInfo.framebuffer       = renderer->Framebuffers[0];
-    passBeginInfo.clearValueCount   = 1;
-    passBeginInfo.pClearValues      = &renderer->ClearValue;
-    passBeginInfo.renderPass        = renderer->PrimaryRenderPass;
-    passBeginInfo.renderArea        = renderer->RenderArea;
-
-    vkBeginCommandBuffer(renderer->CommandBuffers[0], &bufferBeginInfo);
-    vkCmdBeginRenderPass(renderer->CommandBuffers[0], &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(renderer->CommandBuffers[0], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
-        vkCmdBindVertexBuffers(renderer->CommandBuffers[0], 0, 1, useBuffers, offsets);
-        vkCmdBindIndexBuffer(renderer->CommandBuffers[0], mageBufferGetNativeBuffer(&renderable->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
-        vkCmdDrawIndexed(renderer->CommandBuffers[0], 6, 1, 0, 0, 0);
-    vkCmdEndRenderPass(renderer->CommandBuffers[0]);
-    vkEndCommandBuffer(renderer->CommandBuffers[0]);
-    */
 }
 void mageRendererDraw(struct mageRenderer *renderer, struct mageRenderable *renderable)
 {
@@ -86,7 +58,7 @@ void mageRendererDraw(struct mageRenderer *renderer, struct mageRenderable *rend
 
     vkBeginCommandBuffer(renderer->CommandBuffers[index], &bufferBeginInfo);
     vkCmdBeginRenderPass(renderer->CommandBuffers[index], &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-        vkCmdBindPipeline(renderer->CommandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
+    vkCmdBindPipeline(renderer->CommandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
         vkCmdBindVertexBuffers(renderer->CommandBuffers[index], 0, 1, useBuffers, offsets);
         vkCmdBindIndexBuffer(renderer->CommandBuffers[index], mageBufferGetNativeBuffer(&renderable->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
         vkCmdDrawIndexed(renderer->CommandBuffers[index], 6, 1, 0, 0, 0);

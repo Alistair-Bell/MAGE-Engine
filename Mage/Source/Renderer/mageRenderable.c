@@ -8,15 +8,15 @@ mageResult mageRenderableCreate(struct mageRenderable *renderable, struct mageRe
         info->IndexCount    = 6;
         info->Indicies      = (uint16_t[]) { 0, 1, 2, 2, 3, 0 }; 
     }
-    if (info->VertexCount == 0 ||info->Verticies == NULL)
+    if (info->VertexCount == 0 || info->Verticies == NULL)
     {
         info->VertexCount   = 4;
         info->Verticies     = (struct mageVertex[])
         { 
-            { .Vertex = { .x = -0.5f, .y = -0.5f }, .Color = { .x = 1.0f, .y = 0.0f, .z = 0.0f} }, 
-            { .Vertex = { .x = 0.5f, .y = -0.5f }, .Color = { .x = 0.0f, .y = 1.0f, .z = 0.0f } },
-            { .Vertex = { .x = 0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f  } },
-            { .Vertex = { .x = -0.5f, .y = 0.5f }, .Color = { .x = 0.0f, .y = 0.0f, .z = 1.0f } }
+            { .Vertex = { .X = -0.5f, .Y = -0.5f }, .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f} }, 
+            { .Vertex = { .X = 0.5f, .Y = -0.5f }, .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f } },
+            { .Vertex = { .X = 0.5f, .Y = 0.5f }, .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f  } },
+            { .Vertex = { .X = -0.5f, .Y = 0.5f }, .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f } }
         };
     }
     if (info->TextureCreateInfo == NULL)
@@ -30,8 +30,8 @@ mageResult mageRenderableCreate(struct mageRenderable *renderable, struct mageRe
 
     mageBufferCreate(&renderable->IndexBuffer, MAGE_BUFFER_TYPE_INDEX, info->Indicies, sizeof(uint16_t) * info->IndexCount, renderer); 
     mageBufferCreate(&renderable->VertexBuffer, MAGE_BUFFER_TYPE_VERTEX, info->Verticies, sizeof(struct mageVertex) * info->VertexCount, renderer);
-
     mageTextureCreate(&renderable->Texture, info->TextureCreateInfo->TexturePath, info->TextureCreateInfo->SamplerMode, MAGE_TEXTURE_FILE_FORMAT_PNG, renderer);
+
     MAGE_LOG_CORE_INFORM("Renderable has been created\n", NULL);
     return MAGE_RESULT_SUCCESS;
 }

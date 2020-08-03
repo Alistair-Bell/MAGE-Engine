@@ -19,7 +19,7 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
     - Added `premake5` build support
     - Moved `hypatia.h` to `src` directory
     - Added `hypatia.c` in `src` directory moving all definitions in to the source file
-    - Removed the need for `HYPATIA_IMPLEMENTATION`
+    - Removed the need for `HYPATIA_IMPLEMENTATION`, removed `HYPAPI` from function definitons
 - Version `2.0.0`
 - Sourced from `https://github.com/dagostinelli/hypatia`
 

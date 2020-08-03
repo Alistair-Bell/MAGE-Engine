@@ -27,8 +27,15 @@ project "MageEngine"
 
     files
     {
-        "Mage/Source/**.h",
-        "Mage/Source/**.c"
+        -- Files all systems use 
+        "Mage/Source/*.h",
+        "Mage/Source/*.c",
+        "Mage/Source/Maths/*.h",
+        "Mage/Source/Maths/*.c",
+        "Mage/Source/ECS/*.h",
+        "Mage/Source/ECS/*.c",
+        "Mage/Source/Renderer/*.h",
+        "Mage/Source/Renderer/*.c",
     }
     defines
     {
@@ -48,6 +55,12 @@ project "MageEngine"
 filter "system:linux"
     pchheader "Mage/Source/mageAPI.h"
     pchsource "Mage/Source/mageAPI.c"
+
+    files
+    {
+        "Mage/Source/Linux/*.h",
+        "Mage/Source/Linux/*.c",
+    }
     
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
@@ -83,7 +96,7 @@ project "Sandbox"
     links
     {
         "MageEngine",
-        "hypatia",
+        -- "hypatia",
         "GLFW",
         "vulkan",
         "lodepng",
@@ -112,9 +125,10 @@ project "Sandbox"
         
 
 group "Externals"
-    include "Mage/Externals/hypatia"
+    -- include "Mage/Externals/hypatia"
     include "Mage/Externals/glfw3"
     include "Mage/Externals/lodepng"
     include "Mage/Externals/libyaml"
     include "Mage/Externals/libogg"
+group "Examples"
     include "Examples/"
