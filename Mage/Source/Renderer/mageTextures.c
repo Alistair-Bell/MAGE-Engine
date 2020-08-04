@@ -19,8 +19,7 @@ VkResult mageImageCreate(VkImage *image, VkDeviceMemory *memory, const uint32_t 
     createInfo.sharingMode      = VK_SHARING_MODE_EXCLUSIVE;
 
 
-    VkResult result = MAGE_VULKAN_CHECK(vkCreateImage(renderer->Device, &createInfo, NULL, image));
-    if (result != VK_SUCCESS) { return result; }
+    MAGE_VULKAN_CHECK(vkCreateImage(renderer->Device, &createInfo, NULL, image));
 
     VkMemoryRequirements memoryRequirements;
     vkGetImageMemoryRequirements(renderer->Device, *image, &memoryRequirements);
@@ -31,10 +30,9 @@ VkResult mageImageCreate(VkImage *image, VkDeviceMemory *memory, const uint32_t 
     allocateInfo.memoryTypeIndex        = mageFindMemoryType(memoryRequirements.memoryTypeBits, properties, renderer);
     allocateInfo.allocationSize         = memoryRequirements.size;
 
-    result = MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, memory));
-    if (result != VK_SUCCESS) { return result; }
+    MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, memory));
 
-    vkBindImageMemory(renderer->Device, *image, *memory, 0);
+    MAGE_VULKAN_CHECK(vkBindImageMemory(renderer->Device, *image, *memory, 0));
     return VK_SUCCESS;
 }
 VkResult mageImageViewCreate(VkImage image, VkImageView *view, VkFormat format, struct mageRenderer *renderer)
@@ -95,9 +93,10 @@ static void mageTransitionImageLayout(VkImage image, VkFormat format, VkImageLay
         MAGE_LOG_CORE_FATAL_ERROR("Undefined image layout\n", NULL);
         assert(1 == 1);
     }
-     
 
-    vkCmdPipelineBarrier(commandBuffer, 0, 0, 0, 0, NULL, 0, NULL, 1, &barrier);
+    VkImageMemoryBarrier barriers[] = { barrier };
+
+    vkCmdPipelineBarrier(commandBuffer, sourceStage, destinationStage, 0, 0, NULL, 0, NULL, 1, barriers);
 
     mageCommandBufferEnd(commandBuffer, renderer);
 }
@@ -119,7 +118,6 @@ static void mageCopyBufferToImage(struct mageBufferWrapper *wrapper, VkImage ima
     region.imageSubresource.layerCount      = 1;
 
     vkCmdCopyBufferToImage(commandBuffer, wrapper->Buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region);
-
     mageCommandBufferEnd(commandBuffer, renderer);
 }
 
@@ -165,19 +163,18 @@ static VkSamplerAddressMode mageSamplerModeToNative(mageTextureSamplerMode mode)
 }
 mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePath, mageTextureSamplerMode samplerMode, mageTextureFileFormat format, struct mageRenderer *renderer)
 {
-    uint32_t width, height;
+    int32_t width, height, channels;
     uint8_t *fileData;
 
     switch (format)
     {
         case MAGE_TEXTURE_FILE_FORMAT_PNG:
         {
-            MAGE_PNG_LOADE_CHECK(lodepng_decode32_file(&fileData, &width, &height, texturePath), fileData);
+            MAGE_PNG_LOADE_CHECK(lodepng_decode32_file(&fileData, (uint32_t *)&width, (uint32_t *)&height, texturePath), fileData);
             break;
         }
-        default:
-            MAGE_LOG_CORE_ERROR("Only png file formats are currently supported\n", NULL);
-            return MAGE_RESULT_INVALID_INPUT;
+        case MAGE_TEXTURE_FILE_FORMAT_JPEG:
+            fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);
     }   
     VkDeviceSize textureSize = width * height * 4;
 
@@ -189,22 +186,25 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
         memcpy(memory, fileData, textureSize);
     vkUnmapMemory(renderer->Device, stagingBuffer.AllocatedMemory);
     free(fileData);
-    /*
-    mageTransitionImageLayout(texture->Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, renderer);
-        mageCopyBufferToImage(&stagingBuffer, texture->Image, width, height, renderer);
-    mageTransitionImageLayout(texture->Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, renderer);
-    */
+    
+    VkSamplerAddressMode nativeSamplerMode = mageSamplerModeToNative(samplerMode);
 
     mageImageCreate(&texture->Image, &texture->DeviceMemory, width, height, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, renderer); 
     mageImageViewCreate(texture->Image, &texture->View, VK_FORMAT_R8G8B8A8_SRGB, renderer);
-    mageTextureSamplerCreate(&texture->Sampler, mageSamplerModeToNative(samplerMode), renderer);
-
+    mageTextureSamplerCreate(&texture->Sampler, nativeSamplerMode, renderer);
+    
+    mageTransitionImageLayout(texture->Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, renderer);
+        mageCopyBufferToImage(&stagingBuffer, texture->Image, width, height, renderer);
+    mageTransitionImageLayout(texture->Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, renderer);
+    
+    mageDescriptorWriteCreate(&texture->Image, &texture->View, &texture->Sampler, nativeSamplerMode, renderer);
     mageBufferWrapperDestroy(&stagingBuffer, renderer);
     MAGE_LOG_CORE_INFORM("Texture %s was created with source of %dpx by %dpx\n", texturePath, width, height);
     return MAGE_RESULT_SUCCESS;
 }
 void mageTextureDestroy(struct mageTexture *texture, struct mageRenderer *renderer)
 {
+    vkDestroyDescriptorSetLayout(renderer->Device, renderer->DescriptorSetLayout, NULL);
     vkDestroyImageView(renderer->Device, texture->View, NULL);
     vkDestroyImage(renderer->Device, texture->Image, NULL);
     vkDestroySampler(renderer->Device, texture->Sampler, NULL);

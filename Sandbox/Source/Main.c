@@ -1,11 +1,11 @@
 #include "Core.h"
 
-#define SANDBOX_ENTITY_COUNT 3
+#define SANDBOX_ENTITY_COUNT 5
 
 /* Application instance */
 static struct mageApplication *SandboxApplication;
 static struct mageShader shaders[2];
-static struct mageRenderable renderable;
+static struct mageRenderable renderable, renderable2;
 
 void CreateShaders()
 {
@@ -22,7 +22,7 @@ MAGE_ENTRY_POINT()
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
 
-    applicationCreateInfo.FixedResolution        = 0;
+    applicationCreateInfo.FixedResolution        = 1;
     applicationCreateInfo.Fullscreen             = 0;
     applicationCreateInfo.Width                  = 1920;
     applicationCreateInfo.Height                 = 1080;
@@ -36,21 +36,13 @@ MAGE_ENTRY_POINT()
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
     
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
-    struct mageMatrix4 model;
-    struct mageMatrix4 projection;
-    struct mageMatrix4 view;
-    struct mageVertex verticies[] = 
+    struct mageVertex verticies1[] = 
     {
-        { .Vertex = { .X = -0.25f, .Y = -0.25f }, .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f} },
-        { .Vertex = { .X = 0.25f, .Y = -0.25f }, .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f} },
-        { .Vertex = { .X = 0.25f, .Y = 0.25f }, .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f} },
-        { .Vertex = { .X = -0.25f, .Y = 0.25f }, .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f} }
+        { .Vertex = { .X = -0.25f, .Y = -0.25f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
+        { .Vertex = { .X = 0.25f, .Y = -0.25f },    .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
+        { .Vertex = { .X = 0.25f, .Y = 0.25f },     .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
+        { .Vertex = { .X = -0.25f, .Y = 0.25f },    .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }   
     };
-
-    memset(&model, 0, sizeof(struct mageMatrix4));
-    memset(&projection, 0, sizeof(struct mageMatrix4));
-    memset(&view, 0, sizeof(struct mageMatrix4));
-
 
     mageRenderableCreate(
         &renderable, 
@@ -59,20 +51,22 @@ MAGE_ENTRY_POINT()
             .IndexCount         = 6,
             .Indicies           = (uint16_t[]) { 0, 1, 2, 2, 3, 0 },
             .VertexCount        = 4,
-            .Verticies          = verticies,
+            .Verticies          = verticies1,
             .TextureCreateInfo  = &(struct mageTextureCreateInfo)
             {
                 .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT,
-                .TexturePath = "Mage/Resources/Textures/Vulkan/Vulkan_White_170px_Dec16.png",
+                .TexturePath = "Mage/Resources/Textures/MTEC/Logo-copy.jpg",
             }
         },
         SandboxApplication->Renderer
     );
-    
+
+    struct mageRenderable *r[] = { &renderable };
+
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
-        mageRendererDraw(SandboxApplication->Renderer, &renderable);
+        mageRendererDraw(SandboxApplication->Renderer, r, 1);
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     

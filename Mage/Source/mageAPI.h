@@ -454,6 +454,7 @@ struct mageVertex
 {
 	struct mageVector2						Vertex;
 	struct mageVector3						Color;
+	struct mageVector2						TextureLocation;
 };
 struct mageTransform
 {
@@ -585,8 +586,9 @@ struct mageRenderer
 	VkFence									*FencesInUse;
 	VkFence									*SwapChainImagesInUse;
 
-	VkDescriptorSetLayout					UniformLayout;
-	struct mageBufferWrapper				*UniformBuffers;
+	VkDescriptorSet							DescriptorSet;
+	VkDescriptorPool						DescriptorPool;
+	VkDescriptorSetLayout					DescriptorSetLayout;
 
 	VkDebugUtilsMessengerCreateInfoEXT		DebugMessengerCreateInfo;
 	VkDebugUtilsMessengerEXT				DebugMessenger;
@@ -1156,7 +1158,20 @@ extern void mageCommandBufferEnd(
 );
 
 /* Descriptor set */
-VkDescriptorSetLayout mageDescriptorSetLayoutCreate(
+extern void mageDescriptorPoolCreate(
+	struct mageRenderer *renderer
+);
+extern void mageDescriptorSetLayoutCreate(
+	struct mageRenderer *renderer
+);
+extern void mageDescriptorSetsAllocate(
+	struct mageRenderer *renderer
+);
+extern void mageDescriptorWriteCreate(
+	const VkImage *image,
+	const VkImageView *view,
+	const VkSampler *textureSampler,
+	const VkSamplerAddressMode mode,
 	struct mageRenderer *renderer
 );
 
@@ -1171,13 +1186,10 @@ extern void mageRendererResize(
 	struct mageWindow *window,
 	struct mageRendererCreateInfo *rendererProps
 );
-extern void mageRendererRecord(
-	struct mageRenderer *renderer,
-	struct mageRenderable *renderable
-);
 extern void mageRendererDraw(
 	struct mageRenderer *renderer,
-	struct mageRenderable *renderable
+	struct mageRenderable **renderables,
+	const uint32_t count
 );
 extern void mageRendererDestroy(
 	struct mageRenderer *renderer,

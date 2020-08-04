@@ -27,7 +27,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessa
             MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
             break;  
     }
-    assert(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT);
+    assert(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT || messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT);
     
     return VK_FALSE;
 }
@@ -541,8 +541,8 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     memset(&pipelineLayoutInfo, 0, sizeof(VkPipelineLayoutCreateInfo));
 
     pipelineLayoutInfo.sType                    = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount           = 0;
-    pipelineLayoutInfo.pushConstantRangeCount   = 0;
+    pipelineLayoutInfo.setLayoutCount           = 1;
+    pipelineLayoutInfo.pSetLayouts              = &renderer->DescriptorSetLayout;
 
     VkResult result = MAGE_VULKAN_CHECK(vkCreatePipelineLayout(renderer->Device, &pipelineLayoutInfo, NULL, &renderer->GraphicsPipelineLayout));
     
@@ -587,11 +587,16 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     free(inputDescriptions);
     return result;  
 }
+static VkResult mageCreateDescriptors(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
+{
+    mageDescriptorPoolCreate(renderer);
+    mageDescriptorSetLayoutCreate(renderer);
+    mageDescriptorSetsAllocate(renderer);
+    return VK_SUCCESS;
+}
 static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {   
-    renderer->UniformLayout     = mageDescriptorSetLayoutCreate(renderer);
     renderer->Framebuffers      = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
-    renderer->UniformBuffers    = calloc(renderer->SwapChainImageCount, sizeof(struct mageBufferWrapper));
 
     uint32_t i;
     for (i = 0; i < renderer->SwapChainImageCount; i++)
@@ -608,7 +613,6 @@ static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mag
         createInfo.layers               = 1;
 
         MAGE_VULKAN_CHECK(vkCreateFramebuffer(renderer->Device, &createInfo, NULL, &renderer->Framebuffers[i]));
-        mageBufferWrapperAllocate(&renderer->UniformBuffers[i], sizeof(struct mageUniformObject), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer);
     }
     return VK_SUCCESS;
 }
@@ -694,6 +698,7 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
         mageCreateSwapChain,
         mageCreateSwapChainImages,
         mageCreateRenderPass,
+        mageCreateDescriptors,
         mageCreateGraphicsPipeline,
         mageCreateFrameBuffers,
         mageCreateCommandPool,
@@ -713,11 +718,9 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
 {
     uint32_t i;
     
-    vkDestroyDescriptorSetLayout(renderer->Device, renderer->UniformLayout, NULL);
     for (i = 0; i < renderer->SwapChainImageCount; i++)
     {
         vkDestroyFramebuffer(renderer->Device, renderer->Framebuffers[i], NULL);
-        mageBufferWrapperDestroy(&renderer->UniformBuffers[i], renderer);
     }
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, renderer->SwapChainImageCount, renderer->CommandBuffers);
     vkDestroyRenderPass(renderer->Device, renderer->PrimaryRenderPass, NULL);
@@ -731,7 +734,10 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
 
     vkDestroySwapchainKHR(renderer->Device, renderer->SwapChain, NULL);
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
-    free(renderer->UniformBuffers);
+
+    /* Descriptor Sets */
+    vkDestroyDescriptorPool(renderer->Device, renderer->DescriptorPool, NULL);
+
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);
@@ -747,6 +753,7 @@ void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window
         mageCreateSwapChain,
         mageCreateSwapChainImages,
         mageCreateRenderPass,
+        mageCreateDescriptors,
         mageCreateGraphicsPipeline,
         mageCreateFrameBuffers,
         mageCreateCommandPool,

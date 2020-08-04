@@ -126,6 +126,7 @@
 #include "../Externals/lodepng/src/lodepng.h"
 #include "../Externals/libyaml/include/yaml.h"
 #include "../Externals/libogg/include/ogg/ogg.h"
+#include "../Externals/stb-image/src/stb_image.h"
 
 #if defined (MAGE_DEBUG)
 	#define MAGE_LOG_CORE_INFORM(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)

@@ -61,3 +61,12 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
   - Changed include directories to local includes rather than system wide
 - Version `1.3.4`
 - Sourced from `https://www.xiph.org/ogg/`
+
+## stb-image
+- Maintained under the `MIT-License`
+- Changes
+  - Moved `stb_image.h` to src
+  - Added `stb_image.c` for implimentation
+  - Added `premake5.lua` build system
+- Version `2.26`
+- Sourced from `https://github.com/nothings/stb`
