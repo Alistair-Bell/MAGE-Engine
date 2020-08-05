@@ -121,9 +121,6 @@
 #include <signal.h>
 #include <stdint.h>
 
-/*#define HYPATIA_SINGLE_PRECISION_FLOATS*/
-/*#include "../Externals/hypatia/src/hypatia.h"*/
-#include "../Externals/lodepng/src/lodepng.h"
 #include "../Externals/libyaml/include/yaml.h"
 #include "../Externals/libogg/include/ogg/ogg.h"
 #include "../Externals/stb-image/src/stb_image.h"
