@@ -27,7 +27,7 @@ MAGE_ENTRY_POINT()
     applicationCreateInfo.Width                  = 1920;
     applicationCreateInfo.Height                 = 1080;
     applicationCreateInfo.Name                   = "Sandbox Application";
-    applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/MTEC/Logo.png";
+    applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_LogoBug_48px_Nov17.png";
 
     struct mageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(struct mageRendererCreateInfo));
@@ -38,10 +38,16 @@ MAGE_ENTRY_POINT()
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
     struct mageVertex verticies1[] = 
     {
+        /*
         { .Vertex = { .X = -0.25f, .Y = -0.25f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
         { .Vertex = { .X = 0.25f, .Y = -0.25f },    .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
         { .Vertex = { .X = 0.25f, .Y = 0.25f },     .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
         { .Vertex = { .X = -0.25f, .Y = 0.25f },    .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }   
+        */
+        { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  1.0f, .Y = -1.00f },    .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  1.0f, .Y =  1.00f },     .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
+        { .Vertex = { .X = -1.0f, .Y =  1.00f },    .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
     };
 
     mageRenderableCreate(
@@ -55,7 +61,7 @@ MAGE_ENTRY_POINT()
             .TextureCreateInfo  = &(struct mageTextureCreateInfo)
             {
                 .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT,
-                .TexturePath = "Mage/Resources/Textures/MTEC/Logo-copy.jpg",
+                .TexturePath = "Sandbox/Resources/Textures/tango.jpg",
             }
         },
         SandboxApplication->Renderer

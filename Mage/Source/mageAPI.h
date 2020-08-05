@@ -324,11 +324,6 @@ typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
 	MAGE_TEXTURE_SAMPLER_MIRRORED_CLAMP_TO_EDGE,
 } mageTextureSamplerMode;
 
-typedef enum MAGE_TEXTURE_FILE_FORMAT_ENUM
-{
-	MAGE_TEXTURE_FILE_FORMAT_JPEG,
-	MAGE_TEXTURE_FILE_FORMAT_PNG,
-} mageTextureFileFormat;
 
 typedef void (*mageEventListenerCallback)(void *, mageEventType);
 typedef void *(*mageMemoryAllocaterMethod)(uint64_t);
@@ -1052,7 +1047,6 @@ extern mageResult mageTextureCreate(
 	struct mageTexture *texture,
 	const char *texturePath,
 	mageTextureSamplerMode samplerMode,
-	mageTextureFileFormat format,
 	struct mageRenderer *renderer
 );
 extern void mageTextureDestroy(
@@ -1189,6 +1183,11 @@ extern void mageRendererResize(
 extern void mageRendererDraw(
 	struct mageRenderer *renderer,
 	struct mageRenderable **renderables,
+	const uint32_t count
+);
+extern void mageRendererDrawQuads(
+	struct mageRenderer *renderer,
+	const struct mageRenderable *renderables,
 	const uint32_t count
 );
 extern void mageRendererDestroy(

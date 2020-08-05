@@ -13,10 +13,9 @@ project "Hello-World"
     links
     {
         "MageEngine",
-        -- "hypatia",
+        "stb-image",
         "GLFW",
         "vulkan",
-        "lodepng",
         "yaml",
         "libogg"
     }

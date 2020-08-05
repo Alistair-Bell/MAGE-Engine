@@ -30,7 +30,7 @@ mageResult mageRenderableCreate(struct mageRenderable *renderable, struct mageRe
 
     mageBufferCreate(&renderable->IndexBuffer, MAGE_BUFFER_TYPE_INDEX, info->Indicies, sizeof(uint16_t) * info->IndexCount, renderer); 
     mageBufferCreate(&renderable->VertexBuffer, MAGE_BUFFER_TYPE_VERTEX, info->Verticies, sizeof(struct mageVertex) * info->VertexCount, renderer);
-    mageTextureCreate(&renderable->Texture, info->TextureCreateInfo->TexturePath, info->TextureCreateInfo->SamplerMode, MAGE_TEXTURE_FILE_FORMAT_JPEG, renderer);
+    mageTextureCreate(&renderable->Texture, info->TextureCreateInfo->TexturePath, info->TextureCreateInfo->SamplerMode, renderer);
 
     MAGE_LOG_CORE_INFORM("Renderable has been created\n", NULL);
     return MAGE_RESULT_SUCCESS;

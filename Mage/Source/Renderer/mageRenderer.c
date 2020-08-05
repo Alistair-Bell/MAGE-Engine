@@ -35,6 +35,31 @@ void mageCommandBufferEnd(VkCommandBuffer commandBuffer, struct mageRenderer *re
 
     vkFreeCommandBuffers(renderer->Device, renderer->CommandPool, 1, &commandBuffer);
 }
+static void mageRendererRecord(VkCommandBuffer buffer, VkRenderPassBeginInfo beginInfo, VkCommandBufferBeginInfo bufferBeginInfo, VkPipeline pipeline, VkPipelineLayout layout, VkDescriptorSet set, struct mageRenderable **renderables, const uint32_t count)
+{
+    uint32_t i;
+
+    vkBeginCommandBuffer(buffer, &bufferBeginInfo);
+    vkCmdBeginRenderPass(buffer, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+    vkCmdBindPipeline(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+        for (i = 0; i < count; i++)
+        {
+            VkBuffer useBuffers[] = { mageBufferGetNativeBuffer(&renderables[i]->VertexBuffer) };
+            VkDeviceSize offsets[] = { 0 };
+            
+
+
+            /* Binding relative information */
+            vkCmdBindVertexBuffers(buffer, 0, 1, useBuffers, offsets);
+            vkCmdBindIndexBuffer(buffer, mageBufferGetNativeBuffer(&renderables[i]->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
+            vkCmdBindDescriptorSets(buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, layout, 0, 1, &set, 0, NULL);
+            vkCmdDrawIndexed(buffer, 6, 1, 0, 0, 0);
+        }
+    vkCmdEndRenderPass(buffer);
+    vkEndCommandBuffer(buffer);
+
+}
+
 void mageRendererDraw(struct mageRenderer *renderer, struct mageRenderable **renderables, const uint32_t count)
 {
     uint32_t index, i;
@@ -54,25 +79,8 @@ void mageRendererDraw(struct mageRenderer *renderer, struct mageRenderable **ren
     passBeginInfo.renderPass        = renderer->PrimaryRenderPass;
     passBeginInfo.renderArea        = renderer->RenderArea;
 
-    vkBeginCommandBuffer(renderer->CommandBuffers[index], &bufferBeginInfo);
-    vkCmdBeginRenderPass(renderer->CommandBuffers[index], &passBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-    vkCmdBindPipeline(renderer->CommandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipeline);
-        for (i = 0; i < count; i++)
-        {
-            VkBuffer useBuffers[] = { mageBufferGetNativeBuffer(&renderables[i]->VertexBuffer) };
-            VkDeviceSize offsets[] = { 0 };
-            
-
-
-            /* Binding relative information */
-            vkCmdBindVertexBuffers(renderer->CommandBuffers[index], 0, 1, useBuffers, offsets);
-            vkCmdBindIndexBuffer(renderer->CommandBuffers[index], mageBufferGetNativeBuffer(&renderables[i]->IndexBuffer), 0, VK_INDEX_TYPE_UINT16);
-            vkCmdBindDescriptorSets(renderer->CommandBuffers[index], VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->GraphicsPipelineLayout, 0, 1, &renderer->DescriptorSet, 0, NULL);
-            vkCmdDrawIndexed(renderer->CommandBuffers[index], 6, 1, 0, 0, 0);
-        }
-    vkCmdEndRenderPass(renderer->CommandBuffers[index]);
-    vkEndCommandBuffer(renderer->CommandBuffers[index]);
     
+    mageRendererRecord(renderer->CommandBuffers[index], passBeginInfo, bufferBeginInfo, renderer->GraphicsPipeline, renderer->GraphicsPipelineLayout, renderer->DescriptorSet, renderables, count);
 
     if (renderer->SwapChainImagesInUse[renderer->CurrentFrame] != VK_NULL_HANDLE)
     {

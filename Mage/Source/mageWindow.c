@@ -25,20 +25,14 @@ mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCre
 
 	GLFWimage localIcon;
 	uint8_t data;
-	uint32_t width, height;
-	uint8_t *image;
-	uint32_t error = lodepng_decode32_file(&image, &width, &height, info->WindowIcon);
-	if (error) 
-	{
-    	MAGE_LOG_CORE_ERROR("Image decoder error %u: %s\n", error, lodepng_error_text(error));
-  	}
-	else
-	{
-		localIcon.width = width;
-		localIcon.height = height;
-		localIcon.pixels = image;
-		glfwSetWindowIcon(window->Context, 1, &localIcon);
-	}
+	int32_t width, height, channels;
+    uint8_t *image = stbi_load(info->WindowIcon, &width, &height, &channels, STBI_rgb_alpha);
+
+
+	localIcon.width = width;
+	localIcon.height = height;
+	localIcon.pixels = image;
+	glfwSetWindowIcon(window->Context, 1, &localIcon);
 	
 	if (window->Context == NULL)
 	{

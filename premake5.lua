@@ -2,7 +2,6 @@
 BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}"
 BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}"
 
-
 workspace "MAGE"
     architecture "x64"
 
@@ -13,6 +12,13 @@ workspace "MAGE"
     }
 
     startproject "Sandbox"
+
+group "Externals"
+    include "Mage/Externals/glfw3"
+    include "Mage/Externals/libyaml"
+    include "Mage/Externals/libogg"
+    include "Mage/Externals/stb-image"
+
     
     
 -- Engine Project
@@ -96,17 +102,14 @@ project "Sandbox"
     links
     {
         "MageEngine",
-        -- "hypatia",
         "GLFW",
         "vulkan",
-        "lodepng",
         "yaml",
         "libogg",
         "stb-image"
     }
-
-    filter "system:linux"
     
+    filter "system:linux"
         links 
         { 
             "dl",
@@ -124,13 +127,5 @@ project "Sandbox"
         runtime "Release"
         optimize "Speed"
         
-
-group "Externals"
-    -- include "Mage/Externals/hypatia"
-    include "Mage/Externals/glfw3"
-    include "Mage/Externals/lodepng"
-    include "Mage/Externals/libyaml"
-    include "Mage/Externals/libogg"
-    include "Mage/Externals/stb-image"
 group "Examples"
     include "Examples/"

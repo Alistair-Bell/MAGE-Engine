@@ -11,18 +11,6 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
 - Version `3.4.0`
 - Sourced from `https://github.com/glfw/glfw`
 
-## hypatia
-- Maintained under `custom` license
-  - Changes
-    - Removed `cmake`, `help`, `docs`, `scripts` and `tests` directories
-    - Removed `.gitignore`, `.travis.yml`, `CMakelists.txt`, `appveyor.yml` and `check.mak`
-    - Added `premake5` build support
-    - Moved `hypatia.h` to `src` directory
-    - Added `hypatia.c` in `src` directory moving all definitions in to the source file
-    - Removed the need for `HYPATIA_IMPLEMENTATION`, removed `HYPAPI` from function definitons
-- Version `2.0.0`
-- Sourced from `https://github.com/dagostinelli/hypatia`
-
 ## libyaml
 - Maintained under `MIT` license
   - Changes

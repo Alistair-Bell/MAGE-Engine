@@ -161,22 +161,13 @@ static VkSamplerAddressMode mageSamplerModeToNative(mageTextureSamplerMode mode)
         return VK_SAMPLER_ADDRESS_MODE_REPEAT;
     }
 }
-mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePath, mageTextureSamplerMode samplerMode, mageTextureFileFormat format, struct mageRenderer *renderer)
+mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePath, mageTextureSamplerMode samplerMode, struct mageRenderer *renderer)
 {
     int32_t width, height, channels;
     uint8_t *fileData;
-
-    switch (format)
-    {
-        case MAGE_TEXTURE_FILE_FORMAT_PNG:
-        {
-            MAGE_PNG_LOADE_CHECK(lodepng_decode32_file(&fileData, (uint32_t *)&width, (uint32_t *)&height, texturePath), fileData);
-            break;
-        }
-        case MAGE_TEXTURE_FILE_FORMAT_JPEG:
-            fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);
-    }   
+    fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);
     VkDeviceSize textureSize = width * height * 4;
+
 
     struct mageBufferWrapper stagingBuffer;
     mageBufferWrapperAllocate(&stagingBuffer, textureSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer); 
