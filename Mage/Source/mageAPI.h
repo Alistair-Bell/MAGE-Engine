@@ -32,9 +32,14 @@
 #define MAGE_VULKAN_CHECK(function) \
 	mageHandleVulkanResult(#function, function)
 
-#define MAGE_PNG_LOADE_CHECK(function, data)\
-	uint32_t error = function; \
-	if (error) { MAGE_LOG_CORE_ERROR("PNG Error %d, %s was a bad file\n", error, lodepng_error_text(error)); free(data); }
+/* Whith great power comes great responsiblity */
+#if defined (MAGE_PRACTICAL_JOKES)
+	#define MAGE_TRUE (rand() % 100 < 98)
+	#define MAGE_FALSE !MAGE_TRUE
+#else
+	#define MAGE_TRUE 1
+	#define MAGE_FALSE !MAGE_TRUE
+#endif
 
 /* ECS Macros*/ 
 #define MAGE_ECS_REGISTER_COMPONENT(scene, component) \
@@ -508,7 +513,7 @@ struct mageTexture
 };
 struct mageRenderableCreateInfo
 {
-	struct mageTextureCreateInfo			*TextureCreateInfo;
+	struct mageTextureCreateInfo			TextureCreateInfo;
 	struct mageVertex						*Verticies;
 	uint16_t								*Indicies;
 	uint32_t								VertexCount;
@@ -518,7 +523,11 @@ struct mageRenderable
 {
 	struct mageBuffer						IndexBuffer;
 	struct mageBuffer						VertexBuffer;
-	struct mageBuffer						UniformBuffer;
+	struct mageTexture						Texture;
+};
+struct mageRenderableQuad
+{
+	struct mageBuffer						VertexBuffer;
 	struct mageTexture						Texture;
 };
 struct mageWindow
@@ -541,6 +550,7 @@ struct mageApplicationCreateInfo
 struct mageRendererCreateInfo
 {
 	struct mageShader						*PipelineShaders;
+	uint8_t									TextureTransparency;
 	uint32_t 								ShaderCount;
 };
 struct mageRenderer
@@ -589,6 +599,8 @@ struct mageRenderer
 	VkDebugUtilsMessengerEXT				DebugMessenger;
 	struct mageIndiciesIndexes				Indexes;
 	struct mageSwapChainSupportDetails		SwapChainSupportInfo;
+
+	struct mageBuffer						*DefaultSquareIndexBuffer;
 
 	uint32_t 								SwapChainImageCount;
 	uint32_t								ConcurentFrames;
@@ -1180,14 +1192,14 @@ extern void mageRendererResize(
 	struct mageWindow *window,
 	struct mageRendererCreateInfo *rendererProps
 );
-extern void mageRendererDraw(
+extern void mageRendererDrawRenderables(
 	struct mageRenderer *renderer,
 	struct mageRenderable **renderables,
 	const uint32_t count
 );
 extern void mageRendererDrawQuads(
 	struct mageRenderer *renderer,
-	const struct mageRenderable *renderables,
+	struct mageRenderableQuad **quads,
 	const uint32_t count
 );
 extern void mageRendererDestroy(
@@ -1222,6 +1234,15 @@ extern mageResult mageRenderableCreate(
 );
 extern void mageRenderableDestroy(
 	struct mageRenderable *renderable,
+	struct mageRenderer *renderer
+);
+extern void mageRenderableQuadCreate(
+	struct mageRenderableQuad *quad,
+	struct mageRenderableCreateInfo *info,
+	struct mageRenderer *renderer
+);
+extern void mageRenderableQuadDestroy(
+	struct mageRenderableQuad *quad,
 	struct mageRenderer *renderer
 );
 

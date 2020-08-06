@@ -134,12 +134,11 @@ static VkResult mageTextureSamplerCreate(VkSampler *sampler, VkSamplerAddressMod
     createInfo.addressModeW             = mode;
     createInfo.anisotropyEnable         = VK_TRUE;
     createInfo.maxAnisotropy            = 16.0f;
-    createInfo.borderColor              = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+    createInfo.borderColor              = VK_BORDER_COLOR_FLOAT_TRANSPARENT_BLACK;
     createInfo.compareEnable            = VK_FALSE;
     createInfo.compareOp                = VK_COMPARE_OP_ALWAYS;
     createInfo.unnormalizedCoordinates  = VK_FALSE;
     createInfo.mipmapMode               = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-
     return MAGE_VULKAN_CHECK(vkCreateSampler(renderer->Device, &createInfo, NULL, sampler));
 }
 static VkSamplerAddressMode mageSamplerModeToNative(mageTextureSamplerMode mode)
@@ -163,11 +162,16 @@ static VkSamplerAddressMode mageSamplerModeToNative(mageTextureSamplerMode mode)
 }
 mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePath, mageTextureSamplerMode samplerMode, struct mageRenderer *renderer)
 {
+    const char *defaultTexture = "Mage/Resources/Textures/MTEC/Logo.png";
     int32_t width, height, channels;
     uint8_t *fileData;
     fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);
+    if (fileData == NULL)
+    {
+        MAGE_LOG_CORE_WARNING("Invalid texture %s, using default texture %s\n", texturePath, defaultTexture);
+        fileData = stbi_load(defaultTexture, &width, &height, &channels, STBI_rgb_alpha);
+    }   
     VkDeviceSize textureSize = width * height * 4;
-
 
     struct mageBufferWrapper stagingBuffer;
     mageBufferWrapperAllocate(&stagingBuffer, textureSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, renderer); 

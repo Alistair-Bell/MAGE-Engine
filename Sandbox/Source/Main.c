@@ -5,7 +5,7 @@
 /* Application instance */
 static struct mageApplication *SandboxApplication;
 static struct mageShader shaders[2];
-static struct mageRenderable renderable, renderable2;
+static struct mageRenderable renderable;
 
 void CreateShaders()
 {
@@ -34,49 +34,42 @@ MAGE_ENTRY_POINT()
 
     rendererCreateInfo.PipelineShaders          = shaders;
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
-    
+    rendererCreateInfo.TextureTransparency      = MAGE_TRUE;
+
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
     struct mageVertex verticies1[] = 
     {
-        /*
-        { .Vertex = { .X = -0.25f, .Y = -0.25f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
-        { .Vertex = { .X = 0.25f, .Y = -0.25f },    .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
-        { .Vertex = { .X = 0.25f, .Y = 0.25f },     .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
-        { .Vertex = { .X = -0.25f, .Y = 0.25f },    .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }   
-        */
-        { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
-        { .Vertex = { .X =  1.0f, .Y = -1.00f },    .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
-        { .Vertex = { .X =  1.0f, .Y =  1.00f },     .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
-        { .Vertex = { .X = -1.0f, .Y =  1.00f },    .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
+        { .Vertex = { .X = -0.5f, .Y = -0.5f }, .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
+        { .Vertex = { .X = 0.5f, .Y = -0.5f },  .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
+        { .Vertex = { .X = 0.5f, .Y = 0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
+        { .Vertex = { .X = -0.5f, .Y = 0.5f },  .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } },   
+    
     };
+    
+    uint32_t i;
+    
+    struct mageRenderableCreateInfo info;
+    memset(&info, 0, sizeof(struct mageRenderableCreateInfo));
+    info.Verticies          = verticies1;
+    info.VertexCount        = 4;
+    info.IndexCount         = 0;
+    info.Indicies           = NULL;
+    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT, .TexturePath = "Mage/Resources/Textures/MTEC/Logo-copy.jpg" };
 
-    mageRenderableCreate(
-        &renderable, 
-        &(struct mageRenderableCreateInfo)
-        {
-            .IndexCount         = 6,
-            .Indicies           = (uint16_t[]) { 0, 1, 2, 2, 3, 0 },
-            .VertexCount        = 4,
-            .Verticies          = verticies1,
-            .TextureCreateInfo  = &(struct mageTextureCreateInfo)
-            {
-                .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT,
-                .TexturePath = "Sandbox/Resources/Textures/tango.jpg",
-            }
-        },
-        SandboxApplication->Renderer
-    );
-
+    mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
+    
     struct mageRenderable *r[] = { &renderable };
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
-        mageRendererDraw(SandboxApplication->Renderer, r, 1);
+        mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
+    
+    
     mageApplicationDestroy(SandboxApplication);    
     free(SandboxApplication);
     mageLogEnd();

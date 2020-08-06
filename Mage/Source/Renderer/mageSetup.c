@@ -521,8 +521,11 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     VkPipelineColorBlendAttachmentState colorBlendAttachment;
     memset(&colorBlendAttachment, 0, sizeof(VkPipelineColorBlendAttachmentState));
 
-    colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-    colorBlendAttachment.blendEnable    = VK_FALSE;
+    colorBlendAttachment.blendEnable                = VK_TRUE;
+    colorBlendAttachment.srcColorBlendFactor        = VK_BLEND_FACTOR_SRC_ALPHA;
+    colorBlendAttachment.dstColorBlendFactor        = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+    colorBlendAttachment.colorBlendOp               = VK_BLEND_OP_ADD;
+    colorBlendAttachment.colorWriteMask             = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
 
     VkPipelineColorBlendStateCreateInfo colorBlending;
     memset(&colorBlending, 0, sizeof(VkPipelineColorBlendStateCreateInfo));
@@ -641,9 +644,9 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     allocateInfo.commandBufferCount         = (uint32_t) renderer->SwapChainImageCount;
 
     memset(&renderer->ClearValue, 0, sizeof(VkClearValue));
-    renderer->ClearValue.color.float32[0] = 0.0f;
-    renderer->ClearValue.color.float32[1] = 0.0f;
-    renderer->ClearValue.color.float32[2] = 0.0f;
+    renderer->ClearValue.color.float32[0] = 0.15f;
+    renderer->ClearValue.color.float32[1] = 0.15f;
+    renderer->ClearValue.color.float32[2] = 0.15f;
     renderer->ClearValue.color.float32[3] = 0.0f;
     
 
@@ -677,6 +680,15 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
     
     return VK_SUCCESS;
 }
+static VkResult mageCreateDefaultBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
+{
+    renderer->DefaultSquareIndexBuffer = malloc(sizeof(struct mageBuffer));
+    uint16_t indexes[] = { 0, 1, 2, 2, 3, 0 };
+    mageBufferCreate(renderer->DefaultSquareIndexBuffer, MAGE_BUFFER_TYPE_INDEX, indexes, sizeof(indexes), renderer);
+
+    MAGE_LOG_CORE_INFORM("Default buffers have been created\n", NULL);
+    return VK_SUCCESS;
+}
 
 mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {   
@@ -704,6 +716,7 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
         mageCreateCommandPool,
         mageCreateCommandBuffers,
         mageCreateSynchronisationObjects,
+        mageCreateDefaultBuffers
     };
 
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
@@ -737,10 +750,12 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
 
     /* Descriptor Sets */
     vkDestroyDescriptorPool(renderer->Device, renderer->DescriptorPool, NULL);
+    mageBufferDestroy(renderer->DefaultSquareIndexBuffer, renderer);
 
     free(renderer->SwapChainImages);
     free(renderer->SwapChainImageViews);
     free(renderer->Framebuffers);
+    free(renderer->DefaultSquareIndexBuffer);
 }
 void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererProps)
 {
@@ -757,7 +772,8 @@ void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window
         mageCreateGraphicsPipeline,
         mageCreateFrameBuffers,
         mageCreateCommandPool,
-        mageCreateCommandBuffers,    
+        mageCreateCommandBuffers,
+        mageCreateDefaultBuffers
     };
     uint32_t i;
     for (i = 0; i < sizeof(functions) / sizeof(function); i++)
