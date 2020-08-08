@@ -10,6 +10,6 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    vec4 textureValues = vec4(texture(texSampler, fragTexCoord * 4));
+    vec4 textureValues = vec4(texture(texSampler, fragTexCoord));
     outColor = vec4(fragColor * textureValues.rgb, textureValues.a);
 }

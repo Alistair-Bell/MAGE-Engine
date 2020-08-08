@@ -1,28 +1,28 @@
 #include <mageAPI.h>
 
-void mageSceneCreate(struct mageScene *scene, const uint32_t enitityLimit, const char *sceneTag, const struct mageHeapAllocater *allocater)
+void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *createInfo)
 {
-    scene->Allocater                        = *(allocater);
-    scene->Tag                              = sceneTag;
-    scene->Pool.EntityLimit                 = enitityLimit;
+    scene->Allocater                        = createInfo->Allocater;
+    scene->Tag                              = createInfo->SceneTag;
+    scene->Pool.EntityLimit                 = createInfo->EntityLimit;
     scene->Pool.EntityPooledCount           = 0;
     scene->Pool.EntityPooledCount           = 0;
     scene->Pool.ComponentTableCount         = 0;
-    scene->Pool.Pooled                      = scene->Allocater.ListAllocater(enitityLimit, sizeof(mageEntity));
+    scene->Pool.Pooled                      = scene->Allocater.ListAllocater(createInfo->EntityLimit, sizeof(mageEntity));
     scene->Pool.ComponentTables             = scene->Allocater.ListAllocater(0, sizeof(struct mageComponentTable));
-    scene->Pool.ComponentHandles            = scene->Allocater.ListAllocater(enitityLimit, sizeof(mageComponentHandle));
-    memset(scene->Pool.ComponentHandles, 0, sizeof(mageComponentHandle) * enitityLimit);
+    scene->Pool.ComponentHandles            = scene->Allocater.ListAllocater(createInfo->EntityLimit, sizeof(mageComponentHandle));
+    memset(scene->Pool.ComponentHandles, 0, sizeof(mageComponentHandle) * createInfo->EntityLimit);
 
     uint32_t i;
-    mageEntity availableIDs[enitityLimit];
-    for (i = 0; i < enitityLimit; i++)
+    mageEntity availableIDs[createInfo->EntityLimit];
+    for (i = 0; i < createInfo->EntityLimit; i++)
     {
         scene->Pool.ComponentHandles[i] = scene->Allocater.ListAllocater(2, sizeof(mageComponentHandle));
         memset(scene->Pool.ComponentHandles[i], 0, sizeof(mageComponentHandle) * 2);
-        availableIDs[i] = ((enitityLimit - 1) - i);
+        availableIDs[i] = ((createInfo->EntityLimit - 1) - i);
     }
 
-    mageQueueCreateFromSet(&scene->Pool.AvailableQueue, enitityLimit, sizeof(mageEntity), availableIDs, &scene->Allocater);
+    mageQueueCreateFromSet(&scene->Pool.AvailableQueue, createInfo->EntityLimit, sizeof(mageEntity), availableIDs, &scene->Allocater);
     MAGE_LOG_CORE_INFORM("Creating new scene located at %p with tag Of %s\n", scene, scene->Tag);
 }
 void mageSceneDisplayInformation(const struct mageScene *scene)

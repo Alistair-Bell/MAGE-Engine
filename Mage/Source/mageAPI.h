@@ -432,6 +432,12 @@ struct mageEntityPool
 	uint32_t								EntityLimit;
 	uint32_t								ComponentTableCount;
 };
+struct mageSceneCreateInfo
+{
+	uint32_t 								EntityLimit;
+	const char 								*SceneTag;
+	struct mageHeapAllocater 				Allocater;
+};
 struct mageScene
 {
     struct mageEntityPool 					Pool;
@@ -612,6 +618,7 @@ struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
+	struct mageScene						*ActiveScene;
 	struct mageApplicationCreateInfo		CreateInfo;
 	struct mageRendererCreateInfo			RendererCreateInfo;
 	uint8_t 								Running;
@@ -849,9 +856,7 @@ extern void mageQueueDestroy(
 /* Entity component system */
 extern void mageSceneCreate(
 	struct mageScene *scene,
-	const uint32_t enitityLimit,
-	const char *sceneTag,
-	const struct mageHeapAllocater *allocater
+	const struct mageSceneCreateInfo *createInfo
 );
 extern void mageSceneDisplayInformation(
 	const struct mageScene *scene
@@ -1253,6 +1258,10 @@ extern mageResult mageApplicationCreate(
 	struct mageApplication *application, 
 	struct mageApplicationCreateInfo applicationInfo, 
 	struct mageRendererCreateInfo rendererInfo
+);
+extern void mageApplicationSetScene(
+	struct mageApplication *application,
+	struct mageSceneCreateInfo *createInfo
 );
 extern void mageApplicationDestroy(
 	struct mageApplication *application
