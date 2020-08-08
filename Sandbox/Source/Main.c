@@ -5,7 +5,8 @@
 /* Application instance */
 static struct mageApplication *SandboxApplication;
 static struct mageShader shaders[2];
-static struct mageRenderable renderable;
+static struct mageRenderable renderable, renderable2;
+
 
 void CreateShaders()
 {
@@ -15,6 +16,7 @@ void CreateShaders()
 
 MAGE_ENTRY_POINT()
 {
+
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
     CreateShaders();    
@@ -22,7 +24,7 @@ MAGE_ENTRY_POINT()
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
 
-    applicationCreateInfo.FixedResolution        = 1;
+    applicationCreateInfo.FixedResolution        = 0;
     applicationCreateInfo.Fullscreen             = 0;
     applicationCreateInfo.Width                  = 1920;
     applicationCreateInfo.Height                 = 1080;
@@ -39,14 +41,13 @@ MAGE_ENTRY_POINT()
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
     struct mageVertex verticies1[] = 
     {
-        { .Vertex = { .X = -0.5f, .Y = -0.5f }, .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
-        { .Vertex = { .X = 0.5f, .Y = -0.5f },  .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
-        { .Vertex = { .X = 0.5f, .Y = 0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
-        { .Vertex = { .X = -0.5f, .Y = 0.5f },  .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } },   
+        { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  1.0f, .Y = -1.00f },   .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  1.0f, .Y =  1.00f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
+        { .Vertex = { .X = -1.0f, .Y =  1.00f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
     
     };
-    
-    uint32_t i;
+
     
     struct mageRenderableCreateInfo info;
     memset(&info, 0, sizeof(struct mageRenderableCreateInfo));
@@ -54,10 +55,9 @@ MAGE_ENTRY_POINT()
     info.VertexCount        = 4;
     info.IndexCount         = 0;
     info.Indicies           = NULL;
-    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_REPEAT, .TexturePath = "Mage/Resources/Textures/MTEC/Logo-copy.jpg" };
-
+    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Sandbox/Resources/Textures/tango.jpg" };
     mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
-    
+
     struct mageRenderable *r[] = { &renderable };
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))

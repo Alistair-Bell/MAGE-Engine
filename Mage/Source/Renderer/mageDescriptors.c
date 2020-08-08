@@ -56,7 +56,7 @@ void mageDescriptorSetsAllocate(struct mageRenderer *renderer)
 
     MAGE_VULKAN_CHECK(vkAllocateDescriptorSets(renderer->Device, &allocateInfo, &renderer->DescriptorSet));
 }
-void mageDescriptorWriteCreate(const VkImage *image, const VkImageView *view, const VkSampler *textureSampler, const VkSamplerAddressMode mode, struct mageRenderer *renderer)
+void mageDescriptorSetsUpdate(const VkImage *image, const VkImageView *view, const VkSampler *textureSampler, const VkSamplerAddressMode mode, struct mageRenderer *renderer)
 {
     VkDescriptorImageInfo imageInfo;
     memset(&imageInfo, 0, sizeof(VkDescriptorImageInfo));

@@ -53,12 +53,14 @@
 #define MAGE_PI_HALF	1.5707963267948966f
 
 #if defined (MAGE_USE_GLSL_STRUCTURES)
-	#define vec2 struct mageVector2
-	#define vec3 struct mageVector3
-	#define vec4 struct mageVector4
-	#define mat3 struct mageMatrix3
-	#define mat4 struct mageMatrix4
+	#define vec2 mageVector2
+	#define vec3 mageVector3
+	#define vec4 mageVector4
+	#define mat3 mageMatrix3
+	#define mat4 mageMatrix4
 #endif
+
+#define mageColor mageVector3
 
 
 typedef uint32_t mageEventHandle;
@@ -453,7 +455,7 @@ struct mageShader
 struct mageVertex
 {
 	struct mageVector2						Vertex;
-	struct mageVector3						Color;
+	struct mageColor						Color;
 	struct mageVector2						TextureLocation;
 };
 struct mageTransform
@@ -1173,7 +1175,7 @@ extern void mageDescriptorSetLayoutCreate(
 extern void mageDescriptorSetsAllocate(
 	struct mageRenderer *renderer
 );
-extern void mageDescriptorWriteCreate(
+extern void mageDescriptorSetsUpdate(
 	const VkImage *image,
 	const VkImageView *view,
 	const VkSampler *textureSampler,

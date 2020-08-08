@@ -4,6 +4,7 @@
 static const char *mageRequiredExtensions[] = 
 {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+    VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME
 };
 static const char *const mageRequiredLayers[] = 
 {
@@ -282,7 +283,7 @@ static VkResult mageCreateDevice(struct mageRenderer *renderer, struct mageWindo
 
     deviceCreateInfo.sType                      = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.ppEnabledExtensionNames    = mageRequiredExtensions;
-    deviceCreateInfo.enabledExtensionCount      = 1;    
+    deviceCreateInfo.enabledExtensionCount      = 2;    
     deviceCreateInfo.pQueueCreateInfos          = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount       = 1;
     deviceCreateInfo.pEnabledFeatures           = &renderer->PhysicalDeviceFeatures;
@@ -521,12 +522,19 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     VkPipelineColorBlendAttachmentState colorBlendAttachment;
     memset(&colorBlendAttachment, 0, sizeof(VkPipelineColorBlendAttachmentState));
 
-    colorBlendAttachment.blendEnable                = VK_TRUE;
-    colorBlendAttachment.srcColorBlendFactor        = VK_BLEND_FACTOR_SRC_ALPHA;
-    colorBlendAttachment.dstColorBlendFactor        = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
-    colorBlendAttachment.colorBlendOp               = VK_BLEND_OP_ADD;
-    colorBlendAttachment.colorWriteMask             = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
-
+    if (rendererInfo->TextureTransparency == MAGE_TRUE)
+    {
+        colorBlendAttachment.blendEnable                = VK_TRUE;
+        colorBlendAttachment.srcColorBlendFactor        = VK_BLEND_FACTOR_SRC_ALPHA;
+        colorBlendAttachment.dstColorBlendFactor        = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
+        colorBlendAttachment.colorBlendOp               = VK_BLEND_OP_ADD;
+    }
+    else
+    {
+        colorBlendAttachment.blendEnable                = VK_FALSE;
+    }
+    colorBlendAttachment.colorWriteMask                 = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
+    
     VkPipelineColorBlendStateCreateInfo colorBlending;
     memset(&colorBlending, 0, sizeof(VkPipelineColorBlendStateCreateInfo));
 
@@ -749,6 +757,7 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
     vkDestroyCommandPool(renderer->Device, renderer->CommandPool, NULL);
 
     /* Descriptor Sets */
+    vkDestroyDescriptorSetLayout(renderer->Device, renderer->DescriptorSetLayout, NULL);
     vkDestroyDescriptorPool(renderer->Device, renderer->DescriptorPool, NULL);
     mageBufferDestroy(renderer->DefaultSquareIndexBuffer, renderer);
 

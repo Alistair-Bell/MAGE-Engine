@@ -192,14 +192,14 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
         mageCopyBufferToImage(&stagingBuffer, texture->Image, width, height, renderer);
     mageTransitionImageLayout(texture->Image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, renderer);
     
-    mageDescriptorWriteCreate(&texture->Image, &texture->View, &texture->Sampler, nativeSamplerMode, renderer);
+    mageDescriptorSetsUpdate(&texture->Image, &texture->View, &texture->Sampler, nativeSamplerMode, renderer);
     mageBufferWrapperDestroy(&stagingBuffer, renderer);
     MAGE_LOG_CORE_INFORM("Texture %s was created with source of %dpx by %dpx\n", texturePath, width, height);
     return MAGE_RESULT_SUCCESS;
 }
 void mageTextureDestroy(struct mageTexture *texture, struct mageRenderer *renderer)
 {
-    vkDestroyDescriptorSetLayout(renderer->Device, renderer->DescriptorSetLayout, NULL);
+    /* vkDestroyDescriptorSetLayout (renderer->Device, renderer->DescriptorSetLayout, NULL); */
     vkDestroyImageView(renderer->Device, texture->View, NULL);
     vkDestroyImage(renderer->Device, texture->Image, NULL);
     vkDestroySampler(renderer->Device, texture->Sampler, NULL);
