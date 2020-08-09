@@ -48,6 +48,9 @@
 #define MAGE_ECS_BIND_COMPONENT(scene, entity, component, value) \
 	mageEntityBindComponent(scene, entity, #component, value);
 
+#define MAGE_ECS_REGISTER_SYSTEM(scene, system, mode, threading, requestedCount,  ...) \
+	mageSceneSystemRegister(scene, mode, threading, system, requestedCount, #__VA_ARGS__)
+
 #define MAGE_BIT(index) (1 << index) 
 #define MAGE_PI 		3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f
 #define MAGE_PI_HALF	1.5707963267948966f
@@ -117,6 +120,22 @@ typedef enum MAGE_COMPONENT_TYPE_ENUM
 	MAGE_COMPONENT_TYPE_REQUIRED,
 	MAGE_COMPONENT_TYPE_OPTIONAL
 } mageComponentType;
+
+typedef enum MAGE_SYSTEM_TYPE_ENUM
+{
+	MAGE_SYSTEM_TYPE_START				= 1,
+	MAGE_SYSTEM_TYPE_AWAKE				= 2,
+	MAGE_SYSTEM_TYPE_UPDATE				= 3,
+	MAGE_SYSTEM_TYPE_LATE_UPDATE		= 4,
+	MAGE_SYSTEM_TYPE_FIXED_UPDATE		= 5,
+	MAGE_SYSTEM_TYPE_END				= 6,
+} mageSystemType;
+
+typedef enum
+{
+	MAGE_SYSTEM_THREAD_PRIORITY_NONE	= 1,
+	MAGE_SYSTEM_THREAD_PRIORITY_FORCE	= 2,
+} mageSystemThreadPriority;
 
 typedef enum MAGE_KEYCODE_ENUM
 {
@@ -332,12 +351,13 @@ typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
 } mageTextureSamplerMode;
 
 
-typedef void (*mageEventListenerCallback)(void *, mageEventType);
-typedef void *(*mageMemoryAllocaterMethod)(uint64_t);
-typedef void (*mageMemoryFreeMethod)(void *);
-typedef void *(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
-typedef void *(*mageMemoryReallocater)(void *, uint64_t);
-typedef void *(*mageThreadJobCallback)(void *);
+typedef void 		(*mageEventListenerCallback)(void *, mageEventType);
+typedef void 		*(*mageMemoryAllocaterMethod)(uint64_t);
+typedef void 		(*mageMemoryFreeMethod)(void *);
+typedef void 		*(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
+typedef void 		*(*mageMemoryReallocater)(void *, uint64_t);
+typedef void 		*(*mageThreadJobCallback)(void *);
+typedef uint8_t 	(*mageSystemCallback)(void **, const uint32_t);
 
 struct mageVector2
 {
@@ -413,6 +433,14 @@ struct mageHeapAllocater
 	mageMemoryListAllocaterMethod 			ListAllocater;
 	mageMemoryReallocater 					Reallocater;
 };
+struct mageSystemTable
+{
+	mageSystemCallback						Callback;
+	mageThread								SystemThread;
+	uint32_t								*ComponentID;
+	uint32_t 								ComponentCount;
+	uint8_t									Flags;
+};
 struct mageComponentTable
 {
     const char 								*Tag;
@@ -428,9 +456,11 @@ struct mageEntityPool
 	mageComponentHandle						**ComponentHandles;
 	struct mageQueue						AvailableQueue;
 	struct mageComponentTable 				*ComponentTables;
+	struct mageSystemTable					*SystemTables;
     uint32_t 								EntityPooledCount;
 	uint32_t								EntityLimit;
 	uint32_t								ComponentTableCount;
+	uint32_t								SystemTableCount;
 };
 struct mageSceneCreateInfo
 {
@@ -861,8 +891,23 @@ extern void mageSceneCreate(
 extern void mageSceneDisplayInformation(
 	const struct mageScene *scene
 );
+extern void mageSceneUpdate(
+	struct mageScene *scene
+);
 extern mageEntity mageEntityCreate(
 	struct mageScene *scene
+);
+extern void mageSceneSystemRegister(
+	struct mageScene *scene,
+	const mageSystemType type,
+	const mageSystemThreadPriority threadPriority,
+	mageSystemCallback system,
+	const uint32_t componentCount,
+	...
+);
+extern void mageSceneSystemFree(
+	struct mageSystemTable *table,
+	struct mageHeapAllocater *allocater
 );
 extern void mageEntityBindComponent(
 	struct mageScene *scene,

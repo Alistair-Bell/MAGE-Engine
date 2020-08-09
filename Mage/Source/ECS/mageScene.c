@@ -1,4 +1,4 @@
-#include <mageAPI.h>
+#include "../mageAPI.h"
 
 void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *createInfo)
 {
@@ -8,6 +8,8 @@ void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *
     scene->Pool.EntityPooledCount           = 0;
     scene->Pool.EntityPooledCount           = 0;
     scene->Pool.ComponentTableCount         = 0;
+    scene->Pool.SystemTableCount            = 0;
+    scene->Pool.SystemTables                = scene->Allocater.ListAllocater(0, sizeof(struct mageSystemTable));
     scene->Pool.Pooled                      = scene->Allocater.ListAllocater(createInfo->EntityLimit, sizeof(mageEntity));
     scene->Pool.ComponentTables             = scene->Allocater.ListAllocater(0, sizeof(struct mageComponentTable));
     scene->Pool.ComponentHandles            = scene->Allocater.ListAllocater(createInfo->EntityLimit, sizeof(mageComponentHandle));
@@ -48,11 +50,19 @@ void mageSceneDestroy(struct mageScene *scene)
     {
         mageComponentTableFree(&scene->Pool.ComponentTables[i], &scene->Allocater);
     }
+    for (i = 0; i < scene->Pool.SystemTableCount; i++)
+    {
+        mageSceneSystemFree(&scene->Pool.SystemTables[i], &scene->Allocater);
+    }
 
-
+    scene->Allocater.Free(scene->Pool.SystemTables);    
     scene->Allocater.Free(scene->Pool.ComponentHandles);
     scene->Allocater.Free(scene->Pool.Pooled);  
     scene->Allocater.Free(scene->Pool.ComponentTables);
     mageQueueDestroy(&scene->Pool.AvailableQueue, &scene->Allocater);
     MAGE_LOG_CORE_INFORM("Scene %s destroyed\n", scene->Tag); 
+}
+void mageSceneUpdate(struct mageScene *scene)
+{
+    
 }

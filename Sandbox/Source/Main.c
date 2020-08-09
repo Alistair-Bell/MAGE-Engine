@@ -14,11 +14,17 @@ void CreateShaders()
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
 
-MAGE_ENTRY_POINT()
+uint8_t ExampleSystem(void **components, const uint32_t count)
 {
+    struct mageRenderable r = *((struct mageRenderable *) components[0]);
+    return MAGE_TRUE;
+}
 
+    MAGE_ENTRY_POINT()
+{
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
+#if 0
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -68,9 +74,25 @@ MAGE_ENTRY_POINT()
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
-    
-    
     mageApplicationDestroy(SandboxApplication);    
+#endif
+    
+    struct mageScene scene;
+    struct mageSceneCreateInfo info;
+    memset(&info, 0, sizeof(struct mageSceneCreateInfo));
+
+    info.Allocater      = mageHeapAllocaterDefault();
+    info.EntityLimit    = 12;
+    info.SceneTag       = "Hello World";
+
+    mageSceneCreate(&scene, &info);
+    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageRenderable);
+    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageTexture);
+
+    SANDBOX_LOG_CORE_WARNING("First component id -> %d\n", scene.Pool.ComponentTables[0].ID);
+
+    MAGE_ECS_REGISTER_SYSTEM(&scene, ExampleSystem, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
+    mageSceneDestroy(&scene);
     free(SandboxApplication);
     mageLogEnd();
     return 1;

@@ -11,7 +11,6 @@
                 "MAGE_CORE",
                 "SANDBOX_DEBUG"
             ],
-            "compilerPath": "/usr/lib64/ccache/clang",
             "cStandard": "c89",
             "intelliSenseMode": "clang-x64"
         }

@@ -13,3 +13,6 @@ Makefile*
 # Macos generated build files
 *.pbxproj
 *.xcworkspacedata
+
+# Valgrind generated debug files
+vgcore*

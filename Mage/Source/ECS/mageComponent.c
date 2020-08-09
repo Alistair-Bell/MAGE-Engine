@@ -9,7 +9,7 @@ uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const ui
     struct mageComponentTable table;
     table.Tag           = id;
     table.ByteSize      = size;
-    table.ID            = scene->Pool.ComponentTableCount;
+    table.ID            = scene->Pool.ComponentTableCount - 1;
     table.Count         = 0;
     table.Components    = scene->Allocater.ListAllocater(0, table.ByteSize);
     mageQueueCreate(&table.IndexQueue, sizeof(uint32_t), &scene->Allocater);
