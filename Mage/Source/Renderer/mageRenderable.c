@@ -18,7 +18,7 @@ static void mageTextureCreateInfoDefault(struct mageTextureCreateInfo *createInf
 
 mageResult mageRenderableCreate(struct mageRenderable *renderable, struct mageRenderableCreateInfo *info, struct mageRenderer *renderer)
 {
-    assert(info);
+    MAGE_ASSERT(info);
     if (info->IndexCount == 0 || info->Indicies == NULL)
     {
         info->IndexCount    = 6;

@@ -3,9 +3,9 @@
 mageEntity mageEntityCreate(struct mageScene *scene)
 {
     mageEntity entity;
-    assert(mageQueuePop(&scene->Pool.AvailableQueue, &entity, &scene->Allocater) == MAGE_RESULT_SUCCESS);
+    MAGE_ASSERT(mageQueuePop(&scene->Pool.AvailableQueue, &entity, &scene->Allocater) == MAGE_RESULT_SUCCESS);
     scene->Pool.EntityPooledCount++;
-    assert(scene->Pool.EntityPooledCount <= scene->Pool.EntityLimit);
+    MAGE_ASSERT(scene->Pool.EntityPooledCount <= scene->Pool.EntityLimit);
     scene->Pool.Pooled[entity] = entity;
     MAGE_LOG_CORE_INFORM("Entity %d registerd\n", entity);
     return entity;
@@ -23,7 +23,7 @@ void mageEntityBindComponent(struct mageScene *scene, mageEntity entity, const c
             break;
         }
     }
-    assert(found);
+    MAGE_ASSERT(found);
     struct mageComponentTable *table = &scene->Pool.ComponentTables[i];
     mageComponentHandle *handle = scene->Pool.ComponentHandles[entity];
     table->Count++;

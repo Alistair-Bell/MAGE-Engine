@@ -9,7 +9,8 @@
             "defines": [
                 "MAGE_DEBUG",
                 "MAGE_CORE",
-                "SANDBOX_DEBUG"
+                "SANDBOX_DEBUG",
+                "MAGE_ASSERTS"
             ],
             "cStandard": "c89",
             "intelliSenseMode": "clang-x64"

@@ -28,7 +28,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL mageVulkanDebugCallback( VkDebugUtilsMessa
             MAGE_LOG_CORE_ERROR("Validation Layers : Unknown validation error\n", NULL);
             break;  
     }
-    assert(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT || messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT);
+    MAGE_ASSERT(messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT || messageSeverity == VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT);
     
     return VK_FALSE;
 }

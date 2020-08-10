@@ -1,5 +1,12 @@
 #include "../mageAPI.h"
 
+static struct mageSystemData mageGatherData(struct mageScene *scene, struct mageSystemTable *systemTable)
+{
+    struct mageSystemData data;
+    data.ElementCount       = systemTable->ComponentCount;
+    return data;
+}
+
 void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *createInfo)
 {
     scene->Allocater                        = createInfo->Allocater;
@@ -64,5 +71,30 @@ void mageSceneDestroy(struct mageScene *scene)
 }
 void mageSceneUpdate(struct mageScene *scene)
 {
-    
+    uint32_t i;
+    struct mageVector3 v = (struct mageVector3) { .X = 0.0f, .Y = 1.0f, .Z = 2.0f };
+    struct mageVector3 x = (struct mageVector3) { .X = 0.0f, .Y = 1.0f, .Z = 3.0f };
+    struct mageVector3 z = (struct mageVector3) { .X = 0.0f, .Y = 1.0f, .Z = 4.0f };
+    struct mageSystemTable activeTable;
+    struct mageSystemData w;
+    w.Data          = (void *[]) { &v, &x, &z };
+    w.ElementCount  = 3;
+
+    for (i = 0; i < scene->Pool.SystemTableCount; i++)
+    {
+        activeTable = scene->Pool.SystemTables[i];
+        if (!(activeTable.Flags >> 7))
+        {
+            continue;
+        }
+        if (activeTable.SystemThread != NULL)
+        {
+            mageThreadBegin(activeTable.SystemThread, activeTable.Callback, &w);
+        }
+        else
+        {
+            activeTable.Callback(&w);
+        }
+        mageThreadDestroy(activeTable.SystemThread);
+    }
 }

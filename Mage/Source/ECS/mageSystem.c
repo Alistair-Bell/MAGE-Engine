@@ -4,7 +4,7 @@ static uint32_t mageSceneFindComponentHandleByTag(const struct mageScene *scene,
 {
     uint32_t i;
     uint8_t found = MAGE_FALSE;
-    assert(0 <= scene->Pool.ComponentTableCount);
+    MAGE_ASSERT(0 <= scene->Pool.ComponentTableCount);
     for (i = 0; i < scene->Pool.ComponentTableCount; i++)
     {
         if (strcmp(tag, scene->Pool.ComponentTables[i].Tag) == 0)
@@ -12,7 +12,7 @@ static uint32_t mageSceneFindComponentHandleByTag(const struct mageScene *scene,
             return scene->Pool.ComponentTables[i].ID;
         }
     }
-    assert(found != MAGE_FALSE);
+    MAGE_ASSERT(found != MAGE_FALSE);
     return 0;
 }
 static uint8_t mageSystemTableCreateFlags(const mageSystemType type, const mageSystemThreadPriority threadPriority)
@@ -35,7 +35,7 @@ void mageSceneSystemRegister(struct mageScene *scene, const mageSystemType type,
     strcpy(arguments, f);
     va_end(vardicArgumemts);
 
-    assert(2 <= strlen(arguments));
+    MAGE_ASSERT(2 <= strlen(arguments));
     
     /* Parsing the vardic argument string */
     const char *splitter = ",";
@@ -94,6 +94,13 @@ void mageSceneSystemRegister(struct mageScene *scene, const mageSystemType type,
     MAGE_LOG_CORE_INFORM("Registering system, requiring %d components %s\n", componentCount, f);
     free(arguments);
     free(iterator);
+}
+struct mageSystemData mageSceneSystemGetEntityComponents(struct mageScene *scene, const mageEntity entity, const uint32_t *components, const uint32_t count)
+{
+    struct mageSystemData data;
+    uint32_t i;
+    return data;
+
 }
 void mageSceneSystemFree(struct mageSystemTable *table, struct mageHeapAllocater *allocater)
 {

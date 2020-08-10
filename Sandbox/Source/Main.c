@@ -3,9 +3,9 @@
 #define SANDBOX_ENTITY_COUNT 5
 
 /* Application instance */
-static struct mageApplication *SandboxApplication;
-static struct mageShader shaders[2];
-static struct mageRenderable renderable, renderable2;
+static struct mageApplication   *SandboxApplication;
+static struct mageShader        shaders[2];
+static struct mageRenderable    renderable, renderable2;
 
 
 void CreateShaders()
@@ -14,13 +14,20 @@ void CreateShaders()
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
 
-uint8_t ExampleSystem(void **components, const uint32_t count)
+void *Thread1(void *components)
 {
-    struct mageRenderable r = *((struct mageRenderable *) components[0]);
-    return MAGE_TRUE;
+    return MAGE_ECS_SYSTEM_SUCCESS;
+}
+void *Thread2(void *components)
+{
+    struct mageSystemData w = MAGE_VOID_POINTER_CAST(components, struct mageSystemData);
+    struct mageVector3 v = (*(struct mageVector3 *) w.Data[2]);
+    SANDBOX_LOG_CORE_ERROR("Thread 2 %f %f %f\n", v.X, v.Y, v.Z);
+    return MAGE_ECS_SYSTEM_SUCCESS;
 }
 
-    MAGE_ENTRY_POINT()
+
+MAGE_ENTRY_POINT()
 {
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
@@ -88,10 +95,20 @@ uint8_t ExampleSystem(void **components, const uint32_t count)
     mageSceneCreate(&scene, &info);
     MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageRenderable);
     MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageTexture);
+    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageTransform);
+    MAGE_ECS_REGISTER_SYSTEM(&scene, Thread1, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
+    MAGE_ECS_REGISTER_SYSTEM(&scene, Thread2, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
+    mageEntity e = mageEntityCreate(&scene);
 
-    SANDBOX_LOG_CORE_WARNING("First component id -> %d\n", scene.Pool.ComponentTables[0].ID);
 
-    MAGE_ECS_REGISTER_SYSTEM(&scene, ExampleSystem, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
+    mageEntityDestroy(&scene, e);
+
+    uint32_t i;
+    for (i = 0; i < 20; i++)
+    {
+        mageSceneUpdate(&scene);
+    }
+
     mageSceneDestroy(&scene);
     free(SandboxApplication);
     mageLogEnd();

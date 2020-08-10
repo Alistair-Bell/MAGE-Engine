@@ -12,7 +12,7 @@ static void mageThreadHandle(int32_t error)
     {
         MAGE_LOG_CORE_ERROR("PThread error: %d\n", strerror(error));
     }
-    assert(error != 1);
+    MAGE_ASSERT(error != 1);
 }
 
 mageThread mageThreadCreate()
@@ -27,8 +27,10 @@ void mageThreadBegin(mageThread thread, mageThreadJobCallback callback, void *da
     memcpy(thread, &type, sizeof(struct mageThreadType));
 }   
 void mageThreadDestroy(mageThread thread)
-{
+{   
+    if (thread == NULL) return;
     struct mageThreadType type = (*(struct mageThreadType *)thread);
-    mageThreadHandle(pthread_join(type.NativeThread, NULL));
-    free(thread);
+    uint8_t result;
+    mageThreadHandle(pthread_join(type.NativeThread, (void **)&result));
+    MAGE_ASSERT(result == 1);
 }

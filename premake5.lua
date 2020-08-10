@@ -46,6 +46,7 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE",
+        "MAGE_ASSERTS"
     }
     includedirs
     {

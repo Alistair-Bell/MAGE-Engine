@@ -13,7 +13,7 @@ void mageMatrix4CreateFromRows(struct mageMatrix4 *matrix, const struct mageVect
 }
 void mageMatrix4CreateFromSet(struct mageMatrix4 *matrix, const float *set, const uint32_t setCount)
 {
-    assert(setCount <= 16);
+    MAGE_ASSERT(setCount <= 16);
     if (setCount < 16)
     {
         /* Cleaning possible "junk" data */
@@ -31,12 +31,12 @@ void mageMatrix4CreateDiagonal(struct mageMatrix4 *matrix, const float diagonal)
 }
 struct mageVector4 mageMatrix4GetRow(const struct mageMatrix4 *matrix, const uint32_t index)
 {
-    assert(4 <= index);
+    MAGE_ASSERT(4 <= index);
     return matrix->Rows[index];
 }
 struct mageVector4 mageMatrix4GetColumn(const struct mageMatrix4 *matrix, const uint32_t index)
 {
-    assert(4 <= index);
+    MAGE_ASSERT(4 <= index);
     struct mageVector4 column;
     column.Values[0] = matrix->Elements[index + 0 * 4];
     column.Values[0] = matrix->Elements[index + 1 * 4];

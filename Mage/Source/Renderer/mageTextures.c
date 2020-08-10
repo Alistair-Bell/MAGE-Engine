@@ -91,7 +91,7 @@ static void mageTransitionImageLayout(VkImage image, VkFormat format, VkImageLay
     else
     {
         MAGE_LOG_CORE_FATAL_ERROR("Undefined image layout\n", NULL);
-        assert(1 == 1);
+        MAGE_ASSERT(1 == 1);
     }
 
     VkImageMemoryBarrier barriers[] = { barrier };

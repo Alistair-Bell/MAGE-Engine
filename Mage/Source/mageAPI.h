@@ -32,13 +32,25 @@
 #define MAGE_VULKAN_CHECK(function) \
 	mageHandleVulkanResult(#function, function)
 
+#define MAGE_VOID_POINTER_CAST(data, type) \
+	(*(type *)data)
+
 /* Whith great power comes great responsiblity */
 #if defined (MAGE_PRACTICAL_JOKES)
 	#define MAGE_TRUE (rand() % 100 < 98)
 	#define MAGE_FALSE !MAGE_TRUE
+	#define true MAGE_TRUE
+	#define false MAGE_FALSE
 #else
 	#define MAGE_TRUE 1
 	#define MAGE_FALSE !MAGE_TRUE
+#endif
+
+#if defined (MAGE_ASSERTS)
+	#define MAGE_ASSERT(expression) \
+		assert(expression)
+#else
+	#define MAGE_ASSERT(expression)
 #endif
 
 /* ECS Macros*/ 
@@ -48,10 +60,20 @@
 #define MAGE_ECS_BIND_COMPONENT(scene, entity, component, value) \
 	mageEntityBindComponent(scene, entity, #component, value);
 
+#define MAGE_ECS_BIND_EXISTING_DATA_FROM_DATA(scene, entity, component, data) \
+	mageEntityBindExistingComponentFromData(scene, entity, #component, data)
+
+#define MAGE_ECS_BIND_EXISTING_DATA_FROM_INDEX(scene, entity, component, index) \
+	
+
 #define MAGE_ECS_REGISTER_SYSTEM(scene, system, mode, threading, requestedCount,  ...) \
 	mageSceneSystemRegister(scene, mode, threading, system, requestedCount, #__VA_ARGS__)
 
+#define MAGE_ECS_SYSTEM_SUCCESS ((void *)1)
+#define MAGE_ECS_SYSTEM_FAILURE ((void *)0)
+
 #define MAGE_BIT(index) (1 << index) 
+#define MAGE_PI_SQUARED 9.86960440109f
 #define MAGE_PI 		3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f
 #define MAGE_PI_HALF	1.5707963267948966f
 
@@ -131,11 +153,20 @@ typedef enum MAGE_SYSTEM_TYPE_ENUM
 	MAGE_SYSTEM_TYPE_END				= 6,
 } mageSystemType;
 
-typedef enum
+typedef enum MAGE_SYSTEM_THREAD_PRIORITY_ENUM
 {
 	MAGE_SYSTEM_THREAD_PRIORITY_NONE	= 1,
 	MAGE_SYSTEM_THREAD_PRIORITY_FORCE	= 2,
 } mageSystemThreadPriority;
+
+/*
+typedef enum MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_ENUM
+{
+	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_ALL 			= 1,
+	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_BOUND_ONLY 	= 2,
+	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_UNBOUND_ONLY = 3,
+} mageSystemComponentRecieveMode;
+*/
 
 typedef enum MAGE_KEYCODE_ENUM
 {
@@ -357,7 +388,7 @@ typedef void 		(*mageMemoryFreeMethod)(void *);
 typedef void 		*(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
 typedef void 		*(*mageMemoryReallocater)(void *, uint64_t);
 typedef void 		*(*mageThreadJobCallback)(void *);
-typedef uint8_t 	(*mageSystemCallback)(void **, const uint32_t);
+typedef void 		*(*mageSystemCallback)(void *);
 
 struct mageVector2
 {
@@ -456,6 +487,11 @@ struct mageComponentTable
     uint32_t 								ID;
 	struct mageQueue						IndexQueue;
     void 									**Components;
+};
+struct mageSystemData
+{
+	uint32_t								ElementCount;
+	void 									**Data;
 };
 struct mageEntityPool
 {
@@ -911,6 +947,12 @@ extern MAGE_API void mageSceneSystemRegister(
 	mageSystemCallback system,
 	const uint32_t componentCount,
 	...
+);
+extern MAGE_API struct mageSystemData mageSceneSystemGetEntityComponents(
+	struct mageScene *scene,
+	const mageEntity entity,
+	const uint32_t *components,
+	const uint32_t count
 );
 extern MAGE_API void mageSceneSystemFree(
 	struct mageSystemTable *table,

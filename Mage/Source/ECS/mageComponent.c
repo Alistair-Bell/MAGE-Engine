@@ -2,7 +2,7 @@
 
 uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const uint64_t size)
 {
-    assert(scene != NULL);
+    MAGE_ASSERT(scene != NULL);
     scene->Pool.ComponentTableCount++;
     scene->Pool.ComponentTables = scene->Allocater.Reallocater(scene->Pool.ComponentTables, sizeof(struct mageComponentTable) * scene->Pool.ComponentTableCount);
     

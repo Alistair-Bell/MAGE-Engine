@@ -120,7 +120,7 @@ VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResul
     default:
         MAGE_LOG_CORE_FATAL_ERROR("Undefined vulkan error\n", NULL);
     }
-    assert(functionResult == VK_SUCCESS);
+    MAGE_ASSERT(functionResult == VK_SUCCESS);
     return functionResult;
 }
 
