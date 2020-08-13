@@ -22,7 +22,7 @@ mageEntity mageSceneEntityCreate(struct mageScene *scene)
     
 
 
-    
+    return 0;
 }
 void mageSceneDestroy(struct mageScene *scene)
 {

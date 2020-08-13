@@ -10,6 +10,7 @@ static void mageGLFWKeyCallback(GLFWwindow *window, int32_t key, int32_t scancod
     switch (action)
     {
         case GLFW_PRESS:
+            mageEventFormatKeyPressed(buffer, key);
             break;
 
         case GLFW_RELEASE:

@@ -51,8 +51,8 @@
         "typeinfo": "c"
     },
     // Controls the font family.
-    "editor.fontFamily": "Courier New",
+    "editor.fontFamily": "Source Code Pro",
 
     // Controls the font size.
-    "editor.fontSize": 13
+    "editor.fontSize": 12
 }

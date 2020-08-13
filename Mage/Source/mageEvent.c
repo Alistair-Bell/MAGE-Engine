@@ -129,68 +129,68 @@ void mageEventRegisterListener(mageEventListenerCallback callback)
 void mageEventFormatWindowClose(void *buffer)
 {   
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_WINDOW_CLOSE);
-    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
 }
 void mageEventFormatWindowFocus(void *buffer) 
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_WINDOW_FOCUS);
-    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
 }
 void mageEventFormatWindowLostFocus(void *buffer)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_WINDOW_LOST_FOCUS);
-    memmove(buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
 }
 void mageEventFormatWindowMoved(void *buffer, const int32_t x, const int32_t y)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_WINDOW_MOVED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &x, sizeof(int32_t));
-    memmove(buffer + 6, &y, sizeof(int32_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &x, sizeof(int32_t));
+    memmove((char *)buffer + 6, &y, sizeof(int32_t));
 }
 void mageEventFormatKeyPressed(void *buffer, const uint8_t keycode)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_KEY_PRESSED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &keycode, sizeof(uint8_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &keycode, sizeof(uint8_t));
 }
 void mageEventFormatKeyReleased(void *buffer, const uint8_t keycode)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_KEY_RELEASED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &keycode, sizeof(uint8_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &keycode, sizeof(uint8_t));
 }
 void mageEventFormatKeyRepeat(void *buffer, const uint8_t keycode)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_KEY_REPEAT);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &keycode, sizeof(uint8_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &keycode, sizeof(uint8_t));
 }
 void mageEventFormatMouseButtonPressed(void *buffer, const uint8_t mousecode)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_MOUSE_BUTTON_PRESSED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &mousecode, sizeof(uint8_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &mousecode, sizeof(uint8_t));
 }
 void mageEventFormatMouseButtonRelease(void *buffer, const uint8_t mousecode)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_MOUSE_BUTTON_RELEASED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &mousecode, sizeof(uint8_t));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &mousecode, sizeof(uint8_t));
 }
 void mageEventFormatMouseMoved(void *buffer, const double x, const double y)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_MOUSE_MOVED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &x, sizeof(double));
-    memmove(buffer + 10, &y, sizeof(double));    
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &x, sizeof(double));
+    memmove((char *)buffer + 10, &y, sizeof(double));    
 }
 void mageEventFormatMouseWheelMoved(void *buffer, const double x, const double y)
 {
     uint16_t temp = mageEventHandleCreate(MAGE_EVENT_MOUSE_SCROLLED);
-    memmove(buffer, &temp, sizeof(uint16_t));
-    memmove(buffer + 2, &x, sizeof(double));
-    memmove(buffer + 10, &y, sizeof(double));
+    memmove((char *)buffer, &temp, sizeof(uint16_t));
+    memmove((char *)buffer + 2, &x, sizeof(double));
+    memmove((char *)buffer + 10, &y, sizeof(double));
 }
 void mageEventDispatch(void *event)
 {

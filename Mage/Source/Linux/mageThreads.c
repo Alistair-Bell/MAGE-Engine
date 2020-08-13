@@ -3,7 +3,7 @@
 struct mageThreadType
 {
     pthread_t   NativeThread;
-    uint32_t    WorkerID:
+    uint32_t    WorkerID;
 };
 
 static void mageThreadHandle(int32_t error)

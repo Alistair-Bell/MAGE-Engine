@@ -22,13 +22,19 @@ void exampleDeconstructer(void *data)
 {
 
 }
+void exampleListener(void *package, mageEventType type)
+{
+    if (type == MAGE_EVENT_KEY_PRESSED)
+    {
+    
+    }
+}
 
 
 MAGE_ENTRY_POINT()
 {
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
-#if 0
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -49,6 +55,9 @@ MAGE_ENTRY_POINT()
     rendererCreateInfo.TextureTransparency      = MAGE_TRUE;
 
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
+
+    mageEventRegisterListener(exampleListener);
+#if 0
     struct mageVertex verticies1[] = 
     {
         { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
@@ -69,17 +78,17 @@ MAGE_ENTRY_POINT()
     mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
 
     struct mageRenderable *r[] = { &renderable };
+        mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
+        mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
 
+#endif
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
-        mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
     
-    mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
     mageApplicationDestroy(SandboxApplication);    
-#endif
 
     struct mageScene s;
     struct mageSceneCreateInfo i;
@@ -93,6 +102,7 @@ MAGE_ENTRY_POINT()
 
     MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector2, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
     MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector4, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
 
 
     mageSceneDestroy(&s);
