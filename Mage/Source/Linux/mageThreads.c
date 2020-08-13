@@ -2,8 +2,8 @@
 
 struct mageThreadType
 {
-    pthread_t NativeThread;
-
+    pthread_t   NativeThread;
+    uint32_t    WorkerID:
 };
 
 static void mageThreadHandle(int32_t error)
@@ -17,7 +17,7 @@ static void mageThreadHandle(int32_t error)
 
 mageThread mageThreadCreate()
 {
-    return malloc(sizeof(struct mageThreadType));
+   return malloc(sizeof(struct mageThreadType));
 }
 void mageThreadBegin(mageThread thread, mageThreadJobCallback callback, void *data)
 {
@@ -25,7 +25,11 @@ void mageThreadBegin(mageThread thread, mageThreadJobCallback callback, void *da
     /* Creating thread */
     mageThreadHandle(pthread_create(&type.NativeThread, NULL, callback, data));
     memcpy(thread, &type, sizeof(struct mageThreadType));
-}   
+}
+uint32_t mageThreadGetID(const mageThread thread)
+{
+    return (uint32_t) pthread_self();
+}
 void mageThreadDestroy(mageThread thread)
 {   
     if (thread == NULL) return;

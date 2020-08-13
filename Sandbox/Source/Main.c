@@ -13,17 +13,14 @@ void CreateShaders()
     mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
+void exampleConstructer(void *data, const uint32_t size)
+{
+    struct mageVector2 *v = (struct mageVector2 *)data;
 
-void *Thread1(void *components)
-{
-    return MAGE_ECS_SYSTEM_SUCCESS;
 }
-void *Thread2(void *components)
+void exampleDeconstructer(void *data)
 {
-    struct mageSystemData w = MAGE_VOID_POINTER_CAST(components, struct mageSystemData);
-    struct mageVector3 v = (*(struct mageVector3 *) w.Data[2]);
-    SANDBOX_LOG_CORE_ERROR("Thread 2 %f %f %f\n", v.X, v.Y, v.Z);
-    return MAGE_ECS_SYSTEM_SUCCESS;
+
 }
 
 
@@ -83,33 +80,22 @@ MAGE_ENTRY_POINT()
     mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
     mageApplicationDestroy(SandboxApplication);    
 #endif
+
+    struct mageScene s;
+    struct mageSceneCreateInfo i;
+    struct mageHeapAllocater h = mageHeapAllocaterDefault();
+    i.Allocater         = &h;
+    i.ComponentLimit    = UINT32_MAX;
+    i.EntityLimit       = UINT32_MAX;
+    i.SceneTag          = "Hello World";
     
-    struct mageScene scene;
-    struct mageSceneCreateInfo info;
-    memset(&info, 0, sizeof(struct mageSceneCreateInfo));
+    mageSceneCreate(&s, &i);
 
-    info.Allocater      = mageHeapAllocaterDefault();
-    info.EntityLimit    = 12;
-    info.SceneTag       = "Hello World";
-
-    mageSceneCreate(&scene, &info);
-    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageRenderable);
-    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageTexture);
-    MAGE_ECS_REGISTER_COMPONENT(&scene, struct mageTransform);
-    MAGE_ECS_REGISTER_SYSTEM(&scene, Thread1, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
-    MAGE_ECS_REGISTER_SYSTEM(&scene, Thread2, MAGE_SYSTEM_TYPE_FIXED_UPDATE, MAGE_SYSTEM_THREAD_PRIORITY_FORCE, 2, struct mageRenderable, struct mageTexture);
-    mageEntity e = mageEntityCreate(&scene);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector2, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
 
 
-    mageEntityDestroy(&scene, e);
-
-    uint32_t i;
-    for (i = 0; i < 20; i++)
-    {
-        mageSceneUpdate(&scene);
-    }
-
-    mageSceneDestroy(&scene);
+    mageSceneDestroy(&s);
     free(SandboxApplication);
     mageLogEnd();
     return 1;

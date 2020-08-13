@@ -44,6 +44,8 @@
 #else
 	#define MAGE_TRUE 1
 	#define MAGE_FALSE !MAGE_TRUE
+	#define true MAGE_TRUE
+	#define false MAGE_FALSE
 #endif
 
 #if defined (MAGE_ASSERTS)
@@ -53,21 +55,10 @@
 	#define MAGE_ASSERT(expression)
 #endif
 
-/* ECS Macros*/ 
-#define MAGE_ECS_REGISTER_COMPONENT(scene, component) \
-	mageComponentRegister(scene, #component, sizeof(component))
+#define MAGE_ECS_REGISTER_COMPONENT(scene, component, constructer, deconstructer, mode) \
+	mageSceneRegisterComponent(scene, #component, sizeof(component), constructer, deconstructer, mode)
 
-#define MAGE_ECS_BIND_COMPONENT(scene, entity, component, value) \
-	mageEntityBindComponent(scene, entity, #component, value);
 
-#define MAGE_ECS_BIND_EXISTING_DATA_FROM_DATA(scene, entity, component, data) \
-	mageEntityBindExistingComponentFromData(scene, entity, #component, data)
-
-#define MAGE_ECS_BIND_EXISTING_DATA_FROM_INDEX(scene, entity, component, index) \
-	
-
-#define MAGE_ECS_REGISTER_SYSTEM(scene, system, mode, threading, requestedCount,  ...) \
-	mageSceneSystemRegister(scene, mode, threading, system, requestedCount, #__VA_ARGS__)
 
 #define MAGE_ECS_SYSTEM_SUCCESS ((void *)1)
 #define MAGE_ECS_SYSTEM_FAILURE ((void *)0)
@@ -137,11 +128,12 @@ typedef enum MAGE_RESULT_ENUM
 	MAGE_RESULT_DATA_NOT_PRESENT
 } mageResult;
 
-typedef enum MAGE_COMPONENT_TYPE_ENUM
+typedef enum MAGE_COMPONENT_REGISTERING_MODE_ENUM
 {
-	MAGE_COMPONENT_TYPE_REQUIRED,
-	MAGE_COMPONENT_TYPE_OPTIONAL
-} mageComponentType;
+	MAGE_COMPONENT_REGISTERING_MODE_REQUIRED,
+	MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL,
+	MAGE_COMPONENT_REGISTERING_MODE_UNBOUNDABLE
+} mageComponentRegisteringMode;
 
 typedef enum MAGE_SYSTEM_TYPE_ENUM
 {
@@ -159,14 +151,6 @@ typedef enum MAGE_SYSTEM_THREAD_PRIORITY_ENUM
 	MAGE_SYSTEM_THREAD_PRIORITY_FORCE	= 2,
 } mageSystemThreadPriority;
 
-/*
-typedef enum MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_ENUM
-{
-	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_ALL 			= 1,
-	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_BOUND_ONLY 	= 2,
-	MAGE_SYSTEM_COMPONENT_RECIEVE_MODE_UNBOUND_ONLY = 3,
-} mageSystemComponentRecieveMode;
-*/
 
 typedef enum MAGE_KEYCODE_ENUM
 {
@@ -389,6 +373,8 @@ typedef void 		*(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
 typedef void 		*(*mageMemoryReallocater)(void *, uint64_t);
 typedef void 		*(*mageThreadJobCallback)(void *);
 typedef void 		*(*mageSystemCallback)(void *);
+typedef void		(*mageComponentConstructer)(void *, const uint32_t);
+typedef void		(*mageComponentDeconstructer)(void *);
 
 struct mageVector2
 {
@@ -397,8 +383,8 @@ struct mageVector2
 		float Values[2];
 		struct
 		{
-			float X;
-			float Y;
+			float 				X;
+			float 				Y;
 		};
 	};
 };
@@ -409,38 +395,37 @@ struct mageVector3
 		float Values[3];
 		struct
 		{
-			float X;
-			float Y;
-			float Z;
+			float 				X;
+			float 				Y;
+			float 				Z;
 		};
 		struct
 		{
-			float Yaw;
-			float Pitch;
-			float Roll;
+			float 				Yaw;
+			float 				Pitch;
+			float 				Roll;
 		};
-		
 	};
 };
 struct mageVector4
 {
 	union
 	{
-		float Values[4];
-		float X;
-		float Y;
-		float Z;
-		float W;
+		float 					Values[4];
+		float 					X;
+		float 					Y;
+		float 					Z;
+		float 					W;
 	};
 };
 struct mageMatrix3
 {
 	union
 	{
-		float Elements[9];
+		float 					Elements[9];
 		struct
 		{
-			struct mageVector3 Rows[3];
+			struct mageVector3 	Rows[3];
 		};
 	};
 };
@@ -471,51 +456,53 @@ struct mageHeapAllocater
 	mageMemoryListAllocaterMethod 			ListAllocater;
 	mageMemoryReallocater 					Reallocater;
 };
-struct mageSystemTable
+struct mageSceneCreateInfo
 {
-	mageSystemCallback						Callback;
-	mageThread								SystemThread;
-	uint32_t								*ComponentID;
-	uint32_t 								ComponentCount;
-	uint8_t									Flags;
-};
-struct mageComponentTable
-{
-    const char 								*Tag;
-    uint32_t 								Count;
-    uint64_t 								ByteSize;
-    uint32_t 								ID;
-	struct mageQueue						IndexQueue;
-    void 									**Components;
-};
-struct mageSystemData
-{
-	uint32_t								ElementCount;
-	void 									**Data;
+	uint64_t								EntityLimit;
+	uint64_t								ComponentLimit;
+	struct mageHeapAllocater				*Allocater;
+	const char								*SceneTag;
 };
 struct mageEntityPool
 {
-    mageEntity 								*Pooled;
-	mageComponentHandle						**ComponentHandles;
-	struct mageQueue						AvailableQueue;
-	struct mageComponentTable 				*ComponentTables;
-	struct mageSystemTable					*SystemTables;
-    uint32_t 								EntityPooledCount;
-	uint32_t								EntityLimit;
-	uint32_t								ComponentTableCount;
-	uint32_t								SystemTableCount;
+	uint32_t								ActiveCount;
+	struct mageQueue						AvaliableQueue;
+	mageEntity								*Pooled;
 };
-struct mageSceneCreateInfo
+struct mageComponent
 {
-	uint32_t 								EntityLimit;
-	const char 								*SceneTag;
-	struct mageHeapAllocater 				Allocater;
+	uint8_t									SharedCount;
+	void									*Data;
+};
+struct mageComponentTable
+{
+	const char 								*Identifier;
+	struct mageQueue						IndexQueues;
+	struct mageComponent					*Stored;
+	mageComponentConstructer				Constructer;
+	mageComponentDeconstructer				Deconstructer;
+	uint32_t								ID;
+	uint32_t								StoredCount;
+	uint32_t								ByteSize;
+};
+struct mageSystemTable
+{
+	mageSystemCallback						MethodCallback;
+	mageThread								ThreadHandle;
+	uint32_t								ComponentCount;
+	uint16_t								Identifer;
 };
 struct mageScene
 {
-    struct mageEntityPool 					Pool;
-	struct mageHeapAllocater 				Allocater;
-	const char 								*Tag;
+	const char 								*SceneTag;
+	struct mageHeapAllocater				Allocater;
+	struct mageEntityPool					*Entities;
+	struct mageSystemTable					*Systems;
+	struct mageComponentTable				*ComponentTables;
+	uint32_t								SystemCount;
+	uint32_t								TableCount;
+	uint64_t								MaxComponents;
+	uint64_t								MaxEntities;
 };
 struct mageIndiciesIndexes
 {
@@ -691,7 +678,6 @@ struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
-	struct mageScene						*ActiveScene;
 	struct mageApplicationCreateInfo		CreateInfo;
 	struct mageRendererCreateInfo			RendererCreateInfo;
 	uint8_t 								Running;
@@ -926,61 +912,6 @@ extern MAGE_API void mageQueueDestroy(
 	const struct mageHeapAllocater *allocater
 );
 
-/* Entity component system */
-extern MAGE_API void mageSceneCreate(
-	struct mageScene *scene,
-	const struct mageSceneCreateInfo *createInfo
-);
-extern MAGE_API void mageSceneDisplayInformation(
-	const struct mageScene *scene
-);
-extern MAGE_API void mageSceneUpdate(
-	struct mageScene *scene
-);
-extern MAGE_API mageEntity mageEntityCreate(
-	struct mageScene *scene
-);
-extern MAGE_API void mageSceneSystemRegister(
-	struct mageScene *scene,
-	const mageSystemType type,
-	const mageSystemThreadPriority threadPriority,
-	mageSystemCallback system,
-	const uint32_t componentCount,
-	...
-);
-extern MAGE_API struct mageSystemData mageSceneSystemGetEntityComponents(
-	struct mageScene *scene,
-	const mageEntity entity,
-	const uint32_t *components,
-	const uint32_t count
-);
-extern MAGE_API void mageSceneSystemFree(
-	struct mageSystemTable *table,
-	struct mageHeapAllocater *allocater
-);
-extern MAGE_API void mageEntityBindComponent(
-	struct mageScene *scene,
-	mageEntity entity,
-	const char *componentReference,
-	void *component
-);
-extern MAGE_API void mageEntityDestroy(
-	struct mageScene *scene,
-	mageEntity entity
-);
-extern MAGE_API uint64_t mageComponentRegister(
-	struct mageScene *scene,
-	const char *id,
-	const uint64_t size
-);
-extern MAGE_API void mageComponentTableFree(
-	struct mageComponentTable *table, 
-	struct mageHeapAllocater *allocater
-);
-extern MAGE_API void mageSceneDestroy(
-	struct mageScene *scene
-);
-
 /* Threads, abstraction of the native platform thread system */
 extern MAGE_API void *mageThreadCreate(
 	void
@@ -990,8 +921,41 @@ extern MAGE_API void mageThreadBegin(
 	mageThreadJobCallback callback,
 	void *data
 );
+extern MAGE_API uint32_t mageThreadGetID(
+	const mageThread thread
+);
 extern MAGE_API void mageThreadDestroy(
 	mageThread thread
+);
+
+/* ECS system */
+extern MAGE_API void mageSceneCreate(
+	struct mageScene *scene,
+	const struct mageSceneCreateInfo *info
+);
+extern MAGE_API uint32_t mageSceneRegisterComponent(
+	struct mageScene *scene,
+	const char *component,
+	const uint32_t dataSize,
+	const mageComponentConstructer constructer,
+	const mageComponentDeconstructer deconstructer,
+	const mageComponentRegisteringMode mode
+);
+extern MAGE_API mageEntity mageSceneEntityCreate(
+	struct mageScene *scene
+);
+extern MAGE_API void mageSceneBindRequiredComponentsToEntity(
+	struct mageScene *scene,
+	const mageEntity entity,
+	const uint32_t *componentID,
+	const uint32_t count
+);
+extern MAGE_API void mageSceneComponentTableFree(
+	struct mageComponentTable *table,
+	const struct mageHeapAllocater *allocater
+);
+extern MAGE_API void mageSceneDestroy(
+	struct mageScene *scene
 );
 
 /* Generic */
@@ -1352,10 +1316,6 @@ extern MAGE_API mageResult mageApplicationCreate(
 	struct mageApplication *application, 
 	struct mageApplicationCreateInfo applicationInfo, 
 	struct mageRendererCreateInfo rendererInfo
-);
-extern MAGE_API void mageApplicationSetScene(
-	struct mageApplication *application,
-	struct mageSceneCreateInfo *createInfo
 );
 extern MAGE_API void mageApplicationDestroy(
 	struct mageApplication *application

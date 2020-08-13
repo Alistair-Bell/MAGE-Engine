@@ -1,32 +1,31 @@
 #include <mageAPI.h>
 
-uint64_t mageComponentRegister(struct mageScene *scene, const char *id, const uint64_t size)
+uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *component, const uint32_t dataSize, const mageComponentConstructer constructer, const mageComponentDeconstructer deconstructer, const mageComponentRegisteringMode mode)
 {
-    MAGE_ASSERT(scene != NULL);
-    scene->Pool.ComponentTableCount++;
-    scene->Pool.ComponentTables = scene->Allocater.Reallocater(scene->Pool.ComponentTables, sizeof(struct mageComponentTable) * scene->Pool.ComponentTableCount);
-    
-    struct mageComponentTable table;
-    table.Tag           = id;
-    table.ByteSize      = size;
-    table.ID            = scene->Pool.ComponentTableCount - 1;
-    table.Count         = 0;
-    table.Components    = scene->Allocater.ListAllocater(0, table.ByteSize);
-    mageQueueCreate(&table.IndexQueue, sizeof(uint32_t), &scene->Allocater);
+    assert(scene != NULL);
+    uint64_t tableIndex = scene->TableCount;
 
-    memcpy(&scene->Pool.ComponentTables[scene->Pool.ComponentTableCount - 1], &table, sizeof(struct mageComponentTable));
-    
-    MAGE_LOG_CORE_INFORM("Registerning component %s, created table with id %d\n", id, table.ID);
-    return table.ID;
+    struct mageComponentTable table;
+    table.ByteSize          = dataSize;
+    table.Constructer       = constructer;
+    table.Deconstructer     = deconstructer;
+    table.StoredCount       = 0;
+    table.Stored            = scene->Allocater.ListAllocater(0, sizeof(struct mageComponent));
+    table.Identifier        = component;
+    table.ID                = tableIndex;
+    mageQueueCreate(&table.IndexQueues, dataSize, &scene->Allocater);
+
+    scene->TableCount++;
+    scene->ComponentTables  = scene->Allocater.Reallocater(scene->ComponentTables, sizeof(struct mageComponentTable) * scene->TableCount);
+    memcpy(&scene->ComponentTables[tableIndex], &table, sizeof(struct mageComponentTable));
+
+    MAGE_LOG_CORE_INFORM("Creating %s component table with index of %d\n", component, tableIndex);
+    return tableIndex;
 }
-void mageComponentTableFree(struct mageComponentTable *table, struct mageHeapAllocater *allocater)
+void mageSceneComponentTableFree(struct mageComponentTable *table, const struct mageHeapAllocater *allocater)
 {
-    uint32_t i;
-    for (i = 0; i < table->Count; i++)
-    {
-        allocater->Free(table->Components[i]);
-    }
-    mageQueueDestroy(&table->IndexQueue, allocater);
-    MAGE_LOG_CORE_INFORM("Destroying table %p (%s) with %lu components totalling %lu bytes\n", table, table->Tag, table->Count, table->Count * table->ByteSize);
-    allocater->Free(table->Components);
+    mageMemoryFreeMethod f = allocater->Free;
+    mageQueueDestroy(&table->IndexQueues, allocater);
+    f(table->Stored);
+    MAGE_LOG_CORE_INFORM("Destroying component table %d\n", table->ID);
 }
