@@ -1,9 +1,5 @@
 #include "mageAPI.h"
 
-struct mageHeapAllocater mageHeapAllocaterDefault()
-{
-	return (struct mageHeapAllocater){ .Allocate = malloc, .Free = free, .ListAllocater = calloc, .Reallocater = realloc };
-}
 char *mageFileReadContents(const char *file, const char *readmode, uint32_t *fileSize)
 {
 	FILE *f = fopen(file, readmode);

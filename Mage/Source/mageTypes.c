@@ -1,26 +1,26 @@
 #include "mageAPI.h"
 
-void mageQueueCreate(struct mageQueue *queue, const uint32_t dataSize, const struct mageHeapAllocater *allocater)
+void mageQueueCreate(struct mageQueue *queue, const uint32_t dataSize)
 {   
     queue->DataSize     = dataSize;
     queue->Count        = 0;
-    queue->Data         = allocater->ListAllocater(0, dataSize);
+    queue->Data         = MAGE_MEMORY_ARRAY_ALLOCATE(0, dataSize);
 }
-void mageQueueCreateFromSet(struct mageQueue *queue, uint32_t elementCount, uint32_t elementSize, void *data, struct mageHeapAllocater *allocater)
+void mageQueueCreateFromSet(struct mageQueue *queue, uint32_t elementCount, uint32_t elementSize, void *data)
 {
     queue->DataSize     = elementSize;
     queue->Count        = elementCount;
-    queue->Data         = allocater->ListAllocater(elementCount, elementSize);
+    queue->Data         = MAGE_MEMORY_ARRAY_ALLOCATE(elementCount, elementSize);
     memcpy(queue->Data, data, elementCount * elementSize);
 }
-void mageQueuePush(struct mageQueue *queue, void *data, const struct mageHeapAllocater *allocater)
+void mageQueuePush(struct mageQueue *queue, void *data)
 {
     uint64_t index = queue->DataSize * queue->Count;
     queue->Count++;
-	queue->Data = allocater->Reallocater(queue->Data, queue->DataSize * queue->Count);
+	queue->Data = MAGE_MEMORY_REALLOCATE(queue->Data, queue->DataSize * queue->Count);
 	memcpy(queue->Data + index, data, queue->DataSize);
 }
-mageResult mageQueuePop(struct mageQueue *queue, void *buffer, const struct mageHeapAllocater *allocater)
+mageResult mageQueuePop(struct mageQueue *queue, void *buffer)
 {
     if (queue->Count <= 0)
     {
@@ -30,10 +30,10 @@ mageResult mageQueuePop(struct mageQueue *queue, void *buffer, const struct mage
     queue->Count--;
     uint64_t index = queue->DataSize * queue->Count;
     memcpy(buffer, queue->Data + index, queue->DataSize);
-    queue->Data = allocater->Reallocater(queue->Data, queue->DataSize * queue->Count);
+    queue->Data = MAGE_MEMORY_REALLOCATE(queue->Data, queue->DataSize * queue->Count);
     return MAGE_RESULT_SUCCESS;
 }
-void mageQueueDestroy(struct mageQueue *queue, const struct mageHeapAllocater *allocater)
+void mageQueueDestroy(struct mageQueue *queue)
 {
     free(queue->Data);
 }

@@ -23,7 +23,7 @@
 	#define MAGE_PLATFORM_LINUX
 
 
-	/* Including the linux kernel headers */	
+	/* Including the linux kernel headers and native libraries */	
 	#define __USE_XOPEN_EXTENDED
 	#include <linux/kernel.h>
 	#include <linux/module.h>
@@ -59,6 +59,11 @@
 	
 	/* Including the native windows API */
 	#include <Windows.h>
+	#if defined (near)
+		#undef near
+	#elif defined (far)
+		#undef far
+	#endif
 #else
 	#error "Undefined platform MAGE currently supports Windows, Apple OS's and Linux, 64 bit systems only"
 #endif 
@@ -73,6 +78,10 @@
 	 	int32_t main(const int32_t argumentCount, char **arguments)
 #endif
 
+/* Checking if we are compiling with c++ */
+#if defined (__cplusplus)
+	#define MAGE_CPP
+#endif
 
 /* Checking if the microsoft visual studio compiler is being used */
 #if defined (_MSC_VER)

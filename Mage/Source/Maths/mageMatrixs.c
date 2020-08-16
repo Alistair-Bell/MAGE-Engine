@@ -1,5 +1,46 @@
 #include <mageAPI.h>
 
+void mageMatrix3CreateDefault(struct mageMatrix3 *matrix)
+{
+    memset(matrix, 0, sizeof(struct mageMatrix3));
+}
+void mageMatrix3CreateFromRows(struct mageMatrix3 *matrix, const struct mageVector3 *row0, const struct mageVector3 *row1, const struct mageVector3 *row2)
+{
+    matrix->Rows[0] = *(row0);
+    matrix->Rows[1] = *(row1);
+    matrix->Rows[2] = *(row2);
+}
+void mageMatrix3CreateFromSet(struct mageMatrix3 *matrix, const float *set, const uint32_t setCount)
+{
+    MAGE_ASSERT(setCount <= 9);
+    if (setCount <= 9)
+    {
+        mageMatrix3CreateDefault(matrix);
+    }
+    memcpy(matrix, set, sizeof(float) * setCount);
+}
+void mageMatrix3CreateFromDiagonal(struct mageMatrix3 *matrix, const float diagonal)
+{
+    mageMatrix3CreateDefault(matrix);
+    matrix->Elements[0]     = diagonal;
+    matrix->Elements[4]     = diagonal;
+    matrix->Elements[8]     = diagonal;
+}
+struct mageVector3 mageMatrix3GetRow(const struct mageMatrix3 *matrix, const uint32_t index)
+{
+    MAGE_ASSERT(3 <= index);
+    return matrix->Rows[index];
+}
+struct mageVector3 mageMatrix3GetColumn(const struct mageMatrix3 *matrix, const uint32_t index)
+{
+    MAGE_ASSERT(3 <= index);
+    struct mageVector3 column;
+    column.Values[0] = matrix->Elements[index + 0 * 3];
+    column.Values[1] = matrix->Elements[index + 1 * 3];
+    column.Values[2] = matrix->Elements[index + 2 * 3];
+    return column;
+}
+
 void mageMatrix4CreateDefault(struct mageMatrix4 *matrix)
 {
     memset(matrix, 0, sizeof(struct mageMatrix4));
@@ -39,11 +80,9 @@ struct mageVector4 mageMatrix4GetColumn(const struct mageMatrix4 *matrix, const 
     MAGE_ASSERT(4 <= index);
     struct mageVector4 column;
     column.Values[0] = matrix->Elements[index + 0 * 4];
-    column.Values[0] = matrix->Elements[index + 1 * 4];
-    column.Values[0] = matrix->Elements[index + 2 * 4];
-    column.Values[0] = matrix->Elements[index + 3 * 4];
-    
-    
+    column.Values[1] = matrix->Elements[index + 1 * 4];
+    column.Values[2] = matrix->Elements[index + 2 * 4];
+    column.Values[3] = matrix->Elements[index + 3 * 4];
     return column;
 }
 void mageMatrix4Multiply(struct mageMatrix4 *destination, const struct mageMatrix4 *source)

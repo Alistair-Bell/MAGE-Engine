@@ -15,12 +15,12 @@ void CreateShaders()
 }
 void exampleConstructer(void *data, const uint32_t size)
 {
-    struct mageVector2 *v = (struct mageVector2 *)data;
+    SANDBOX_LOG_CORE_WARNING("Calling constructer %p\n", data);
 
 }
 void exampleDeconstructer(void *data)
 {
-
+    SANDBOX_LOG_CORE_WARNING("Calling deconstructer %p\n", data);
 }
 void exampleListener(void *package, mageEventType type)
 {
@@ -35,6 +35,7 @@ MAGE_ENTRY_POINT()
 {
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
+#if 0
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -57,7 +58,6 @@ MAGE_ENTRY_POINT()
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
 
     mageEventRegisterListener(exampleListener);
-#if 0
     struct mageVertex verticies1[] = 
     {
         { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
@@ -81,29 +81,27 @@ MAGE_ENTRY_POINT()
         mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
         mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
 
-#endif
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         glfwPollEvents();
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
-    
-    mageApplicationDestroy(SandboxApplication);    
+    mageApplicationDestroy(SandboxApplication);
+#endif
 
     struct mageScene s;
     struct mageSceneCreateInfo i;
-    struct mageHeapAllocater h = mageHeapAllocaterDefault();
-    i.Allocater         = &h;
-    i.ComponentLimit    = UINT32_MAX;
-    i.EntityLimit       = UINT32_MAX;
+    i.ComponentLimit    = 100;
+    i.EntityLimit       = 100;
     i.SceneTag          = "Hello World";
     
     mageSceneCreate(&s, &i);
 
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector2, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector4, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector2,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
+    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector4,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
+    mageEntity e = mageSceneEntityCreate(&s);
 
     mageSceneDestroy(&s);
     free(SandboxApplication);
