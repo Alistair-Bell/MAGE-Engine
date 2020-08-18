@@ -34,7 +34,8 @@ void mageSceneComponentTableFree(struct mageComponentTable *table)
     mageQueueDestroy(&table->IndexQueues);
     for (i = 0; i < table->StoredCount; i++)
     {
-        table->Deconstructer(table->Stored[i].Data);
+        if (table->Deconstructer != NULL)
+            table->Deconstructer(table->Stored[i].Data);
         MAGE_MEMORY_FREE(table->Stored[i].Data);
     }
     MAGE_MEMORY_FREE(table->Stored);

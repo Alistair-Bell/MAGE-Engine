@@ -40,6 +40,18 @@ struct mageVector3 mageMatrix3GetColumn(const struct mageMatrix3 *matrix, const 
     column.Values[2] = matrix->Elements[index + 2 * 3];
     return column;
 }
+void mageMatrix3Log(const struct mageMatrix3 *matrix, const char *name)
+{
+    struct mageMatrix3 *m = (struct mageMatrix3 *)matrix;
+    MAGE_LOG_CORE_INFORM("Matrix4: %s \
+        \n\t[%f %f %f] \
+        \n\t[%f %f %f] \
+        \n\t[%f %f %f] \
+        \n\t[%f %f %f]\n", name, \
+        m->Elements[0], m->Elements[1], m->Elements[2], \
+        m->Elements[3], m->Elements[4], m->Elements[5], \
+        m->Elements[6], m->Elements[7], m->Elements[8]);
+}
 
 void mageMatrix4CreateDefault(struct mageMatrix4 *matrix)
 {
@@ -61,6 +73,10 @@ void mageMatrix4CreateFromSet(struct mageMatrix4 *matrix, const float *set, cons
         mageMatrix4CreateDefault(matrix);
     }
     memcpy(matrix, set, sizeof(float) * setCount);
+}
+void mageMatrix4CreateFromCopy(struct mageMatrix4 *destination, const struct mageMatrix4 *source)
+{
+    memcpy(destination, source, sizeof(struct mageMatrix4));
 }
 void mageMatrix4CreateDiagonal(struct mageMatrix4 *matrix, const float diagonal)
 {
@@ -112,7 +128,7 @@ void mageMatrix4Multiply(struct mageMatrix4 *destination, const struct mageMatri
 	data[13]    = destination->Elements[1] * source->Elements[12] + destination->Elements[5] * source->Elements[13] + destination->Elements[9] * source->Elements[14] + destination->Elements[13] * source->Elements[15];
 	data[14]    = destination->Elements[2] * source->Elements[12] + destination->Elements[6] * source->Elements[13] + destination->Elements[10] * source->Elements[14] + destination->Elements[14] * source->Elements[15];
 	data[15]    = destination->Elements[3] * source->Elements[12] + destination->Elements[7] * source->Elements[13] + destination->Elements[11] * source->Elements[14] + destination->Elements[15] * source->Elements[15];
-    memcpy(destination->Elements, data, 4 * 4 * sizeof(float));
+    memcpy(destination->Elements, data, sizeof(data));
 }
 void mageMatrix4ApplyOrthographicProjection(struct mageMatrix4 *destination, const float left, const float right, const float bottom, const float top, const float near, const float far)
 {
@@ -171,11 +187,11 @@ void mageMatrix4Inverse(struct mageMatrix4 *destination)
     float values[16];
 
     values[0] = destination->Elements[5] * destination->Elements[10] * destination->Elements[15] -
-			destination->Elements[5] * destination->Elements[11] * destination->Elements[14] -
-			destination->Elements[9] * destination->Elements[6] * destination->Elements[15] +
-			destination->Elements[9] * destination->Elements[7] * destination->Elements[14] +
-			destination->Elements[13] * destination->Elements[6] * destination->Elements[11] -
-			destination->Elements[13] * destination->Elements[7] * destination->Elements[10];
+        destination->Elements[5] * destination->Elements[11] * destination->Elements[14] -
+        destination->Elements[9] * destination->Elements[6] * destination->Elements[15] +
+        destination->Elements[9] * destination->Elements[7] * destination->Elements[14] +
+        destination->Elements[13] * destination->Elements[6] * destination->Elements[11] -
+        destination->Elements[13] * destination->Elements[7] * destination->Elements[10];
 
     values[4] = -destination->Elements[4] * destination->Elements[10] * destination->Elements[15] +
         destination->Elements[4] * destination->Elements[11] * destination->Elements[14] +

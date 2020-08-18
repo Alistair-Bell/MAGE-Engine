@@ -15,12 +15,12 @@ void CreateShaders()
 }
 void exampleConstructer(void *data, const uint32_t size)
 {
-    SANDBOX_LOG_CORE_WARNING("Calling constructer %p\n", data);
-
+    struct mageTransform *t = ((struct mageTransform *)data);
+    
 }
 void exampleDeconstructer(void *data)
 {
-    SANDBOX_LOG_CORE_WARNING("Calling deconstructer %p\n", data);
+    
 }
 void exampleListener(void *package, mageEventType type)
 {
@@ -29,7 +29,6 @@ void exampleListener(void *package, mageEventType type)
     
     }
 }
-
 
 MAGE_ENTRY_POINT()
 {
@@ -91,17 +90,26 @@ MAGE_ENTRY_POINT()
 
     struct mageScene s;
     struct mageSceneCreateInfo i;
-    i.ComponentLimit    = 100;
-    i.EntityLimit       = 100;
-    i.SceneTag          = "Hello World";
+    i.ComponentLimit                = 10;
+    i.EntityLimit                   = 10;
+    i.SceneTag                      = "Hello World";
+    i.RegisterDefaultComponents     = MAGE_FALSE;
     
     mageSceneCreate(&s, &i);
 
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector2,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-    MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector4,   exampleConstructer, exampleDeconstructer, MAGE_COMPONENT_REGISTERING_MODE_REQUIRED);
-    mageEntity e = mageSceneEntityCreate(&s);
+    struct mageTransform t;
+    memset(&t, 0, sizeof(struct mageTransform));
+
+    uint32_t id = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t id2 = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+
+    mageEntity eee[4];
+    eee[0] = mageSceneEntityCreate(&s);
+    eee[1] = mageSceneEntityCreate(&s);
+    eee[2] = mageSceneEntityCreate(&s);
+    eee[3] = mageSceneEntityCreate(&s);
+
+    mageComponentHandle h = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, eee, 4);
 
     mageSceneDestroy(&s);
     free(SandboxApplication);

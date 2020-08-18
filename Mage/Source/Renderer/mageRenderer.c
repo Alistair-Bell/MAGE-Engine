@@ -150,8 +150,6 @@ void mageRendererDrawQuads(struct mageRenderer *renderer, struct mageRenderableQ
     mageRendererRecordQuads(mageBufferGetNativeBuffer(renderer->DefaultSquareIndexBuffer), renderer->CommandBuffers[index], passBeginInfo, bufferBeginInfo, renderer->GraphicsPipeline, renderer->GraphicsPipelineLayout, renderer->DescriptorSet, quads, count);
     mageRendererPresent(renderer, index);
 }
-
-
 void mageRendererDrawRenderables(struct mageRenderer *renderer, struct mageRenderable **renderables, const uint32_t count)
 {
     VkCommandBufferBeginInfo bufferBeginInfo;
@@ -163,4 +161,3 @@ void mageRendererDrawRenderables(struct mageRenderer *renderer, struct mageRende
     mageRendererRecordRenderables(renderer->CommandBuffers[index], passBeginInfo, bufferBeginInfo, renderer->GraphicsPipeline, renderer->GraphicsPipelineLayout, renderer->DescriptorSet, renderables, count);
     mageRendererPresent(renderer, index);
 }
-

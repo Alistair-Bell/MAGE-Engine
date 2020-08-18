@@ -58,6 +58,17 @@
 #define MAGE_ECS_REGISTER_COMPONENT(scene, component, constructer, deconstructer, mode) \
 	mageSceneRegisterComponent(scene, #component, sizeof(component), constructer, deconstructer, mode)
 
+#define MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(scene, component, value, entities, count) \
+	mageSceneComponentFromTagBindEntities(scene, #component, value, entities, count)
+
+#define MAGE_ECS_BIND_NEW_COMPONENT_BY_ID_TO_ENTITIES(scene, tableID, value, entities, count) \
+	mageSceneComponentFromIDBindEntities(scene, tableID, value, entities, count)
+
+#define MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(scene, componentHandle, entities, count) \
+	mageSceneComponentBindExistingToEntities(scene, componentHandle, entities, count)
+
+#define MAGE_GET_COMPONENT_BY_TAG(scene, component, entity) \
+	mageSceneEntityFetchComponent(scene, component, entity) 
 
 /* User config stuff */
 
@@ -80,9 +91,9 @@
 #define MAGE_ECS_SYSTEM_FAILURE ((void *)0)
 
 #define MAGE_BIT(index) (1 << index) 
-#define MAGE_PI_SQUARED 9.86960440109f
-#define MAGE_PI 		3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679f
-#define MAGE_PI_HALF	1.5707963267948966f
+#define MAGE_PI_SQUARED 9.86960440109
+#define MAGE_PI 		3.1415926535897932384626433832795028841971693993751058209749445923078164062862089986280348253421170679
+#define MAGE_PI_HALF	1.5707963267948966
 
 #if defined (MAGE_USE_GLSL_STRUCTURES)
 	#define vec2 mageVector2
@@ -149,6 +160,11 @@ typedef enum MAGE_COMPONENT_REGISTERING_MODE_ENUM
 	MAGE_COMPONENT_REGISTERING_MODE_REQUIRED,
 	MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL,
 } mageComponentRegisteringMode;
+
+typedef enum MAGE_PREDEFINED_COMPONENT_TABLE_INDEX_ENUM
+{
+	MAGE_PREDEFINED_COMPONENT_TABLE_INDEXES_TRANSFORM = 0,
+} magePredefinedComponentTableIndex;
 
 typedef enum MAGE_SYSTEM_TYPE_ENUM
 {
@@ -469,6 +485,7 @@ struct mageSceneCreateInfo
 	uint64_t								EntityLimit;
 	uint64_t								ComponentLimit;
 	const char								*SceneTag;
+	uint8_t									RegisterDefaultComponents;
 };
 struct mageEntityPool
 {
@@ -541,7 +558,6 @@ struct mageTransform
 };
 struct mageOrthographicCamera
 {
-	struct mageTransform					Transform;
 	struct mageMatrix4 						ProjectionMatrix;
 	struct mageMatrix4						ViewMatrix;
 	struct mageMatrix4						ViewProjectionMatrix;
@@ -817,6 +833,7 @@ void mageVector4Log(
 	const struct mageVector4 *vector,
 	const char *name
 );
+	
 
 /* Matrix's */
 extern MAGE_API void mageMatrix3CreateDefault(
@@ -845,6 +862,10 @@ extern MAGE_API struct mageVector3 mageMatrix3GetColumn(
 	const struct mageMatrix3 *matrix,
 	const uint32_t index
 );
+extern MAGE_API void mageMatrix3Log(
+	const struct mageMatrix3 *matrix,
+	const char *name
+);
 
 extern MAGE_API void mageMatrix4CreateDefault(
 	struct mageMatrix4 *matrix
@@ -864,6 +885,10 @@ extern MAGE_API void mageMatrix4CreateFromSet(
 extern MAGE_API void mageMatrix4CreateDiagonal(
 	struct mageMatrix4 *matrix,
 	const float diagonal
+);
+extern MAGE_API void mageMatrix4CreateFromCopy(
+	struct mageMatrix4 *destination,
+	const struct mageMatrix4 *source
 );
 extern MAGE_API struct mageVector4 mageMatrix4GetRow(
 	const struct mageMatrix4 *matrix,
@@ -974,6 +999,26 @@ extern MAGE_API void mageSceneBindEntityRequiredComponents(
 	struct mageScene *scene,
 	const mageEntity entity,
 	const uint32_t *componentID,
+	const uint32_t count
+);
+extern MAGE_API mageComponentHandle mageSceneComponentFromTagBindEntities(
+	struct mageScene *scene,
+	const char *component,
+	void *data,
+	mageEntity *entities,
+	const uint64_t count
+);
+extern MAGE_API mageComponentHandle mageSceneComponentFromIDBindEntities(
+	struct mageScene *scene,
+	const uint32_t id,
+	void *data,
+	mageEntity *entities,
+	const uint64_t count
+);
+extern MAGE_API void mageSceneComponentBindExistingToEntities(
+	struct mageScene *scene,
+	const mageComponentHandle componentHandle,
+	mageEntity *entities,
 	const uint32_t count
 );
 extern MAGE_API void mageSceneComponentTableFree(
