@@ -108,7 +108,6 @@
 
 typedef uint32_t mageEventHandle;
 typedef uint32_t mageEntity;
-typedef uint64_t mageComponentHandle;
 typedef void 	*mageThread;
 
 typedef enum MAGE_LOG_MODE_ENUM
@@ -492,7 +491,24 @@ struct mageEntityPool
 	uint32_t								ActiveCount;
 	struct mageQueue						AvaliableQueue;
 	mageEntity								*Pooled;
-	uint64_t								**Handles;
+	struct mageComponentHandle				**Handles;
+};
+struct mageComponentHandle
+{
+	union
+	{
+		uint64_t Data;
+		struct
+		{
+			uint32_t 						ComponentIndex;
+			uint32_t 						TableIndex;
+		};
+		struct
+		{
+			uint32_t 						High;
+			uint32_t 						Low;
+		};
+	};
 };
 struct mageComponent
 {
@@ -1001,14 +1017,14 @@ extern MAGE_API void mageSceneBindEntityRequiredComponents(
 	const uint32_t *componentID,
 	const uint32_t count
 );
-extern MAGE_API mageComponentHandle mageSceneComponentFromTagBindEntities(
+extern MAGE_API struct mageComponentHandle mageSceneComponentFromTagBindEntities(
 	struct mageScene *scene,
 	const char *component,
 	void *data,
 	mageEntity *entities,
 	const uint64_t count
 );
-extern MAGE_API mageComponentHandle mageSceneComponentFromIDBindEntities(
+extern MAGE_API struct mageComponentHandle mageSceneComponentFromIDBindEntities(
 	struct mageScene *scene,
 	const uint32_t id,
 	void *data,
@@ -1017,7 +1033,7 @@ extern MAGE_API mageComponentHandle mageSceneComponentFromIDBindEntities(
 );
 extern MAGE_API void mageSceneComponentBindExistingToEntities(
 	struct mageScene *scene,
-	const mageComponentHandle componentHandle,
+	const struct mageComponentHandle componentHandle,
 	mageEntity *entities,
 	const uint32_t count
 );
@@ -1351,13 +1367,14 @@ extern MAGE_API void mageOrthographicCameraCreate(
 	const float top
 );
 extern MAGE_API void mageOrthographicCameraCalculateViewMatrix(
-	struct mageOrthographicCamera *camera
+	struct mageOrthographicCamera *camera,
+	struct mageTransform *transform
 );
 extern MAGE_API void mageOrthographicCameraSetProjection(
-	struct mageOrthographicCamera *camera,
-	const float left,
-	const float right,
-	const float bottom,
+	struct mageOrthographicCamera *camera, 
+	const float left, 
+	const float right, 
+	const float bottom, 
 	const float top
 );
 

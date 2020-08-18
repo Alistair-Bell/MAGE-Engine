@@ -73,43 +73,44 @@ MAGE_ENTRY_POINT()
     info.VertexCount        = 4;
     info.IndexCount         = 0;
     info.Indicies           = NULL;
-    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Sandbox/Resources/Textures/tango.jpg" };
+    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Mage/Resources/Textures/MTEC/Logo.png" };
     mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
 
     struct mageRenderable *r[] = { &renderable };
-        mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
-        mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
+        mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
         glfwPollEvents();
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
+    mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
     mageApplicationDestroy(SandboxApplication);
-#endif
 
+#endif
     struct mageScene s;
     struct mageSceneCreateInfo i;
     i.ComponentLimit                = 10;
     i.EntityLimit                   = 10;
     i.SceneTag                      = "Hello World";
     i.RegisterDefaultComponents     = MAGE_FALSE;
-    
     mageSceneCreate(&s, &i);
-
+    
     struct mageTransform t;
     memset(&t, 0, sizeof(struct mageTransform));
 
-    uint32_t id = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
-    uint32_t id2 = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t vector3 = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t transform = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
 
-    mageEntity eee[4];
-    eee[0] = mageSceneEntityCreate(&s);
-    eee[1] = mageSceneEntityCreate(&s);
-    eee[2] = mageSceneEntityCreate(&s);
-    eee[3] = mageSceneEntityCreate(&s);
+    mageEntity civillian = mageSceneEntityCreate(&s);
+    mageEntity goblin = mageSceneEntityCreate(&s);
+    mageEntity soldier = mageSceneEntityCreate(&s);
 
-    mageComponentHandle h = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, eee, 4);
+    mageEntity bindings[] = { civillian, goblin };
+
+    struct mageComponentHandle h = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, bindings, 2);
+
+    MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(&s, h, &soldier, 1);
 
     mageSceneDestroy(&s);
     free(SandboxApplication);
