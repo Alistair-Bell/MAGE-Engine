@@ -1,14 +1,22 @@
 #include <mageAPI.h>
 
-/* I would have liked to have this header public in mageCore.h but the compiler was having none of it, an unintended side effect of single header libraries and the macro template structure */
+/* I would have liked to have this header public in mageCore.h but the compiler was having none of it, an unintended side effect of single header libraries and the macro template structure, works as intended so I dont care */
 #define SORT_NAME sort_algorithms
 #define SORT_TYPE uint64_t
 #define SORT_CMP(x, y) ((x) - (y))
 #include "../Externals/sort/sort.h"
 
-static void mageEntitiesSortHandles(struct mageComponentHandle *handles, const uint64_t count)
+static void mageEntitiesSortHandles(struct mageComponentHandle *handles, const mageEntity entity, const uint64_t count)
 {
-    
+    uint64_t i;
+    uint64_t *raw = MAGE_MEMORY_ARRAY_ALLOCATE(count - 1, sizeof(uint64_t));
+    if (count <= 2)
+        return;
+
+    memcpy(raw, handles + 1, sizeof(struct mageComponentHandle) * count - 1);
+    sort_algorithms_heap_sort(raw, count - 1);
+    MAGE_LOG_CORE_INFORM("Sorting entity %d with %d component handles using heap sort\n", entity, count - 1);
+    MAGE_MEMORY_FREE(raw);
 }
 
 static struct mageComponentHandle mageComponentHandleGenerate(uint64_t tableIndex, uint64_t index)
@@ -41,14 +49,16 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
-static void mageUpdateEntityComponentHandle(struct mageComponentHandle *handles, struct mageComponentHandle *addition, const uint32_t count)
+static void mageUpdateEntityComponentHandle(struct mageComponentHandle *handles, const struct mageComponentHandle *addition, const mageEntity entity, const uint32_t count)
 {
+    uint64_t coppyOffset = handles[0].Data + 1;
+    uint64_t oldSize = handles[0].Data;
     handles[0].Data += count;
-    uint64_t newSize = (handles[0].Data + 1) * sizeof(struct mageComponentHandle);
-    MAGE_ASSERT(newSize < UINT64_MAX);
+    uint64_t newSize = (sizeof(struct mageComponentHandle) * (handles[0].Data + 1));
     handles = MAGE_MEMORY_REALLOCATE(handles, newSize);
-    memcpy(handles + 1, addition, sizeof(struct mageComponentHandle) * count);
-    mageEntitiesSortHandles(handles, count);
+    memcpy(handles + coppyOffset, addition, (sizeof(struct mageComponentHandle) * count));
+    
+    mageEntitiesSortHandles(handles, entity, handles[0].Data + 1);
 }
 
 void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *info)
@@ -107,7 +117,6 @@ struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScen
     struct mageComponentHandle returnValue;
 
     /* Finding table */
-    
     for (i = 0; i < scene->TableCount; i++)
     {
         if (strcmp(component, scene->ComponentTables[i].Identifier) == 0)
@@ -125,17 +134,15 @@ struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScen
     c.Data = MAGE_MEMORY_ALLOCATE(scene->ComponentTables[tableIndex].ByteSize);
     c.SharedCount = count;
     componentIndex = mageAddComponentToTable(&scene->ComponentTables[tableIndex], c, scene->MaxComponents);
-    
-    /*  Generating handle */
 
-    /* High 4 bytes = table id Low 4 bytes = index in table */
+
     returnValue = mageComponentHandleGenerate(tableIndex, componentIndex);
     
     /* Coppy to entity handle */
     for (i = 0; i < count; i++)
     {
         struct mageComponentHandle *handles = scene->Entities->Handles[entities[i]];
-        mageUpdateEntityComponentHandle(handles, &returnValue, 1);
+        mageUpdateEntityComponentHandle(handles, &returnValue, entities[i], 1);
     }
     return returnValue;
 }
@@ -147,7 +154,7 @@ void mageSceneComponentBindExistingToEntities(struct mageScene *scene, const str
     for (i = 0; i < count; i++)
     {
         uint32_t entityIndex = entities[i];
-        mageUpdateEntityComponentHandle(scene->Entities->Handles[entityIndex], handles, 1);
+        mageUpdateEntityComponentHandle(scene->Entities->Handles[entityIndex], handles, entities[i], 1);
     }
     
 }
@@ -156,18 +163,19 @@ mageEntity mageSceneEntityCreate(struct mageScene *scene)
     MAGE_ASSERT(scene != NULL);
     uint32_t i;
     mageEntity returnValue;
-    scene->Entities->ActiveCount++;
     mageEntity entity;
     
-    if (scene->Entities->AvaliableQueue.Count <= 0)
+    if (scene->Entities->AvaliableQueue.Count > 0)
     {
-        entity = scene->Entities->ActiveCount - 1;
+        mageQueuePop(&scene->Entities->AvaliableQueue, &entity);
     }
     else
     {
-        MAGE_ASSERT(mageQueuePop(&scene->Entities->AvaliableQueue, &entity) == MAGE_RESULT_INVALID_INPUT);
+        entity = scene->Entities->ActiveCount;
     }
     
+    
+    scene->Entities->ActiveCount++;
     uint32_t *indexes = MAGE_MEMORY_ARRAY_ALLOCATE(scene->RequiredTableCount, sizeof(uint32_t));
     uint32_t count = 0;
     for (i = 0; i < scene->TableCount; i++)

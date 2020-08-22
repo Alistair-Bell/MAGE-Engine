@@ -16,7 +16,7 @@ static void mageThreadHandle(int32_t error)
 
 mageThread mageThreadCreate()
 {
-   return malloc(sizeof(struct mageThreadType));
+   return MAGE_MEMORY_ALLOCATE(sizeof(struct mageThreadType));
 }
 void mageThreadBegin(mageThread thread, mageThreadJobCallback callback, void *data)
 {

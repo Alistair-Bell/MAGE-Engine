@@ -126,8 +126,8 @@ VkResult mageHandleVulkanResult(const char *functionName, VkResult functionResul
 
 void mageIndiciesIndexesCreate(struct mageIndiciesIndexes *indicies, const uint32_t *graphics, const uint32_t graphicCount, const uint32_t *presents, const uint32_t presentCount)
 {
-    indicies->GraphicIndexes = calloc(graphicCount, sizeof(uint32_t));
-    indicies->PresentIndexes = calloc(presentCount, sizeof(uint32_t));
+    indicies->GraphicIndexes = MAGE_MEMORY_ARRAY_ALLOCATE(graphicCount, sizeof(uint32_t));
+    indicies->PresentIndexes = MAGE_MEMORY_ARRAY_ALLOCATE(presentCount, sizeof(uint32_t));
     memcpy(indicies->GraphicIndexes, graphics, graphicCount * sizeof(uint32_t));
     memcpy(indicies->PresentIndexes, presents, presentCount * sizeof(uint32_t));
     indicies->GraphicIndexesCount = graphicCount;
@@ -135,14 +135,14 @@ void mageIndiciesIndexesCreate(struct mageIndiciesIndexes *indicies, const uint3
 }
 void mageIndiciesIndexesDestroy(struct mageIndiciesIndexes *indicies)
 {
-    free(indicies->GraphicIndexes);
-    free(indicies->PresentIndexes);
+    MAGE_MEMORY_FREE(indicies->GraphicIndexes);
+    MAGE_MEMORY_FREE(indicies->PresentIndexes);
 }
 mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice device, struct mageIndiciesIndexes *indicies)
 {
     uint32_t queueCount;
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueCount, NULL);
-    VkQueueFamilyProperties *queueProperties = calloc(queueCount, sizeof(VkPhysicalDeviceProperties));
+    VkQueueFamilyProperties *queueProperties = MAGE_MEMORY_ARRAY_ALLOCATE(queueCount, sizeof(VkPhysicalDeviceProperties));
     vkGetPhysicalDeviceQueueFamilyProperties(device, &queueCount, queueProperties);
 
 
@@ -181,13 +181,13 @@ mageResult mageGetDeviceIndexes(struct mageRenderer *renderer, VkPhysicalDevice 
     }
     
     mageIndiciesIndexesCreate(indicies, (uint32_t []){ graphicsIndex }, 1, (uint32_t []){ presentIndex }, 1);
-    free(queueProperties);
+    MAGE_MEMORY_FREE(queueProperties);
     return MAGE_RESULT_SUCCESS;
 }
 void mageSwapChainSupportInitialise(struct mageSwapChainSupportDetails *swapChainSupport, const VkSurfaceCapabilitiesKHR surfaceCapabilities, VkSurfaceFormatKHR *formats, const uint32_t formatCount, VkPresentModeKHR *presentModes, const uint32_t presentCount, VkExtent2D extent)
 {
-    swapChainSupport->Formats           = calloc(formatCount, sizeof(VkSurfaceFormatKHR));
-    swapChainSupport->PresentModes      = calloc(presentCount, sizeof(VkPresentModeKHR));
+    swapChainSupport->Formats           = MAGE_MEMORY_ARRAY_ALLOCATE(formatCount, sizeof(VkSurfaceFormatKHR));
+    swapChainSupport->PresentModes      = MAGE_MEMORY_ARRAY_ALLOCATE(presentCount, sizeof(VkPresentModeKHR));
     memcpy(swapChainSupport->Formats, formats, sizeof(VkSurfaceFormatKHR) * formatCount);
     memcpy(swapChainSupport->PresentModes, presentModes, sizeof(VkPresentModeKHR) * presentCount);
     
@@ -213,10 +213,10 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
         return MAGE_RESULT_HARDWARE_INVALID;
     }
     
-    VkSurfaceFormatKHR *formats = calloc(formatCount, sizeof(VkSurfaceFormatKHR));
+    VkSurfaceFormatKHR *formats = MAGE_MEMORY_ARRAY_ALLOCATE(formatCount, sizeof(VkSurfaceFormatKHR));
     vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevice, surface, &formatCount, formats);
     
-    VkPresentModeKHR *presents = calloc(presentCount, sizeof(VkPresentModeKHR));
+    VkPresentModeKHR *presents = MAGE_MEMORY_ARRAY_ALLOCATE(presentCount, sizeof(VkPresentModeKHR));
     vkGetPhysicalDeviceSurfacePresentModesKHR(physicalDevice, surface, &presentCount, presents);
 
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &swapChainSupport->Capabilities);
@@ -233,8 +233,8 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
 
     mageSwapChainSupportInitialise(swapChainSupport, capabilities, formats, formatCount, presents, presentCount, extent);
 
-    free(presents);
-    free(formats);
+    MAGE_MEMORY_FREE(presents);
+    MAGE_MEMORY_FREE(formats);
     return MAGE_RESULT_SUCCESS;
 }
 VkPresentModeKHR mageSwapChainSupportPickPresentMode(struct mageSwapChainSupportDetails *swapChainSupport)
@@ -264,8 +264,8 @@ VkSurfaceFormatKHR mageSwapChainSupportPickSurfaceFormat(struct mageSwapChainSup
 }
 void mageSwapChainSupportDestroy(struct mageSwapChainSupportDetails *swapChainSupport)
 {
-    free(swapChainSupport->Formats);
-    free(swapChainSupport->PresentModes);
+    MAGE_MEMORY_FREE(swapChainSupport->Formats);
+    MAGE_MEMORY_FREE(swapChainSupport->PresentModes);
 }
 uint32_t mageFindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, struct mageRenderer *renderer)
 {

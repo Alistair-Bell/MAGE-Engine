@@ -117,7 +117,7 @@ VkVertexInputBindingDescription mageVertexBindingDescription()
 }
 VkVertexInputAttributeDescription *mageVertexGetAttributeDescriptions(uint32_t *count)
 {
-    VkVertexInputAttributeDescription *attributeDescriptions = calloc(3, sizeof(VkVertexInputAttributeDescription));
+    VkVertexInputAttributeDescription *attributeDescriptions = MAGE_MEMORY_ARRAY_ALLOCATE(3, sizeof(VkVertexInputAttributeDescription));
     *count = 3;
     memset(attributeDescriptions, 0, sizeof(VkVertexInputAttributeDescription) * 2);
 

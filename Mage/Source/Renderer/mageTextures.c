@@ -180,7 +180,7 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
     vkMapMemory(renderer->Device, stagingBuffer.AllocatedMemory, 0, textureSize, 0, &memory);
         memcpy(memory, fileData, textureSize);
     vkUnmapMemory(renderer->Device, stagingBuffer.AllocatedMemory);
-    free(fileData);
+    MAGE_MEMORY_FREE(fileData);
     
     VkSamplerAddressMode nativeSamplerMode = mageSamplerModeToNative(samplerMode);
 

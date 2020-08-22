@@ -51,8 +51,8 @@
         "typeinfo": "c"
     },
     // Controls the font family.
-    "editor.fontFamily": "Source Code Pro",
-
+    "editor.fontFamily": "'Fixedsys Excelsior 3.01'",
+    
     // Controls the font size.
-    "editor.fontSize": 12
+    "editor.fontSize": 16
 }

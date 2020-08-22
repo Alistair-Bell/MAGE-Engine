@@ -59,7 +59,7 @@ static uint8_t mageCheckValidationLayers(struct mageRenderer *renderer, struct m
     uint32_t layerFound = 0;
 
     vkEnumerateInstanceLayerProperties(&layerCount, NULL);
-    VkLayerProperties *properties = calloc(layerCount, sizeof(VkLayerProperties));
+    VkLayerProperties *properties = MAGE_MEMORY_ARRAY_ALLOCATE(layerCount, sizeof(VkLayerProperties));
     vkEnumerateInstanceLayerProperties(&layerCount, properties);
 
     for (i = 0; i < layerCount; i++)
@@ -75,13 +75,13 @@ static uint8_t mageCheckValidationLayers(struct mageRenderer *renderer, struct m
     }
     if (!layerFound)
     {
-        free(properties);
+        MAGE_MEMORY_FREE(properties);
         MAGE_LOG_CORE_FATAL_ERROR("Required validation layers not found\n", NULL);
         return 0;
     }
     MAGE_LOG_CORE_INFORM("Required validation layers found\n", NULL);
     
-    free(properties);
+    MAGE_MEMORY_FREE(properties);
     return 1;
 }
 static char **mageGetRequiredExtensions(uint32_t *count)
@@ -98,7 +98,7 @@ static char **mageGetRequiredExtensions(uint32_t *count)
     totalCount = glfwCount;
 #endif
 
-    char **extensions = calloc(totalCount, sizeof(char *));
+    char **extensions = MAGE_MEMORY_ARRAY_ALLOCATE(totalCount, sizeof(char *));
 
     for (i = 0; i < totalCount; i++)
     {
@@ -229,7 +229,7 @@ static VkResult mageCreateInstance(struct mageRenderer *renderer, struct mageWin
 #endif
 
     VkResult result = MAGE_VULKAN_CHECK(vkCreateInstance(&instanceCreateInfo, NULL, &renderer->Instance));
-    free(extensions);
+    MAGE_MEMORY_FREE(extensions);
     return result;
 }
 static VkResult mageCreateSurface(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -246,8 +246,8 @@ static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mag
         MAGE_LOG_CORE_FATAL_ERROR("Unable to find any vulkan physical devices\n", NULL);
         return VK_ERROR_INCOMPATIBLE_DRIVER;
     }
-    VkPhysicalDevice *devices = calloc(deviceCount, sizeof(VkPhysicalDevice));
-    uint32_t *scores = calloc(deviceCount, sizeof(uint32_t));    
+    VkPhysicalDevice *devices = MAGE_MEMORY_ARRAY_ALLOCATE(deviceCount, sizeof(VkPhysicalDevice));
+    uint32_t *scores = MAGE_MEMORY_ARRAY_ALLOCATE(deviceCount, sizeof(uint32_t));    
     vkEnumeratePhysicalDevices(renderer->Instance, &deviceCount, devices);
 
     for (i = 0; i < deviceCount; i++)
@@ -264,8 +264,8 @@ static VkResult magePickPhysicalDevice(struct mageRenderer *renderer, struct mag
     vkGetPhysicalDeviceMemoryProperties(renderer->PhysicalDevice, &renderer->PhysicalDeviceMemoryProperties);
     vkGetPhysicalDeviceFeatures(renderer->PhysicalDevice, &renderer->PhysicalDeviceFeatures);
     renderer->PhysicalDeviceFeatures.samplerAnisotropy = VK_TRUE;
-    free(devices);
-    free(scores);
+    MAGE_MEMORY_FREE(devices);
+    MAGE_MEMORY_FREE(scores);
     return VK_SUCCESS;
 }
 static VkResult mageCreateDevice(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -348,8 +348,8 @@ static VkResult mageCreateSwapChainImages(struct mageRenderer *renderer, struct 
 {
     uint32_t imageCount, i;
     vkGetSwapchainImagesKHR(renderer->Device, renderer->SwapChain, &imageCount, NULL);
-    renderer->SwapChainImages = calloc(imageCount, sizeof(VkImage));
-    renderer->SwapChainImageViews = calloc(imageCount, sizeof(VkImageView));
+    renderer->SwapChainImages = MAGE_MEMORY_ARRAY_ALLOCATE(imageCount, sizeof(VkImage));
+    renderer->SwapChainImageViews = MAGE_MEMORY_ARRAY_ALLOCATE(imageCount, sizeof(VkImageView));
     vkGetSwapchainImagesKHR(renderer->Device, renderer->SwapChain, &imageCount, renderer->SwapChainImages);
     renderer->SwapChainImageCount = imageCount;
 
@@ -435,8 +435,8 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
         rendererInfo->ShaderCount        = 2;
     }
 
-    VkPipelineShaderStageCreateInfo *pipelineShaderStages = calloc(rendererInfo->ShaderCount, sizeof(VkPipelineShaderStageCreateInfo));
-    VkShaderModule *pipelineShaderModules                 = calloc(rendererInfo->ShaderCount, sizeof(VkShaderModule));
+    VkPipelineShaderStageCreateInfo *pipelineShaderStages = MAGE_MEMORY_ARRAY_ALLOCATE(rendererInfo->ShaderCount, sizeof(VkPipelineShaderStageCreateInfo));
+    VkShaderModule *pipelineShaderModules                 = MAGE_MEMORY_ARRAY_ALLOCATE(rendererInfo->ShaderCount, sizeof(VkShaderModule));
     {
         uint32_t i;
         for (i = 0; i < rendererInfo->ShaderCount; i++)
@@ -564,8 +564,8 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
         {
             vkDestroyShaderModule(renderer->Device, pipelineShaderModules[i], NULL);
         }
-        free(pipelineShaderModules);
-        free(pipelineShaderStages);
+        MAGE_MEMORY_FREE(pipelineShaderModules);
+        MAGE_MEMORY_FREE(pipelineShaderStages);
 
         return result;  
     }
@@ -593,9 +593,9 @@ static VkResult mageCreateGraphicsPipeline(struct mageRenderer *renderer, struct
     {
         vkDestroyShaderModule(renderer->Device, pipelineShaderModules[i], NULL);
     }
-    free(pipelineShaderModules);
-    free(pipelineShaderStages);
-    free(inputDescriptions);
+    MAGE_MEMORY_FREE(pipelineShaderModules);
+    MAGE_MEMORY_FREE(pipelineShaderStages);
+    MAGE_MEMORY_FREE(inputDescriptions);
     return result;  
 }
 static VkResult mageCreateDescriptors(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
@@ -607,7 +607,7 @@ static VkResult mageCreateDescriptors(struct mageRenderer *renderer, struct mage
 }
 static VkResult mageCreateFrameBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {   
-    renderer->Framebuffers      = calloc(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
+    renderer->Framebuffers      = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->SwapChainImageCount, sizeof(VkFramebuffer));
 
     uint32_t i;
     for (i = 0; i < renderer->SwapChainImageCount; i++)
@@ -642,7 +642,7 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
 {    
     uint32_t i;
     
-    renderer->CommandBuffers = calloc(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
+    renderer->CommandBuffers = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->SwapChainImageCount, sizeof(VkCommandBuffer));
     
     VkCommandBufferAllocateInfo allocateInfo;
     memset(&allocateInfo, 0, sizeof(VkCommandBufferAllocateInfo));
@@ -673,10 +673,10 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
     fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
-    renderer->SignalSemaphores      = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
-    renderer->WaitSemaphores        = calloc(renderer->ConcurentFrames, sizeof(VkSemaphore));
-    renderer->FencesInUse           = calloc(renderer->ConcurentFrames, sizeof(VkFence));
-    renderer->SwapChainImagesInUse  = calloc(renderer->ConcurentFrames, sizeof(VkFence));
+    renderer->SignalSemaphores      = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->WaitSemaphores        = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->ConcurentFrames, sizeof(VkSemaphore));
+    renderer->FencesInUse           = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->ConcurentFrames, sizeof(VkFence));
+    renderer->SwapChainImagesInUse  = MAGE_MEMORY_ARRAY_ALLOCATE(renderer->ConcurentFrames, sizeof(VkFence));
 
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {
@@ -690,7 +690,7 @@ static VkResult mageCreateSynchronisationObjects(struct mageRenderer *renderer, 
 }
 static VkResult mageCreateDefaultBuffers(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererInfo)
 {
-    renderer->DefaultSquareIndexBuffer = malloc(sizeof(struct mageBuffer));
+    renderer->DefaultSquareIndexBuffer = MAGE_MEMORY_ALLOCATE(sizeof(struct mageBuffer));
     uint16_t indexes[] = { 0, 1, 2, 2, 3, 0 };
     mageBufferCreate(renderer->DefaultSquareIndexBuffer, MAGE_BUFFER_TYPE_INDEX, indexes, sizeof(indexes), renderer);
 
@@ -761,10 +761,10 @@ static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRende
     vkDestroyDescriptorPool(renderer->Device, renderer->DescriptorPool, NULL);
     mageBufferDestroy(renderer->DefaultSquareIndexBuffer, renderer);
 
-    free(renderer->SwapChainImages);
-    free(renderer->SwapChainImageViews);
-    free(renderer->Framebuffers);
-    free(renderer->DefaultSquareIndexBuffer);
+    MAGE_MEMORY_FREE(renderer->SwapChainImages);
+    MAGE_MEMORY_FREE(renderer->SwapChainImageViews);
+    MAGE_MEMORY_FREE(renderer->Framebuffers);
+    MAGE_MEMORY_FREE(renderer->DefaultSquareIndexBuffer);
 }
 void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window, struct mageRendererCreateInfo *rendererProps)
 {
@@ -816,8 +816,8 @@ void mageRendererDestroy(struct mageRenderer *renderer, struct mageRendererCreat
     mageIndiciesIndexesDestroy(&renderer->Indexes);
     mageSwapChainSupportDestroy(&renderer->SwapChainSupportInfo);
 
-    free(renderer->SignalSemaphores);
-    free(renderer->WaitSemaphores);
-    free(renderer->FencesInUse);
+    MAGE_MEMORY_FREE(renderer->SignalSemaphores);
+    MAGE_MEMORY_FREE(renderer->WaitSemaphores);
+    MAGE_MEMORY_FREE(renderer->FencesInUse);
 
 }   

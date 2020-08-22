@@ -35,5 +35,5 @@ mageResult mageQueuePop(struct mageQueue *queue, void *buffer)
 }
 void mageQueueDestroy(struct mageQueue *queue)
 {
-    free(queue->Data);
+    MAGE_MEMORY_FREE(queue->Data);
 }

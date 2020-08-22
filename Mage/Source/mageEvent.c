@@ -35,7 +35,7 @@ static struct mageEventMaster EventMaster;
 void mageEventSetupMaster()
 {
     memset(&EventMaster, 0, sizeof(struct mageEventMaster));
-    EventMaster.Listeners = calloc(0, sizeof(mageEventListenerCallback));
+    EventMaster.Listeners = MAGE_MEMORY_ARRAY_ALLOCATE(0, sizeof(mageEventListenerCallback));
 }
 uint16_t mageEventHandleCreate(const mageEventType type)
 {
@@ -117,13 +117,13 @@ uint8_t mageEventInCategory(const uint16_t handle, const mageEventCategoryBit ca
     {
         if (categories[i] == category) return 1;
     }
-    free(categories);
+    MAGE_MEMORY_FREE(categories);
     return 0;
 }
 void mageEventRegisterListener(mageEventListenerCallback callback)
 {
     EventMaster.ListenerCount++;
-    EventMaster.Listeners = realloc(EventMaster.Listeners, EventMaster.ListenerCount * sizeof(mageEventListenerCallback));
+    EventMaster.Listeners = MAGE_MEMORY_REALLOCATE(EventMaster.Listeners, EventMaster.ListenerCount * sizeof(mageEventListenerCallback));
     EventMaster.Listeners[EventMaster.ListenerCount - 1] = callback;
 }
 void mageEventFormatWindowClose(void *buffer)

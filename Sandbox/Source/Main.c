@@ -99,18 +99,19 @@ MAGE_ENTRY_POINT()
     struct mageTransform t;
     memset(&t, 0, sizeof(struct mageTransform));
 
-    uint32_t vector3 = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
-    uint32_t transform = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    struct mageVector3 v;
 
-    mageEntity civillian = mageSceneEntityCreate(&s);
-    mageEntity goblin = mageSceneEntityCreate(&s);
-    mageEntity soldier = mageSceneEntityCreate(&s);
+    uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t vector3                = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    mageEntity civillian            = mageSceneEntityCreate(&s);
+    mageEntity soldier              = mageSceneEntityCreate(&s);
+    
 
-    mageEntity bindings[] = { civillian, goblin };
+    struct mageComponentHandle h1   = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &civillian,   1);
+    struct mageComponentHandle h2   = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &civillian, 1);
 
-    struct mageComponentHandle h = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, bindings, 2);
+    MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(&s, h1, &soldier, 1);
 
-    MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(&s, h, &soldier, 1);
 
     mageSceneDestroy(&s);
     free(SandboxApplication);

@@ -10,7 +10,7 @@ char *mageFileReadContents(const char *file, const char *readmode, uint32_t *fil
 	}
     fseek(f, 0, SEEK_END);
     uint64_t length = ftell(f);	
-	char *foo = malloc(sizeof(char) * (length + 1));
+	char *foo = MAGE_MEMORY_ALLOCATE(sizeof(char) * (length + 1));
 	memset(foo, 0, length + 1);
     fseek(f, 0, SEEK_SET);
     fread(foo, 1, length, f);
@@ -38,4 +38,3 @@ mageResult mageFileDumpContents(const char *file, const char *buffer, const uint
 
 	return MAGE_RESULT_SUCCESS;
 }
-

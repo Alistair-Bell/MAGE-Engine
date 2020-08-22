@@ -13,8 +13,8 @@ mageResult mageEngineInitialise()
 }
 mageResult mageApplicationCreate(struct mageApplication *application, struct mageApplicationCreateInfo applicationInfo, struct mageRendererCreateInfo rendererInfo)
 {
-    application->Window             = malloc(sizeof(struct mageWindow));
-    application->Renderer           = malloc(sizeof(struct mageRenderer));
+    application->Window             = MAGE_MEMORY_ALLOCATE(sizeof(struct mageWindow));
+    application->Renderer           = MAGE_MEMORY_ALLOCATE(sizeof(struct mageRenderer));
     application->RendererCreateInfo = rendererInfo;
 
     application->Running = 1;
@@ -29,8 +29,8 @@ void mageApplicationDestroy(struct mageApplication *application)
 {
     mageWindowDestroy(application->Window);
     mageRendererDestroy(application->Renderer, &application->RendererCreateInfo);
-    free(application->Window);
-    free(application->Renderer);
+    MAGE_MEMORY_FREE(application->Window);
+    MAGE_MEMORY_FREE(application->Renderer);
     
     MAGE_LOG_CORE_INFORM("Application has been cleaned up\n", NULL);
 }

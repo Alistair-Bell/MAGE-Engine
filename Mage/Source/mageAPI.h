@@ -72,7 +72,7 @@
 
 /* User config stuff */
 
-/* Heap memory malloc */
+/* Heap memory MAGE_MEMORY_ALLOCATE */
 #define MAGE_MEMORY_ALLOCATE(size) \
 	malloc(size)
 

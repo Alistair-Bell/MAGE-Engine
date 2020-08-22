@@ -47,7 +47,7 @@ mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCre
 
 	glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
 
-	free(image);
+	MAGE_MEMORY_FREE(image);
 	return MAGE_RESULT_SUCCESS;
 
 }
