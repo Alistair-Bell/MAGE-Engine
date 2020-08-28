@@ -1,4 +1,5 @@
-import os, sys, subprocess
+import os, sys, subprocess, zipfile
+
 """
     Helper scripts that helps setup the environment for MAGE
     Platform wrapper for the commands
@@ -75,10 +76,11 @@ def CreateDirectory(localPath):
         makeDirectory = Command(command, command, command)
         makeDirectory.CallCommand()
 
-def UnzipFile(localPath):
+def UnzipFile(localPath, output):
     if os.path.isfile(localPath) == True:
-        LogMessage("Unziping %s zip file", LogModes["Inform"])
-
+        LogMessage("Unziping %s" % (localPath), LogModes["Inform"])
+        file = zipfile.ZipFile(localPath, "r")
+        file.extractall(output) 
     else:
         LogMessage("%s zip file was not found, engine assets may be missing!" % (localPath), LogModes["Error"]) 
 
@@ -94,7 +96,7 @@ def Main():
     # Allowing the use of the shell scripts for the engine 
     if (RuntimePlatform == "linux"):
         linuxScriptPath = "./Scripts/Linux"
-        linuxScripts = ["Clean.sh", "Commit.sh", "CompileShaders.sh", "Makefile.sh", "ValidateShaders.sh"]
+        linuxScripts = ["Clean.sh",  "CompileShaders.sh", "Makefile.sh", "ValidateShaders.sh"]
         command = Command(windowsCommand = None, linuxCommand = None, macCommand = None)
         LogMessage("Allowing shell scripts to be run %s" % (linuxScripts), LogModes["Inform"])
         for x in linuxScripts:
@@ -107,10 +109,16 @@ def Main():
         CreateDirectory(x)
 
     # Unziping assets 
-    assetsToUnzip = [ "Mage/Resources/Resources.zip" ]
-    for x in assetsToUnzip:
-        UnzipFile(x)
+    assetsToUnzip = {
+        "Mage/Resources/Shaders.zip": "Mage/Resources/",
+        "Mage/Resources/Textures.zip": "Mage/Resources/", 
+         
+    }
+    for x, y in assetsToUnzip.items():
+        UnzipFile(x, y)
 
+
+    LogMessage("Succesfully setup the MAGE-Engine environment!", LogModes["Inform"])
     LogReset()
 
 if __name__ == '__main__':
