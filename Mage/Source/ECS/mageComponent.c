@@ -1,12 +1,24 @@
 #include <mageAPI.h>
 
-uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *component, const uint32_t dataSize, const mageComponentConstructer constructer, const mageComponentDeconstructer deconstructer, const mageComponentRegisteringMode mode)
+static void mageDefaultConstructer(void *data, const uint32_t size)
+{
+
+}
+static void mageDefaultDeconstructer(void *data)
+{
+    
+}
+
+uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *component, const uint32_t dataSize, mageComponentConstructer constructer, mageComponentDeconstructer deconstructer, const mageComponentRegisteringMode mode)
 {
     MAGE_ASSERT(scene != NULL);
     uint64_t tableIndex = scene->TableCount;
 
     struct mageComponentTable table;
     table.ByteSize          = dataSize;
+
+    if (constructer == NULL)    constructer = mageDefaultConstructer;
+    if (deconstructer == NULL)  deconstructer = mageDefaultDeconstructer;
     table.Constructer       = constructer;
     table.Deconstructer     = deconstructer;
     table.StoredCount       = 0;
@@ -34,8 +46,7 @@ void mageSceneComponentTableFree(struct mageComponentTable *table)
     mageQueueDestroy(&table->IndexQueues);
     for (i = 0; i < table->StoredCount; i++)
     {
-        if (table->Deconstructer != NULL)
-            table->Deconstructer(table->Stored[i].Data);
+        table->Deconstructer(table->Stored[i].Data);
         MAGE_MEMORY_FREE(table->Stored[i].Data);
     }
     MAGE_MEMORY_FREE(table->Stored);

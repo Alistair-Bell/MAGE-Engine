@@ -1004,12 +1004,16 @@ extern MAGE_API uint32_t mageSceneRegisterComponent(
 	struct mageScene *scene,
 	const char *component,
 	const uint32_t dataSize,
-	const mageComponentConstructer constructer,
-	const mageComponentDeconstructer deconstructer,
+	mageComponentConstructer constructer,
+	mageComponentDeconstructer deconstructer,
 	const mageComponentRegisteringMode mode
 );
 extern MAGE_API mageEntity mageSceneEntityCreate(
 	struct mageScene *scene
+);
+extern MAGE_API void mageSceneEntityDestroy(
+	struct mageScene *scene,
+	mageEntity entity
 );
 extern MAGE_API void mageSceneBindEntityRequiredComponents(
 	struct mageScene *scene,

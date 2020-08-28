@@ -51,8 +51,9 @@
         "typeinfo": "c"
     },
     // Controls the font family.
-    "editor.fontFamily": "'Fixedsys Excelsior 3.01'",
-    
+    // "editor.fontFamily": "Fixedsys Excelsior 3.01",
+    "editor.fontFamily": "Cascadia Code",
+
     // Controls the font size.
-    "editor.fontSize": 16
+    "editor.fontSize": 16   
 }

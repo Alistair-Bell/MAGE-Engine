@@ -9,10 +9,9 @@
 static void mageEntitiesSortHandles(struct mageComponentHandle *handles, const mageEntity entity, const uint64_t count)
 {
     uint64_t i;
-    uint64_t *raw = MAGE_MEMORY_ARRAY_ALLOCATE(count - 1, sizeof(uint64_t));
     if (count <= 2)
         return;
-
+    uint64_t *raw = MAGE_MEMORY_ARRAY_ALLOCATE(count - 1, sizeof(uint64_t));
     memcpy(raw, handles + 1, sizeof(struct mageComponentHandle) * count - 1);
     sort_algorithms_heap_sort(raw, count - 1);
     MAGE_LOG_CORE_INFORM("Sorting entity %d with %d component handles using heap sort\n", entity, count - 1);
@@ -43,22 +42,22 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
     {
         mageQueuePop(&table->IndexQueues, &componentIndex);
     }
-    if (table->Constructer != NULL)
-        table->Constructer(component.Data, table->ByteSize);
+    table->Constructer(component.Data, table->ByteSize);
 
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
-static void mageUpdateEntityComponentHandle(struct mageComponentHandle *handles, const struct mageComponentHandle *addition, const mageEntity entity, const uint32_t count)
+static void mageUpdateEntityComponentHandle(struct mageScene *scene, const struct mageComponentHandle *addition, const mageEntity entity, const uint32_t count)
 {
-    uint64_t coppyOffset = handles[0].Data + 1;
-    uint64_t oldSize = handles[0].Data;
-    handles[0].Data += count;
-    uint64_t newSize = (sizeof(struct mageComponentHandle) * (handles[0].Data + 1));
-    handles = MAGE_MEMORY_REALLOCATE(handles, newSize);
-    memcpy(handles + coppyOffset, addition, (sizeof(struct mageComponentHandle) * count));
+    struct mageComponentHandle *handles = scene->Entities->Handles[entity];
+    uint64_t coppyOffset = scene->Entities->Handles[entity][0].Data;
+    uint64_t oldSize = scene->Entities->Handles[entity][0].Data;
+    scene->Entities->Handles[entity][0].Data += count;
+    uint64_t newSize = (sizeof(struct mageComponentHandle) * (scene->Entities->Handles[entity][0].Data + 1));
+    scene->Entities->Handles[entity] = MAGE_MEMORY_REALLOCATE(scene->Entities->Handles[entity], newSize);
+    memcpy(scene->Entities->Handles[entity] + coppyOffset, addition, (sizeof(struct mageComponentHandle) * count));
     
-    mageEntitiesSortHandles(handles, entity, handles[0].Data + 1);
+    mageEntitiesSortHandles(scene->Entities->Handles[entity], entity, scene->Entities->Handles[entity][0].Data + 1);
 }
 
 void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *info)
@@ -141,20 +140,18 @@ struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScen
     /* Coppy to entity handle */
     for (i = 0; i < count; i++)
     {
-        struct mageComponentHandle *handles = scene->Entities->Handles[entities[i]];
-        mageUpdateEntityComponentHandle(handles, &returnValue, entities[i], 1);
+        mageUpdateEntityComponentHandle(scene, &returnValue, entities[i], 1);
     }
     return returnValue;
 }
 void mageSceneComponentBindExistingToEntities(struct mageScene *scene, const struct mageComponentHandle componentHandle, mageEntity *entities, const uint32_t count)
 {
     uint32_t i;
-    struct mageComponentHandle handles[] = { componentHandle };
     scene->ComponentTables[componentHandle.TableIndex].Stored[componentHandle.ComponentIndex].SharedCount += count;
     for (i = 0; i < count; i++)
     {
         uint32_t entityIndex = entities[i];
-        mageUpdateEntityComponentHandle(scene->Entities->Handles[entityIndex], handles, entities[i], 1);
+        mageUpdateEntityComponentHandle(scene, &componentHandle, entities[i], 1);
     }
     
 }
@@ -190,6 +187,45 @@ mageEntity mageSceneEntityCreate(struct mageScene *scene)
     mageSceneBindEntityRequiredComponents(scene, entity, indexes, scene->RequiredTableCount);
     MAGE_MEMORY_FREE(indexes);
     return entity;
+}
+void mageSceneEntityDestroy(struct mageScene *scene, mageEntity entity)
+{
+    MAGE_ASSERT(scene != NULL);
+
+    /* Add index to queue */
+    mageQueuePush(&scene->Entities->AvaliableQueue, &entity);
+
+    /* Update components */
+    struct mageComponentHandle *handles = scene->Entities->Handles[entity];
+
+    /* Update runtime count */
+    uint32_t i, actualIndex;
+    struct mageComponent *currentComponent;
+    struct mageComponentTable *table;
+    for (i = 0; i < handles[0].Data; i++)
+    {   
+        uint32_t actualIndex = i + 1;
+        
+        currentComponent = &scene->ComponentTables[handles[actualIndex].TableIndex].Stored[handles[actualIndex].ComponentIndex];
+        table = &scene->ComponentTables[i];
+        uint32_t tableIndex = handles[actualIndex].TableIndex;
+        currentComponent->SharedCount--;
+
+        if (currentComponent->SharedCount <= 0)
+        {
+            /* Call deconstructer */
+            table->Deconstructer(currentComponent->Data);
+            MAGE_LOG_CORE_INFORM("Destroying %s component %p %p\n", table->Identifier, currentComponent->Data);
+            MAGE_MEMORY_FREE(currentComponent->Data);
+            currentComponent->Data = NULL;
+            table->StoredCount--;
+        }
+    }
+    scene->Entities->ActiveCount--;
+
+    mageQueuePush(&scene->Entities->AvaliableQueue, &entity);
+    scene->Entities->Handles[entity] = MAGE_MEMORY_REALLOCATE(scene->Entities->Handles[entity], sizeof(struct mageComponentHandle));
+    memset(scene->Entities->Handles[entity], 0, sizeof(struct mageComponentHandle));
 }
 void mageSceneDestroy(struct mageScene *scene)
 {
