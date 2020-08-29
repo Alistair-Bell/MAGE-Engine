@@ -1,4 +1,9 @@
+# Global libraries
 import os, sys, subprocess, zipfile
+
+# Local libraries
+from Utility import *
+
 
 """
     Helper scripts that helps setup the environment for MAGE
@@ -12,89 +17,16 @@ import os, sys, subprocess, zipfile
 
 """
 
-FullPath                = os.path.dirname(os.path.realpath(__file__))
-RuntimePlatform         = sys.platform
-SupportedPlatforms      = [ "win32", "linux", "darwin" ]
-
-LogModes = {
-    "Inform":           "\x1b[32m",
-    "Warning":          "\x1b[33m",
-    "Error":            "\x1b[34m",
-    "Fatal Error":      "\x1b[36m",
-    "Reset":            "\x1b[0m"
-}
-
-def LogMessage(message, mode):
-    switcher = {
-        "\x1b[32m": "Inform     :",
-        "\x1b[33m": "Warning    :",
-        "\x1b[34m": "Error      :",
-        "\x1b[36m": "FatalError :",
-        "\x1b[0m":  "Reset      :",
-    }   
-    
-    print("%sLog %s %s" % (mode, switcher[mode], message))
-
-def LogReset():
-    print(LogModes["Reset"], end = '')
-
-# Nice bundle of the native commands to be run
-class Command:
-
-
-    def __init__(self, windowsCommand, linuxCommand, macCommand):
-       self.PlatformCommands = { 
-           "win32":         windowsCommand,
-           "linux":         linuxCommand,
-           "macCommand":    macCommand
-       }
-
-    def UpdateCommand(self, newCommand, platform):
-        self.PlatformCommands[platform] = newCommand
-
-    @staticmethod
-    def FormatCommand(command):
-        tokens = [ x.strip() for x in command.strip('[]').split(' ') ]
-        return tokens
-
-    def CallCommand(self):
-        command = self.PlatformCommands[RuntimePlatform]
-        if command == None:
-            return
-        formatted = Command.FormatCommand(command)
-        subprocess.call(formatted)
-
-def CheckDirectory(absolutePath):
-    return os.path.exists(absolutePath)
-
-def CreateDirectory(localPath):
-    combined = "%s/%s" % (FullPath, localPath)
-    if (CheckDirectory(combined) == False):
-        # all the platforms have the same command
-        command = "mkdir %s" % (combined)
-        LogMessage("Creating %s directory" % (localPath), LogModes["Inform"])
-        makeDirectory = Command(command, command, command)
-        makeDirectory.CallCommand()
-
-def UnzipFile(localPath, output):
-    if os.path.isfile(localPath) == True:
-        LogMessage("Unziping %s" % (localPath), LogModes["Inform"])
-        file = zipfile.ZipFile(localPath, "r")
-        file.extractall(output) 
-    else:
-        LogMessage("%s zip file was not found, engine assets may be missing!" % (localPath), LogModes["Error"]) 
-
-
 def Main():
     
     # Checking supported platform
-    if RuntimePlatform not in SupportedPlatforms:
-        LogMessage("Unsupported platform %s, supported platforms are: %s" % (RuntimePlatform, SupportedPlatforms), LogModes["Fatal Error"])
+    if GetPlatform() not in GetSupportedBuildPlatforms():
+        LogMessage("Unsupported platform %s, supported platforms are: %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
         LogReset()
         return
 
     # Allowing the use of the shell scripts for the engine 
-    if (RuntimePlatform == "linux"):
+    if (GetPlatform() == "linux"):
         linuxScriptPath = "./Scripts/Linux"
         linuxScripts = ["Clean.sh",  "CompileShaders.sh", "Makefile.sh", "ValidateShaders.sh"]
         command = Command(windowsCommand = None, linuxCommand = None, macCommand = None)
