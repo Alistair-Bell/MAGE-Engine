@@ -16,3 +16,13 @@ Makefile*
 
 # Valgrind generated debug files
 vgcore*
+
+# Currently uncompressed directories
+Mage/Resources/Shaders*
+Mage/Resources/Textures*
+
+# User config folder
+Config*
+
+# Python created files
+__pychache__*
