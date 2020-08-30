@@ -15,8 +15,8 @@ workspace "MAGE"
 
 group "Externals"
     include "Mage/Externals/glfw3"
-    include "Mage/Externals/libyaml"
-    include "Mage/Externals/libogg"
+    -- include "Mage/Externals/libyaml"
+    -- include "Mage/Externals/libogg"
     include "Mage/Externals/stb-image"
 
     
@@ -105,8 +105,6 @@ project "Sandbox"
         "MageEngine",
         "GLFW",
         "vulkan",
-        "yaml",
-        "libogg",
         "stb-image"
     }
     

@@ -16,8 +16,6 @@ project "Hello-World"
         "stb-image",
         "GLFW",
         "vulkan",
-        "yaml",
-        "libogg"
     }
     includedirs
     {

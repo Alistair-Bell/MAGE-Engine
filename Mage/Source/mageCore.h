@@ -130,8 +130,6 @@
 #include <signal.h>
 #include <stdint.h>
 
-#include "../Externals/libyaml/include/yaml.h"
-#include "../Externals/libogg/include/ogg/ogg.h"
 #include "../Externals/stb-image/src/stb_image.h"
 
 #if defined (MAGE_DEBUG)
