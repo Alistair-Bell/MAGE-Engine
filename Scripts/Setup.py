@@ -1,5 +1,5 @@
 # Global libraries
-import os, sys, subprocess, zipfile
+import os, sys, subprocess, zipfile, json
 
 # Local libraries
 from Utility import *
@@ -14,7 +14,7 @@ from Utility import *
         (0) -> Allows for the linux shell scrips
         (1) -> Builds the directories
         (2) -> Unzips assets
-
+        (3) -> Stores vulkan sdk location and other information for the build system
 """
 
 def Main():
@@ -36,7 +36,7 @@ def Main():
             command.CallCommand()
     
     # Making logs directory
-    directoriesToCreate = [ "Logs", "Examples/Logs" ]
+    directoriesToCreate = [ "Logs", "Examples/Logs", "Config" ]
     for x in directoriesToCreate:
         CreateDirectory(x)
 
@@ -49,8 +49,19 @@ def Main():
     for x, y in assetsToUnzip.items():
         UnzipFile(x, y)
 
+    # Getting sdk related locations
+    if CheckExistence("Config/Locations.json") is False:
+        dump = {
+            "GLSLValidator": "",
+            "GLSLCompiler": "",
+        }
+        with open("Config/Locations.json", "w") as f:
+            json.dump(dump, f, indent=6)
+            f.close()
 
-    LogMessage("Succesfully setup the MAGE-Engine environment!", LogModes["Inform"])
+    
+
+    LogMessage("Succesfully setup the MAGE-Engine environment!, to use the utility scripts provided goto Config/Locations.json and add the items to the path", LogModes["Inform"])
     LogReset()
 
 if __name__ == '__main__':

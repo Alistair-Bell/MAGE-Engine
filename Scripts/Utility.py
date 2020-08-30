@@ -44,6 +44,7 @@ class Command:
         subprocess.call(formatted)
 
 def LogMessage(message, mode):
+    
     switcher = {
         "\x1b[32m": "Inform     :",
         "\x1b[33m": "Warning    :",
@@ -57,24 +58,25 @@ def LogMessage(message, mode):
 def LogReset():
     print(LogModes["Reset"], end = '')
 
-def CheckDirectory(absolutePath):
-    return os.path.exists(absolutePath)
+def CheckExistence(localPath):
+    return os.path.exists(localPath)
+        
 
 def CreateDirectory(localPath):
-    combined = "%s/%s" % (GetWorkingDirectory(), localPath)
-    if (CheckDirectory(combined) == False):
+    combined = "%s" % (localPath)
+    if (CheckExistence(combined) == False):
         # all the platforms have the same command
         command = "mkdir %s" % (combined)
         LogMessage("Creating %s directory" % (localPath), LogModes["Inform"])
         makeDirectory = Command(command, command, command)
         makeDirectory.CallCommand()
 
-def GetFilesInDirectory(absolutePath, extension = "*"):
+def GetFilesInDirectory(localPath, extension = "*"):
     files = []
-    if CheckDirectory(absolutePath) == False:
-        LogMessage("%s directory was not found!" % (absolutePath), LogModes["Error"])
+    if CheckExistence(localPath) == False:
+        LogMessage("%s directory was not found!" % (localPath), LogModes["Error"])
         return files
-    files = [f for f in glob.glob("%s*%s" % (absolutePath, extension))]
+    files = [f for f in glob.glob("%s/*%s" % (localPath, extension))]
     return files
 
 
@@ -85,8 +87,6 @@ def UnzipFile(localPath, output):
         file.extractall(output) 
     else:
         LogMessage("%s zip file was not found, engine assets may be missing!" % (localPath), LogModes["Error"]) 
-def CheckDirectory(absolutePath):
-    return os.path.exists(absolutePath)
 
 if __name__ == '__main__':
     LogMessage("%s was called, this file provides utility for the build system and environemt setup, on it's on it has no functionality. Run Setup.py to use the engine!" % (__file__), LogModes["Warning"])
