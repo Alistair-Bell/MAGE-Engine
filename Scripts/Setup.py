@@ -62,8 +62,8 @@ def Main():
     
 
     LogMessage("Succesfully setup the MAGE-Engine environment!, to use the utility scripts provided goto Config/Locations.json and add the items to the path", LogModes["Inform"])
-    LogReset()
 
 if __name__ == '__main__':
     Main()
+    LogReset()
     

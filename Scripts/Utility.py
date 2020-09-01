@@ -61,7 +61,6 @@ def LogReset():
 def CheckExistence(localPath):
     return os.path.exists(localPath)
         
-
 def CreateDirectory(localPath):
     combined = "%s" % (localPath)
     if (CheckExistence(combined) == False):
@@ -79,7 +78,6 @@ def GetFilesInDirectory(localPath, extension = "*"):
     files = [f for f in glob.glob("%s/*%s" % (localPath, extension))]
     return files
 
-
 def UnzipFile(localPath, output):
     if os.path.isfile(localPath) == True:
         LogMessage("Unziping %s" % (localPath), LogModes["Inform"])
@@ -91,4 +89,3 @@ def UnzipFile(localPath, output):
 if __name__ == '__main__':
     LogMessage("%s was called, this file provides utility for the build system and environemt setup, on it's on it has no functionality. Run Setup.py to use the engine!" % (__file__), LogModes["Warning"])
     LogReset()
-    
