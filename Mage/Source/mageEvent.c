@@ -115,10 +115,10 @@ uint8_t mageEventInCategory(const uint16_t handle, const mageEventCategoryBit ca
     uint8_t i;
     for (i = 0; i < categoryCount; i++) 
     {
-        if (categories[i] == category) return 1;
+        if (categories[i] == category) return MAGE_TRUE;
     }
     MAGE_MEMORY_FREE(categories);
-    return 0;
+    return MAGE_FALSE;
 }
 void mageEventRegisterListener(mageEventListenerCallback callback)
 {

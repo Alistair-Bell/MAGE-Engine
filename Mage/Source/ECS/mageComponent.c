@@ -30,7 +30,7 @@ uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *compone
     mageQueueCreate(&table.IndexQueues, dataSize);
 
     scene->TableCount++;
-    if (mode == MAGE_COMPONENT_REGISTERING_MODE_REQUIRED)
+    if (mode == MAGE_ECS_COMPONENT_REGISTERING_MODE_REQUIRED)
     {
        scene->RequiredTableCount++;
     }

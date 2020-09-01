@@ -77,12 +77,12 @@ static uint8_t mageCheckValidationLayers(struct mageRenderer *renderer, struct m
     {
         MAGE_MEMORY_FREE(properties);
         MAGE_LOG_CORE_FATAL_ERROR("Required validation layers not found\n", NULL);
-        return 0;
+        return MAGE_FALSE;
     }
     MAGE_LOG_CORE_INFORM("Required validation layers found\n", NULL);
     
     MAGE_MEMORY_FREE(properties);
-    return 1;
+    return MAGE_TRUE;
 }
 static char **mageGetRequiredExtensions(uint32_t *count)
 {
@@ -138,7 +138,7 @@ static uint8_t mageIsDeviceSuitable(struct mageRenderer *renderer, VkPhysicalDev
     if (result != MAGE_RESULT_SUCCESS)
     {
         mageIndiciesIndexesDestroy(&indicies);
-        return 0;
+        return MAGE_FALSE;
     }
     VkBool32 supported;
     vkGetPhysicalDeviceSurfaceSupportKHR(device, indicies.GraphicIndexes[indicies.GraphicIndexesCount - 1], renderer->Surface, &supported);
@@ -146,11 +146,11 @@ static uint8_t mageIsDeviceSuitable(struct mageRenderer *renderer, VkPhysicalDev
     if (!supported)
     {
         mageIndiciesIndexesDestroy(&indicies);
-        return 0;
+        return MAGE_FALSE;
     }
 
     mageIndiciesIndexesDestroy(&indicies);
-    return 1;
+    return MAGE_TRUE;
 }
 static uint32_t mageRateDevice(struct mageRenderer *renderer, VkPhysicalDevice device)
 {

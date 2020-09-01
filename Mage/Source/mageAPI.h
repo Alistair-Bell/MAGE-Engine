@@ -67,8 +67,12 @@
 #define MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(scene, componentHandle, entities, count) \
 	mageSceneComponentBindExistingToEntities(scene, componentHandle, entities, count)
 
-#define MAGE_GET_COMPONENT_BY_TAG(scene, component, entity) \
-	mageSceneEntityFetchComponent(scene, component, entity) 
+#define MAGE_ECS_REGISTER_SYSTEM(scene, callback, systemType, threadPriority, count, ...) \
+	mageSceneSystemRegister(scene, callback, systemType, threadPriority, count, #__VA_ARGS__ )
+
+/* #define MAGE_GET_COMPONENT_BY_TAG(scene, callback) */
+/* 	mageSceneEntityFetchComponent(scene, ) */
+
 
 /* User config stuff */
 
@@ -87,8 +91,8 @@
 #define MAGE_MEMORY_ARRAY_ALLOCATE(count, size) \
 	calloc(count, size)
 
-#define MAGE_ECS_SYSTEM_SUCCESS ((void *)1)
-#define MAGE_ECS_SYSTEM_FAILURE ((void *)0)
+#define MAGE_SYSTEM_SUCCESS ((void *)1)
+#define MAGE_SYSTEM_FAILURE ((void *)0)
 
 #define MAGE_BIT(index) (1 << index) 
 #define MAGE_PI_SQUARED 9.86960440109
@@ -154,33 +158,27 @@ typedef enum MAGE_RESULT_ENUM
 	MAGE_RESULT_DATA_NOT_PRESENT
 } mageResult;
 
-typedef enum MAGE_COMPONENT_REGISTERING_MODE_ENUM
+typedef enum MAGE_ECS_COMPONENT_REGISTERING_MODE_ENUM
 {
-	MAGE_COMPONENT_REGISTERING_MODE_REQUIRED,
-	MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL,
+	MAGE_ECS_COMPONENT_REGISTERING_MODE_REQUIRED,
+	MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL,
 } mageComponentRegisteringMode;
-
-typedef enum MAGE_PREDEFINED_COMPONENT_TABLE_INDEX_ENUM
-{
-	MAGE_PREDEFINED_COMPONENT_TABLE_INDEXES_TRANSFORM = 0,
-} magePredefinedComponentTableIndex;
 
 typedef enum MAGE_SYSTEM_TYPE_ENUM
 {
-	MAGE_SYSTEM_TYPE_START				= 1,
-	MAGE_SYSTEM_TYPE_AWAKE				= 2,
-	MAGE_SYSTEM_TYPE_UPDATE				= 3,
-	MAGE_SYSTEM_TYPE_LATE_UPDATE		= 4,
-	MAGE_SYSTEM_TYPE_FIXED_UPDATE		= 5,
-	MAGE_SYSTEM_TYPE_END				= 6,
+	MAGE_ECS_SYSTEM_TYPE_START				= 1,
+	MAGE_ECS_SYSTEM_TYPE_AWAKE				= 2,
+	MAGE_ECS_SYSTEM_TYPE_UPDATE				= 3,
+	MAGE_ECS_SYSTEM_TYPE_LATE_UPDATE		= 4,
+	MAGE_ECS_SYSTEM_TYPE_FIXED_UPDATE		= 5,
+	MAGE_ECS_SYSTEM_TYPE_END				= 6,
 } mageSystemType;
 
-typedef enum MAGE_SYSTEM_THREAD_PRIORITY_ENUM
+typedef enum MAGE_ECS_SYSTEM_THREAD_PRIORITY_ENUM
 {
-	MAGE_SYSTEM_THREAD_PRIORITY_NONE	= 1,
-	MAGE_SYSTEM_THREAD_PRIORITY_FORCE	= 2,
+	MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE	= 1,
+	MAGE_ECS_SYSTEM_THREAD_PRIORITY_FORCE	= 2,
 } mageSystemThreadPriority;
-
 
 typedef enum MAGE_KEYCODE_ENUM
 {
@@ -529,10 +527,17 @@ struct mageComponentTable
 };
 struct mageSystemTable
 {
-	mageSystemCallback						MethodCallback;
-	mageThread								ThreadHandle;
+	uint32_t								Identifer;
 	uint32_t								ComponentCount;
-	uint16_t								Identifer;
+	mageSystemCallback						MethodCallback;
+	mageSystemType							Type;
+	mageThread								ThreadHandle;
+	uint32_t 								*ComponentIDs;
+};
+struct mageSystemPackage
+{
+	uint32_t								Count;
+	void									**Data;
 };
 struct mageScene
 {
@@ -1041,6 +1046,41 @@ extern MAGE_API void mageSceneComponentBindExistingToEntities(
 	mageEntity *entities,
 	const uint32_t count
 );
+extern MAGE_API uint32_t mageSceneSystemRegister(
+	struct mageScene *scene,
+	const mageSystemCallback callback,
+	const mageSystemType type,
+	const mageSystemThreadPriority threadPriority,
+	const uint32_t count,
+	...
+);
+extern MAGE_API uint8_t mageSceneStart(
+	struct mageScene *scene
+);
+extern MAGE_API uint8_t  mageSceneUpdate(
+	struct mageScene *scene
+);
+extern MAGE_API uint8_t  mageSceneLateUpdate(
+	struct mageScene *scene
+);
+extern MAGE_API uint8_t mageSceneFinsish(
+	struct mageScene *scene,
+	const uint8_t serialize,
+	const char *output
+);
+
+extern MAGE_API void mageSystemTableDestroy(
+	struct mageSystemTable *table
+);
+
+
+/* Placeholder for later
+extern MAGE_API mageResult mageSceneSerialiseActive(
+	struct mageScene *scene,
+	const char *output
+);
+*/
+
 extern MAGE_API void mageSceneComponentTableFree(
 	struct mageComponentTable *table
 );

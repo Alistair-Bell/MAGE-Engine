@@ -25,4 +25,4 @@ Mage/Resources/Textures*
 Config*
 
 # Python created files
-__pychache__*
+*.pyc

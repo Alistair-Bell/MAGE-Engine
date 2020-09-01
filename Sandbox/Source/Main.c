@@ -16,18 +16,14 @@ void CreateShaders()
 void exampleConstructer(void *data, const uint32_t size)
 {
     struct mageTransform *t = ((struct mageTransform *)data);
-    
 }
 void exampleDeconstructer(void *data)
 {
     
 }
-void exampleListener(void *package, mageEventType type)
+void *exampleSystem(void *package)
 {
-    if (type == MAGE_EVENT_KEY_PRESSED)
-    {
-    
-    }
+    return MAGE_SYSTEM_SUCCESS;
 }
 
 MAGE_ENTRY_POINT()
@@ -95,15 +91,25 @@ MAGE_ENTRY_POINT()
     i.SceneTag                      = "Hello World";
     i.RegisterDefaultComponents     = MAGE_FALSE;
     mageSceneCreate(&s, &i);
-    uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
-    uint32_t vector3                = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_COMPONENT_REGISTERING_MODE_OPTIONAL);
-    struct mageTransform t;
-    memset(&t, 0, sizeof(struct mageTransform));
+    uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t vector3                = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
     
-    mageEntity civillian            = mageSceneEntityCreate(&s);
-    struct mageComponentHandle h2   = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &civillian, 1);
-    mageSceneEntityDestroy(&s, civillian);
-   
+    
+    
+    struct mageTransform t;
+    struct mageVector3 v;
+    memset(&t, 0, sizeof(struct mageTransform));
+    memset(&v, 0, sizeof(struct mageVector3));
+
+    
+    mageEntity creature             = mageSceneEntityCreate(&s);
+    MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &creature, 1);
+    MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &creature, 1);
+    
+
+    MAGE_ECS_REGISTER_SYSTEM(&s, exampleSystem, MAGE_ECS_SYSTEM_TYPE_START, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 2, struct mageTransform, struct mageVector3); 
+    /* mageSceneStart(&s); */
+    
     mageSceneDestroy(&s);
     free(SandboxApplication);
     mageLogEnd();
