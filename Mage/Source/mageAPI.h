@@ -70,8 +70,8 @@
 #define MAGE_ECS_REGISTER_SYSTEM(scene, callback, systemType, threadPriority, count, ...) \
 	mageSceneSystemRegister(scene, callback, systemType, threadPriority, count, #__VA_ARGS__ )
 
-/* #define MAGE_GET_COMPONENT_BY_TAG(scene, callback) */
-/* 	mageSceneEntityFetchComponent(scene, ) */
+#define MAGE_ECS_GET_COMPONENT_BY_HANDLE(scene, getType, handle, entity) \
+	(*(getType *)mageSceneEntityFetchComponentByHandle(scene, #getType, handle, entity))
 
 
 /* User config stuff */
@@ -1015,6 +1015,17 @@ extern MAGE_API uint32_t mageSceneRegisterComponent(
 );
 extern MAGE_API mageEntity mageSceneEntityCreate(
 	struct mageScene *scene
+);
+extern MAGE_API void *mageSceneEntityFetchComponentByHandle(
+	struct mageScene *scene,
+	const char *component,
+	const struct mageComponentHandle handle,
+	const mageEntity entity
+);
+extern MAGE_API void *mageSceneEntityFetchComponentByTableID(
+	struct mageScene *scene,
+	const uint32_t table,
+	const mageEntity entity
 );
 extern MAGE_API void mageSceneEntityDestroy(
 	struct mageScene *scene,

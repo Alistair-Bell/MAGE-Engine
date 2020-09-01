@@ -36,7 +36,6 @@ static void mageUpdateEntityComponentHandle(struct mageScene *scene, const struc
     uint64_t newSize = count * sizeof(struct mageComponentHandle);
     scene->Entities->Handles[entity][0].Data += count;
     scene->Entities->Handles[entity] = MAGE_MEMORY_REALLOCATE(scene->Entities->Handles[entity], newSize + oldSize);
-    MAGE_LOG_CORE_FATAL_ERROR("Old size %lu new size %lu combined %lu\n", oldSize, newSize, oldSize + newSize);
     memcpy(scene->Entities->Handles[entity] + start, addition, newSize);
     mageEntitiesSortHandles(scene, entity, scene->Entities->Handles[entity][0].Data);
 }   
@@ -61,7 +60,7 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
-int64_t mageBinarySearch(uint32_t *array, uint32_t low, uint32_t high, uint32_t key)
+int64_t mageBinarySearch(uint64_t *array, uint32_t low, uint32_t high, uint32_t key)
 {
     /* Sourced -> https://github.com/vvs14/searching/blob/master/binary_search.c */
 	if (low <= high)
@@ -71,10 +70,10 @@ int64_t mageBinarySearch(uint32_t *array, uint32_t low, uint32_t high, uint32_t 
 			return mid;
 		
         else if (key < array[mid])
-			return mageBinarySearch(array, low, mid-1, key);
+			return mageBinarySearch(array, low, mid - 1, key);
 		
         else
-			return mageBinarySearch(array, mid+1, high, key);
+			return mageBinarySearch(array, mid + 1, high, key);
 	}
 	return -1;
 }
@@ -216,6 +215,27 @@ mageEntity mageSceneEntityCreate(struct mageScene *scene)
     mageSceneBindEntityRequiredComponents(scene, entity, indexes, scene->RequiredTableCount);
     MAGE_MEMORY_FREE(indexes);
     return entity;
+}
+void *mageSceneEntityFetchComponentByHandle(struct mageScene *scene, const char *component, const struct mageComponentHandle handle, const mageEntity entity)
+{
+    uint32_t tableIndex, componentIndex;
+    tableIndex      = handle.TableIndex;
+    componentIndex  = handle.ComponentIndex;
+    MAGE_ASSERT(tableIndex <= scene->TableCount - 1);
+    MAGE_ASSERT(componentIndex <= scene->ComponentTables[tableIndex].StoredCount - 1);
+
+    void *data = scene->ComponentTables[tableIndex].Stored[componentIndex].Data;
+    if (data == NULL)
+    {
+        MAGE_LOG_CORE_ERROR("Entity %lu has no current %s component!\n", entity, component);
+        return data;
+    }
+    MAGE_LOG_CORE_INFORM("Found %s component attached to entity %lu\n", component, entity);
+    return data;
+}
+void *mageSceneEntityFetchComponentByTableID(struct mageScene *scene, const uint32_t table, const mageEntity entity)
+{
+    return NULL;
 }
 uint32_t mageSceneSystemRegister(struct mageScene *scene, const mageSystemCallback callback, const mageSystemType type, const mageSystemThreadPriority threadPriority, const uint32_t count, ...)
 {

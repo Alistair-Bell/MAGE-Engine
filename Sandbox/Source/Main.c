@@ -103,9 +103,11 @@ MAGE_ENTRY_POINT()
 
     
     mageEntity creature             = mageSceneEntityCreate(&s);
-    MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &creature, 1);
-    MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &creature, 1);
+    struct mageComponentHandle v3 = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &creature, 1);
+    struct mageComponentHandle tf = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &creature, 1);
     
+
+    struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, creature);
 
     MAGE_ECS_REGISTER_SYSTEM(&s, exampleSystem, MAGE_ECS_SYSTEM_TYPE_START, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 2, struct mageTransform, struct mageVector3); 
     /* mageSceneStart(&s); */
