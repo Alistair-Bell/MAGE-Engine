@@ -13,6 +13,8 @@ ShaderExtensions = {
     "Compute": [ "comp" ],
 }
 
+CompilerOptmisations = [ "none", "speed", "size" ]
+
 """
     Script that compiles the shaders specified on the command line arguments
     Arguments:
@@ -32,7 +34,15 @@ ShaderExtensions = {
 """
 
 def GetShaders(path):
+    # Delete previous spirv files
     files = []
+    removing = GetFilesInDirectory(path, ".sprv")
+    for sprv in removing:
+        linux = "rm %s" % (sprv)
+        windows = "del /F %s" % (sprv)
+        command = Command(windows, linux, linux)
+        command.CallCommand()
+        
     for key, value in ShaderExtensions.items():
         for extensions in value:
             addition = GetFilesInDirectory(path, extensions)
@@ -56,18 +66,24 @@ def ValidateShader(shader, validator):
     command.CallCommand()
     LogMessage("Succesfully validated %s" % (shader))
 
-def CompileShader(shader, compiler):
+def CompileShader(shader, optimisation, compiler):
     output = GenerateSpirvFileName(shader)
-    finalCommand = "%s -c %s -o %s" % (compiler, shader, output)
+    switcher = {
+        "none": "-O0",
+        "speed": "-O",
+        "size": "-Os",
+    }
+
+    finalCommand = "%s -c %s %s -o %s" % (compiler, shader, switcher[optimisation], output)
     LogMessage("Compiling %s outputing spirv binary as %s" % (shader, output))
     command = Command(finalCommand, finalCommand, finalCommand)
     command.CallCommand()
     LogMessage("Succesfully compiled %s" % (shader))
 
-def HandleShader(shaders, validator, compiler):
+def HandleShader(shaders, optimisation, validator, compiler):
     for shader in shaders:
         ValidateShader(shader, validator)
-        CompileShader(shader, compiler)
+        CompileShader(shader, optimisation, compiler)
     LogMessage("Validated and compiled all shaders!")
 
 
@@ -75,6 +91,7 @@ def HandleShader(shaders, validator, compiler):
 
 def Main():
     arguments = sys.argv
+    optimisation = str(arguments[-1]).lower()
     
     # Validating input 
     if not CheckExistence("Config/Locations.json"):
@@ -83,6 +100,10 @@ def Main():
     
     if len(arguments) < 3:
         LogMessage("Invalid argument count!, 2 are required!", LogModes["Error"])
+        return
+
+    if optimisation not in CompilerOptmisations:
+        LogMessage("Invalid optimistaion setting %s, available options %s" % (optimisation, CompilerOptmisations.values()), LogModes["Error"])
         return
 
     glslValidator = ""
@@ -107,11 +128,8 @@ def Main():
         LogMessage("GLSL compiler was not found, check the Config/Locations.json", LogModes["Error"])
         return
 
-    print(glslCompiler)
-
     paths       = []
     shaderFiles = []
-    optimisation = str(arguments[-1]).lower()
 
     # Getting the directories
     for x in range(1, len(sys.argv) - 1):
@@ -123,7 +141,9 @@ def Main():
         if files is not []:
             shaderFiles += files
 
-    HandleShader(shaderFiles, glslValidator, glslCompiler)
+    LogMessage("Validating and building %s shaders with %s optmisation set" % (len(shaderFiles), optimisation))
+
+    HandleShader(shaderFiles, optimisation, glslValidator, glslCompiler)
 
 
 if __name__ == '__main__':

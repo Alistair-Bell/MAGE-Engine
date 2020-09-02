@@ -11,7 +11,7 @@
     - ECS-System ❌
     - Custom vulkan memory manager / debugger ❌
     - Performance benchmarking system ❌
-    - Tutorials / informative documentation
+    - Tutorials / informative documentation ❌
 
 #### Platforms
     - Windows support (64 bit) ❌
