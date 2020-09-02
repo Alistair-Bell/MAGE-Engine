@@ -40,10 +40,9 @@ class Command:
         command = self.PlatformCommands[GetPlatform()]
         if command == None:
             return
-        formatted = Command.FormatCommand(command)
-        subprocess.call(formatted)
+        subprocess.run(args=command, shell = True, check=True )
 
-def LogMessage(message, mode):
+def LogMessage(message, mode = LogModes["Inform"]):
     
     switcher = {
         "\x1b[32m": "Inform     :",

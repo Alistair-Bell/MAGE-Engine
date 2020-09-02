@@ -1,4 +1,4 @@
-Build*
+Build/
 Logs/*.*
 
 # Linux generated build files
@@ -18,9 +18,10 @@ Makefile*
 vgcore*
 
 # Currently uncompressed directories
-Mage/Resources/Shaders/*
-Mage/Resources/Textures/*
-Sandbox/Resources/Textures/*
+Shaders/
+Textures/
+
+
 
 # User config folder
 Config*
