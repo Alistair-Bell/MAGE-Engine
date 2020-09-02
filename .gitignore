@@ -18,8 +18,9 @@ Makefile*
 vgcore*
 
 # Currently uncompressed directories
-Mage/Resources/Shaders*
-Mage/Resources/Textures*
+Mage/Resources/Shaders/*
+Mage/Resources/Textures/*
+Sandbox/Resources/Textures/*
 
 # User config folder
 Config*

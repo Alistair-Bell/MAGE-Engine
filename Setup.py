@@ -44,6 +44,7 @@ def Main():
     assetsToUnzip = {
         "Mage/Resources/Shaders.zip": "Mage/Resources/",
         "Mage/Resources/Textures.zip": "Mage/Resources/", 
+        "Sandbox/Resources/Textures.zip": "Sandbox/Resources/",
          
     }
     for x, y in assetsToUnzip.items():
