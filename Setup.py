@@ -17,6 +17,15 @@ from Utility import *
         (3) -> Stores vulkan sdk location and other information for the build system
 """
 
+def GetBinaryLocation(question, mode=LogModes["Inform"]):
+    userInput = ""
+    while (1):
+        LogMessage(question, mode)
+        userInput = str(input())
+        if userInput != "" or CheckExistence(userInput):
+            break
+    return userInput
+
 def Main():
     
     # Checking supported platform
@@ -28,17 +37,18 @@ def Main():
     # Allowing the use of the shell scripts for the engine 
     if (GetPlatform() == "linux"):
         linuxScriptPath = "./Scripts/Linux"
-        linuxScripts = ["Clean.sh",  "CompileShaders.sh", "Makefile.sh", "ValidateShaders.sh"]
+        linuxScripts = GetFilesInDirectory(linuxScriptPath, ".sh")
         command = Command(windowsCommand = None, linuxCommand = None, macCommand = None)
         LogMessage("Allowing shell scripts to be run %s" % (linuxScripts), LogModes["Inform"])
         for x in linuxScripts:
-            command.UpdateCommand("chmod +x %s/%s" % (linuxScriptPath, x), "linux")
+            command.UpdateCommand("chmod +x %s" % (x), "linux")
             command.CallCommand()
     
     # Making logs directory
-    directoriesToCreate = [ "Logs", "Examples/Logs", "Config" ]
+    directoriesToCreate = [ "Logs", "Config" ]
     for x in directoriesToCreate:
-        CreateDirectory(x)
+        if not CheckExistence(x):
+            CreateDirectory(x)
 
     # Unziping assets 
     assetsToUnzip = {
@@ -52,17 +62,19 @@ def Main():
 
     # Getting sdk related locations
     if CheckExistence("Config/Locations.json") is False:
+        # Recieving input
         dump = {
-            "GLSLValidator": "",
-            "GLSLCompiler": "",
+            "GLSLValidator": str(GetBinaryLocation("Where is the glsl validator binary located?: ")),
+            "GLSLCompiler":  str(GetBinaryLocation("Where is the glsl compiler binary located?: ")),
         }
+        # Dumping to config file
         with open("Config/Locations.json", "w") as f:
             json.dump(dump, f, indent=6)
             f.close()
 
     
 
-    LogMessage("Succesfully setup the MAGE-Engine environment!, to use the utility scripts provided goto Config/Locations.json and add the items to the path", LogModes["Inform"])
+    LogMessage("Succesfully setup the MAGE-Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
 
 if __name__ == '__main__':
     Main()
