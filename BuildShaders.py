@@ -103,7 +103,7 @@ def Main():
         return
 
     if optimisation not in CompilerOptmisations:
-        LogMessage("Invalid optimistaion setting %s, available options %s" % (optimisation, CompilerOptmisations.values()), LogModes["Error"])
+        LogMessage("Invalid optimistaion setting %s, available options %s" % (optimisation, CompilerOptmisations), LogModes["Error"])
         return
 
     glslValidator = ""

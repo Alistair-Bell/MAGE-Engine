@@ -24,8 +24,6 @@
       - Arch support ❌
     - MacOS support (64 bit)
 
-
-
 ## Version 2.0 release
 
 ### Key features
