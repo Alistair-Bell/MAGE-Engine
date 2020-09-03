@@ -125,6 +125,3 @@ project "Sandbox"
         defines "SANDBOX_RELEASE"
         runtime "Release"
         optimize "Speed"
-        
-group "Examples"
-    include "Examples/"

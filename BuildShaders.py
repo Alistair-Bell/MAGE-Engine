@@ -86,9 +86,6 @@ def HandleShader(shaders, optimisation, validator, compiler):
         CompileShader(shader, optimisation, compiler)
     LogMessage("Validated and compiled all shaders!")
 
-
-
-
 def Main():
     arguments = sys.argv
     optimisation = str(arguments[-1]).lower()
