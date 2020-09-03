@@ -31,6 +31,6 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
 ## sort
 - Maintained under the `MIT-License`
 - Changes
-  - Removed `generate_bitonic_sort.py`, `.git`, `.gitignore`, `stresstest.c`, `.travis.yml`, `CONTRIBUTING.md`, `CONTRIBUTORS.md`, `astyle.options`, `Makefile`
+  - Removed `generate_bitonic_sort.py`, `.git`, `.gitignore`, `stresstest.c`, `.travis.yml`, `CONTRIBUTING.md`, `CONTRIBUTORS.md`, `astyle.options`, `Makefile`, `benchmark.c`, `demo.c`, `multdemo.c` and `stresstest.c`
   - Removed `doc` directory
 - Sourced from `https://github.com/swenson/sort`

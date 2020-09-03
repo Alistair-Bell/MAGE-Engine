@@ -13,15 +13,12 @@ void CreateShaders()
     mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
-void exampleConstructer(void *data, const uint32_t size)
+void TransformConstructer(void *data, uint64_t size)
 {
     struct mageTransform *t = ((struct mageTransform *)data);
+    mageVector3CreateFromFloats(&t->Location, 1.0f, 2.0f, 3.0f);
 }
-void exampleDeconstructer(void *data)
-{
-    
-}
-void *exampleSystem(void *package)
+void *System(void *package)
 {
     return MAGE_SYSTEM_SUCCESS;
 }
@@ -91,7 +88,7 @@ MAGE_ENTRY_POINT()
     i.SceneTag                      = "Hello World";
     i.RegisterDefaultComponents     = MAGE_FALSE;
     mageSceneCreate(&s, &i);
-    uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, NULL, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
+    uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, TransformConstructer, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
     uint32_t vector3                = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
     
     
@@ -108,10 +105,8 @@ MAGE_ENTRY_POINT()
     
 
     struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, creature);
+    SANDBOX_LOG_CORE_FATAL_ERROR("%f %f %f\n", data.Location.X, data.Location.Y, data.Location.Z);
 
-    MAGE_ECS_REGISTER_SYSTEM(&s, exampleSystem, MAGE_ECS_SYSTEM_TYPE_START, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 2, struct mageTransform, struct mageVector3); 
-    /* mageSceneStart(&s); */
-    
     mageSceneDestroy(&s);
     free(SandboxApplication);
     mageLogEnd();

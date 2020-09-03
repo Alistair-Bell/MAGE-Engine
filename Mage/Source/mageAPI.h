@@ -401,7 +401,7 @@ typedef void 		*(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
 typedef void 		*(*mageMemoryReallocater)(void *, uint64_t);
 typedef void 		*(*mageThreadJobCallback)(void *);
 typedef void 		*(*mageSystemCallback)(void *);
-typedef void		(*mageComponentConstructer)(void *, const uint32_t);
+typedef void		(*mageComponentConstructer)(void *, const uint64_t);
 typedef void		(*mageComponentDeconstructer)(void *);
 
 struct mageVector2

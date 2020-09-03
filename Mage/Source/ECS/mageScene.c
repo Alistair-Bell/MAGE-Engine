@@ -56,7 +56,6 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
         mageQueuePop(&table->IndexQueues, &componentIndex);
     }
     table->Constructer(component.Data, table->ByteSize);
-
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
@@ -160,6 +159,7 @@ struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScen
     /* Allocating component */
     struct mageComponent c;
     c.Data = MAGE_MEMORY_ALLOCATE(scene->ComponentTables[tableIndex].ByteSize);
+    memcpy(c.Data, data, scene->ComponentTables[tableIndex].ByteSize);
     c.SharedCount = count;
     componentIndex = mageAddComponentToTable(&scene->ComponentTables[tableIndex], c, scene->MaxComponents);
 

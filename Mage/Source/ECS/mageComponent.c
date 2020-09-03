@@ -1,6 +1,6 @@
 #include <mageAPI.h>
 
-static void mageDefaultConstructer(void *data, const uint32_t size)
+static void mageDefaultConstructer(void *data, const uint64_t size)
 {
 
 }
