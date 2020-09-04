@@ -43,16 +43,7 @@ class Command:
         subprocess.run(args=command, shell = True, check=True )
 
 def LogMessage(message, mode = LogModes["Inform"]):
-    
-    switcher = {
-        "\x1b[32m": "Inform     :",
-        "\x1b[33m": "Warning    :",
-        "\x1b[34m": "Error      :",
-        "\x1b[36m": "FatalError :",
-        "\x1b[0m":  "Reset      :",
-    }   
-    
-    print("%sLog %s %s" % (mode, switcher[mode], message))
+    print("%s%s" % (mode, message))
 
 def LogReset():
     print(LogModes["Reset"], end = '')
@@ -84,6 +75,61 @@ def UnzipFile(localPath, output):
         file.extractall(output) 
     else:
         LogMessage("%s zip file was not found, engine assets may be missing!" % (localPath), LogModes["Error"]) 
+
+def GenerateDefaultArguments(dictionary):
+    returning = []
+    for x, y in dictionary.items():
+        returning.append(y[0])
+    return returning
+
+# The default uses the key: value[0]
+def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
+    returnValues = []
+    actualArguments = rawArguments[1 : len(rawArguments)]
+
+    # No arguments specified
+    if len(rawArguments) <= 1:
+        LogMessage("No arguments specified")
+        if helpInfo != None:
+            helpInfo()
+            return GenerateDefaultArguments(searchingDictionary)
+    
+    requiredKeys = list(searchingDictionary.keys())
+
+    # removing the uneccesary command line arguments
+    for raw in actualArguments:
+        splitter = -1
+        try:
+            splitter = int(raw.index("="))
+        except ValueError:
+            LogMessage("%s does not follow the argument formatting!, %s" % (raw, searchingDictionary.keys()), LogModes["Error"])
+        else:
+            passed = False
+            for x, y in searchingDictionary.items():
+                lowerBound = str(raw[0 : splitter + 1])
+                upperBound = str(raw[splitter + 1: len(raw)]) 
+                if not (lowerBound != x or upperBound not in y):
+                    requiredKeys.remove(lowerBound)
+                    returnValues.append(upperBound)
+                    passed = True
+        
+            # Not acceptable
+            if not passed:
+                currentKey = list(searchingDictionary.keys())[len(returnValues)]
+                defaultValue = searchingDictionary.get(currentKey)[0]
+                LogMessage("Invalid option %s, key did not match or value not present" % (raw), LogModes["Error"])
+                returnValues.append(defaultValue)
+
+
+    for x in requiredKeys:
+        value = list(searchingDictionary[x])[0]
+        LogMessage("Value %s not present, using default value %s" % (x, value))
+        returnValues.append(value)
+
+    # Removing any possible duplicates
+    returnValues = list(dict.fromkeys(returnValues))
+    return returnValues
+
 
 if __name__ == '__main__':
     LogMessage("%s was called, this file provides utility for the build system and environemt setup, on it's on it has no functionality. Run Setup.py to use the engine!" % (__file__), LogModes["Warning"])

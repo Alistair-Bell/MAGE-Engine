@@ -2,18 +2,7 @@ import os, sys, json
 
 from Utility import *
 
-ShaderExtensions = {
 
-    "Fragment": [ "frag" ],
-    "Vertex": [ "vert" ],
-    "Tessellation-Control": [ "tesc" ],
-    "Tessellation-Evaluation": [ "tese" ],
-    "Geometry": [ "geom" ],
-    "Fragment": [ "frag" ],
-    "Compute": [ "comp" ],
-}
-
-CompilerOptmisations = [ "none", "speed", "size" ]
 
 """
     Script that compiles the shaders specified on the command line arguments
@@ -32,6 +21,19 @@ CompilerOptmisations = [ "none", "speed", "size" ]
         (4) -> Compiles the shaders outputing using NameOfShader.sprv
 
 """
+
+ShaderExtensions = {
+
+    "Fragment": [ "frag" ],
+    "Vertex": [ "vert" ],
+    "Tessellation-Control": [ "tesc" ],
+    "Tessellation-Evaluation": [ "tese" ],
+    "Geometry": [ "geom" ],
+    "Fragment": [ "frag" ],
+    "Compute": [ "comp" ],
+}
+
+CompilerOptmisations = [ "none", "speed", "size" ]
 
 def GetShaders(path):
     # Delete previous spirv files
