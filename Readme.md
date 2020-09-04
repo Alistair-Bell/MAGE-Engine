@@ -1,5 +1,12 @@
 # Mage-Engine
 
+<p align="left">
+    <img src ="https://img.shields.io/github/license/Alistair-Bell/MAGE-Engine"></img>
+    <img src="https://img.shields.io/github/issues/Alistair-Bell/MAGE-Engine"></img>
+    <img src="https://img.shields.io/github/forks/Alistair-Bell/MAGE-Engine"></img>
+    <img src="https://img.shields.io/github/stars/Alistair-Bell/MAGE-Engine"></img>
+</p>
+
 ## 2D vulkan powered game engine
 **Mage is a currently in development game engine striving to provide a sophisticated abstraction of low level API's whilst maintaining performance.** Mage aims to provide the tools for developers to prototype and create 2D games in a C designed environment, Mage is designed with desktop platforms in mind aiming for complete support for a majority of operating systems **Windows, Linux, MacOS**
 
