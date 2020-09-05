@@ -145,7 +145,7 @@ def Main():
 
     HandleShader(shaderFiles, optimisation, glslValidator, glslCompiler)
 
-
+    
 if __name__ == '__main__':
     Main()
     LogReset()
