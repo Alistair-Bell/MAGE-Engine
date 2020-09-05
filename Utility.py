@@ -88,7 +88,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
     actualArguments = rawArguments[1 : len(rawArguments)]
 
     # No arguments specified
-    if len(rawArguments) <= 1:
+    if len(rawArguments) < 1:
         LogMessage("No arguments specified")
         if helpInfo != None:
             helpInfo()
