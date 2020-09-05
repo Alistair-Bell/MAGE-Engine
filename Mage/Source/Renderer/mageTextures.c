@@ -166,6 +166,7 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
     int32_t width, height, channels;
     uint8_t *fileData;
     fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);
+    uint8_t usingDefault = MAGE_FALSE;
     if (fileData == NULL)
     {
         MAGE_LOG_CORE_WARNING("Invalid texture %s, using default texture %s\n", texturePath, defaultTexture);
@@ -194,7 +195,10 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
     
     mageDescriptorSetsUpdate(&texture->Image, &texture->View, &texture->Sampler, nativeSamplerMode, renderer);
     mageBufferWrapperDestroy(&stagingBuffer, renderer);
-    MAGE_LOG_CORE_INFORM("Texture %s was created with source of %dpx by %dpx\n", texturePath, width, height);
+    if (usingDefault)
+        MAGE_LOG_CORE_INFORM("Texture %s was created with source of %dpx by %dpx\n", texturePath, width, height);
+    else
+        MAGE_LOG_CORE_INFORM("Default texture %s was created with source of %dpx by %dpx\n", defaultTexture, width, height);
     return MAGE_RESULT_SUCCESS;
 }
 void mageTextureDestroy(struct mageTexture *texture, struct mageRenderer *renderer)
