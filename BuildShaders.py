@@ -95,6 +95,7 @@ def Main():
     # Validating input 
     if not CheckExistence("Config/Locations.json"):
         LogMessage("Config file was not found! make sure you run Setup.py and set the values in the Config/Setting.json", LogModes["Error"])
+        return
     LogMessage("Config file found! Reading data!", LogModes["Inform"])
     
     if len(arguments) < 3:
