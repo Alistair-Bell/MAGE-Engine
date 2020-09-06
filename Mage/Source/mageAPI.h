@@ -86,6 +86,8 @@
 #define MAGE_ECS_GET_COMPONENT_BY_HANDLE(scene, getType, handle, entity) \
 	(*(getType *)mageSceneEntityFetchComponentByHandle(scene, #getType, handle, entity))
 
+#define MAGE_KEY_COUNT 128
+
 
 /* User config stuff */
 
@@ -126,7 +128,7 @@
 typedef uint32_t mageEventHandle;
 typedef uint32_t mageEntity;
 typedef void 	*mageThread;
-typedef uint8_t  magePhysicalButton;
+typedef uint8_t  magePhysicalKey;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -319,7 +321,7 @@ typedef enum MAGE_PHYSICAL_BUTTON_BITS_ENUM
 	MAGE_PHYSICAL_BUTTON_BITS_PRESSED 		= 0x01, /* 0000 0001 */
 	MAGE_PHYSICAL_BUTTON_BITS_RELEASED		= 0x02, /* 0000 0010 */
 	MAGE_PHYSICAL_BUTTON_BITS_REPEAT		= 0x04  /* 0000 0100 */
-} magePhysicalButtonBits;
+} magePhysicalKeyBits;
 
 typedef enum MAGE_MOUSE_CODE_ENUM
 {
@@ -332,54 +334,6 @@ typedef enum MAGE_MOUSE_CODE_ENUM
 	MAGE_MOUSECODE_BUTTON_7,
 	MAGE_MOUSECODE_BUTTON_8,
 } mageMouseCode;
-
-typedef enum MAGE_EVENT_ENUM
-{
-    MAGE_EVENT_NONE                     		= 0,
-    MAGE_EVENT_WINDOW_CLOSE             		= 1,
-    MAGE_EVENT_WINDOW_FOCUS             		= 2,
-    MAGE_EVENT_WINDOW_LOST_FOCUS        		= 3,
-    MAGE_EVENT_WINDOW_MOVED             		= 4,
-    MAGE_EVENT_APPLICATION_TICK         		= 5,
-    MAGE_EVENT_APPLICATION_UPDATE       		= 6,
-    MAGE_EVENT_APPLICATION_RENDER       		= 7,
-    MAGE_EVENT_KEY_PRESSED              		= 8,
-    MAGE_EVENT_KEY_RELEASED             		= 9,
-    MAGE_EVENT_KEY_REPEAT               		= 10,
-    MAGE_EVENT_MOUSE_BUTTON_PRESSED     		= 11,
-    MAGE_EVENT_MOUSE_BUTTON_RELEASED    		= 12,
-    MAGE_EVENT_MOUSE_MOVED              		= 13,
-    MAGE_EVENT_MOUSE_SCROLLED           		= 14,
-} mageEventType;
-
-typedef enum MAGE_EVENT_REQUIRED_BYTE_SIZE_ENUM
-{
-	MAGE_EVENT_BYTE_SIZE_NONE 					= 0,
-	MAGE_EVENT_BYTE_SIZE_WINDOW_CLOSE 			= sizeof(mageEventHandle),
-	MAGE_EVENT_BYTE_SIZE_WINDOW_FOCUS 			= sizeof(mageEventHandle),
-	MAGE_EVENT_BYTE_SIZE_WINDOW_LOST_FOCUS		= sizeof(mageEventHandle),
-	MAGE_EVENT_BYTE_SIZE_WINDOW_MOVED 			= sizeof(mageEventHandle) + (sizeof(uint32_t) * 2),
-	MAGE_EVENT_BYTE_SIZE_APPLICATION_TICK 		= sizeof(mageEventHandle) + sizeof(int32_t),
-	MAGE_EVENT_BYTE_SIZE_APPLICATION_UPDATE 	= sizeof(mageEventHandle),
-	MAGE_EVENT_BYTE_SIZE_APPLICATION_RENDER 	= sizeof(mageEventHandle),
-	MAGE_EVENT_BYTE_SIZE_KEY_PRESSED 			= sizeof(mageEventHandle) + sizeof(mageKeyCode),
-	MAGE_EVENT_BYTE_SIZE_KEY_REPEAT				= sizeof(mageEventHandle) + sizeof(mageKeyCode),
-	MAGE_EVENT_BYTE_SIZE_KEY_RELEASED 			= sizeof(mageEventHandle) + sizeof(mageKeyCode),
-	MAGE_EVENT_BYTE_SIZE_MOUSE_BUTTON_PRESSED 	= sizeof(mageEventHandle) + sizeof(mageMouseCode),
-	MAGE_EVENT_BYTE_SIZE_MOUSE_BUTTON_RELEASED 	= sizeof(mageEventHandle) + sizeof(mageMouseCode),
-	MAGE_EVENT_BYTE_SIZE_MOUSE_MOVED 			= sizeof(mageEventHandle) + (sizeof(double) * 2),
-	MAGE_EVENT_BYTE_SIZE_MOUSE_SCROLLED 		= sizeof(mageEventHandle) + (sizeof(double) * 2),
-} mageEventRequiredByteSize;
-
-typedef enum MAGE_EVENT_CATEGORY_BITS_ENUM
-{
-	MAGE_EVENT_CATEGORY_NONE 							= -1,
-	MAGE_EVENT_CATEGORY_APPLICATION						= 4,
-	MAGE_EVENT_CATEGORY_INPUT							= 5,
-	MAGE_EVENT_CATEGORY_KEYBOARD 						= 6,
-	MAGE_EVENT_CATEGORY_MOUSE							= 7,
-	MAGE_EVENT_CATEGORY_MOUSE_BUTTON					= 8,
-} mageEventCategoryBit;
 
 typedef enum MAGE_SHADER_TYPE_ENUM
 {
@@ -414,8 +368,6 @@ typedef enum MAGE_TEXTURE_SAMPLER_MODE_ENUM
 	MAGE_TEXTURE_SAMPLER_MIRRORED_CLAMP_TO_EDGE,
 } mageTextureSamplerMode;
 
-
-typedef void 		(*mageEventListenerCallback)(void *, mageEventType);
 typedef void 		*(*mageMemoryAllocaterMethod)(uint64_t);
 typedef void 		(*mageMemoryFreeMethod)(void *);
 typedef void 		*(*mageMemoryListAllocaterMethod)(uint64_t, uint64_t);
@@ -489,8 +441,6 @@ struct mageMatrix4
 		};
 	};
 };
-
-
 
 struct mageQueue
 {
@@ -747,6 +697,8 @@ struct mageApplication
 	struct mageWindow 						*Window;
 	struct mageApplicationCreateInfo		CreateInfo;
 	struct mageRendererCreateInfo			RendererCreateInfo;
+	magePhysicalKey							PhysicalKeysPreviousFrame[MAGE_KEY_COUNT];
+	magePhysicalKey							PhysicalKeysCurrentFrame[MAGE_KEY_COUNT];
 	uint8_t 								Running;
 };
 
@@ -1017,7 +969,10 @@ extern MAGE_API void mageThreadBegin(
 extern MAGE_API uint32_t mageThreadGetID(
 	const mageThread thread
 );
-extern MAGE_API void mageThreadDestroy(
+extern MAGE_API void mageThreadEnd(
+	mageThread thread
+);
+extern MAGE_API void mageThreadTerminate(
 	mageThread thread
 );
 
@@ -1151,76 +1106,12 @@ extern MAGE_API void mageWindowDestroy(
 	struct mageWindow *window
 );
 
-/* Event system */ 
-extern MAGE_API void mageInputSetup(
-	struct mageApplication *application
+/* User input system */ 
+extern MAGE_API magePhysicalKey mageKeyboardGetKey(
+	struct mageApplication *application,
+	const mageKeyCode code
 );
-extern MAGE_API void mageEventSetupMaster(
-	void
-);
-extern MAGE_API mageEventCategoryBit *mageEventGenerateCategories(
-	const mageEventType type
-);
-extern MAGE_API uint16_t mageEventHandleCreate(
-	const mageEventType type
-);
-extern MAGE_API mageEventType mageEventExtractEventType(
-	const uint16_t handle
-);
-extern MAGE_API uint8_t mageEventInCategory(
-	const uint16_t handle, 
-	const mageEventCategoryBit category
-);
-extern MAGE_API void mageEventRegisterListener(
-	mageEventListenerCallback callback
-);
-extern MAGE_API void mageEventFormatWindowClose(
-	void *buffer
-);
-extern MAGE_API void mageEventFormatWindowFocus(
-	void *buffer
-);
-extern MAGE_API void mageEventFormatWindowLostFocus(
-	void *buffer
-);
-extern MAGE_API void mageEventFormatWindowMoved(
-	void *buffer, 
-	const int32_t x, 
-	const int32_t y
-);
-extern MAGE_API void mageEventFormatKeyPressed(
-	void *buffer, 
-	const uint8_t keycode
-);
-extern MAGE_API void mageEventFormatKeyReleased(
-	void *buffer, 
-	const uint8_t keycode
-);
-extern MAGE_API void mageEventFormatKeyRepeat(
-	void *buffer, 
-	const uint8_t keycode
-);
-extern MAGE_API void mageEventFormatMouseButtonPressed(
-	void *buffer, 
-	const uint8_t mousecode
-);
-extern MAGE_API void mageEventFormatMouseButtonRelease(
-	void *buffer, 
-	const uint8_t mousecode
-);
-extern MAGE_API void mageEventFormatMouseMoved(
-	void *buffer, 
-	const double x, 
-	const double y
-);
-extern MAGE_API void mageEventFormatMouseWheelMoved(
-	void *buffer, 
-	const double x, 
-	const double y
-);
-extern MAGE_API void mageEventDispatch(
-	void *event
-);
+
 
 /* Vertexes */
 extern MAGE_API void mageVertexCreate(

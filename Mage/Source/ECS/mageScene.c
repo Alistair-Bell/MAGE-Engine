@@ -327,26 +327,26 @@ void mageSceneEntityDestroy(struct mageScene *scene, mageEntity entity)
 
     /* Update runtime count */
     uint32_t i, actualIndex;
-    struct mageComponent *currentComponent;
-    struct mageComponentTable *table;
     for (i = 0; i < handles[0].Data; i++)
     {   
         uint32_t actualIndex = i + 1;
-        
-        currentComponent = &scene->ComponentTables[handles[actualIndex].TableIndex].Stored[handles[actualIndex].ComponentIndex];
-        table = &scene->ComponentTables[actualIndex];
-        uint32_t tableIndex = handles[actualIndex].TableIndex;
-        currentComponent->SharedCount--;
-
-        if (currentComponent->SharedCount <= 0)
+        struct mageComponentHandle handle = handles[actualIndex];
+        struct mageComponent *component = &scene->ComponentTables[handle.TableIndex].Stored[handle.ComponentIndex];
+        struct mageComponentTable *table = &scene->ComponentTables[handle.TableIndex];
+        if (component->SharedCount <= 1)
         {
-            /* Call deconstructer */
-            table->Deconstructer(currentComponent->Data);
-            MAGE_LOG_CORE_INFORM("Destroying %s component %p %p\n", table->Identifier, currentComponent->Data);
-            MAGE_MEMORY_FREE(currentComponent->Data);
-            currentComponent->Data = NULL;
+            MAGE_LOG_CORE_INFORM("Destroying component %s, last attached to entity %lu\n", table->Identifier, entity);
+            table->Deconstructer(component->Data);
+            mageQueuePush(&table->IndexQueues, &handle.ComponentIndex);
+            MAGE_MEMORY_FREE(component->Data);
+            component->Data = NULL;
             table->StoredCount--;
         }
+        else
+        {
+            component->SharedCount--;
+        }
+        
     }
     scene->Entities->ActiveCount--;
 

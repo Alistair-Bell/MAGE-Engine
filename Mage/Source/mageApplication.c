@@ -22,7 +22,10 @@ mageResult mageApplicationCreate(struct mageApplication *application, struct mag
     if (returnCode != MAGE_RESULT_SUCCESS) { return returnCode; }
     mageWindowCreate(application->Window, &applicationInfo);
     mageRendererCreate(application->Renderer, application->Window, &application->RendererCreateInfo);
-    mageInputSetup(application);
+
+    memset(application->PhysicalKeysCurrentFrame, 0, sizeof(uint8_t) * MAGE_KEY_COUNT);
+    memset(application->PhysicalKeysPreviousFrame, 0, sizeof(uint8_t) * MAGE_KEY_COUNT);
+
     return MAGE_RESULT_SUCCESS;
 }
 void mageApplicationDestroy(struct mageApplication *application)
