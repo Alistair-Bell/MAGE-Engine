@@ -132,18 +132,6 @@
 
 #include "../Externals/stb-image/src/stb_image.h"
 
-#if defined (MAGE_DEBUG)
-	#define MAGE_LOG_CORE_INFORM(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_WARNING(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_ERROR(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) 	mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
-#else
-	#define MAGE_LOG_CORE_INFORM(x, ...)
-	#define MAGE_LOG_CORE_WARNING(x, ...)
-	#define MAGE_LOG_CORE_ERROR(x, ...)
-	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...)
-	#define MAGE_DEBUG_BREAK
-#endif
 
 
 #endif

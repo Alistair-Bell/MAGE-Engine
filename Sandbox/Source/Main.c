@@ -15,9 +15,11 @@ void CreateShaders()
 }
 void TransformConstructer(void *data, uint64_t size)
 {
+    
     struct mageTransform *t = ((struct mageTransform *)data);
     mageVector3CreateFromFloats(&t->Location, 1.0f, 2.0f, 3.0f);
 }
+
 void *System(void *package)
 {
     return MAGE_SYSTEM_SUCCESS;
@@ -33,12 +35,12 @@ MAGE_ENTRY_POINT()
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
 
-    applicationCreateInfo.FixedResolution        = 0;
-    applicationCreateInfo.Fullscreen             = 0;
-    applicationCreateInfo.Width                  = 1920;
-    applicationCreateInfo.Height                 = 1080;
+    applicationCreateInfo.FixedResolution        = MAGE_TRUE;
+    applicationCreateInfo.Fullscreen             = MAGE_FALSE;
+    applicationCreateInfo.Width                  = 1080;
+    applicationCreateInfo.Height                 = 720;
     applicationCreateInfo.Name                   = "Sandbox Application";
-    applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_LogoBug_48px_Nov17.png";
+    applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_500px_Dec16.jpg";
 
     struct mageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(struct mageRendererCreateInfo));
@@ -49,7 +51,6 @@ MAGE_ENTRY_POINT()
 
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
 
-    mageEventRegisterListener(exampleListener);
     struct mageVertex verticies1[] = 
     {
         { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
@@ -66,7 +67,7 @@ MAGE_ENTRY_POINT()
     info.VertexCount        = 4;
     info.IndexCount         = 0;
     info.Indicies           = NULL;
-    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Mage/Resources/Textures/MTEC/Logo.png" };
+    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Sandbox/Resources/Textures/texture.jpg" };
     mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
 
     struct mageRenderable *r[] = { &renderable };
@@ -81,6 +82,8 @@ MAGE_ENTRY_POINT()
     mageApplicationDestroy(SandboxApplication);
 
 #endif
+
+#if 1
     struct mageScene s;
     struct mageSceneCreateInfo i;
     i.ComponentLimit                = 10;
@@ -94,20 +97,32 @@ MAGE_ENTRY_POINT()
     
     
     struct mageTransform t;
+    
     struct mageVector3 v;
     memset(&t, 0, sizeof(struct mageTransform));
     memset(&v, 0, sizeof(struct mageVector3));
 
     
     mageEntity creature             = mageSceneEntityCreate(&s);
+    mageEntity human                = mageSceneEntityCreate(&s);
+
     struct mageComponentHandle v3 = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &creature, 1);
     struct mageComponentHandle tf = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &creature, 1);
     
+    MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(&s, tf, &human, 1);
+    mageSceneEntityDestroy(&s, creature);
 
-    struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, creature);
+    struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, human);
+
+    
+    
     SANDBOX_LOG_CORE_FATAL_ERROR("%f %f %f\n", data.Location.X, data.Location.Y, data.Location.Z);
 
+    
+
+    mageSceneTick(&s);
     mageSceneDestroy(&s);
+#endif
     free(SandboxApplication);
     mageLogEnd();
     return 1;

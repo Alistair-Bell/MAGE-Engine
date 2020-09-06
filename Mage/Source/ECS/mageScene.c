@@ -360,45 +360,47 @@ void mageSceneEntityDestroy(struct mageScene *scene, mageEntity entity)
     scene->Entities->Handles[entity] = MAGE_MEMORY_REALLOCATE(scene->Entities->Handles[entity], sizeof(struct mageComponentHandle));
     memset(scene->Entities->Handles[entity], 0, sizeof(struct mageComponentHandle));
 }
-uint8_t mageSceneStart(struct mageScene *scene)
+mageResult mageSceneTick(struct mageScene *scene)
 {
-    MAGE_ASSERT(scene != NULL);
-    /* Search for systems that use a start method */
-    uint32_t i, j;
-    struct mageSystemTable *table;
+    uint32_t updateCount        = 0;
+    uint32_t fixedCount         = 0;
+    uint32_t lateCount          = 0;
+ 
+    /* 
+        Execution order
+        (0) -> update
+        (?) -> fixed update (based on a specified frame count per second)
+        (2) -> latupdate 
+    */
+    struct mageSystemTable *updateTables[scene->SystemCount];
+    struct mageSystemTable *fixedTables[scene->SystemCount];
+    struct mageSystemTable *lateTables[scene->SystemCount];
+
+    uint32_t i;
     for (i = 0; i < scene->SystemCount; i++)
     {
-        table = &scene->Systems[i];
         switch (scene->Systems[i].Type)
         {
-            case MAGE_ECS_SYSTEM_TYPE_START:
-            {
-                for (j = 0; j < scene->Entities->ActiveCount; j++)
-                    mageCallSystem(scene, table, scene->Entities->Pooled[j]);
+            case MAGE_ECS_SYSTEM_TYPE_UPDATE:
+                updateTables[updateCount] = &scene->Systems[i];
+                updateCount++;
                 break;
-            }
+            case MAGE_ECS_SYSTEM_TYPE_FIXED_UPDATE:
+                fixedTables[fixedCount] = &scene->Systems[i];
+                fixedCount++;
+                break;
+            case MAGE_ECS_SYSTEM_TYPE_LATE_UPDATE:
+                lateTables[lateCount] = &scene->Systems[i];
+                lateCount++;
+                break;
+            
             default:
                 break;
         }
     }
+    MAGE_LOG_CORE_INFORM("Using %d update systems, %d fixed update systems and %d late update systems\n", updateCount, fixedCount, lateCount);
 
-    return MAGE_RESULT_SUCCESS;
-}
-uint8_t  mageSceneUpdate(struct mageScene *scene)
-{
-    MAGE_ASSERT(scene != NULL);
 
-    return MAGE_RESULT_SUCCESS;
-}
-uint8_t  mageSceneLateUpdate(struct mageScene *scene)
-{
-    MAGE_ASSERT(scene != NULL);
-
-    return MAGE_RESULT_SUCCESS;
-}
-uint8_t mageSceneFinsish(struct mageScene *scene, const uint8_t serialize, const char *output)
-{
-    MAGE_ASSERT(scene != NULL);
 
     return MAGE_RESULT_SUCCESS;
 }
@@ -436,4 +438,4 @@ void mageSceneDestroy(struct mageScene *scene)
     }
     MAGE_MEMORY_FREE(scene->Systems);
     MAGE_MEMORY_FREE(scene->ComponentTables);
-}
+} 

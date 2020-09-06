@@ -55,6 +55,19 @@
 	#define MAGE_ASSERT(expression)
 #endif
 
+#if defined (MAGE_DEBUG)
+	#define MAGE_LOG_CORE_INFORM(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_INFORM, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_WARNING(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_WARNING, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_ERROR(x, ...) 		mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_ERROR, x, __VA_ARGS__)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...) 	mageLogMessage(MAGE_LOG_USER_CORE, MAGE_LOG_MODE_FATAL_ERROR, x, __VA_ARGS__)
+#else
+	#define MAGE_LOG_CORE_INFORM(x, ...)
+	#define MAGE_LOG_CORE_WARNING(x, ...)
+	#define MAGE_LOG_CORE_ERROR(x, ...)
+	#define MAGE_LOG_CORE_FATAL_ERROR(x, ...)
+	#define MAGE_DEBUG_BREAK
+#endif
+
 #define MAGE_ECS_REGISTER_COMPONENT(scene, component, constructer, deconstructer, mode) \
 	mageSceneRegisterComponent(scene, #component, sizeof(component), constructer, deconstructer, mode)
 
@@ -1065,19 +1078,8 @@ extern MAGE_API uint32_t mageSceneSystemRegister(
 	const uint32_t count,
 	...
 );
-extern MAGE_API uint8_t mageSceneStart(
+extern MAGE_API mageResult mageSceneTick(
 	struct mageScene *scene
-);
-extern MAGE_API uint8_t  mageSceneUpdate(
-	struct mageScene *scene
-);
-extern MAGE_API uint8_t  mageSceneLateUpdate(
-	struct mageScene *scene
-);
-extern MAGE_API uint8_t mageSceneFinsish(
-	struct mageScene *scene,
-	const uint8_t serialize,
-	const char *output
 );
 
 extern MAGE_API void mageSystemTableDestroy(
