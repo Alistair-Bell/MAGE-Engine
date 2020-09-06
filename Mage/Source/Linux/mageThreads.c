@@ -1,5 +1,7 @@
 #include <mageAPI.h>
 
+#if defined (MAGE_PLATFORM_LINUX)
+
 struct mageThreadType
 {
     pthread_t   NativeThread;
@@ -37,3 +39,5 @@ void mageThreadDestroy(mageThread thread)
     mageThreadHandle(pthread_join(type.NativeThread, (void **)&result));
     MAGE_ASSERT(result == 1);
 }
+
+#endif

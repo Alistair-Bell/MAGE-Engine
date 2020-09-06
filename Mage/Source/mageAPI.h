@@ -126,6 +126,7 @@
 typedef uint32_t mageEventHandle;
 typedef uint32_t mageEntity;
 typedef void 	*mageThread;
+typedef uint8_t  magePhysicalButton;
 
 typedef enum MAGE_LOG_MODE_ENUM
 {
@@ -312,6 +313,13 @@ typedef enum MAGE_KEYCODE_ENUM
 	MAGE_KEYCODE_RIGHTALT,
 	MAGE_KEYCODE_RIGHTSUPER,
 } mageKeyCode;
+
+typedef enum MAGE_PHYSICAL_BUTTON_BITS_ENUM
+{
+	MAGE_PHYSICAL_BUTTON_BITS_PRESSED 		= 0x01, /* 0000 0001 */
+	MAGE_PHYSICAL_BUTTON_BITS_RELEASED		= 0x02, /* 0000 0010 */
+	MAGE_PHYSICAL_BUTTON_BITS_REPEAT		= 0x04  /* 0000 0100 */
+} magePhysicalButtonBits;
 
 typedef enum MAGE_MOUSE_CODE_ENUM
 {
@@ -667,8 +675,8 @@ struct mageWindow
 };
 struct mageApplicationCreateInfo
 {
-	uint32_t 								Width;
-	uint32_t 								Height;
+	uint16_t 								Width;
+	uint16_t 								Height;
 	uint8_t									Fullscreen;
 	uint8_t									FixedResolution;
 	char 						   			*Name;

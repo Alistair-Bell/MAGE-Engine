@@ -59,7 +59,7 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
-int64_t mageBinarySearch(uint64_t *array, uint32_t low, uint32_t high, uint32_t key)
+static int64_t mageBinarySearch(uint64_t *array, uint32_t low, uint32_t high, uint32_t key)
 {
     /* Sourced -> https://github.com/vvs14/searching/blob/master/binary_search.c */
 	if (low <= high)
@@ -88,6 +88,20 @@ static void mageCallSystem(struct mageScene *scene, struct mageSystemTable *tabl
     
     MAGE_LOG_CORE_WARNING("HEre\n", NULL);
 }
+static uint32_t mageFindTableByTag(struct mageScene *scene, const char *tag)
+{
+    /* Need to find a better way to do this but it will do for now */
+    uint32_t i;
+    uint8_t found = MAGE_FALSE;
+    for (i = 0; i < scene->TableCount; i++)
+    {
+        if (strcmp(scene->ComponentTables[i].Identifier, tag) == 0) return i;
+    }
+    MAGE_LOG_CORE_FATAL_ERROR("Unable to find table %s!\n", tag);
+    MAGE_ASSERT(found != MAGE_TRUE);
+    return MAGE_FALSE;
+}
+
 
 void mageSceneCreate(struct mageScene *scene, const struct mageSceneCreateInfo *info)
 {
@@ -138,22 +152,10 @@ void mageSceneBindEntityRequiredComponents(struct mageScene *scene, const mageEn
 }
 struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScene *scene, const char *component, void *data, mageEntity *entities, const uint64_t count)
 {
-    uint32_t i;
-    uint8_t found = MAGE_FALSE;
     uint64_t tableIndex;
     uint64_t componentIndex;
     struct mageComponentHandle returnValue;
-
-    /* Finding table */
-    for (i = 0; i < scene->TableCount; i++)
-    {
-        if (strcmp(component, scene->ComponentTables[i].Identifier) == 0)
-        {
-            found = MAGE_TRUE;
-            break;
-        }
-    }
-    MAGE_ASSERT(found != MAGE_FALSE);
+    uint32_t i = mageFindTableByTag(scene, component);
     tableIndex = i;
 
     /* Allocating component */
@@ -292,16 +294,8 @@ uint32_t mageSceneSystemRegister(struct mageScene *scene, const mageSystemCallba
     /* Find a better way to find handles, this is not that efficient but that is a job for future me */
     for (i = 0; i < count; i++)
     {
-        uint8_t found = MAGE_FALSE;
-        for (j = 0; j < scene->TableCount; j++)
-        {
-            if (strcmp(tokens[i], scene->ComponentTables[i].Identifier) == 0)
-            {
-                found = MAGE_TRUE;
-                table.ComponentIDs[i] = scene->ComponentTables[i].ID;
-            }
-        }
-        MAGE_ASSERT(found == MAGE_TRUE);
+        uint32_t index = mageFindTableByTag(scene, tokens[i]);
+        table.ComponentIDs[i] = scene->ComponentTables[i].ID;
     }
     switch (threadPriority)
     {
