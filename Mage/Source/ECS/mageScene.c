@@ -334,7 +334,7 @@ void mageSceneEntityDestroy(struct mageScene *scene, mageEntity entity)
         uint32_t actualIndex = i + 1;
         
         currentComponent = &scene->ComponentTables[handles[actualIndex].TableIndex].Stored[handles[actualIndex].ComponentIndex];
-        table = &scene->ComponentTables[i];
+        table = &scene->ComponentTables[actualIndex];
         uint32_t tableIndex = handles[actualIndex].TableIndex;
         currentComponent->SharedCount--;
 
