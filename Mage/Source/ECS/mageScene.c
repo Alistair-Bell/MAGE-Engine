@@ -98,7 +98,7 @@ static uint32_t mageFindTableByTag(struct mageScene *scene, const char *tag)
         if (strcmp(scene->ComponentTables[i].Identifier, tag) == 0) return i;
     }
     MAGE_LOG_CORE_FATAL_ERROR("Unable to find table %s!\n", tag);
-    MAGE_ASSERT(found != MAGE_TRUE);
+    MAGE_ASSERT(found != MAGE_FALSE);
     return MAGE_FALSE;
 }
 
