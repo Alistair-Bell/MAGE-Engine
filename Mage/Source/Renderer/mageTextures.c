@@ -195,7 +195,7 @@ mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePat
     
     mageDescriptorSetsUpdate(&texture->Image, &texture->View, &texture->Sampler, nativeSamplerMode, renderer);
     mageBufferWrapperDestroy(&stagingBuffer, renderer);
-    if (usingDefault)
+    if (!usingDefault)
         MAGE_LOG_CORE_INFORM("Texture %s was created with source of %dpx by %dpx\n", texturePath, width, height);
     else
         MAGE_LOG_CORE_INFORM("Default texture %s was created with source of %dpx by %dpx\n", defaultTexture, width, height);
