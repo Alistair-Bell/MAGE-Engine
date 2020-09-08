@@ -2,6 +2,18 @@
 BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}"
 BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}"
 
+newoption 
+{
+    trigger     = "renderer",
+    value       = "API",
+    description = "Choose a particular rendering backend",
+    default     = "opengl",
+    allowed = {
+       { "vulkan",    "Vulkan 1.2" },
+       { "gles",  "OpenGL ES 3.2" },
+    }
+ }
+
 workspace "MAGE"
     architecture "x64"
 

@@ -122,7 +122,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
 
     for x in requiredKeys:
         value = list(searchingDictionary[x])[0]
-        LogMessage("Value %s not present, using default value %s" % (x, value))
+        LogMessage("Value %s not present, using default value %s" % (x, value), LogModes["Warning"])
         returnValues.append(value)
 
     # Removing any possible duplicates
