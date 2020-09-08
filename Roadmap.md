@@ -27,7 +27,8 @@
 ## Version 2.0 release
 
 ### Key features
-    - To be decided
+    - OpenGL ES 3.2 support 
+    - More to be decided
 
 ### Platforms
     - To be decided
