@@ -36,8 +36,8 @@ class Command:
         tokens = [ x.strip() for x in command.strip('[]').split(' ') ]
         return tokens
 
-    def CallCommand(self):
-        command = self.PlatformCommands[GetPlatform()]
+    def CallCommand(self, forcePlatform=GetPlatform()):
+        command = self.PlatformCommands[forcePlatform]
         if command == None:
             return
         subprocess.run(args=command, shell = True, check=True )
@@ -85,19 +85,18 @@ def GenerateDefaultArguments(dictionary):
 # The default uses the key: value[0]
 def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
     returnValues = []
-    actualArguments = rawArguments[1 : len(rawArguments)]
 
     # No arguments specified
     if len(rawArguments) < 1:
         LogMessage("No arguments specified")
         if helpInfo != None:
             helpInfo()
-            return GenerateDefaultArguments(searchingDictionary)
+            return returnValues
     
     requiredKeys = list(searchingDictionary.keys())
 
     # removing the uneccesary command line arguments
-    for raw in actualArguments:
+    for raw in rawArguments:
         splitter = -1
         try:
             splitter = int(raw.index("="))
