@@ -19,7 +19,7 @@ CommandLineOptions = {
     "--config=": [ "debug", "release" ],
     "--platform=": list(GetSupportedBuildPlatforms()),
     "--targets=": [ "all", "sandbox", "engine", "externals" ],
-    "--generator=": [ "vs2019", "vs2017", "xcode", "makefile", "codelite" ],
+    "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
     "--renderer=": [ "vulkan", "gles" ],
 }
 
@@ -76,14 +76,17 @@ def Main():
     generator       = FindArgumentByKey("--generator=", arguments, CommandLineOptions)
     renderer        = FindArgumentByKey("--renderer=", arguments, CommandLineOptions)
     
-    if generator == "makefile":
-        generator = "gmake2"
-    
     targetSwitcher = {
         "all":          "all",
         "sandbox":      "Sandbox",
         "engine":       "MageEngine",
         "externals":    "GLFW stb-image"
+    }
+    generatorSwitcher = {
+        "vsproject":        "vs2019",
+        "xcode":            "xcode",
+        "makefile":         "gmake2",
+        "codelite":         "codelite",
     }
     
 
@@ -95,12 +98,12 @@ def Main():
                 \n\tHardware renderer -> %s" % (config, platform, targets, generator, renderer))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s %s" % (locations[GetPlatform()], renderer, generator)
+    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --cc=clang %s" % (locations[GetPlatform()], renderer, generatorSwitcher[generator])
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     
 
-    if generator == "gmake2":
+    if generator == "makefile":
         LogMessage("Using makefile as build system, calling make")
         makeString = "make config=%s %s" % (config, targetSwitcher[targets])
         bar = Command(makeString, makeString, makeString)

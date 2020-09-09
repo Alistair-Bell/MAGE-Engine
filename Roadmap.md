@@ -22,12 +22,12 @@
       - Fedora ✅
       - CentOS support ❌
       - Arch support ❌
-    - MacOS support (64 bit)
+    - MacOS support (64 bit) ❌
 
 ## Version 2.0 release
 
 ### Key features
-    - OpenGL ES 3.2 support 
+    - OpenGL ES 3.2 support ❌
     - More to be decided
 
 ### Platforms
