@@ -7,7 +7,6 @@ static struct mageApplication   *SandboxApplication;
 static struct mageShader        shaders[2];
 static struct mageRenderable    renderable, renderable2;
 
-
 void CreateShaders()
 {
     mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
@@ -114,9 +113,8 @@ MAGE_ENTRY_POINT()
 
     struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, human);
 
+    MAGE_ECS_REGISTER_SYSTEM(&s, System, MAGE_ECS_SYSTEM_TYPE_UPDATE, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 1, struct mageTransform);
     
-    
-    SANDBOX_LOG_CORE_FATAL_ERROR("%f %f %f\n", data.Location.X, data.Location.Y, data.Location.Z);
 
     
 

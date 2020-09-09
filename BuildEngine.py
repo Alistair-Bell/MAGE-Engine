@@ -88,7 +88,7 @@ def Main():
         "makefile":         "gmake2",
         "codelite":         "codelite",
     }
-    
+
 
     LogMessage("Build options \
                 \n\tConfig -> %s \

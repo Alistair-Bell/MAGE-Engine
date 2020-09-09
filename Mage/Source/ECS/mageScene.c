@@ -311,7 +311,7 @@ uint32_t mageSceneSystemRegister(struct mageScene *scene, const mageSystemCallba
             break;
     }
     memcpy(&scene->Systems[systemIndex], &table, sizeof(struct mageSystemTable));
-    MAGE_LOG_CORE_INFORM("Registering system %lu requiring: %s\n", systemIndex + 1, f);
+    MAGE_LOG_CORE_INFORM("Registering system %lu requiring: %s\n", systemIndex, f);
     MAGE_MEMORY_FREE(arguments);
     return systemIndex;
 }
@@ -393,7 +393,7 @@ mageResult mageSceneTick(struct mageScene *scene)
         }
     }
     MAGE_LOG_CORE_INFORM("Using %d update systems, %d fixed update systems and %d late update systems\n", updateCount, fixedCount, lateCount);
-
+    
 
 
     return MAGE_RESULT_SUCCESS;

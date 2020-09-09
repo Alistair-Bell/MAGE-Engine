@@ -1,5 +1,5 @@
-#ifndef __MAGE_API__
-#define __MAGE_API__
+#ifndef MAGE_API_HEADER
+#define MAGE_API_HEADER
 
 #include "mageCore.h"
 

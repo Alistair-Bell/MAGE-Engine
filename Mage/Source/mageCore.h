@@ -1,5 +1,5 @@
-#ifndef __MAGE_CORE__
-#define __MAGE_CORE__
+#ifndef MAGE_CORE_HEADER
+#define MAGE_CORE_HEADER
 
 /*
 	This file contains core macros used by the engine and handles the includes for the engine

@@ -1,5 +1,5 @@
-#ifndef __SANDBOX_CORE__
-#define __SANDBOX_CORE__
+#ifndef SANDBOX_HEADER
+#define SANDBOX_HEADER
 
 #include <mageAPI.h>
 
