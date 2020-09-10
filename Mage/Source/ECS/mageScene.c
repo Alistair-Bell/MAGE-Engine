@@ -59,7 +59,7 @@ static uint32_t mageAddComponentToTable(struct mageComponentTable *table, struct
     memcpy(&table->Stored[componentIndex], &component, sizeof(struct mageComponent));
     return componentIndex;
 }
-static int64_t mageBinarySearch(uint64_t *array, uint32_t low, uint32_t high, uint32_t key)
+static int64_t mageBinarySearch(uint64_t *array, uint64_t low, uint64_t high, uint64_t key)
 {
     /* Sourced -> https://github.com/vvs14/searching/blob/master/binary_search.c */
 	if (low <= high)
@@ -82,11 +82,15 @@ static void mageCallSystem(struct mageScene *scene, struct mageSystemTable *tabl
     if (scene->Entities->Handles[entity][0].Data < table->ComponentCount)
         return;
     
+    uint32_t i;
     uint64_t handlesCount = scene->Entities->Handles[entity][0].Data;
-    struct mageComponentHandle handles[handlesCount];
-    memcpy(handles, scene->Entities->Handles[entity] + 1, sizeof(struct mageComponentHandle) * handlesCount);
+    uint64_t handles[handlesCount];
+    memcpy(handles, scene->Entities->Handles[entity] + 1, sizeof(uint64_t) * handlesCount);
+    for (i = 0; i < table->ComponentCount; i++)
+    {
+    }
+
     
-    MAGE_LOG_CORE_WARNING("HEre\n", NULL);
 }
 static uint32_t mageFindTableByTag(struct mageScene *scene, const char *tag)
 {
@@ -95,7 +99,7 @@ static uint32_t mageFindTableByTag(struct mageScene *scene, const char *tag)
     uint8_t found = MAGE_FALSE;
     for (i = 0; i < scene->TableCount; i++)
     {
-        if (strcmp(scene->ComponentTables[i].Identifier, tag) == 0) return i;
+        if (strcmp(scene->ComponentTables[i].Identifier, tag) == 0) return scene->ComponentTables[i].ID;
     }
     MAGE_LOG_CORE_FATAL_ERROR("Unable to find table %s!\n", tag);
     MAGE_ASSERT(found != MAGE_FALSE);
@@ -168,6 +172,32 @@ struct mageComponentHandle mageSceneComponentFromTagBindEntities(struct mageScen
 
     returnValue = mageComponentHandleGenerate(tableIndex, componentIndex);
     
+    /* Coppy to entity handle */
+    for (i = 0; i < count; i++)
+    {
+        mageUpdateEntityComponentHandle(scene, &returnValue, entities[i], 1);
+    }
+    return returnValue;
+}
+struct mageComponentHandle mageSceneComponentFromIDBindEntities(struct mageScene *scene, const uint32_t id, void *data, mageEntity *entities, const uint64_t count)
+{
+    MAGE_ASSERT(id < scene->TableCount);
+    uint64_t tableIndex;
+    uint64_t componentIndex;
+    struct mageComponentHandle returnValue;
+    tableIndex = id;
+
+    /* Allocating component */
+    struct mageComponent c;
+    c.Data = MAGE_MEMORY_ALLOCATE(scene->ComponentTables[tableIndex].ByteSize);
+    memcpy(c.Data, data, scene->ComponentTables[tableIndex].ByteSize);
+    c.SharedCount = count;
+    componentIndex = mageAddComponentToTable(&scene->ComponentTables[tableIndex], c, scene->MaxComponents);
+
+
+    returnValue = mageComponentHandleGenerate(tableIndex, componentIndex);
+    
+    uint32_t i;
     /* Coppy to entity handle */
     for (i = 0; i < count; i++)
     {
@@ -290,8 +320,7 @@ uint32_t mageSceneSystemRegister(struct mageScene *scene, const mageSystemCallba
     memset(table.ComponentIDs, 0, sizeof(uint32_t) * count);
 
     uint32_t i, j;
-    /* Find handles */
-    /* Find a better way to find handles, this is not that efficient but that is a job for future me */
+
     for (i = 0; i < count; i++)
     {
         uint32_t index = mageFindTableByTag(scene, tokens[i]);
@@ -370,7 +399,7 @@ mageResult mageSceneTick(struct mageScene *scene)
     struct mageSystemTable *fixedTables[scene->SystemCount];
     struct mageSystemTable *lateTables[scene->SystemCount];
 
-    uint32_t i;
+    uint32_t i, j;
     for (i = 0; i < scene->SystemCount; i++)
     {
         switch (scene->Systems[i].Type)
@@ -394,8 +423,13 @@ mageResult mageSceneTick(struct mageScene *scene)
     }
     MAGE_LOG_CORE_INFORM("Using %d update systems, %d fixed update systems and %d late update systems\n", updateCount, fixedCount, lateCount);
     
-
-
+    for (j = 0; j < scene->Entities->ActiveCount; j++)
+    {
+        for (i = 0; i < updateCount; i++)
+        {
+            mageCallSystem(scene, updateTables[i], scene->Entities->Pooled[i]);
+        }
+    }
     return MAGE_RESULT_SUCCESS;
 }
 void mageSceneDestroy(struct mageScene *scene)

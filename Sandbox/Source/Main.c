@@ -101,22 +101,13 @@ MAGE_ENTRY_POINT()
     memset(&t, 0, sizeof(struct mageTransform));
     memset(&v, 0, sizeof(struct mageVector3));
 
+    mageEntity e = mageSceneEntityCreate(&s);
+    struct mageComponentHandle h1 = MAGE_ECS_BIND_NEW_COMPONENT_BY_ID_TO_ENTITIES(&s, transform, &t, &e, 1);
     
-    mageEntity creature             = mageSceneEntityCreate(&s);
-    mageEntity human                = mageSceneEntityCreate(&s);
-
-    struct mageComponentHandle v3 = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageVector3, &v, &creature, 1);
-    struct mageComponentHandle tf = MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(&s, struct mageTransform, &t, &creature, 1);
+    struct mageTransform trf = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, h1, e);
     
-    MAGE_ECS_BIND_EXISTING_COMPONENT_TO_ENTITIES(&s, tf, &human, 1);
-    mageSceneEntityDestroy(&s, creature);
-
-    struct mageTransform data = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, tf, human);
 
     MAGE_ECS_REGISTER_SYSTEM(&s, System, MAGE_ECS_SYSTEM_TYPE_UPDATE, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 1, struct mageTransform);
-    
-
-    
 
     mageSceneTick(&s);
     mageSceneDestroy(&s);
