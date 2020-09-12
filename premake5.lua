@@ -24,9 +24,21 @@ newoption
     }
 }
 
-RendererLinks = {}
-RendererLinks["vulkan"]     = "vulkan"
-RendererLinks["gl"]         = "glad"
+-- Table of libraries that should be linked againsed
+ConfigurationLinks = {}
+-- Renderers
+ConfigurationLinks["vulkan"]        = "vulkan"
+ConfigurationLinks["gles"]          = "glad"
+-- Audio
+ConfigurationLinks["pulse"]         = "pulse"
+
+-- Table of macros that should be defined
+ConfigurationDefines = {}
+-- Renderers
+ConfigurationDefines["vulkan"]  = "MAGE_VULKAN_BACKEND"
+ConfigurationDefines["gles"]    = "MAGE_GLES_BACKEND"
+-- Audio
+ConfigurationDefines["pulse"]   = "MAGE_PULSE_AUDIO_BACKEND"
 
 workspace "MAGE"
     architecture "x64"
@@ -36,12 +48,16 @@ workspace "MAGE"
         "Debug",
         "Release",
     }
-
     startproject "Sandbox"
+
+
+
 
 group "Externals"
     include "Mage/Externals/glfw3"
+if _OPTIONS["renderer"] == "gles" then
     include "Mage/Externals/glad/"
+end
     include "Mage/Externals/stb-image"
 
     
@@ -71,7 +87,10 @@ project "MageEngine"
     defines
     {
         "MAGE_CORE",
-        "MAGE_ASSERTS"
+        "MAGE_ASSERTS",
+        ConfigurationDefines[_OPTIONS["renderer"]],
+        ConfigurationDefines[_OPTIONS["audio-backend"]],
+
     }
     includedirs
     {
@@ -130,7 +149,7 @@ project "Sandbox"
         "MageEngine",
         "GLFW",
         "stb-image",
-        RendererLinks[_OPTIONS["renderer"]]
+        ConfigurationLinks[_OPTIONS["renderer"]]
     }
     
     filter "system:linux"
