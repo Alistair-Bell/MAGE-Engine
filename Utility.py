@@ -43,7 +43,10 @@ class Command:
         subprocess.run(args=command, shell = True, check=True )
 
 def LogMessage(message, mode = LogModes["Inform"]):
-    print("%s%s" % (mode, message))
+    if GetPlatform() != "win32":
+        print("%s%s" % (mode, message))
+    else:
+        print("%s" % (message))
 
 def LogReset():
     print(LogModes["Reset"], end = '')

@@ -20,7 +20,7 @@ CommandLineOptions = {
     "--platform=": list(GetSupportedBuildPlatforms()),
     "--targets=": [ "all", "sandbox", "engine", "externals" ],
     "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
-    "--renderer=": [ "vulkan", "gles" ],
+    "--renderer=": [ "vulkan", "gl" ],
 }
 
 def FindArgumentByKey(searchingKey, values, dictionary):

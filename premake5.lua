@@ -10,9 +10,23 @@ newoption
     default     = "opengl",
     allowed = {
        { "vulkan",    "Vulkan 1.2" },
-       { "gles",  "OpenGL ES 3.2" },
+       { "gles",  "OpenGL ES 2.0" },
     }
- }
+}
+newoption
+{
+    trigger     = "audio-backend",
+    value       = "API",
+    description = "Choose a particular audio backend",
+    default     = "pulse",
+    allowed     = {
+        { "pulse", "Pulse Audio 13.99.1" },
+    }
+}
+
+RendererLinks = {}
+RendererLinks["vulkan"]     = "vulkan"
+RendererLinks["gl"]         = "glad"
 
 workspace "MAGE"
     architecture "x64"
@@ -27,8 +41,7 @@ workspace "MAGE"
 
 group "Externals"
     include "Mage/Externals/glfw3"
-    -- include "Mage/Externals/libyaml"
-    -- include "Mage/Externals/libogg"
+    include "Mage/Externals/glad/"
     include "Mage/Externals/stb-image"
 
     
@@ -116,8 +129,8 @@ project "Sandbox"
     {
         "MageEngine",
         "GLFW",
-        "vulkan",
-        "stb-image"
+        "stb-image",
+        RendererLinks[_OPTIONS["renderer"]]
     }
     
     filter "system:linux"
@@ -127,7 +140,7 @@ project "Sandbox"
             "pthread",
             "m",
         }
-    
+
     filter "configurations:Debug"
         defines "SANDBOX_DEBUG"    
         runtime "Debug"
