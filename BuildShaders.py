@@ -1,4 +1,5 @@
 import os, sys, json
+from pathlib import Path
 
 from Utility import *
 
@@ -31,6 +32,11 @@ ShaderExtensions = {
     "Geometry": [ "geom" ],
     "Fragment": [ "frag" ],
     "Compute": [ "comp" ],
+}
+CommandLineOptions = {
+    # None does not care what 
+    "--shaders=": [],
+    "--optimisation=": [ "speed", "size", "none" ]
 }
 
 CompilerOptmisations = [ "none", "speed", "size" ]
@@ -88,23 +94,36 @@ def HandleShader(shaders, optimisation, validator, compiler):
         CompileShader(shader, optimisation, compiler)
     LogMessage("Validated and compiled all shaders!")
 
-def Main():
-    arguments = sys.argv
-    optimisation = str(arguments[-1]).lower()
-    
-    # Validating input 
-    if not CheckExistence("Config/Locations.json"):
-        LogMessage("Config file was not found! make sure you run Setup.py and set the values in the Config/Setting.json", LogModes["Error"])
-        return
-    LogMessage("Config file found! Reading data!", LogModes["Inform"])
-    
-    if len(arguments) < 3:
-        LogMessage("Invalid argument count!, 2 are required!", LogModes["Error"])
-        return
+def GenerateShaderArguments():
+    # This code is not too pretty but it will do for now
+    returnValues = []
+    for root, dirs, files in os.walk("."):
+        for file in files:
+            for x, y in ShaderExtensions.items():
+                for v in y:
+                    if file.endswith(v):
+                        returnValues.append(str(root[2: len(root)]))
+    return returnValues
 
-    if optimisation not in CompilerOptmisations:
-        LogMessage("Invalid optimistaion setting %s, available options %s" % (optimisation, CompilerOptmisations), LogModes["Error"])
+def ScriptHelp():
+    LogMessage("Script that validates, builds shaders into sprv assembly, renderers backends like vulkan require this binary format and opengl can use this")
+    LogMessage("Usage: %s:" % (__file__))
+    i = 1
+    for x, y in CommandLineOptions.items():
+        print("\tArgument %s: prefix = %s, acceptable = %s" % (i, x, y))
+        i += 1
+
+def Main():
+    
+    CommandLineOptions["--shaders="] = GenerateShaderArguments()
+    
+    arguments = ParseCommandLineArgument(sys.argv[1 : len(sys.argv)], CommandLineOptions, ScriptHelp)
+    # checking if help was called
+    if arguments == []:
         return
+    
+    optimisation = arguments[1]
+
 
     glslValidator = ""
     glslCompiler  = ""
@@ -132,14 +151,12 @@ def Main():
     shaderFiles = []
 
     # Getting the directories
-    for x in range(1, len(sys.argv) - 1):
-        paths.append(str(arguments[x]))    
 
     # Getting files
-    for path in paths:
-        files = GetShaders(path)
-        if files is not []:
-            shaderFiles += files
+    
+    files = GetShaders(arguments[0])
+    if files is not []:
+        shaderFiles += files
 
     LogMessage("Validating and building %s shaders with %s optmisation set" % (len(shaderFiles), optimisation))
 

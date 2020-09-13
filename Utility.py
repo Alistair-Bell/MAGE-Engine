@@ -109,7 +109,8 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
             passed = False
             for x, y in searchingDictionary.items():
                 lowerBound = str(raw[0 : splitter + 1])
-                upperBound = str(raw[splitter + 1: len(raw)]) 
+                upperBound = str(raw[splitter + 1: len(raw)])
+            
                 if not (lowerBound != x or upperBound not in y):
                     requiredKeys.remove(lowerBound)
                     returnValues.append(upperBound)
