@@ -103,7 +103,7 @@ def GenerateShaderArguments():
                 for v in y:
                     if file.endswith(v):
                         returnValues.append(str(root[2: len(root)]))
-    return returnValues
+    return list(dict.fromkeys(returnValues))
 
 def ScriptHelp():
     LogMessage("Script that validates, builds shaders into sprv assembly, renderers backends like vulkan require this binary format and opengl can use this")
