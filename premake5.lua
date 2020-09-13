@@ -40,6 +40,14 @@ ConfigurationDefines["gles"]    = "MAGE_GLES_BACKEND"
 -- Audio
 ConfigurationDefines["pulse"]   = "MAGE_PULSE_AUDIO_BACKEND"
 
+-- Table of files to include
+ConfigurationFiles  = {}
+ConfigurationFiles["vulkan"]    = "Mage/Source/Vulkan/**.*"
+ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
+ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
+
+
+
 workspace "MAGE"
     architecture "x64"
 
@@ -142,6 +150,8 @@ project "Sandbox"
     {
         "%{prj.name}/**.h",   
         "%{prj.name}/**.c",
+        ConfigurationFiles[_OPTIONS["renderer"]],
+        ConfigurationFiles[_OPTIONS["audio-backend"]],
     }
 
     links
@@ -149,7 +159,8 @@ project "Sandbox"
         "MageEngine",
         "GLFW",
         "stb-image",
-        ConfigurationLinks[_OPTIONS["renderer"]]
+        ConfigurationLinks[_OPTIONS["renderer"]],
+        ConfigurationLinks[_OPTIONS["audio-backend"]],
     }
     
     filter "system:linux"
