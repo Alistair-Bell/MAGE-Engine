@@ -22,8 +22,9 @@ CommandLineOptions = {
     "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
     "--compiler=": [ "clang", "gcc", "mingw" ],
     "--renderer=": [ "vulkan", "gles" ],
-    "--audio-driver=": [ "pulse-audio" ],
+    "--audio-driver=": [ "pulse" ],
 }
+
 def ScriptHelp():
     LogMessage("Usage: %s:" % (__file__))
     i = 1
@@ -91,7 +92,7 @@ def Main():
                 \n\tHardware renderer -> %s" % (config, platform, targets, generator, renderer))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --cc=%s %s" % (locations[GetPlatform()], renderer, compiler, generatorSwitcher[generator])
+    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], renderer, audioBackend, compiler, generatorSwitcher[generator])
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     
