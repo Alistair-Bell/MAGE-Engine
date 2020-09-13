@@ -20,19 +20,10 @@ CommandLineOptions = {
     "--platform=": list(GetSupportedBuildPlatforms()),
     "--targets=": [ "all", "sandbox", "engine", "externals" ],
     "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
-    "--renderer=": [ "vulkan", "gl" ],
+    "--compiler=": [ "clang", "gcc", "mingw" ],
+    "--renderer=": [ "vulkan", "gles" ],
+    "--audio-driver=": [ "pulse-audio" ],
 }
-
-def FindArgumentByKey(searchingKey, values, dictionary):
-    keyValues = dictionary.get(searchingKey)
-    if keyValues is None:
-        LogMessage("Invalid dictionary key %s!" % (searchingKey), LogModes["Error"])
-        return None
-    for x in values:
-        if x in keyValues:
-            return x
-    return None
-
 def ScriptHelp():
     LogMessage("Usage: %s:" % (__file__))
     i = 1
@@ -70,11 +61,13 @@ def Main():
         # todo script loading
         pass
 
-    config          = FindArgumentByKey("--config=", arguments, CommandLineOptions)
-    platform        = FindArgumentByKey("--platform=", arguments, CommandLineOptions)
-    targets         = FindArgumentByKey("--targets=", arguments, CommandLineOptions)
-    generator       = FindArgumentByKey("--generator=", arguments, CommandLineOptions)
-    renderer        = FindArgumentByKey("--renderer=", arguments, CommandLineOptions)
+    config          = arguments[0]
+    platform        = arguments[1]
+    targets         = arguments[2]
+    generator       = arguments[3]
+    compiler        = arguments[4]
+    renderer        = arguments[5]
+    audioBackend    = arguments[6] 
     
     targetSwitcher = {
         "all":          "all",
@@ -98,7 +91,7 @@ def Main():
                 \n\tHardware renderer -> %s" % (config, platform, targets, generator, renderer))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --cc=clang %s" % (locations[GetPlatform()], renderer, generatorSwitcher[generator])
+    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --cc=%s %s" % (locations[GetPlatform()], renderer, compiler, generatorSwitcher[generator])
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     

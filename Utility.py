@@ -130,7 +130,17 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
 
     # Removing any possible duplicates
     returnValues = list(dict.fromkeys(returnValues))
-    return returnValues
+    
+    # sorting by key
+
+    sortedList = [None] * len(returnValues)
+
+    for returnIndex in range(0, len(returnValues)):
+        keys = [*searchingDictionary.keys()]         
+        for keyIndex in range(0, len(keys)):
+            if returnValues[returnIndex] in searchingDictionary[keys[keyIndex]]:
+                sortedList[keyIndex] = returnValues[returnIndex]
+    return sortedList
 
 
 if __name__ == '__main__':
