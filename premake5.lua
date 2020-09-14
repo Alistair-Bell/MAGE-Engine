@@ -69,14 +69,12 @@ end
     include "Mage/Externals/stb-image"
 
     
-    
 -- Engine Project
 project "MageEngine"
     location "Mage"
     kind "StaticLib"
     language "C"
-    cdialect "C89"
-
+    
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
@@ -89,8 +87,8 @@ project "MageEngine"
         "Mage/Source/Maths/*.c",
         "Mage/Source/ECS/*.h",
         "Mage/Source/ECS/*.c",
-        "Mage/Source/Renderer/*.h",
-        "Mage/Source/Renderer/*.c",
+        ConfigurationFiles[_OPTIONS["renderer"]],
+        ConfigurationFiles[_OPTIONS["audio-backend"]],
     }
     defines
     {
@@ -137,7 +135,6 @@ project "Sandbox"
     location "%{prj.name}"
     kind "ConsoleApp"
     language "C"
-    cdialect "C89"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
@@ -150,8 +147,6 @@ project "Sandbox"
     {
         "%{prj.name}/**.h",   
         "%{prj.name}/**.c",
-        ConfigurationFiles[_OPTIONS["renderer"]],
-        ConfigurationFiles[_OPTIONS["audio-backend"]],
     }
 
     links
