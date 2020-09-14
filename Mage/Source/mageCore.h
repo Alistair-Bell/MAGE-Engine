@@ -117,6 +117,10 @@
 	#define MAGE_API 
 #endif
 
+#if defined (MAGE_PULSE_AUDIO_BACKEND)
+	#include <pulse/pulseaudio.h>
+#endif
+
 
 /* C standard includes */
 #include <assert.h>

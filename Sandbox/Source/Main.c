@@ -2,6 +2,7 @@
 
 #define SANDBOX_ENTITY_COUNT 5
 
+
 /* Application instance */
 static struct mageApplication   *SandboxApplication;
 static struct mageShader        shaders[2];
@@ -18,7 +19,6 @@ void TransformConstructer(void *data, uint64_t size)
     struct mageTransform *t = ((struct mageTransform *)data);
     mageVector3CreateFromFloats(&t->Location, 1.0f, 2.0f, 3.0f);
 }
-
 void *System(void *package)
 {
     return MAGE_SYSTEM_SUCCESS;
@@ -81,8 +81,7 @@ MAGE_ENTRY_POINT()
     mageApplicationDestroy(SandboxApplication);
 
 #endif
-
-#if 1
+#if 0
     struct mageScene s;
     struct mageSceneCreateInfo i;
     i.ComponentLimit                = 10;
@@ -112,6 +111,15 @@ MAGE_ENTRY_POINT()
     mageSceneTick(&s);
     mageSceneDestroy(&s);
 #endif
+#if 1
+    struct mageAudioDriver d;
+    mageAudioDriverCreate(&d);
+    mageAudioDriverDestroy(&d);
+
+
+#endif
+
+
     free(SandboxApplication);
     mageLogEnd();
     return 1;

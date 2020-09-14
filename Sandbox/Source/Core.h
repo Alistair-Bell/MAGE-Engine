@@ -1,6 +1,7 @@
 #ifndef SANDBOX_HEADER
 #define SANDBOX_HEADER
 
+#define MAGE_PULSE_AUDIO_BACKEND
 #include <mageAPI.h>
 
 #if defined (SANDBOX_DEBUG)

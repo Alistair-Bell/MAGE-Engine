@@ -377,6 +377,45 @@ typedef void 		*(*mageSystemCallback)(void *);
 typedef void		(*mageComponentConstructer)(void *, const uint64_t);
 typedef void		(*mageComponentDeconstructer)(void *);
 
+enum MAGE_AUDIO_DRIVER_FLAGS_ENUM
+{
+	MAGE_AUDIO_DRIVER_FLAGS_READY = 0x01
+
+
+} mageAudioDriverFlags;
+
+#if defined (MAGE_PULSE_AUDIO_BACKEND)
+
+struct mageAudioDriver
+{
+	pa_context		*Context;
+	pa_stream 		*Stream;
+	pa_mainloop		*Loop;
+	mageThread		Thread;
+	uint32_t		MixRate;
+	uint32_t		BufferFrames;
+	uint32_t		BufferSize;
+	float 			Latency;
+	uint32_t		*SamplesIn;
+	uint32_t		*SamplesOut;
+	uint64_t		Flags;
+};
+
+
+#else
+	#error No other audio systems implimented
+
+#endif
+
+extern MAGE_API mageResult mageAudioDriverCreate(
+	struct mageAudioDriver *driver
+);
+extern MAGE_API void mageAudioDriverDestroy(
+	struct mageAudioDriver *driver
+);
+
+
+
 struct mageVector2
 {
 	union
