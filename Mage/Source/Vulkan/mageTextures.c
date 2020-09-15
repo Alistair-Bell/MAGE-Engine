@@ -162,7 +162,7 @@ static VkSamplerAddressMode mageSamplerModeToNative(mageTextureSamplerMode mode)
 }
 mageResult mageTextureCreate(struct mageTexture *texture, const char *texturePath, mageTextureSamplerMode samplerMode, struct mageRenderer *renderer)
 {
-    const char *defaultTexture = "Mage/Resources/Textures/MTEC/Logo.png";
+    const char *defaultTexture = "Mage/Resources/Textures/Vulkan/Vulkan_170px_Dec16.png";
     int32_t width, height, channels;
     uint8_t *fileData;
     fileData = stbi_load(texturePath, &width, &height, &channels, STBI_rgb_alpha);

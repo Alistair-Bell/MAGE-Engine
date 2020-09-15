@@ -10,8 +10,8 @@ static struct mageRenderable    renderable, renderable2;
 
 void CreateShaders()
 {
-    mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/fragment.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
-    mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/vertex.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
+    mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/Texture.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
+    mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/Default.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
 void TransformConstructer(void *data, uint64_t size)
 {
@@ -28,7 +28,7 @@ MAGE_ENTRY_POINT()
 {
     mageLogInitialise("Logs/mage.log");
     SandboxApplication = malloc(sizeof(struct mageApplication));
-#if 0
+#if 1
     CreateShaders();    
 
     struct mageApplicationCreateInfo applicationCreateInfo;
@@ -52,10 +52,10 @@ MAGE_ENTRY_POINT()
 
     struct mageVertex verticies1[] = 
     {
-        { .Vertex = { .X = -1.0f, .Y = -1.00f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
-        { .Vertex = { .X =  1.0f, .Y = -1.00f },   .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
-        { .Vertex = { .X =  1.0f, .Y =  1.00f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
-        { .Vertex = { .X = -1.0f, .Y =  1.00f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
+        { .Vertex = { .X = -0.5f, .Y = -0.5f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  0.5f, .Y = -0.5f },   .Color = { .X = 0.0f, .Y = 1.0f, .Z = 0.0f}, .TextureLocation = { .X = 1.0f, .Y = 0.0f } },  
+        { .Vertex = { .X =  0.5f, .Y =  0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 1.0f, .Y = 1.0f } },  
+        { .Vertex = { .X = -0.5f, .Y =  0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
     
     };
 
@@ -111,15 +111,6 @@ MAGE_ENTRY_POINT()
     mageSceneTick(&s);
     mageSceneDestroy(&s);
 #endif
-#if 1
-    struct mageAudioDriver d;
-    mageAudioDriverCreate(&d);
-    mageAudioDriverDestroy(&d);
-
-
-#endif
-
-
     free(SandboxApplication);
     mageLogEnd();
     return 1;
