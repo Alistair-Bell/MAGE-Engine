@@ -408,6 +408,10 @@ struct mageAudioDriver
 #endif
 
 extern MAGE_API mageResult mageAudioDriverCreate(
+	struct mageAudioDriver *driver,
+	void *userData
+);
+extern MAGE_API void mageAudioDriverDetectChannels(
 	struct mageAudioDriver *driver
 );
 extern MAGE_API void mageAudioDriverDestroy(

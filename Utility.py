@@ -125,6 +125,9 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
 
 
     for x in requiredKeys:
+        if len(list(searchingDictionary[x])) <= 0:
+            LogMessage("No available values for %s" % (list(searchingDictionary[x])), LogModes["Fatal Error"])
+            returnValues.append("")
         value = list(searchingDictionary[x])[0]
         LogMessage("Value %s not present, using default value %s" % (x, value), LogModes["Warning"])
         returnValues.append(value)
