@@ -10,12 +10,11 @@ static struct mageRenderable    renderable, renderable2;
 
 void CreateShaders()
 {
-    mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/Texture.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
+    mageShaderCreate(&shaders[0], "Mage/Resources/Shaders/DefaultTexture.sprv", "main", MAGE_SHADER_TYPE_FRAGMENT);
     mageShaderCreate(&shaders[1], "Mage/Resources/Shaders/Default.sprv", "main", MAGE_SHADER_TYPE_VERTEX);
 }
 void TransformConstructer(void *data, uint64_t size)
 {
-    
     struct mageTransform *t = ((struct mageTransform *)data);
     mageVector3CreateFromFloats(&t->Location, 1.0f, 2.0f, 3.0f);
 }
@@ -58,7 +57,6 @@ MAGE_ENTRY_POINT()
         { .Vertex = { .X = -0.5f, .Y =  0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
     
     };
-
     
     struct mageRenderableCreateInfo info;
     memset(&info, 0, sizeof(struct mageRenderableCreateInfo));
