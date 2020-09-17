@@ -23,6 +23,17 @@ newoption
         { "pulse", "Pulse Audio 13.99.1" },
     }
 }
+newoption
+{
+    trigger     = "scripting-language",
+    value       = "API",
+    description = "Choose a particular scripting language",
+    default     = "none",
+    allowed     = {
+        { "none", "Disables scripting" },
+        { "mono", "Mono C# 6 <" },
+    }
+}
 
 -- Table of libraries that should be linked againsed
 ConfigurationLinks = {}
@@ -45,7 +56,7 @@ ConfigurationFiles  = {}
 ConfigurationFiles["vulkan"]    = "Mage/Source/Vulkan/**.*"
 ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
-
+ConfigurationFiles["mono"]      = "Mage/Source/Mono/*.cs"
 
 
 workspace "MAGE"
@@ -62,13 +73,12 @@ workspace "MAGE"
 
 
 group "Externals"
-    include "Mage/Externals/glfw3"
 if _OPTIONS["renderer"] == "gles" then
     include "Mage/Externals/glad/"
 end
-    include "Mage/Externals/stb-image"
+include "Mage/Externals/stb-image"
+include "Mage/Externals/glfw3"
 
-    
 -- Engine Project
 project "MageEngine"
     location "Mage"
@@ -89,6 +99,7 @@ project "MageEngine"
         "Mage/Source/ECS/*.c",
         ConfigurationFiles[_OPTIONS["renderer"]],
         ConfigurationFiles[_OPTIONS["audio-backend"]],
+        ConfigurationFiles[_OPTIONS["scripting-language"]]   
     }
     defines
     {
@@ -96,7 +107,6 @@ project "MageEngine"
         "MAGE_ASSERTS",
         ConfigurationDefines[_OPTIONS["renderer"]],
         ConfigurationDefines[_OPTIONS["audio-backend"]],
-
     }
     includedirs
     {

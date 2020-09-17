@@ -11,7 +11,8 @@
                 "MAGE_CORE",
                 "SANDBOX_DEBUG",
                 "MAGE_ASSERTS",
-                "MAGE_PULSE_AUDIO_BACKEND"
+                "MAGE_PULSE_AUDIO_BACKEND",
+                "MAGE_VULKAN_BACKEND"
             ],
             "cStandard": "c89",
             "intelliSenseMode": "clang-x64"

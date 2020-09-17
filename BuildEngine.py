@@ -20,7 +20,8 @@ CommandLineOptions = {
     "--platform=": list(GetSupportedBuildPlatforms()),
     "--targets=": [ "all", "sandbox", "engine", "externals" ],
     "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
-    "--compiler=": [ "clang", "gcc", "mingw" ],
+    "--c-compiler=": [ "clang", "gcc", "mingw" ],
+    "--mono-compiler=": [ "none", "mono", "dot-net" ],
     "--renderer=": [ "vulkan", "gles" ],
     "--audio-driver=": [ "pulse" ],
 }
@@ -62,13 +63,14 @@ def Main():
         # todo script loading
         pass
 
-    config          = arguments[0]
-    platform        = arguments[1]
-    targets         = arguments[2]
-    generator       = arguments[3]
-    compiler        = arguments[4]
-    renderer        = arguments[5]
-    audioBackend    = arguments[6] 
+    config              = arguments[0]
+    platform            = arguments[1]
+    targets             = arguments[2]
+    generator           = arguments[3]
+    compiler            = arguments[4]
+    monoCompiler        = arguments[5]
+    renderer            = arguments[6]
+    audioBackend        = arguments[7] 
     
     targetSwitcher = {
         "all":          "all",
@@ -92,7 +94,14 @@ def Main():
                 \n\tHardware renderer -> %s" % (config, platform, targets, generator, renderer))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], renderer, audioBackend, compiler, generatorSwitcher[generator])
+    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], renderer, audioBackend, compiler)
+    
+    if monoCompiler != "none":
+        LogMessage("Building for c# scripting, native c is still allowed, supported platforms %s" % (GetSupportedBuildPlatforms()))
+        premakeString += str(" --dotnet=%s" % (monoCompiler))
+
+    premakeString += str(" %s" % (generatorSwitcher[generator]))
+
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     
