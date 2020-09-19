@@ -6,20 +6,19 @@ using System.Runtime.InteropServices;
 
 namespace Mage
 {
-    #region Debug
-
-    /* Interact with the logging system */
-    public partial class Log
+    namespace Debug
     {
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public static extern Inform(string message);
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public static extern Warning(string message);
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public static extern Error(string message);
-        [MethodImplAttribute(MethodImplOptions.InternalCall)]
-        public static extern Fatal(string message);
+        /* Interact with the logging system */
+        public partial class Log
+        {
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public static extern void Inform(string message);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public static extern void Warning(string message);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public static extern void Error(string message);
+            [MethodImplAttribute(MethodImplOptions.InternalCall)]
+            public static extern void Fatal(string message);
+        }
     }
-    
-    #endregion
 }

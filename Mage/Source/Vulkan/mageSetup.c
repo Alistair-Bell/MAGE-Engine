@@ -1,5 +1,6 @@
 #include <mageAPI.h>
 
+#define MAGE_VULKAN_VERSION "1.2"
 
 static const char *mageRequiredExtensions[] = 
 {
@@ -700,7 +701,7 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
 {   
     renderer->ConcurentFrames = 2;    
     renderer->CurrentFrame = 0;
-
+    MAGE_LOG_CORE_INFORM("Creating vulkan %s backend\n", MAGE_VULKAN_VERSION);
     uint32_t i;
     typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererCreateInfo *);
     function functions[] = 
@@ -730,7 +731,7 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
         VkResult result = functions[i](renderer, window, rendererInfo);
         if (result != VK_SUCCESS) return MAGE_RESULT_UNKNOWN;
     }
-    MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations\n", i, sizeof(functions) / sizeof(function));
+    MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations, succesfully created vulkan %s backend\n", i, sizeof(functions) / sizeof(function), MAGE_VULKAN_VERSION);
     return MAGE_RESULT_SUCCESS;
 }
 static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRendererCreateInfo *rendererInfo)
