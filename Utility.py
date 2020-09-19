@@ -49,7 +49,8 @@ def LogMessage(message, mode = LogModes["Inform"]):
         print("%s" % (message))
 
 def LogReset():
-    print(LogModes["Reset"], end = '')
+    if not GetPlatform() == "win32":
+        print(LogModes["Reset"], end = '')
 
 def CheckExistence(localPath):
     return os.path.exists(localPath)
