@@ -9,8 +9,9 @@ namespace Sandbox
         public static void Main(string[] arguments)
         {
             Vector2 vect = new Vector2(1.0f, 2.0f);
-            
-            Console.Write(string.Format("Main {0}\n", vect, vect));
+            Matrix3 matrix = new Matrix3(2.0f);
+            Console.Write(string.Format("vec2 {0}\n", vect));
+            Console.Write(string.Format("matrix\n{0}\n", matrix.ToString()));
         }
     }
 }

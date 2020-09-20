@@ -139,7 +139,7 @@ namespace Mage
 
             public override string ToString()
             {
-                return string.Format("Vector2 [{0} {1}]", new object[] { this.Y.ToString(), this.Y.ToString() });
+                return string.Format("{0} {1}", new object[] { this.X.ToString(), this.Y.ToString() });
             }
             public static void Log(Vector2 logging)
             {
@@ -295,7 +295,7 @@ namespace Mage
 
             public override string ToString()
             {
-                return string.Format("Vector3 [{0} {1} {2}]", new object[] { this.Y.ToString(), this.Y.ToString(), this.Z.ToString() });
+                return string.Format("{0} {1} {2}", new object[] { this.X.ToString(), this.Y.ToString(), this.Z.ToString() });
             }
             
             public static void Log(Vector3 logging)
@@ -477,7 +477,7 @@ namespace Mage
 
             public override string ToString()
             {
-                return string.Format("Vector4 [{0} {1} {2} {3}]", new object[] { this.Y.ToString(), this.Y.ToString(), this.Z.ToString(), this.W.ToString() });
+                return string.Format("{0} {1} {2} {3}", new object[] { this.X.ToString(), this.Y.ToString(), this.Z.ToString(), this.W.ToString() });
             }
         
             public static void Log(Vector4 logging)
@@ -513,13 +513,17 @@ namespace Mage
                 this.Z /= other.Z;
                 this.W /= other.W;
             }
-            
-            /*
-                C# implimentation of the mageMatrix3 structure (see mageAPI.h)
-            */
-            [Serializable]
-            [StructLayout(LayoutKind.Sequential)]
-            public class Matrix3
+        }
+        #endregion
+
+        #region Matrixs
+
+        /*
+            C# implimentation of the mageMatrix3 structure (see mageAPI.h)
+        */
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public class Matrix3
             {
                 public float[] Elements;
 
@@ -530,6 +534,7 @@ namespace Mage
                 }
                 public Matrix3(Vector3 column0, Vector3 column1, Vector3 column2)
                 {
+                    this.Elements = new float[9];
                     /* Column 0 */
                     this.Elements[0]    = column0.X;
                     this.Elements[3]    = column0.Y;
@@ -547,22 +552,38 @@ namespace Mage
                 }
                 public Matrix3(float diagonal)
                 {
+                    this.Elements = new float[9];
                     this.Elements[0] = diagonal;
                     this.Elements[4] = diagonal;
                     this.Elements[8] = diagonal;
                 }
                 public Matrix3()
                 {
-                    this.Elements = new Matrix3(1.0f).Elements;
+                    this.Elements = (float []) new Matrix3(1.0f).Elements;
                 }
-                
+                public Vector3 GetRow(int index)
+                {
+                    if (3 < index)
+                        throw new IndexOutOfRangeException();
+                        
+                    return new Vector3(
+                        this.Elements[index + 0 * 3],
+                        this.Elements[index + 1 * 3],
+                        this.Elements[index + 2 * 3]
+                    );
+                }
+                public override string ToString()
+                {
+                    return string.Format("{0}\n{1}\n{2}", new object[] { GetRow(0).ToString(), GetRow(1).ToString(), GetRow(2).ToString() });
+                }
+
             }
-            /*
-                C# implimentation of the mageMatrix3 structure (see mageAPI.h)
-            */
-            [Serializable]
-            [StructLayout(LayoutKind.Sequential)]
-            public class Matrix4
+        /*
+            C# implimentation of the mageMatrix3 structure (see mageAPI.h)
+        */
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        public class Matrix4
             {
                 public float[] Elements;
 
@@ -610,11 +631,6 @@ namespace Mage
                 }
 
             }
-        }
-
-
-
-
         #endregion
     }
 }
