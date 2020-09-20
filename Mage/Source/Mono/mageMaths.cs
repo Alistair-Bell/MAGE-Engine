@@ -177,9 +177,9 @@ namespace Mage
         [StructLayout(LayoutKind.Sequential)]
         public struct Vector3
         {
-            float X;
-            float Y;
-            float Z;
+            public float X;
+            public float Y;
+            public float Z;
 
             public float this[int vectorIndex]
             {
@@ -336,10 +336,10 @@ namespace Mage
         [StructLayout(LayoutKind.Sequential)]
         public struct Vector4
         {
-            float X;
-            float Y;
-            float Z;
-            float W;
+            public float X;
+            public float Y;
+            public float Z;
+            public float W;
 
             public float this[int vectorIndex]
             {
@@ -513,9 +513,103 @@ namespace Mage
                 this.Z /= other.Z;
                 this.W /= other.W;
             }
+            
+            /*
+                C# implimentation of the mageMatrix3 structure (see mageAPI.h)
+            */
+            [Serializable]
+            [StructLayout(LayoutKind.Sequential)]
+            public class Matrix3
+            {
+                public float[] Elements;
 
-        
-        
+                public Matrix3(float[] values)
+                {
+                    this.Elements = new float[9];
+                    this.Elements = values;  
+                }
+                public Matrix3(Vector3 column0, Vector3 column1, Vector3 column2)
+                {
+                    /* Column 0 */
+                    this.Elements[0]    = column0.X;
+                    this.Elements[3]    = column0.Y;
+                    this.Elements[6]    = column0.Z;
+
+                    /* Column 1 */
+                    this.Elements[1]    = column1.X;
+                    this.Elements[4]    = column1.Y;
+                    this.Elements[7]    = column1.Z;
+
+                    /* Column 2 */
+                    this.Elements[2]    = column2.X;
+                    this.Elements[5]    = column2.Y;
+                    this.Elements[8]    = column2.Z;
+                }
+                public Matrix3(float diagonal)
+                {
+                    this.Elements[0] = diagonal;
+                    this.Elements[4] = diagonal;
+                    this.Elements[8] = diagonal;
+                }
+                public Matrix3()
+                {
+                    this.Elements = new Matrix3(1.0f).Elements;
+                }
+                
+            }
+            /*
+                C# implimentation of the mageMatrix3 structure (see mageAPI.h)
+            */
+            [Serializable]
+            [StructLayout(LayoutKind.Sequential)]
+            public class Matrix4
+            {
+                public float[] Elements;
+
+                public Matrix4(float[] values)
+                {
+                    this.Elements = new float[16];
+                    this.Elements = values;  
+                }
+                public Matrix4(Vector4 column0, Vector4 column1, Vector4 column2, Vector4 column3)
+                {
+                    /* Column 0 */
+                    this.Elements[0]    = column0.X;
+                    this.Elements[4]    = column0.Y;
+                    this.Elements[8]    = column0.Z;
+                    this.Elements[12]   = column0.W;
+
+                    /* Column 1 */
+                    this.Elements[1]    = column1.X;
+                    this.Elements[5]    = column1.Y;
+                    this.Elements[9]    = column1.Z;
+                    this.Elements[13]   = column1.W;
+
+                    /* Column 2 */
+                    this.Elements[2]    = column2.X;
+                    this.Elements[6]    = column2.Y;
+                    this.Elements[10]   = column2.Z;
+                    this.Elements[14]   = column2.W;
+
+                    /* Column 3 */
+                    this.Elements[3]    = column3.X;
+                    this.Elements[7]    = column3.Y;
+                    this.Elements[11]   = column3.Z;
+                    this.Elements[15]   = column3.W;
+                }
+                public Matrix4(float diagonal)
+                {
+                    this.Elements[0]    = diagonal;
+                    this.Elements[5]    = diagonal;
+                    this.Elements[10]   = diagonal;
+                    this.Elements[15]   = diagonal;
+                }
+                public Matrix4()
+                {
+                    this.Elements = new Matrix4(1.0f).Elements;
+                }
+
+            }
         }
 
 
