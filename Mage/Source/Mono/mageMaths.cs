@@ -595,6 +595,7 @@ namespace Mage
                 public Matrix4(Vector4 column0, Vector4 column1, Vector4 column2, Vector4 column3)
                 {
                     /* Column 0 */
+                    this.Elements       = new float[16];
                     this.Elements[0]    = column0.X;
                     this.Elements[4]    = column0.Y;
                     this.Elements[8]    = column0.Z;
@@ -620,6 +621,7 @@ namespace Mage
                 }
                 public Matrix4(float diagonal)
                 {
+                    this.Elements       = new float[16];
                     this.Elements[0]    = diagonal;
                     this.Elements[5]    = diagonal;
                     this.Elements[10]   = diagonal;
@@ -628,6 +630,22 @@ namespace Mage
                 public Matrix4()
                 {
                     this.Elements = new Matrix4(1.0f).Elements;
+                }
+
+                public Vector4 GetRow(int index)
+                {
+                    if (4 <= index)
+                        throw new IndexOutOfRangeException();
+                    return new Vector4(
+                        this.Elements[index + 0 * 4],
+                        this.Elements[index + 1 * 4],
+                        this.Elements[index + 2 * 4],
+                        this.Elements[index + 3 * 4]
+                    );
+                }
+                public override string ToString()
+                {
+                    return string.Format("{0}\n{1}\n{2}\n{3}", new object[] { GetRow(0), GetRow(1), GetRow(2), GetRow(3) });
                 }
 
             }
