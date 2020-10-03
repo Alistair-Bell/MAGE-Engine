@@ -12,7 +12,7 @@
 	| |  | |/ ____ \ |__| | |____  | |____| | | | (_| | | | | |  __/
 	|_|  |_/_/    \_\_____|______| |______|_| |_|\__, |_|_| |_|\___|
 												__/ |             
-											    |___/              
+											   |___/              
 	
 	This header contains the generic function, enums and structures that are used in the engine
 	
@@ -883,6 +883,13 @@ struct mageTexture
 	uint32_t								Height;
 };
 
+#else
+
+struct mageTexture
+{
+    void *VoidData;
+};
+
 #endif
 
 extern MAGE_API mageResult mageTextureCreate(
@@ -941,6 +948,14 @@ struct mageBufferWrapper
 {
 	VkBuffer								Buffer;
 	VkDeviceMemory							AllocatedMemory;
+};
+
+#else
+
+struct mageBufferWrapper
+{
+    void *VoidData;
+
 };
 
 #endif
@@ -1223,8 +1238,7 @@ extern MAGE_API void mageRendererDrawQuads(
 	const uint32_t count
 );
 extern MAGE_API void mageRendererDestroy(
-	struct mageRenderer *renderer,
-	struct mageRendererCreateInfo *rendererInfo
+	struct mageRenderer *renderer
 );
 
 /* 
@@ -1282,17 +1296,8 @@ enum MAGE_AUDIO_DRIVER_FLAGS_ENUM
 
 struct mageAudioDriver
 {
-	pa_context		*Context;
-	pa_stream 		*Stream;
-	pa_mainloop		*Loop;
-	mageThread		Thread;
-	uint32_t		MixRate;
-	uint32_t		BufferFrames;
-	uint32_t		BufferSize;
-	float 			Latency;
-	uint32_t		*SamplesIn;
-	uint32_t		*SamplesOut;
-	uint64_t		Flags;
+	pa_mainloop			*MainLoop;
+	pa_context			*Context;
 };
 
 #endif
@@ -1346,8 +1351,8 @@ struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
-	struct mageApplicationCreateInfo		CreateInfo;
-	struct mageRendererCreateInfo			RendererCreateInfo;
+	/*struct mageApplicationCreateInfo		CreateInfo;*/
+	/*struct mageRendererCreateInfo			RendererCreateInfo;*/
 	uint8_t 								Running;
 };
 

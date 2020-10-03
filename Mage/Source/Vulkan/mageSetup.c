@@ -734,7 +734,7 @@ mageResult mageRendererCreate(struct mageRenderer *renderer, struct mageWindow *
     MAGE_LOG_CORE_INFORM("Renderer passed in %d of %d operations, succesfully created vulkan %s backend\n", i, sizeof(functions) / sizeof(function), MAGE_VULKAN_VERSION);
     return MAGE_RESULT_SUCCESS;
 }
-static void mageCleanupSwapChain(struct mageRenderer *renderer, struct mageRendererCreateInfo *rendererInfo)
+static void mageCleanupSwapChain(struct mageRenderer *renderer)
 {
     uint32_t i;
     
@@ -769,7 +769,7 @@ void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window
 {
     MAGE_LOG_CORE_INFORM("Recreating rendering swapchain, window / surface resized\n", NULL);
     vkDeviceWaitIdle(renderer->Device);
-    mageCleanupSwapChain(renderer, rendererProps);
+    mageCleanupSwapChain(renderer);
     typedef VkResult (*function)(struct mageRenderer *, struct mageWindow *, struct mageRendererCreateInfo *);
     function functions[] = 
     {
@@ -789,11 +789,11 @@ void mageRendererResize(struct mageRenderer *renderer, struct mageWindow *window
         functions[i](renderer, window, rendererProps);
     }
 }
-void mageRendererDestroy(struct mageRenderer *renderer, struct mageRendererCreateInfo *rendererInfo)
+void mageRendererDestroy(struct mageRenderer *renderer)
 {
     uint32_t i;
     
-    mageCleanupSwapChain(renderer, rendererInfo);
+    mageCleanupSwapChain(renderer);
 
     for (i = 0; i < renderer->ConcurentFrames; i++)
     {

@@ -15,19 +15,18 @@ mageResult mageApplicationCreate(struct mageApplication *application, struct mag
 {
     application->Window             = MAGE_MEMORY_ALLOCATE(sizeof(struct mageWindow));
     application->Renderer           = MAGE_MEMORY_ALLOCATE(sizeof(struct mageRenderer));
-    application->RendererCreateInfo = rendererInfo;
-
+    
     application->Running = 1;
     mageResult returnCode = mageEngineInitialise();
-    if (returnCode != MAGE_RESULT_SUCCESS) { return returnCode; }
+    MAGE_ASSERT(returnCode == MAGE_RESULT_SUCCESS);
     mageWindowCreate(application->Window, &applicationInfo);
-    mageRendererCreate(application->Renderer, application->Window, &application->RendererCreateInfo);
+    mageRendererCreate(application->Renderer, application->Window, &rendererInfo);
     return MAGE_RESULT_SUCCESS;
 }
 void mageApplicationDestroy(struct mageApplication *application)
 {
     mageWindowDestroy(application->Window);
-    mageRendererDestroy(application->Renderer, &application->RendererCreateInfo);
+    mageRendererDestroy(application->Renderer);
     MAGE_MEMORY_FREE(application->Window);
     MAGE_MEMORY_FREE(application->Renderer);
     
