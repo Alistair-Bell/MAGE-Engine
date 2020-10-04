@@ -1,4 +1,4 @@
-import os, sys, json, time
+import os, sys, json, time, platform
 
 from Utility import *
 
@@ -124,13 +124,11 @@ def Main():
         "codelite":         "codelite",
     }
 
-
-    LogMessage("Build options \
+    LogMessage("Build options: \
                 \n\tConfig -> %s \
                 \n\tPlatform -> %s \
                 \n\tTargets -> %s \
-                \n\tGenerator -> %s \
-                \n\tHardware renderer -> %s" % (config, platform, targets, generator, renderer))
+                \n\tGenerator -> %s" % (config, platform, targets, generator))
 
     LogMessage("Calling premake")
     premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], renderer, audioBackend, compiler)
@@ -153,9 +151,45 @@ def Main():
 
 
 if __name__ == '__main__':
+    
+    # clear the screen
+    clearScreen = Command("CLS", "clear", "clear")
+    clearScreen.CallCommand()
+
+
     if GetPlatform() not in GetSupportedBuildPlatforms():
         LogMessage("%s platform is not supported by MAGE!, supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
+    
     else:
-        Main()
+        
+        # This is not elegent 
+        # This is horrible
+
+
+        if GetPlatform() is not "win32":
+            asciiText = " \
+\x1b[91m    __  ___                    ______            _           \n \
+\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+\x1b[94m             /____/                    /____/                "
+        
+        else:
+            asciiText = " \
+            __  ___                    ______            _           \n \
+           /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+          / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+         / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+        /_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+                     /____/                    /____/                "
+
+        LogMessage(asciiText)
+        LogMessage("Welcome to MAGE-Engine build system")
+        LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
+        LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
+        
+        # Main()
+        
     LogReset()
     

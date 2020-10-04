@@ -1,4 +1,5 @@
 import os, sys, subprocess, zipfile, glob, pathlib
+from platform import platform
 
 
 LogModes = {
@@ -12,6 +13,9 @@ LogModes = {
 
 def GetPlatform():
     return sys.platform
+
+def GetPythonVersionToString():
+    return "%s.%s.%s" % (sys.version_info[0], sys.version_info[1], sys.version_info[2])
 
 def GetSupportedBuildPlatforms():
     return [ "win32", "linux", "darwin" ]
