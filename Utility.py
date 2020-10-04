@@ -52,6 +52,15 @@ def LogReset():
     if not GetPlatform() == "win32":
         print(LogModes["Reset"], end = '')
 
+def HandleUserInput(message, choices):
+    answer = ""
+    while answer not in choices:
+        LogMessage("%s" % (message))
+        answer = str(input())
+        if answer in choices:
+            return answer
+        LogMessage("Invalid choice %s, valid choices %s" % (answer, choices))
+
 def CheckExistence(localPath):
     return os.path.exists(localPath)
         
@@ -95,7 +104,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         LogMessage("No arguments specified")
         if helpInfo != None:
             helpInfo()
-            return returnValues
+        return returnValues
     
     requiredKeys = list(searchingDictionary.keys())
 
@@ -105,7 +114,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         try:
             splitter = int(raw.index("="))
         except ValueError:
-            LogMessage("%s does not follow the argument formatting!, %s" % (raw, searchingDictionary.keys()), LogModes["Error"])
+            LogMessage("%s does not follow the argument formatting!, %s" % (raw, [*searchingDictionary]), LogModes["Error"])
         else:
             passed = False
             for x, y in searchingDictionary.items():
