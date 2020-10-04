@@ -10,6 +10,33 @@ LogModes = {
     "Reset":            "\x1b[0m"
 }
 
+def DisplayStartingInfo():
+    # clear the screen
+    clearScreen = Command("CLS", "clear", "clear")
+    clearScreen.CallCommand()
+
+    if GetPlatform() is not "win32":
+        asciiText = " \
+\x1b[91m    __  ___                    ______            _           \n \
+\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+\x1b[94m             /____/                    /____/                "
+        
+    else:
+        asciiText = " \
+            __  ___                    ______            _           \n \
+           /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+          / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+         / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+        /_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+                     /____/                    /____/                "
+
+    LogMessage("%s\n" % asciiText)
+    LogMessage("Welcome to MAGE-Engine python utility's system")
+    LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
+    LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
 
 def GetPlatform():
     return sys.platform
@@ -162,5 +189,6 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
 
 
 if __name__ == '__main__':
+    DisplayStartingInfo()
     LogMessage("%s was called, this file provides utility for the build system and environemt setup, on it's on it has no functionality. Run Setup.py to use the engine!" % (__file__), LogModes["Warning"])
     LogReset()
