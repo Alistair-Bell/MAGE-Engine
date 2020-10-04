@@ -20,7 +20,7 @@ BuildScript = "Config/BuildScript.json"
 CommandLineOptions = {
     "--config=": [ "debug", "release" ],
     "--platform=": list(GetSupportedBuildPlatforms()),
-    "--targets=": [ "all", "sandbox", "engine", "externals" ],
+    "--targets=": [ "all", "sandbox", "engine", "externals", "sandbox-c#" ],
     "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
     "--c-compiler=": [ "clang", "gcc", "mingw" ],
     "--mono-compiler=": [ "none", "mono", "dot-net" ],
@@ -115,7 +115,8 @@ def Main():
         "all":          "all",
         "sandbox":      "Sandbox",
         "engine":       "MageEngine",
-        "externals":    "GLFW stb-image"
+        "externals":    "GLFW stb-image",
+        "sandbox-c#":   "SandboxSharp",
     }
     generatorSwitcher = {
         "vsproject":        "vs2019",
