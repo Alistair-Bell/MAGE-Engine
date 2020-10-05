@@ -7,12 +7,6 @@ from Utility import *
 
 """
     Script that compiles the shaders specified on the command line arguments
-    Arguments:
-        (x) -> Python string array of the directories of the shaders
-        (x - 1) -> Optimisation flags:
-            (0) -> None
-            (1) -> Speed
-            (2) -> File size
 
     Does:
         (0) -> Find all pr-existing SPIRV binaries in the specified folders and removes them
@@ -46,10 +40,7 @@ def GetShaders(path):
     files = []
     removing = GetFilesInDirectory(path, ".sprv")
     for sprv in removing:
-        linux = "rm %s" % (sprv)
-        windows = "del /F %s" % (sprv)
-        command = Command(windows, linux, linux)
-        command.CallCommand()
+        os.remove(sprv)
         
     for key, value in ShaderExtensions.items():
         for extensions in value:

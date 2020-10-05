@@ -5,14 +5,7 @@ from Utility import *
 
 
 """
-    Script that wraps up the premake build system allowing for loading build modes and automatically executing them
-    Arguments:
-        () -> 
-        
-    Does:
-        () -> Parses arguments
-
-        
+    Script that wraps up the premake build system allowing for loading build modes and automatically executing them    
 """
 
 BuildScript = "Config/BuildScript.json"

@@ -1,4 +1,5 @@
 import os, sys, subprocess, zipfile, glob, pathlib
+from sys import path
 from platform import platform
 
 
@@ -66,6 +67,14 @@ class Command:
     def FormatCommand(command):
         tokens = [ x.strip() for x in command.strip('[]').split(' ') ]
         return tokens
+
+    @staticmethod
+    def DeleteFileCommand(paths):
+        for x in paths:
+            win32 = "del /f %s" % (path)
+            other = "rm %s" % (path)
+            c = Command(win32, other, other)
+            c.CallCommand()
 
     def CallCommand(self, forcePlatform=GetPlatform()):
         command = self.PlatformCommands[forcePlatform]
