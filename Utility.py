@@ -35,7 +35,7 @@ def DisplayStartingInfo():
                      /____/                    /____/                "
 
     LogMessage("%s\n" % asciiText)
-    LogMessage("Welcome to MAGE-Engine python utility's system")
+    LogMessage("Welcome to Mage Engine python utility's system")
     LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
     LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
 

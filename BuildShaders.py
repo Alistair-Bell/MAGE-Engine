@@ -119,6 +119,10 @@ def Main():
     glslValidator = ""
     glslCompiler  = ""
 
+    if CheckExistence("Config/Locations.json") == False:
+        LogMessage("Unable to find Config/Locations.json, required for program to run", LogModes["Error"])
+        return
+
     # Getting data from config file
     with open("Config/Locations.json", "r") as file:
         contents = json.load(file)

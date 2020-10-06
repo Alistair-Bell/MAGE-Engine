@@ -27,22 +27,17 @@ def GetBinaryLocation(question, mode=LogModes["Inform"]):
     return userInput
 
 def Main():
-    
-    # Checking supported platform
-    if GetPlatform() not in GetSupportedBuildPlatforms():
-        LogMessage("Unsupported platform %s, supported platforms are: %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
-        LogReset()
-        return
 
     # Allowing the use of the shell scripts for the engine 
     # if (GetPlatform() == "linux"):
     #     linuxScriptPath = "./Scripts/Linux"
     #     linuxScripts = GetFilesInDirectory(linuxScriptPath, ".sh")
     #     command = Command(windowsCommand = None, linuxCommand = None, macCommand = None)
-    #     LogMessage("Allowing shell scripts to be run %s" % (linuxScripts), LogModes["Inform"])
-    #     for x in linuxScripts:
-    #         command.UpdateCommand("chmod +x %s" % (x), "linux")
-    #         command.CallCommand()
+    #     if linuxScripts is not []:
+    #         LogMessage("Allowing shell scripts to be run %s" % (linuxScripts), LogModes["Inform"])
+    #         for x in linuxScripts:
+    #             command.UpdateCommand("chmod +x %s" % (x), "linux")
+    #             command.CallCommand()
     
     # Making logs directory
     directoriesToCreate = [ "Logs", "Config" ]
@@ -74,10 +69,13 @@ def Main():
 
     
 
-    LogMessage("Succesfully setup the MAGE-Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
+    LogMessage("Succesfully setup the Mage Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
 
 if __name__ == '__main__':
     DisplayStartingInfo()
-    Main()
+    if GetPlatform() not in GetSupportedBuildPlatforms():
+        LogMessage("Unsupported platform %s, supported platforms are: %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
+    else:
+        Main()
     LogReset()
     
