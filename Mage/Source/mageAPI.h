@@ -5,14 +5,14 @@
 
 
 /*
-	 __  __          _____ ______   ______             _            
-	|  \/  |   /\   / ____|  ____| |  ____|           (_)           
-	| \  / |  /  \ | |  __| |__    | |__   _ __   __ _ _ _ __   ___ 
-	| |\/| | / /\ \| | |_ |  __|   |  __| | '_ \ / _` | | '_ \ / _ \
-	| |  | |/ ____ \ |__| | |____  | |____| | | | (_| | | | | |  __/
-	|_|  |_/_/    \_\_____|______| |______|_| |_|\__, |_|_| |_|\___|
-												__/ |             
-											   |___/              
+	  __  __                    ______             _            
+	 |  \/  |                  |  ____|           (_)           
+	 | \  / | __ _  __ _  ___  | |__   _ __   __ _ _ _ __   ___ 
+	 | |\/| |/ _` |/ _` |/ _ \ |  __| | '_ \ / _` | | '_ \ / _ \
+	 | |  | | (_| | (_| |  __/ | |____| | | | (_| | | | | |  __/
+     |_|  |_|\__,_|\__, |\___| |______|_| |_|\__, |_|_| |_|\___|
+	                __/ |                     __/ |             
+	               |___/                     |___/                     
 	
 	This header contains the generic function, enums and structures that are used in the engine
 	
@@ -800,11 +800,6 @@ extern MAGE_API void mageIndiciesIndexesCreate(
 extern MAGE_API void mageIndiciesIndexesDestroy(
 	struct mageIndiciesIndexes *indicies
 );
-extern MAGE_API uint32_t mageFindMemoryType(
-	uint32_t typeFilter, 
-	VkMemoryPropertyFlags properties,
-	struct mageRenderer *renderer
-);
 
 #endif
 
@@ -1147,6 +1142,61 @@ extern MAGE_API void mageDescriptorSetsUpdate(
 );
 
 #endif
+
+/*
+	Vulkan memory management
+*/
+
+#if defined (MAGE_VULKAN_BACKEND)
+
+#define MAGE_VULKAN_MEMORY_DEFAULT_BLOCK_SIZE 1024 * 1024 * 64 
+
+/* typedef enum MAGE_VULKAN_HEAP_FLAGS */
+/* { */
+/* */
+/* } mageVulkanHeapFlags; */
+
+
+struct mageVulkanMemoryHeap
+{
+	VkDeviceMemory	Memory;
+	VkDeviceSize	BlockSize;
+	uint32_t		Flags;
+};
+struct mageVulkanBufferBlock
+{
+	uint64_t 		Offset;
+	uint64_t		Size;
+};
+
+
+extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
+	VkDevice device,
+	struct mageVulkanMemoryHeap *heap,
+	uint64_t flags,
+	uint64_t bytes
+);
+extern MAGE_API VkResult mageVulkanMemoryRequestBufferMemory(
+	VkDevice device,
+	VkPhysicalDevice physicalDevice,
+	struct mageVulkanMemoryHeap *heap,
+	struct mageVulkanBufferBlock *bufferBlock
+);
+extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(
+	VkPhysicalDevice device
+);
+extern MAGE_API uint32_t mageFindMemoryType(
+	uint32_t typeFilter, 
+	VkMemoryPropertyFlags properties,
+	struct mageRenderer *renderer
+);
+extern MAGE_API void mageVulkanMemoryFreeMemory(
+	VkDevice device,
+	struct mageVulkanMemoryHeap *heap
+);
+
+#endif
+
 
 /* 
 	Renderer 
