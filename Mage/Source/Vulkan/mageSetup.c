@@ -5,7 +5,8 @@
 static const char *mageRequiredExtensions[] = 
 {
     VK_KHR_SWAPCHAIN_EXTENSION_NAME,
-    VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME
+    VK_KHR_SAMPLER_MIRROR_CLAMP_TO_EDGE_EXTENSION_NAME,
+    VK_KHR_DEDICATED_ALLOCATION_EXTENSION_NAME
 };
 static const char *const mageRequiredLayers[] = 
 {
@@ -207,7 +208,7 @@ static VkResult mageCreateInstance(struct mageRenderer *renderer, struct mageWin
     applicationInfo.sType                           = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     applicationInfo.apiVersion                      = VK_API_VERSION_1_2;
     applicationInfo.pApplicationName                = window->Title;
-    applicationInfo.pEngineName                     = "MAGE-ENGINE";
+    applicationInfo.pEngineName                     = "Mage-Engine";
     applicationInfo.engineVersion                   = VK_MAKE_VERSION(1, 0, 0);
     
     const char **extensions = (const char **)mageGetRequiredExtensions(&count);
@@ -282,7 +283,7 @@ static VkResult mageCreateDevice(struct mageRenderer *renderer, struct mageWindo
 
     deviceCreateInfo.sType                      = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.ppEnabledExtensionNames    = mageRequiredExtensions;
-    deviceCreateInfo.enabledExtensionCount      = 2;    
+    deviceCreateInfo.enabledExtensionCount      = sizeof(mageRequiredExtensions) / sizeof(const char *);    
     deviceCreateInfo.pQueueCreateInfos          = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount       = 1;
     deviceCreateInfo.pEnabledFeatures           = &renderer->PhysicalDeviceFeatures;
@@ -651,9 +652,9 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     allocateInfo.commandBufferCount         = (uint32_t) renderer->SwapChainImageCount;
 
     memset(&renderer->ClearValue, 0, sizeof(VkClearValue));
-    renderer->ClearValue.color.float32[0] = 0.15f;
-    renderer->ClearValue.color.float32[1] = 0.15f;
-    renderer->ClearValue.color.float32[2] = 0.15f;
+    renderer->ClearValue.color.float32[0] = 0.0f;
+    renderer->ClearValue.color.float32[1] = 0.0f;
+    renderer->ClearValue.color.float32[2] = 0.0f;
     renderer->ClearValue.color.float32[3] = 0.0f;
     
 
