@@ -1,4 +1,4 @@
-# Mage-Engine
+# Mage Engine
 
 <p align="left">
     <img src ="https://img.shields.io/github/license/Alistair-Bell/MAGE-Engine"></img>
