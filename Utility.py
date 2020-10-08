@@ -162,8 +162,12 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
                 upperBound = str(raw[splitter + 1: len(raw)])
             
                 if not (lowerBound != x or upperBound not in y):
-                    requiredKeys.remove(lowerBound)
-                    returnValues.append(upperBound)
+                    if lowerBound in requiredKeys:
+                        requiredKeys.remove(lowerBound)
+                        returnValues.append(upperBound)
+                    else:
+                        LogMessage("Repeat option found %s, using first instance" % (lowerBound), LogModes["Error"])
+                        
                     passed = True
         
             # Not acceptable
