@@ -1,6 +1,4 @@
-import os, sys, subprocess, zipfile, glob, pathlib
-from sys import path
-from platform import platform
+import os, sys, subprocess, zipfile, glob, platform
 
 
 LogModes = {
@@ -71,8 +69,8 @@ class Command:
     @staticmethod
     def DeleteFileCommand(paths):
         for x in paths:
-            win32 = "del /f %s" % (path)
-            other = "rm %s" % (path)
+            win32 = "del /f %s" % (sys.path)
+            other = "rm %s" % (sys.path)
             c = Command(win32, other, other)
             c.CallCommand()
 

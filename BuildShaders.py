@@ -36,12 +36,7 @@ CommandLineOptions = {
 CompilerOptmisations = [ "none", "speed", "size" ]
 
 def GetShaders(path):
-    # Delete previous spirv files
     files = []
-    removing = GetFilesInDirectory(path, ".sprv")
-    for sprv in removing:
-        os.remove(sprv)
-        
     for key, value in ShaderExtensions.items():
         for extensions in value:
             addition = GetFilesInDirectory(path, extensions)
