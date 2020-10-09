@@ -1,4 +1,4 @@
-# MAGE-Engine roadmap
+# Mage Engine roadmap
 
 ## Version 1.0 release
 
