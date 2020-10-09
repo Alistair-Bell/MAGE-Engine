@@ -1,6 +1,6 @@
 # Externals
 
-These libraries help power the MAGE engine and I am thankful for the authors of these external libraries for making them free and open source for the public
+These libraries help power the Mage Engine and I am thankful for the authors of these external libraries for making them free and open source for the public
 
 ## glfw3
 - Maintained under `zlib` license
@@ -34,3 +34,7 @@ These libraries help power the MAGE engine and I am thankful for the authors of 
   - Removed `generate_bitonic_sort.py`, `.git`, `.gitignore`, `stresstest.c`, `.travis.yml`, `CONTRIBUTING.md`, `CONTRIBUTORS.md`, `astyle.options`, `Makefile`, `benchmark.c`, `demo.c`, `multdemo.c` and `stresstest.c`
   - Removed `doc` directory
 - Sourced from `https://github.com/swenson/sort`
+
+## glad
+- Maintained under the `MIT-License`
+- Sourced from `https://glad.dav1d.de/` (alternative `https://github.com/Dav1dde/glad`)
