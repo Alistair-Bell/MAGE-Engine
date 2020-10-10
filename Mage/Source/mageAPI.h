@@ -5,22 +5,20 @@
 
 
 /*
-	  __  __                    ______             _            
-	 |  \/  |                  |  ____|           (_)           
-	 | \  / | __ _  __ _  ___  | |__   _ __   __ _ _ _ __   ___ 
-	 | |\/| |/ _` |/ _` |/ _ \ |  __| | '_ \ / _` | | '_ \ / _ \
-	 | |  | | (_| | (_| |  __/ | |____| | | | (_| | | | | |  __/
-     |_|  |_|\__,_|\__, |\___| |______|_| |_|\__, |_|_| |_|\___|
-	                __/ |                     __/ |             
-	               |___/                     |___/                     
-	
+	    __  ___                    ______            _          
+	   /  |/  ____ _____ ____     / ________  ____ _(_____  ___ 
+	  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \
+	 / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/
+	/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/ 
+	             /____/                    /____/            
+
 	This header contains the generic function, enums and structures that are used in the engine
 	
 	Open source 2D game engine written with low memory footprint and performance in mind
 	The engine is not the next unity or unreal. Just a fun tool to mess around with
 	Documentation has been moved to the github wiki so use that for the documentation or ask me personally
 	Documentation will be released once version 1.0 is released
-	To contribute go to https://github.com/Alistair-Bell/MAGE-Engine
+	To contribute go to https://github.com/Alistair-Bell/Mage-Engine
 	For use please read the license
 
 */
@@ -1151,20 +1149,28 @@ extern MAGE_API void mageDescriptorSetsUpdate(
 
 #define MAGE_VULKAN_MEMORY_DEFAULT_BLOCK_SIZE 1024 * 1024 * 64 
 
-/* typedef enum MAGE_VULKAN_HEAP_FLAGS */
-/* { */
-/* */
-/* } mageVulkanHeapFlags; */
 
+#define MAGE_VULKAN_MEMORY_MAX_HEAP_COUNT 6
+#define MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS 32
+
+typedef enum MAGE_VULKAN_MEMORY_BLOCK_MODES_ENUM
+{
+	MAGE_VULKAN_MEMORY_BLOCK_MODES_STORAGE_BUFFER 	= 0x01,
+	MAGE_VULKAN_MEMORY_BLOCK_MODES_STORAGE_TEXTURE 	= 0x02,
+	MAGE_VULKAN_MEMORY_BLOCK_MODES_STORAGE_SAMPLER	= 0x03
+} mageVulkanMemoryBlockModes;
 
 struct mageVulkanMemoryHeap
 {
 	VkDeviceMemory	Memory;
 	VkDeviceSize	BlockSize;
-	uint32_t		Flags;
+	VkDeviceSize 	Unallocated;
+	VkDeviceSize	BufferBlockOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
+	VkDeviceSize	*NextOffset;
 };
-struct mageVulkanBufferBlock
+struct mageVulkanMemoryBufferBlock
 {
+	uint32_t		MemoryTypeIndex;
 	uint64_t 		Offset;
 	uint64_t		Size;
 };
@@ -1173,19 +1179,21 @@ struct mageVulkanBufferBlock
 extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	VkDevice device,
 	struct mageVulkanMemoryHeap *heap,
-	uint64_t flags,
 	uint64_t bytes
 );
-extern MAGE_API VkResult mageVulkanMemoryRequestBufferMemory(
+extern MAGE_API void mageVulkanMemoryMapBufferToBlock(
 	VkDevice device,
-	VkPhysicalDevice physicalDevice,
 	struct mageVulkanMemoryHeap *heap,
-	struct mageVulkanBufferBlock *bufferBlock
+	const struct mageVulkanMemoryBufferBlock *block,
+	VkBuffer buffer,
+	const VkBufferUsageFlags flags,
+	void *data,
+	const uint64_t dataSize
 );
 extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(
 	VkPhysicalDevice device
 );
-extern MAGE_API uint32_t mageFindMemoryType(
+extern MAGE_API uint32_t mageVulkanMemoryFindMemoryType(
 	uint32_t typeFilter, 
 	VkMemoryPropertyFlags properties,
 	struct mageRenderer *renderer

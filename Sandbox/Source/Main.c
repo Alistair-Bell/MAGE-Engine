@@ -35,8 +35,8 @@ MAGE_ENTRY_POINT()
 
     applicationCreateInfo.FixedResolution        = MAGE_TRUE;
     applicationCreateInfo.Fullscreen             = MAGE_FALSE;
-    applicationCreateInfo.Width                  = 1080;
-    applicationCreateInfo.Height                 = 720;
+    applicationCreateInfo.Width                  = 1920;
+    applicationCreateInfo.Height                 = 1080;
     applicationCreateInfo.Name                   = "Sandbox Application";
     applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_500px_Dec16.jpg";
 
@@ -64,10 +64,21 @@ MAGE_ENTRY_POINT()
     info.VertexCount        = 4;
     info.IndexCount         = 0;
     info.Indicies           = NULL;
-    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_MIRRORED_REPEAT, .TexturePath = "Sandbox/Resources/Textures/texture.jpg" };
+    info.TextureCreateInfo  = (struct mageTextureCreateInfo) { .SamplerMode = MAGE_TEXTURE_SAMPLER_CLAMP_TO_BORDER, .TexturePath = "Sandbox/Resources/Textures/texture.jpg" };
     mageRenderableCreate(&renderable, &info, SandboxApplication->Renderer);
 
     struct mageRenderable *r[] = { &renderable };
+
+    struct mageVulkanMemoryHeap heap;
+    struct mageVulkanMemoryBufferBlock block;
+
+    VkBuffer b;
+    uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
+
+    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, &heap, 1024 * 1024 * 64);
+    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, NULL, b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
+    mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
+
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
