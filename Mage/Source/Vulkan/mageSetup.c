@@ -208,7 +208,7 @@ static VkResult mageCreateInstance(struct mageRenderer *renderer, struct mageWin
     applicationInfo.sType                           = VK_STRUCTURE_TYPE_APPLICATION_INFO;
     applicationInfo.apiVersion                      = VK_API_VERSION_1_2;
     applicationInfo.pApplicationName                = window->Title;
-    applicationInfo.pEngineName                     = "Mage-Engine";
+    applicationInfo.pEngineName                     = "Mage Engine";
     applicationInfo.engineVersion                   = VK_MAKE_VERSION(1, 0, 0);
     
     const char **extensions = (const char **)mageGetRequiredExtensions(&count);

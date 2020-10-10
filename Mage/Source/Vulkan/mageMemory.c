@@ -22,6 +22,7 @@ VkResult mageVulkanMemoryAllocateHeap(VkDevice device, struct mageVulkanMemoryHe
     memset(&info, 0, sizeof(VkMemoryAllocateInfo));
     info.sType              = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
     info.allocationSize     = (VkDeviceSize) bytes;
+    // info.memoryTypeIndex    = mageVulkanMemoryFindMemoryType()
 
     MAGE_VULKAN_CHECK(vkAllocateMemory(device, &info, NULL, &heap->Memory));
 
@@ -57,7 +58,10 @@ void mageVulkanMemoryMapBufferToBlock(VkDevice device, struct mageVulkanMemoryHe
 
     VkMemoryRequirements memoryRequirements;
     memset(&memoryRequirements, 0, sizeof(VkMemoryRequirements));
-    
+
+
+
+
 }
 void mageVulkanMemoryFreeMemory(VkDevice device, struct mageVulkanMemoryHeap *heap)
 {

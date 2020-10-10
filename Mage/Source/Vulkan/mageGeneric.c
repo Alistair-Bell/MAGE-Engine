@@ -267,15 +267,13 @@ void mageSwapChainSupportDestroy(struct mageSwapChainSupportDetails *swapChainSu
     MAGE_MEMORY_FREE(swapChainSupport->Formats);
     MAGE_MEMORY_FREE(swapChainSupport->PresentModes);
 }
-uint32_t mageFindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties, struct mageRenderer *renderer)
+uint32_t mageVulkanMemoryFindMemoryType(VkPhysicalDeviceMemoryProperties propeties, uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 
-    VkPhysicalDeviceMemoryProperties memoryProperties;
-    vkGetPhysicalDeviceMemoryProperties(renderer->PhysicalDevice, &memoryProperties);
-
     uint32_t i;
-    for (i= 0; i < memoryProperties.memoryTypeCount; i++) {
-        if ((typeFilter & (1 << i)) && (memoryProperties.memoryTypes[i].propertyFlags & properties) == properties) 
+    for (i = 0; i < propeties.memoryTypeCount; i++) 
+    {
+        if ((typeFilter & (1 << i)) && (propeties.memoryTypes[i].propertyFlags & properties) == properties) 
         {
             return i;
         }

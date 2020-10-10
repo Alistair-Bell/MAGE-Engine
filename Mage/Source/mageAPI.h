@@ -1194,9 +1194,9 @@ extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProper
 	VkPhysicalDevice device
 );
 extern MAGE_API uint32_t mageVulkanMemoryFindMemoryType(
+	VkPhysicalDeviceMemoryProperties propeties,
 	uint32_t typeFilter, 
-	VkMemoryPropertyFlags properties,
-	struct mageRenderer *renderer
+	VkMemoryPropertyFlags properties
 );
 extern MAGE_API void mageVulkanMemoryFreeMemory(
 	VkDevice device,

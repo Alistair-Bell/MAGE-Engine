@@ -27,7 +27,7 @@ VkResult mageImageCreate(VkImage *image, VkDeviceMemory *memory, const uint32_t 
     VkMemoryAllocateInfo allocateInfo;
     memset(&allocateInfo, 0, sizeof(VkMemoryAllocateInfo));
     allocateInfo.sType                  = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocateInfo.memoryTypeIndex        = mageFindMemoryType(memoryRequirements.memoryTypeBits, properties, renderer);
+    allocateInfo.memoryTypeIndex        = mageVulkanMemoryFindMemoryType(renderer->PhysicalDeviceMemoryProperties, memoryRequirements.memoryTypeBits, properties);
     allocateInfo.allocationSize         = memoryRequirements.size;
 
     MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, memory));
