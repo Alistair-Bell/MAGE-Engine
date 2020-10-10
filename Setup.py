@@ -72,10 +72,7 @@ def Main():
     LogMessage("Succesfully setup the Mage Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
 
 if __name__ == '__main__':
-    DisplayStartingInfo()
-    if GetPlatform() not in GetSupportedBuildPlatforms():
-        LogMessage("Unsupported platform %s, supported platforms are: %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
-    else:
+    if DisplayStartingInfo():
         Main()
     LogReset()
     
