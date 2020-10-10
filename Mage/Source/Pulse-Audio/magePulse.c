@@ -7,7 +7,7 @@
 
 #if defined (MAGE_PULSE_AUDIO_BACKEND)
 
-#define MAGE_PULSE_AUDIO_CONTEXT_NAME "Mage-Engine"
+#define MAGE_PULSE_AUDIO_CONTEXT_NAME "Mage Engine"
 
 static void magePulseAudioStateCallback(pa_context *context, void *userData)
 {
