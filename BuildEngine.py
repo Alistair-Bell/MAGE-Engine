@@ -145,9 +145,6 @@ def Main():
 
 
 if __name__ == '__main__':
-    DisplayStartingInfo()
-    if GetPlatform() not in GetSupportedBuildPlatforms():
-        LogMessage("%s platform is not supported by MAGE!, supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
-    else:
+    if DisplayStartingInfo():
         Main()  
     LogReset()

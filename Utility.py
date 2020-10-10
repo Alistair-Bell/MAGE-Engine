@@ -9,34 +9,6 @@ LogModes = {
     "Reset":            "\x1b[0m"
 }
 
-def DisplayStartingInfo():
-    # clear the screen
-    clearScreen = Command("CLS", "clear", "clear")
-    clearScreen.CallCommand()
-
-    if GetPlatform() is not "win32":
-        asciiText = " \
-\x1b[91m    __  ___                    ______            _           \n \
-\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
-\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
-\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
-\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
-\x1b[94m             /____/                    /____/                "
-        
-    else:
-        asciiText = " \
-            __  ___                    ______            _           \n \
-           /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
-          / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
-         / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
-        /_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
-                     /____/                    /____/                "
-
-    LogMessage("%s\n" % asciiText)
-    LogMessage("Welcome to Mage Engine python utility's system")
-    LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
-    LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
-
 def GetPlatform():
     return sys.platform
 
@@ -198,6 +170,40 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
                 sortedList[keyIndex] = returnValues[returnIndex]
     return sortedList
 
+def DisplayStartingInfo():
+    
+    # clear the screen
+    clearScreen = Command("CLS", "clear", "clear")
+    clearScreen.CallCommand()
+
+    if GetPlatform() is not "win32":
+        asciiText = " \
+\x1b[91m    __  ___                    ______            _           \n \
+\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+\x1b[94m             /____/                    /____/                "
+        
+    else:
+        asciiText = " \
+            __  ___                    ______            _           \n \
+           /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
+          / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
+         / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
+        /_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
+                     /____/                    /____/                "
+
+    LogMessage("%s\n" % asciiText)
+    
+    if GetPlatform() not in GetSupportedBuildPlatforms():
+        LogMessage("Host platform %s not currently supported! see supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
+        return False
+
+    LogMessage("Welcome to Mage Engine python utility's system")
+    LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
+    LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
+    return True
 
 if __name__ == '__main__':
     DisplayStartingInfo()
