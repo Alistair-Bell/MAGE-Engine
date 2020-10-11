@@ -200,6 +200,10 @@ def DisplayStartingInfo():
         LogMessage("Host platform %s not currently supported! see supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
         return False
 
+    if sys.version_info[0] < 3 or sys.version_info[1] < 7:
+        LogMessage("Python version too old!, current %s < 3.7.x " % (GetPythonVersionToString()), LogModes["Fatal Error"])
+        return False
+    
     LogMessage("Welcome to Mage Engine python utility's system")
     LogMessage("Using python version %s\nHost platform recognised as %s\nLicense BSD 2-Clause License https://opensource.org/licenses/BSD-2-Clause\nThis is free software: you are free to change and redistribute it" % (GetPythonVersionToString(), GetPlatform()))
     LogMessage("%s\n" % ('-' * 73), LogModes["Reset"])
