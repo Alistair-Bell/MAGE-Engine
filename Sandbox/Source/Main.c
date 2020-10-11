@@ -70,14 +70,17 @@ MAGE_ENTRY_POINT()
     struct mageRenderable *r[] = { &renderable };
 
     struct mageVulkanMemoryHeap heap;
-    struct mageVulkanMemoryBufferBlock block;
-
-    VkBuffer b;
+    
+    VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
 
-    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, &heap, 1024 * 1024 * 64);
-    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, NULL, b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
+    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, 1024 * 1024 * 64);
+    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
+    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &bb, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, data, sizeof(data));
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
+
+    vkDestroyBuffer(SandboxApplication->Renderer->Device, b, NULL);
+    vkDestroyBuffer(SandboxApplication->Renderer->Device, bb, NULL);
 
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))

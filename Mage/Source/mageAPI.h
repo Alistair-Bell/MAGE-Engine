@@ -1168,24 +1168,18 @@ struct mageVulkanMemoryHeap
 	VkDeviceSize	BufferBlockOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
 	VkDeviceSize	*NextOffset;
 };
-struct mageVulkanMemoryBufferBlock
-{
-	uint32_t		MemoryTypeIndex;
-	uint64_t 		Offset;
-	uint64_t		Size;
-};
 
 
 extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	VkDevice device,
+	VkPhysicalDevice gpu,
 	struct mageVulkanMemoryHeap *heap,
-	uint64_t bytes
+	const uint64_t bytes
 );
 extern MAGE_API void mageVulkanMemoryMapBufferToBlock(
 	VkDevice device,
 	struct mageVulkanMemoryHeap *heap,
-	const struct mageVulkanMemoryBufferBlock *block,
-	VkBuffer buffer,
+	VkBuffer *buffer,
 	const VkBufferUsageFlags flags,
 	void *data,
 	const uint64_t dataSize
