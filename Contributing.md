@@ -1,4 +1,4 @@
-# MAGE-Engine contributing guide
+# Mage Engine contributing guide
 
 If you want to contribute to the development to the project then here are some rules to follow
 
