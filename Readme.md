@@ -14,7 +14,7 @@
 Mage will never or take royalities from it's users, nor charge for features. Maintained under the **BSD 2-Clause License** allowing for private, open and commerical use from indie developers to large teams
 
 ## Download
-Currently we do not distribute precompiled binaries in any form and will not be until future stable releases, for now the only way to use Mage is to compile the source code from the [github](https://github.com/Alistair-Bell/MAGE-Engine). Guides for compiling the engine and it's example will be provided with the 1.0 release
+Currently we do not distribute precompiled binaries in any form and will not be until future stable releases, for now the only way to use Mage is to compile the source code from the [github](https://github.com/Alistair-Bell/Mage-Engine). Guides for compiling the engine and it's example will be provided with the 1.0 release
 
 ## Features
 See Roadmap for more information on features to come
