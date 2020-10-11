@@ -32,9 +32,15 @@
 #define MAGE_VOID_POINTER_CAST(data, type) \
 	(*(type *)data)
 
+#define MAGE_TYPE_TO_STRING(type) #type
+
 #if defined (MAGE_ASSERTS)
 	#define MAGE_ASSERT(expression) \
 		assert(expression)
+
+	#define MAGE_ASSERT_MESSAGE(expression, failMessage, ...) \
+		if (!(expression)) MAGE_LOG_CORE_FATAL_ERROR(failMessage, __VA_ARGS__); MAGE_ASSERT(expression) 
+
 #else
 	#define MAGE_ASSERT(expression)
 #endif
@@ -1160,8 +1166,16 @@ typedef enum MAGE_VULKAN_MEMORY_BLOCK_MODES_ENUM
 	MAGE_VULKAN_MEMORY_BLOCK_MODES_STORAGE_SAMPLER	= 0x03
 } mageVulkanMemoryBlockModes;
 
+typedef enum MAGE_VULKAN_MEMORY_HEAP_FLAGS_ENUM
+{
+	MAGE_VULKAN_MEMORY_HEAP_FLAGS_NON_DISCRIMINANT 	= 0x00,
+	MAGE_VULKAN_MEMORY_HEAP_FLAGS_DEVICE_LOCAL 		= 0x01,
+
+} mageVulkanMemoryHeapFlags;
+
 struct mageVulkanMemoryHeap
 {
+	/* VkMemoryHeap	AssociatedHeap; */
 	VkDeviceMemory	Memory;
 	VkDeviceSize	BlockSize;
 	VkDeviceSize 	Unallocated;
@@ -1174,6 +1188,9 @@ extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	VkDevice device,
 	VkPhysicalDevice gpu,
 	struct mageVulkanMemoryHeap *heap,
+	const uint8_t forceHeap,
+	const uint32_t heapIndex,
+	const uint32_t heapFlags,
 	const uint64_t bytes
 );
 extern MAGE_API void mageVulkanMemoryMapBufferToBlock(
