@@ -125,7 +125,7 @@ def Main():
                 \n\tGenerator -> %s" % (config, platform, targets, generator))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=premake5.lua --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], renderer, audioBackend, compiler)
+    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], renderer, audioBackend, compiler)
     
     if monoCompiler != "none":
         LogMessage("Building for c# scripting, native c is still allowed, supported platforms %s" % (GetSupportedBuildPlatforms()))
