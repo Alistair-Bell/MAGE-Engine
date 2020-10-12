@@ -59,7 +59,7 @@ ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
 ConfigurationFiles["mono"]      = "Mage/Source/Mono/*.cs"
 
 
-workspace "MAGE"
+workspace "Mage"
     architecture "x64"
 
     configurations
@@ -185,17 +185,3 @@ project "Sandbox"
         defines "SANDBOX_RELEASE"
         runtime "Release"
         optimize "Speed"
-
-project "SandboxSharp"
-    location "%{prj.name}"
-    kind "ConsoleApp"
-    language "c#"
-    targetdir (BuildTargetPath)
-    objdir (BuildObjectPath)
-
-    files
-    {
-        "Mage/Source/Mono/**.cs",
-        "%{prj.name}/Source/**.cs",   
-        "%{prj.name}/Source/**.cs",
-    }
