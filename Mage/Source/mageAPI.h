@@ -1181,6 +1181,7 @@ struct mageVulkanMemoryHeap
 	VkDeviceSize 	Unallocated;
 	VkDeviceSize	BufferBlockOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
 	VkDeviceSize	*NextOffset;
+	uint32_t		OffsetCount;
 };
 
 
@@ -1193,13 +1194,19 @@ extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	const uint32_t heapFlags,
 	const uint64_t bytes
 );
-extern MAGE_API void mageVulkanMemoryMapBufferToBlock(
+extern MAGE_API uint32_t mageVulkanMemoryBufferMapToBlock(
 	VkDevice device,
 	struct mageVulkanMemoryHeap *heap,
 	VkBuffer *buffer,
 	const VkBufferUsageFlags flags,
 	void *data,
 	const uint64_t dataSize
+);
+extern MAGE_API void mageVulkanMemoryBufferUnmapBufferToBlock(
+	VkDevice device,
+	struct mageVulkanMemoryHeap *heap,
+	VkBuffer *buffer,
+	const uint32_t bufferOffset
 );
 extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(
 	VkPhysicalDevice device

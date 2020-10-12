@@ -74,13 +74,13 @@ MAGE_ENTRY_POINT()
     VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
 
-    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, 1024 * 1024 * 64);
-    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
-    mageVulkanMemoryMapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &bb, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, data, sizeof(data));
+    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, MAGE_FALSE, 0, MAGE_VULKAN_MEMORY_HEAP_FLAGS_DEVICE_LOCAL, 1024 * 64);
+    uint32_t offset1 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
+    uint32_t offset2 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &bb, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, data, sizeof(data));
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
 
-    vkDestroyBuffer(SandboxApplication->Renderer->Device, b, NULL);
-    vkDestroyBuffer(SandboxApplication->Renderer->Device, bb, NULL);
+    mageVulkanMemoryBufferUnmapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &b, offset1);
+    mageVulkanMemoryBufferUnmapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &bb, offset2);
 
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
