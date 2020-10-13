@@ -1,5 +1,10 @@
 #include <mageAPI.h>
 
+#define SORT_NAME sort_algorithms
+#define SORT_TYPE uint64_t
+#define SORT_CMP(x, y) ((x) - (y))
+#include "../../Externals/sort/sort.h"
+
 uint32_t mageVulkanMemoryFindMemoryType(VkPhysicalDeviceMemoryProperties propeties, uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 
@@ -24,6 +29,7 @@ VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(VkPhysicalD
 VkResult mageVulkanMemoryAllocateHeap(VkDevice device, VkPhysicalDevice gpu, struct mageVulkanMemoryHeap *heap, const uint8_t forceHeap, const uint32_t heapIndex, const uint32_t heapFlags, const uint64_t bytes)
 {    
     memset(heap, 0, sizeof(struct mageVulkanMemoryHeap));
+    memset(heap->HeapOffsets, 0, sizeof(VkDeviceSize) * MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS);
     VkPhysicalDeviceMemoryProperties memoryProperties = mageVulkanMemoryGetDeviceProperties(gpu);
 
     /* For optimistations to the space that the memory uses align to 1024 */
@@ -69,14 +75,14 @@ VkResult mageVulkanMemoryAllocateHeap(VkDevice device, VkPhysicalDevice gpu, str
 
     MAGE_VULKAN_CHECK(vkAllocateMemory(device, &info, NULL, &heap->Memory));
 
-    heap->Unallocated       = heap->BlockSize;
-    heap->BlockSize         = (VkDeviceSize)bytes;
-    heap->NextOffset        = &heap->BufferBlockOffsets[0];
-
+    heap->BlockSize         = bytes;
+    heap->Unallocated       = bytes;
+    heap->OffsetCount       = 0;
+    heap->NextOffset        = &heap->HeapOffsets[0];
     MAGE_LOG_CORE_INFORM("Allocating vulkan memory of size %luK\n", bytes / 1024);
     return VK_SUCCESS;
 }
-void mageVulkanMemoryMapBufferToBlock(VkDevice device, struct mageVulkanMemoryHeap *heap, VkBuffer *buffer, const VkBufferUsageFlags flags, void *data, const uint64_t size)
+uint32_t mageVulkanMemoryBufferMapToBlock(VkDevice device, struct mageVulkanMemoryHeap *heap, VkBuffer *buffer, const VkBufferUsageFlags flags, void *data, const uint64_t size)
 {   
     VkBufferCreateInfo createInfo;
     memset(&createInfo, 0, sizeof(VkBufferCreateInfo));
@@ -85,16 +91,26 @@ void mageVulkanMemoryMapBufferToBlock(VkDevice device, struct mageVulkanMemoryHe
     createInfo.sharingMode  = VK_SHARING_MODE_EXCLUSIVE;
     createInfo.usage        = flags;
 
+    uint32_t bufferOffset;
+    if (heap->OffsetCount <= 0)
+        bufferOffset = 0;
+    else
+        bufferOffset = *heap->NextOffset + size;
+
     MAGE_VULKAN_CHECK(vkCreateBuffer(device, &createInfo, NULL, buffer));
-    MAGE_LOG_CORE_INFORM("Binding buffer memory to heap of %luK, using offset of %lu\n", (uint64_t)heap->BlockSize / 1024, (uint64_t)*heap->NextOffset);
+    MAGE_LOG_CORE_INFORM("Binding buffer memory to heap of %luK, using offset of %lu\n", (uint64_t)heap->BlockSize / 1024, (uint64_t)bufferOffset);
+    vkBindBufferMemory(device, *buffer, heap->Memory, bufferOffset);
 
-    vkBindBufferMemory(device, *buffer, heap->Memory, *heap->NextOffset);
-    VkDeviceSize previousOffset = *heap->NextOffset;
-    heap->NextOffset++;
-    *heap->NextOffset += (previousOffset + size);
+    heap->OffsetCount++;
+    heap->NextOffset = &heap->HeapOffsets[heap->OffsetCount];
 
-    MAGE_LOG_CORE_INFORM("Using next buffer offset of %lu\n", *heap->NextOffset);
+    return bufferOffset;
 }
+void mageVulkanMemoryBufferUnmapBufferToBlock(VkDevice device, struct mageVulkanMemoryHeap *heap, VkBuffer *buffer, const uint32_t bufferOffset)
+{
+    vkDestroyBuffer(device, *buffer, NULL);
+}
+
 void mageVulkanMemoryFreeMemory(VkDevice device, struct mageVulkanMemoryHeap *heap)
 {
     /* Saftey net for the memory being invalid */

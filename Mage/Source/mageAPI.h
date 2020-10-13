@@ -1179,9 +1179,9 @@ struct mageVulkanMemoryHeap
 	VkDeviceMemory	Memory;
 	VkDeviceSize	BlockSize;
 	VkDeviceSize 	Unallocated;
-	VkDeviceSize	BufferBlockOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
+	VkDeviceSize	HeapOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
 	VkDeviceSize	*NextOffset;
-	uint32_t		OffsetCount;
+	uint32_t 		OffsetCount;
 };
 
 
