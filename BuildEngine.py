@@ -1,4 +1,5 @@
 import os, sys, json, time, platform
+from os import POSIX_FADV_SEQUENTIAL
 
 from Utility import *
 
@@ -23,9 +24,11 @@ CommandLineOptions = {
 
 def ScriptHelp():
     LogMessage("Usage: %s:" % (__file__))
+    LogMessage("Arguments presented may be in any order")
+    LogMessage("Some IDE environment may be incompatable with some specified tools!", LogModes["Warning"])
     i = 1
     for x, y in CommandLineOptions.items():
-        print("\tArgument %s: prefix = %s, acceptable = %s" % (i, x, y))
+        LogMessage("\tArgument %s: prefix = %s, acceptable = %s" % (i, x, y))
         i += 1
 
 def LoadConfigFile():
@@ -51,11 +54,14 @@ def LoadConfigFile():
 
 def UseCommandLineArguments():
     # By default the os will dump the file name of the program into args[0], stripping it from the parser
-    LogMessage("Using command line arguments")
     parsing = sys.argv[1 : len(sys.argv)]
     arguments = ParseCommandLineArgument(parsing, CommandLineOptions, ScriptHelp)
     return arguments
-  
+
+def CallSingleCommand(win32 = "", linux = "", darwin = ""):
+    foo = Command(win32, linux, darwin)
+    foo.CallCommand()
+
 def Main():
 
     arguments = []
@@ -86,9 +92,9 @@ def Main():
         "linux": "./Externals/Linux/premake5",
         "win32": "Externals/Windows/premake5.exe",
         # Currently the macos binary is not being distributed by us, todo by version <= 1.0.0
-        "darwin": "",
+        "darwin": None,
     } 
-    if locations[GetPlatform()] == "":
+    if locations[GetPlatform()] == None:
         LogMessage("%s platform has no distributed premake binaries, support currently incomplete!" % (GetPlatform()), LogModes["Fatal Error"])
         return
 
@@ -131,13 +137,16 @@ def Main():
                 \n\tGenerator -> %s" % (config, platform, targets, generator))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler)
-
+    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler, generatorSwitcher[generator])
+    
+    generatedMono = False
     if monoCompiler != "none":
+        # build c# project
         LogMessage("Building for c# scripting, native c is still allowed, supported platforms %s" % (GetSupportedBuildPlatforms()))
-        premakeString += str(" --dotnet=%s" % (monoCompiler))
-
-    premakeString += str(" %s" % (generatorSwitcher[generator]))
+        premakeMonoString = "%s --fatal --verbose --file=SandboxSharp/PremakeSharp.lua --dotnet=%s %s" % (locations[GetPlatform()], monoCompiler, generatorSwitcher[generator])
+        bar = Command(premakeMonoString, premakeMonoString, premakeMonoString)
+        bar.CallCommand()
+        generatedMono = True
 
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
@@ -146,9 +155,13 @@ def Main():
     if generator == "makefile":
         LogMessage("Using makefile as build system, calling make")
         makeString = "make config=%s %s" % (config, targetSwitcher[targets])
-        bar = Command(makeString, makeString, makeString)
-        bar.CallCommand()
+        CallSingleCommand(makeString, makeString, makeString)
 
+        if generatedMono:
+            os.chdir("SandboxSharp")
+            makeString = "make config=%s" % (config)
+            CallSingleCommand(makeString, makeString, makeString)
+            os.chdir(GetWorkingDirectory())
 
 if __name__ == '__main__':
     if DisplayStartingInfo():
