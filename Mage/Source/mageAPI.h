@@ -1175,13 +1175,14 @@ typedef enum MAGE_VULKAN_MEMORY_HEAP_FLAGS_ENUM
 
 struct mageVulkanMemoryHeap
 {
-	/* VkMemoryHeap	AssociatedHeap; */
-	VkDeviceMemory	Memory;
-	VkDeviceSize	BlockSize;
-	VkDeviceSize 	Unallocated;
-	VkDeviceSize	HeapOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
-	VkDeviceSize	*NextOffset;
-	uint32_t 		OffsetCount;
+	VkDeviceMemory					Memory;
+	VkDeviceSize					BlockSize;
+	VkDeviceSize 					Unallocated;
+	VkDeviceSize					HeapOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
+	VkDeviceSize					*NextOffset;
+	uint32_t						AssociatedHeapIndex;
+	uint32_t 						OffsetCount;
+	uint32_t						Flags;	
 };
 
 
@@ -1189,9 +1190,7 @@ extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	VkDevice device,
 	VkPhysicalDevice gpu,
 	struct mageVulkanMemoryHeap *heap,
-	const uint8_t forceHeap,
 	const uint32_t heapIndex,
-	const uint32_t heapFlags,
 	const uint64_t bytes
 );
 extern MAGE_API uint32_t mageVulkanMemoryBufferMapToBlock(

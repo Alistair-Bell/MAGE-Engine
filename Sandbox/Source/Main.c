@@ -2,7 +2,6 @@
 
 #define SANDBOX_ENTITY_COUNT 5
 
-
 /* Application instance */
 static struct mageApplication   *SandboxApplication;
 static struct mageShader        shaders[2];
@@ -74,7 +73,7 @@ MAGE_ENTRY_POINT()
     VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
 
-    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, MAGE_FALSE, 0, MAGE_VULKAN_MEMORY_HEAP_FLAGS_DEVICE_LOCAL, 1024 * 64);
+    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, 0, 1024 * 64);
     uint32_t offset1 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
     uint32_t offset2 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &bb, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, data, sizeof(data));
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
