@@ -21,7 +21,7 @@ project "SandboxSharp"
 
     files
     {
-        "Mage/Source/Mono/**.cs",
-        "%{prj.name}/Source/**.cs",   
-        "%{prj.name}/Source/**.cs",
+        "../Mage/Source/Mono/**.cs",
+        "Source/**.cs",   
+        "Source/**.cs",
     }
