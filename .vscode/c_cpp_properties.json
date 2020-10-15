@@ -8,6 +8,7 @@
             ],
             "defines": [
                 "MAGE_DEBUG",
+                "MAGE_PLATFORM_LINUX",
                 "MAGE_CORE",
                 "SANDBOX_DEBUG",
                 "MAGE_ASSERTS",

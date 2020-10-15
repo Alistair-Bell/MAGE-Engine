@@ -117,6 +117,12 @@ def Main():
         "makefile":         "gmake2",
         "codelite":         "codelite",
     }
+    platformSwitcher = {
+        "win32":            "windows",
+        "linux":            "linux",
+        "darwin":           "macosx",
+    }
+
 
     LogMessage("Build options: \
                 \n\tConfig -> %s \
@@ -125,8 +131,8 @@ def Main():
                 \n\tGenerator -> %s" % (config, platform, targets, generator))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], renderer, audioBackend, compiler)
-    
+    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler)
+
     if monoCompiler != "none":
         LogMessage("Building for c# scripting, native c is still allowed, supported platforms %s" % (GetSupportedBuildPlatforms()))
         premakeString += str(" --dotnet=%s" % (monoCompiler))

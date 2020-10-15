@@ -58,6 +58,11 @@ ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
 ConfigurationFiles["mono"]      = "Mage/Source/Mono/*.cs"
 
+PlatformDefines     = {}
+PlatformDefines["windows"]      = "MAGE_PLATFORM_WINDOWS"
+PlatformDefines["linux"]        = "MAGE_PLATFORM_LINUX"
+PlatformDefines["macosx"]       = "MAGE_PLATFORM_MAC_OS"
+
 
 workspace "Mage"
     architecture "x64"
@@ -107,6 +112,7 @@ project "MageEngine"
         "MAGE_ASSERTS",
         ConfigurationDefines[_OPTIONS["renderer"]],
         ConfigurationDefines[_OPTIONS["audio-backend"]],
+        PlatformDefines[_OPTIONS["os"]],
     }
     includedirs
     {
