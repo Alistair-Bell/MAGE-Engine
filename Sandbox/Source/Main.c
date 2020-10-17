@@ -73,9 +73,32 @@ MAGE_ENTRY_POINT()
     VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
 
-    mageVulkanMemoryAllocateHeap(SandboxApplication->Renderer->Device, SandboxApplication->Renderer->PhysicalDevice, &heap, 0, 1024 * 64);
-    uint32_t offset1 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &b, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, data, sizeof(data));
-    uint32_t offset2 = mageVulkanMemoryBufferMapToBlock(SandboxApplication->Renderer->Device, &heap, &bb, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, data, sizeof(data));
+    struct mageVulkanMemoryHeapCreateInfo i;
+    memset(&i, 0, sizeof(struct mageVulkanMemoryHeapCreateInfo));
+    i.AllocationSize                = 1024 * 64;
+    i.AssociatedHeap                = 0;
+    i.PhysicalDevice                = SandboxApplication->Renderer->PhysicalDevice;
+    i.Device                        = SandboxApplication->Renderer->Device;
+
+    struct mageVulkanMemoryMapBufferInfo m;
+    memset(&m, 0, sizeof(struct mageVulkanMemoryMapBufferInfo));
+    m.AssociatedHeap                = 0;
+    m.Buffer                        = &b;
+    m.BufferUsage                   = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    m.PhysicalDevice                = SandboxApplication->Renderer->PhysicalDevice;
+    m.Device                        = SandboxApplication->Renderer->Device;
+    m.CommandPool                   = &SandboxApplication->Renderer->CommandPool;
+    m.CopyCommandBuffer             = NULL;
+    m.Data                          = data;
+    m.DataSize                      = sizeof(data);
+
+    mageVulkanMemoryAllocateHeap(&heap, &i);
+    uint32_t offset1 = mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    
+    m.Buffer = &bb;
+    m.BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+    
+    uint32_t offset2 = mageVulkanMemoryBufferMapToBlock(&heap, &m);
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
 
     mageVulkanMemoryBufferUnmapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &b, offset1);

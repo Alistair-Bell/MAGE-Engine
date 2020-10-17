@@ -96,7 +96,7 @@ void mageBufferWrapperAllocate(struct mageBufferWrapper *buffer, uint32_t dataSi
     VkMemoryAllocateInfo allocateInfo;
     memset(&allocateInfo, 0, sizeof(VkMemoryAllocateInfo));
     allocateInfo.sType              = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    allocateInfo.memoryTypeIndex    = mageVulkanMemoryFindMemoryType(renderer->PhysicalDeviceMemoryProperties, requirements.memoryTypeBits, flags);
+    allocateInfo.memoryTypeIndex    = mageVulkanMemoryFindMemoryType(renderer->PhysicalDevice, requirements.memoryTypeBits, flags);
     allocateInfo.allocationSize     = requirements.size;
     MAGE_VULKAN_CHECK(vkAllocateMemory(renderer->Device, &allocateInfo, NULL, &buffer->AllocatedMemory));
     MAGE_VULKAN_CHECK(vkBindBufferMemory(renderer->Device, buffer->Buffer, buffer->AllocatedMemory, 0));

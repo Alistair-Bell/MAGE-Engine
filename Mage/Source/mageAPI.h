@@ -1184,22 +1184,34 @@ struct mageVulkanMemoryHeap
 	uint32_t 						OffsetCount;
 	uint32_t						Flags;	
 };
+struct mageVulkanMemoryHeapCreateInfo
+{
+	VkDevice						Device;
+	VkPhysicalDevice				PhysicalDevice;
+	VkDeviceSize					AllocationSize;
+	uint32_t						AssociatedHeap;
+};
 
+struct mageVulkanMemoryMapBufferInfo
+{
+	VkDevice						Device;
+	VkPhysicalDevice				PhysicalDevice;
+	VkDeviceSize					DataSize;
+	VkBufferUsageFlags 				BufferUsage;
+	uint32_t						AssociatedHeap;
+	VkCommandPool					*CommandPool;
+	VkBuffer						*Buffer;
+	VkCommandBuffer					*CopyCommandBuffer;
+	void							*Data;
+};
 
 extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
-	VkDevice device,
-	VkPhysicalDevice gpu,
 	struct mageVulkanMemoryHeap *heap,
-	const uint32_t heapIndex,
-	const uint64_t bytes
+	struct mageVulkanMemoryHeapCreateInfo *info
 );
 extern MAGE_API uint32_t mageVulkanMemoryBufferMapToBlock(
-	VkDevice device,
 	struct mageVulkanMemoryHeap *heap,
-	VkBuffer *buffer,
-	const VkBufferUsageFlags flags,
-	void *data,
-	const uint64_t dataSize
+	struct mageVulkanMemoryMapBufferInfo *info
 );
 extern MAGE_API void mageVulkanMemoryBufferUnmapBufferToBlock(
 	VkDevice device,
@@ -1211,7 +1223,7 @@ extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProper
 	VkPhysicalDevice device
 );
 extern MAGE_API uint32_t mageVulkanMemoryFindMemoryType(
-	VkPhysicalDeviceMemoryProperties propeties,
+	VkPhysicalDevice device,
 	uint32_t typeFilter, 
 	VkMemoryPropertyFlags properties
 );
