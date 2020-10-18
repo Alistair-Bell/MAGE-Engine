@@ -1,10 +1,10 @@
 # Mage Engine
 
 <p align="left">
-    <img src ="https://img.shields.io/github/license/Alistair-Bell/MAGE-Engine"></img>
-    <img src="https://img.shields.io/github/issues/Alistair-Bell/MAGE-Engine"></img>
-    <img src="https://img.shields.io/github/forks/Alistair-Bell/MAGE-Engine"></img>
-    <img src="https://img.shields.io/github/stars/Alistair-Bell/MAGE-Engine"></img>
+    <img src ="https://img.shields.io/github/license/Alistair-Bell/Mage-Engine"></img>
+    <img src="https://img.shields.io/github/issues/Alistair-Bell/Mage-Engine"></img>
+    <img src="https://img.shields.io/github/forks/Alistair-Bell/Mage-Engine"></img>
+    <img src="https://img.shields.io/github/stars/Alistair-Bell/Mage-Engine"></img>
 </p>
 
 ## 2D vulkan powered game engine
