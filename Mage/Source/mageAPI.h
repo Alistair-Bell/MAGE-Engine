@@ -39,7 +39,11 @@
 		assert(expression)
 
 	#define MAGE_ASSERT_MESSAGE(expression, failMessage, ...) \
-		if (!(expression)) MAGE_LOG_CORE_FATAL_ERROR(failMessage, __VA_ARGS__); MAGE_ASSERT(expression) 
+		if (!(expression)) \
+		{ \
+			MAGE_LOG_CORE_FATAL_ERROR(failMessage, __VA_ARGS__); \
+		} \
+		MAGE_ASSERT(expression)
 
 #else
 	#define MAGE_ASSERT(expression)
@@ -93,6 +97,14 @@ struct mageRendererCreateInfo;
 struct mageRenderableQuad;
 struct mageRenderable;
 struct mageApplicationCreateInfo;
+
+#if defined (MAGE_VULKAN_BACKEND)
+
+struct mageVulkanMemoryHeap;
+struct mageVulkanMemoryMapBufferInfo;
+struct mageVulkanMemoryUnmapBufferInfo;
+
+#endif
 
 #define mageColor mageVector3
 
@@ -1178,8 +1190,8 @@ struct mageVulkanMemoryHeap
 	VkDeviceMemory					Memory;
 	VkDeviceSize					BlockSize;
 	VkDeviceSize 					Unallocated;
-	VkDeviceSize					HeapOffsets[MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS];
-	VkDeviceSize					*NextOffset;
+	uint32_t						*PreviousOffset;
+	uint32_t						*Offsets;
 	uint32_t						AssociatedHeapIndex;
 	uint32_t 						OffsetCount;
 	uint32_t						Flags;	
@@ -1191,33 +1203,46 @@ struct mageVulkanMemoryHeapCreateInfo
 	VkDeviceSize					AllocationSize;
 	uint32_t						AssociatedHeap;
 };
-
 struct mageVulkanMemoryMapBufferInfo
 {
-	VkDevice						Device;
-	VkPhysicalDevice				PhysicalDevice;
-	VkDeviceSize					DataSize;
-	VkBufferUsageFlags 				BufferUsage;
-	uint32_t						AssociatedHeap;
-	VkCommandPool					*CommandPool;
-	VkBuffer						*Buffer;
-	VkCommandBuffer					*CopyCommandBuffer;
-	void							*Data;
+	VkDevice								Device;
+	VkPhysicalDevice						PhysicalDevice;
+	VkDeviceSize							DataSize;
+	VkBufferUsageFlags 						BufferUsage;
+	uint32_t								AssociatedHeap;
+	VkCommandPool							*CommandPool;
+	VkBuffer								*Buffer;
+	VkCommandBuffer							*CopyCommandBuffer;
+	struct mageVulkanMemoryBufferReference 	*Reference;
+	void									*Data;
+
 };
+struct mageVulkanMemoryUnmapBufferInfo
+{
+	VkDevice								Device;
+	VkPhysicalDevice						PhysicalDevice;
+	struct mageVulkanMemoryBufferReference  *Reference;
+};
+struct mageVulkanMemoryBufferReference
+{
+	struct mageVulkanMemoryHeap		*Parent;
+	VkBuffer						*Buffer;
+	VkDeviceSize					Size;
+	uint32_t						*Offset;
+};
+
 
 extern MAGE_API VkResult mageVulkanMemoryAllocateHeap(
 	struct mageVulkanMemoryHeap *heap,
 	struct mageVulkanMemoryHeapCreateInfo *info
 );
-extern MAGE_API uint32_t mageVulkanMemoryBufferMapToBlock(
+extern MAGE_API void mageVulkanMemoryBufferMapToBlock(
 	struct mageVulkanMemoryHeap *heap,
 	struct mageVulkanMemoryMapBufferInfo *info
 );
 extern MAGE_API void mageVulkanMemoryBufferUnmapBufferToBlock(
-	VkDevice device,
 	struct mageVulkanMemoryHeap *heap,
-	VkBuffer *buffer,
-	const uint32_t bufferOffset
+	struct mageVulkanMemoryUnmapBufferInfo *info
 );
 extern MAGE_API VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(
 	VkPhysicalDevice device
@@ -1233,7 +1258,6 @@ extern MAGE_API void mageVulkanMemoryFreeMemory(
 );
 
 #endif
-
 
 /* 
 	Renderer 
@@ -1300,8 +1324,9 @@ struct mageRenderer
 struct mageRendererCreateInfo
 {
 	struct mageShader						*PipelineShaders;
-	uint8_t									TextureTransparency;
 	uint32_t 								ShaderCount;
+	uint8_t									TextureTransparency;
+	struct mageVector4						BackgroundColor;
 };
 
 extern MAGE_API mageResult mageRendererCreate(

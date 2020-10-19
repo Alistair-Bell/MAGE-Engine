@@ -45,7 +45,8 @@ MAGE_ENTRY_POINT()
     rendererCreateInfo.PipelineShaders          = shaders;
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
     rendererCreateInfo.TextureTransparency      = MAGE_TRUE;
-
+    rendererCreateInfo.BackgroundColor          = (struct mageVector4) { .Values[0] = 0.0f, .Values[1] = 0.0f, .Values[2] = 0.0f, .Values[3] = 1.0f };
+    
     mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
 
     struct mageVertex verticies1[] = 
@@ -79,7 +80,9 @@ MAGE_ENTRY_POINT()
     i.AssociatedHeap                = 0;
     i.PhysicalDevice                = SandboxApplication->Renderer->PhysicalDevice;
     i.Device                        = SandboxApplication->Renderer->Device;
-
+    
+    struct mageVulkanMemoryBufferReference re, rb;
+    
     struct mageVulkanMemoryMapBufferInfo m;
     memset(&m, 0, sizeof(struct mageVulkanMemoryMapBufferInfo));
     m.AssociatedHeap                = 0;
@@ -91,19 +94,20 @@ MAGE_ENTRY_POINT()
     m.CopyCommandBuffer             = NULL;
     m.Data                          = data;
     m.DataSize                      = sizeof(data);
+    m.Buffer                        = &b;
+    m.Reference                     = &re;
 
     mageVulkanMemoryAllocateHeap(&heap, &i);
-    uint32_t offset1 = mageVulkanMemoryBufferMapToBlock(&heap, &m);
-    
-    m.Buffer = &bb;
-    m.BufferUsage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-    
-    uint32_t offset2 = mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    mageVulkanMemoryBufferMapToBlock(&heap, &m);
+
+    m.Buffer                        = &bb;
+    m.Reference                     = &rb;
+    mageVulkanMemoryBufferMapToBlock(&heap, &m);
+
+
+    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
+    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
-
-    mageVulkanMemoryBufferUnmapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &b, offset1);
-    mageVulkanMemoryBufferUnmapBufferToBlock(SandboxApplication->Renderer->Device, &heap, &bb, offset2);
-
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {

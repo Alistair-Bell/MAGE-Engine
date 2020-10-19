@@ -652,12 +652,8 @@ static VkResult mageCreateCommandBuffers(struct mageRenderer *renderer, struct m
     allocateInfo.commandBufferCount         = (uint32_t) renderer->SwapChainImageCount;
 
     memset(&renderer->ClearValue, 0, sizeof(VkClearValue));
-    renderer->ClearValue.color.float32[0] = 0.0f;
-    renderer->ClearValue.color.float32[1] = 0.0f;
-    renderer->ClearValue.color.float32[2] = 0.0f;
-    renderer->ClearValue.color.float32[3] = 0.0f;
+    renderer->ClearValue = (VkClearValue) { rendererInfo->BackgroundColor.X, rendererInfo->BackgroundColor.Y, rendererInfo->BackgroundColor.Z, rendererInfo->BackgroundColor.W };
     
-
     VkResult result = vkAllocateCommandBuffers(renderer->Device, &allocateInfo, renderer->CommandBuffers);
     return result;
 }

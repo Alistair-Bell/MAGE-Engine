@@ -1,8 +1,7 @@
 #include <mageAPI.h>
 
 #define SORT_NAME sort_algorithms
-#define SORT_TYPE uint64_t
-#define SORT_CMP(x, y) ((x) - (y))
+#define SORT_TYPE uint32_t
 #include "../../Externals/sort/sort.h"
 
 uint32_t mageVulkanMemoryFindMemoryType(VkPhysicalDevice device, uint32_t typeFilter, VkMemoryPropertyFlags properties)
@@ -19,6 +18,23 @@ uint32_t mageVulkanMemoryFindMemoryType(VkPhysicalDevice device, uint32_t typeFi
     MAGE_ASSERT_MESSAGE(MAGE_TRUE != MAGE_TRUE, "Unable to find memory type index!\n", NULL);
     return UINT32_MAX;
 }
+uint32_t mageSearchOffsetIndex(uint32_t *array, uint32_t low, uint32_t high, uint32_t key)
+{
+    if (low <= high)
+	{
+		uint32_t mid = low + (high - low) / 2;
+		if (key == array[mid])
+			return mid;
+		
+        else if (key < array[mid])
+			return mageSearchOffsetIndex(array, low, mid - 1, key);
+		
+        else
+			return mageSearchOffsetIndex(array, mid + 1, high, key);
+	}
+	MAGE_ASSERT_MESSAGE(1 == 1, "Unable to find offset value %d\n", key);
+    return UINT32_MAX;
+}
 VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(VkPhysicalDevice device)
 {
     VkPhysicalDeviceMemoryProperties properties;
@@ -28,8 +44,8 @@ VkPhysicalDeviceMemoryProperties mageVulkanMemoryGetDeviceProperties(VkPhysicalD
 }
 VkResult mageVulkanMemoryAllocateHeap(struct mageVulkanMemoryHeap *heap, struct mageVulkanMemoryHeapCreateInfo *info)
 {    
-    memset(heap, 0, sizeof(struct mageVulkanMemoryHeap));
-    memset(heap->HeapOffsets, 0, sizeof(VkDeviceSize) * MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS);
+    heap->Offsets = MAGE_MEMORY_ARRAY_ALLOCATE(MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS, sizeof(uint32_t));
+    memset(heap->Offsets, 0, sizeof(uint32_t) * MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS);
     VkPhysicalDeviceMemoryProperties memoryProperties = mageVulkanMemoryGetDeviceProperties(info->PhysicalDevice);
 
     VkDeviceSize bytes = info->AllocationSize;
@@ -39,7 +55,7 @@ VkResult mageVulkanMemoryAllocateHeap(struct mageVulkanMemoryHeap *heap, struct 
     MAGE_ASSERT_MESSAGE((bytes % 1024 == 0), "Memory heap allocation failed, block size of %lu not alligned to whole bits!\n", bytes);
 
     MAGE_LOG_CORE_INFORM("Forcing using gpu heap with index of %lu, of %lu indexes\n", heapIndex, memoryProperties.memoryHeapCount);
-    MAGE_ASSERT_MESSAGE(heapIndex <= memoryProperties.memoryHeapCount, "GPU memory heap index too large!\n", NULL);
+    MAGE_ASSERT_MESSAGE(memoryProperties.memoryHeapCount >= heapIndex, "GPU memory heap index too large!\n", NULL);
     MAGE_ASSERT_MESSAGE(memoryProperties.memoryHeaps[heapIndex].size >= bytes, "Memory requested exceeds heap size of %luK\n", memoryProperties.memoryHeaps[heapIndex].size / 1024);
     
     VkMemoryAllocateInfo allocateInfo;
@@ -54,12 +70,19 @@ VkResult mageVulkanMemoryAllocateHeap(struct mageVulkanMemoryHeap *heap, struct 
     heap->BlockSize             = bytes;
     heap->Unallocated           = bytes;
     heap->OffsetCount           = 0;
-    heap->NextOffset            = &heap->HeapOffsets[0];
+    heap->PreviousOffset        = &heap->Offsets[0];
     heap->Flags                 = memoryProperties.memoryTypes[heapIndex].propertyFlags;
+
+    uint32_t incriment = info->AllocationSize / MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS;
+    uint32_t i;
+    /* For binary search algorithms it is important that no repeat values are stored */
+    for (i = 0; i < MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS; i++)
+        heap->Offsets[i] = i * incriment;
+
     MAGE_LOG_CORE_INFORM("Allocating vulkan memory of size %luK\n", bytes / 1024);
     return VK_SUCCESS;
 }
-uint32_t mageVulkanMemoryBufferMapToBlock(struct mageVulkanMemoryHeap *heap, struct mageVulkanMemoryMapBufferInfo *info)
+void mageVulkanMemoryBufferMapToBlock(struct mageVulkanMemoryHeap *heap, struct mageVulkanMemoryMapBufferInfo *info)
 {   
     MAGE_ASSERT_MESSAGE(info->DataSize <= heap->Unallocated, "Heap has too little space for buffer of %luK, only %luK remaining\n", (uint64_t)(info->DataSize / 1024), (uint64_t)(heap->Unallocated / 1024));
 
@@ -78,14 +101,14 @@ uint32_t mageVulkanMemoryBufferMapToBlock(struct mageVulkanMemoryHeap *heap, str
     if (heap->OffsetCount <= 0)
         bufferOffset = 0;
     else
-        bufferOffset = *heap->NextOffset + info->DataSize;
+        bufferOffset = *heap->PreviousOffset + info->DataSize;
 
     MAGE_VULKAN_CHECK(vkCreateBuffer(info->Device, &createInfo, NULL, info->Buffer));
     vkBindBufferMemory(info->Device, *info->Buffer, heap->Memory, bufferOffset);
 
-    heap->OffsetCount++;
-    heap->NextOffset    = &heap->HeapOffsets[heap->OffsetCount];
-    heap->Unallocated   -= info->DataSize;
+    heap->Offsets[heap->OffsetCount]    = bufferOffset;
+    heap->PreviousOffset                    = &heap->Offsets[heap->OffsetCount];
+    heap->Unallocated                       -= info->DataSize;
 
     if (heap->Flags &= VK_MEMORY_HEAP_DEVICE_LOCAL_BIT)
     {
@@ -165,13 +188,30 @@ uint32_t mageVulkanMemoryBufferMapToBlock(struct mageVulkanMemoryHeap *heap, str
             memcpy(mapping, info->Data, info->DataSize);
         vkUnmapMemory(info->Device, heap->Memory);
     }
-       
+
     MAGE_LOG_CORE_INFORM("Binding buffer memory to heap of %luK, using offset of %lu, heap has %luK remaining\n", (uint64_t)heap->BlockSize / 1024, (uint64_t)bufferOffset, (uint64_t)heap->Unallocated / 1024);
-    return bufferOffset;
+    
+    if (info->Reference != NULL)
+    {
+        info->Reference->Buffer = info->Buffer;
+        info->Reference->Offset = &heap->Offsets[heap->OffsetCount];
+        info->Reference->Parent = heap;
+        info->Reference->Size   = info->DataSize;
+    }
+    heap->OffsetCount++;
 }
-void mageVulkanMemoryBufferUnmapBufferToBlock(VkDevice device, struct mageVulkanMemoryHeap *heap, VkBuffer *buffer, const uint32_t bufferOffset)
+void mageVulkanMemoryBufferUnmapBufferToBlock(struct mageVulkanMemoryHeap *heap, struct mageVulkanMemoryUnmapBufferInfo *info)
 {
-    vkDestroyBuffer(device, *buffer, NULL);
+    MAGE_ASSERT(0 < heap->OffsetCount);
+    MAGE_ASSERT(0 != info->Reference->Size);
+    MAGE_ASSERT(heap->OffsetCount < MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS);
+
+    uint32_t index = mageSearchOffsetIndex(heap->Offsets, 0, MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS - 1, *info->Reference->Offset);
+    heap->Unallocated += info->Reference->Size;
+    
+    vkDestroyBuffer(info->Device, *info->Reference->Buffer, NULL);
+    /* TODO check performance on different algorithms, where sourced quick > heap > in place merge sort */
+    sort_algorithms_quick_sort(heap->Offsets, MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS + 1);
 }
 
 void mageVulkanMemoryFreeMemory(VkDevice device, struct mageVulkanMemoryHeap *heap)
@@ -182,4 +222,5 @@ void mageVulkanMemoryFreeMemory(VkDevice device, struct mageVulkanMemoryHeap *he
         MAGE_LOG_CORE_INFORM("Freeing vulkan memory of size %luK\n", (uint64_t)heap->BlockSize / 1024);
         vkFreeMemory(device, heap->Memory, NULL);
     }
+    MAGE_MEMORY_FREE(heap->Offsets);
 }

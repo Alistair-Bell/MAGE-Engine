@@ -26,5 +26,8 @@ Textures/
 # User config folder
 Config*
 
+# Personal vscode config file
+.vscode/settings.json
+
 # Python created files
 *.pyc
