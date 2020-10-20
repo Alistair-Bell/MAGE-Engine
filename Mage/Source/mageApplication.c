@@ -11,7 +11,7 @@ mageResult mageEngineInitialise()
     
     return MAGE_RESULT_SUCCESS;
 }
-mageResult mageApplicationCreate(struct mageApplication *application, struct mageApplicationCreateInfo applicationInfo, struct mageRendererCreateInfo rendererInfo)
+mageResult mageApplicationCreate(struct mageApplication *application, struct mageApplicationCreateInfo *applicationInfo, struct mageRendererCreateInfo *rendererInfo)
 {
     application->Window             = MAGE_MEMORY_ALLOCATE(sizeof(struct mageWindow));
     application->Renderer           = MAGE_MEMORY_ALLOCATE(sizeof(struct mageRenderer));
@@ -19,8 +19,15 @@ mageResult mageApplicationCreate(struct mageApplication *application, struct mag
     application->Running = 1;
     mageResult returnCode = mageEngineInitialise();
     MAGE_ASSERT(returnCode == MAGE_RESULT_SUCCESS);
-    mageWindowCreate(application->Window, &applicationInfo);
-    mageRendererCreate(application->Renderer, application->Window, &rendererInfo);
+    mageWindowCreate(application->Window, applicationInfo);
+    mageRendererCreate(application->Renderer, application->Window, rendererInfo);
+    struct mageUserInputInquirerSetupInfo inputSetup;
+    memset(&inputSetup, 0, sizeof(struct mageUserInputInquirerSetupInfo));
+
+    if (applicationInfo->InputSetup != NULL)
+        inputSetup = *applicationInfo->InputSetup;
+    mageUserInputInquirerSetup(application->Window, &inputSetup);
+
     return MAGE_RESULT_SUCCESS;
 }
 void mageApplicationDestroy(struct mageApplication *application)

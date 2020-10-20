@@ -583,6 +583,70 @@ extern MAGE_API void mageQueueDestroy(
 );
 
 /* 
+	User IO
+*/
+
+/* Rounded to easiest bit and left some room if any keyboard have special keys */
+#define MAGE_KEYBOARD_KEY_COUNT 128
+
+
+
+typedef enum MAGE_KEYBOARD_SETUP_FLAGS_ENUM
+{
+	MAGE_KEYBOARD_SETUP_FLAGS_ENABLE_STICKY,
+	MAGE_KEYBOARD_SETUP_FLAGS_NONE
+} mageKeyboardSetupFlags;
+
+typedef enum MAGE_MOUSE_SETUP_FLAGS_ENUM
+{
+	MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION 	= 0x00033005,
+	MAGE_MOUSE_SETUP_FLAGS_NONE,
+} mageMouseSetupFlags;
+
+typedef enum MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENUM
+{
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENABLED 	= 0x00034001, 	/* Default */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_HIDDEN  	= 0x00034002, 	/* Hidden but can leave context */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_DISABLED 	= 0x00034003, 	/* Hides but functionality is the same */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_NONE		= 0x0, 			/* No flags, used as placeholder */
+} mageMouseCursorSetupFlags;
+
+struct mageUserInputInquirerSetupInfo
+{
+	mageKeyboardSetupFlags 		*KeyboardFlags;
+	mageMouseSetupFlags			*MouseFlags;
+	mageMouseCursorSetupFlags	*CursorFlags;
+	uint32_t					KeyboardFlagsCount;
+	uint32_t					MouseFlagsCount;
+	uint32_t					CursorFlagsCount;
+};
+
+struct mageKeyBoardState
+{
+	union
+	{
+		uint32_t Data;
+		struct
+		{
+			uint8_t KeyCode;
+			uint8_t KeyState;
+			uint8_t CurrentFrame;
+		};
+	};
+};
+
+extern MAGE_API void mageUserInputInquirerSetup(
+	struct mageWindow *window,
+	struct mageUserInputInquirerSetupInfo *info
+);
+
+extern MAGE_API void mageKeyboardInquireKeyboardState(
+	struct mageWindow *window,
+	struct mageKeyBoardState *states
+);
+
+
+/* 
     ECS systems
 */
 
@@ -1458,21 +1522,20 @@ struct mageApplicationCreateInfo
 	uint8_t									FixedResolution;
 	char 						   			*Name;
 	const char 								*WindowIcon;
+	struct mageUserInputInquirerSetupInfo	*InputSetup;
 };
 struct mageApplication
 {
 	struct mageRenderer 					*Renderer;
 	struct mageWindow 						*Window;
-	/*struct mageApplicationCreateInfo		CreateInfo;*/
-	/*struct mageRendererCreateInfo			RendererCreateInfo;*/
 	uint8_t 								Running;
 };
 
 /* Application */
 extern MAGE_API mageResult mageApplicationCreate(
 	struct mageApplication *application, 
-	struct mageApplicationCreateInfo applicationInfo, 
-	struct mageRendererCreateInfo rendererInfo
+	struct mageApplicationCreateInfo *applicationInfo, 
+	struct mageRendererCreateInfo *rendererInfo
 );
 extern MAGE_API void mageApplicationDestroy(
 	struct mageApplication *application

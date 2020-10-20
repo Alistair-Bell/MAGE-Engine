@@ -29,6 +29,15 @@ MAGE_ENTRY_POINT()
 #if 1
     CreateShaders();    
 
+    struct mageUserInputInquirerSetupInfo inputSetup;
+    memset(&inputSetup, 0, sizeof(struct mageUserInputInquirerSetupInfo));
+    inputSetup.CursorFlags                      = (mageMouseCursorSetupFlags[]) { MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENABLED };
+    inputSetup.CursorFlagsCount                 = 1;
+    inputSetup.MouseFlags                       = (mageMouseSetupFlags[]) { MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION };
+    inputSetup.MouseFlagsCount                  = 1;
+    inputSetup.KeyboardFlags                    = NULL;
+    inputSetup.KeyboardFlagsCount               = 0;
+
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
 
@@ -38,6 +47,8 @@ MAGE_ENTRY_POINT()
     applicationCreateInfo.Height                 = 1080;
     applicationCreateInfo.Name                   = "Sandbox Application";
     applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_500px_Dec16.jpg";
+    applicationCreateInfo.InputSetup             = &inputSetup;
+
 
     struct mageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(struct mageRendererCreateInfo));
@@ -47,7 +58,7 @@ MAGE_ENTRY_POINT()
     rendererCreateInfo.TextureTransparency      = MAGE_TRUE;
     rendererCreateInfo.BackgroundColor          = (struct mageVector4) { .Values[0] = 0.0f, .Values[1] = 0.0f, .Values[2] = 0.0f, .Values[3] = 1.0f };
     
-    mageApplicationCreate(SandboxApplication, applicationCreateInfo, rendererCreateInfo);
+    mageApplicationCreate(SandboxApplication, &applicationCreateInfo, &rendererCreateInfo);
 
     struct mageVertex verticies1[] = 
     {
