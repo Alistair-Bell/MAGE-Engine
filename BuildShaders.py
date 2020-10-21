@@ -27,11 +27,10 @@ ShaderExtensions = {
     "Fragment": [ "frag" ],
     "Compute": [ "comp" ],
 }
-CommandLineOptions = {
-    # None does not care what 
+RuntimeGeneratedCommandLineOptions = {
     "--shaders=": [],
-    "--optimisation=": [ "speed", "size", "none" ]
 }
+CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", __file__, RuntimeGeneratedCommandLineOptions) 
 
 CompilerOptmisations = [ "none", "speed", "size" ]
 

@@ -1,3 +1,4 @@
+import json
 import os, sys, subprocess, zipfile, glob, platform
 
 
@@ -99,6 +100,22 @@ def UnzipFile(localPath, output):
     else:
         LogMessage("%s zip file was not found, engine assets may be missing!" % (localPath), LogModes["Error"]) 
 
+# terminology may be incorrect
+def LoadArgumentsFromJSON(file, key, runtimeGenerated=None):
+    arguments = {}
+    with open (file, "r") as f:
+        fileData = f.read()
+        arguments = json.loads(fileData)
+    keys = [*arguments]
+    if key not in keys:
+        LogMessage("Unable to find key %s in returned keys %s" % (key, keys), LogModes["Error"])
+        return {}
+
+    returning = arguments[key]
+    if runtimeGenerated is not None:
+        returning.update(dict(runtimeGenerated))
+    return returning
+
 def GenerateDefaultArguments(dictionary):
     returning = []
     for x, y in dictionary.items():
@@ -117,7 +134,6 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         return returnValues
     
     requiredKeys = list(searchingDictionary.keys())
-
     # removing the uneccesary command line arguments
     for raw in rawArguments:
         splitter = -1

@@ -1,3 +1,4 @@
+from json import load
 import os, sys, json, time, platform
 from os import POSIX_FADV_SEQUENTIAL
 
@@ -11,16 +12,11 @@ from Utility import *
 
 BuildScript = "Config/BuildScript.json"
 
-CommandLineOptions = {
-    "--config=": [ "debug", "release" ],
+RuntimeGeneratedCommandLineOptions = {
     "--platform=": list(GetSupportedBuildPlatforms()),
-    "--targets=": [ "all", "sandbox", "engine", "externals", "sandbox-c#" ],
-    "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
-    "--c-compiler=": [ "clang", "gcc", "mingw" ],
-    "--mono-compiler=": [ "none", "mono", "dot-net" ],
-    "--renderer=": [ "vulkan", "gles" ],
-    "--audio-driver=": [ "pulse" ],
 }
+
+CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", __file__, RuntimeGeneratedCommandLineOptions)
 
 def ScriptHelp():
     LogMessage("Usage: %s:" % (__file__))
