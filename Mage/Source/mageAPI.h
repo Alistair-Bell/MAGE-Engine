@@ -589,7 +589,8 @@ extern MAGE_API void mageQueueDestroy(
 /* Rounded to easiest bit and left some room if any keyboard have special keys */
 #define MAGE_KEYBOARD_KEY_COUNT 128
 
-
+typedef void (*mageKeyBoardInputCallback)(GLFWwindow *, int32_t, int32_t, int32_t, int32_t);
+typedef void (*mageMouseInputCallback)(GLFWwindow*, int32_t, int32_t, int32_t);
 
 typedef enum MAGE_KEYBOARD_SETUP_FLAGS_ENUM
 {
@@ -599,38 +600,99 @@ typedef enum MAGE_KEYBOARD_SETUP_FLAGS_ENUM
 
 typedef enum MAGE_MOUSE_SETUP_FLAGS_ENUM
 {
-	MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION 	= 0x00033005,
+	MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION,
 	MAGE_MOUSE_SETUP_FLAGS_NONE,
 } mageMouseSetupFlags;
 
 typedef enum MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENUM
 {
-	MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENABLED 	= 0x00034001, 	/* Default */
-	MAGE_MOUSE_CURSOR_SETUP_FLAGS_HIDDEN  	= 0x00034002, 	/* Hidden but can leave context */
-	MAGE_MOUSE_CURSOR_SETUP_FLAGS_DISABLED 	= 0x00034003, 	/* Hides but functionality is the same */
-	MAGE_MOUSE_CURSOR_SETUP_FLAGS_NONE		= 0x0, 			/* No flags, used as placeholder */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENABLED,  	/* Default */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_HIDDEN,   	/* Hidden but can leave context */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_DISABLED,		/* Hides but functionality is the same */
+	MAGE_MOUSE_CURSOR_SETUP_FLAGS_NONE,			/* No flags, used as placeholder */
 } mageMouseCursorSetupFlags;
 
-struct mageUserInputInquirerSetupInfo
+typedef enum MAGE_EXTERNAL_INPUT_SETUP_FLAGS_ENUM
 {
-	mageKeyboardSetupFlags 		*KeyboardFlags;
-	mageMouseSetupFlags			*MouseFlags;
-	mageMouseCursorSetupFlags	*CursorFlags;
-	uint32_t					KeyboardFlagsCount;
-	uint32_t					MouseFlagsCount;
-	uint32_t					CursorFlagsCount;
-};
+	MAGE_EXTERNAL_INPUT_SETUP_FLAGS_NONE,
+	MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_JOYSTICK, /* Arcade sticks and that sort of deal */
+	MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_GAMEPAD /* Gamepads */
+} mageExternalInputSetupFlags;
 
-struct mageKeyBoardState
+/* 
+	Both ps2 < & xbox controllers share the same
+*/
+
+typedef enum MAGE_GAMEPAD_BUTTON_VALUES_ENUM
+{
+	MAGE_GAMEPAD_BUTTON_VALUES_A = 0,
+	MAGE_GAMEPAD_BUTTON_VALUES_B,
+	MAGE_GAMEPAD_BUTTON_VALUES_X,
+	MAGE_GAMEPAD_BUTTON_VALUES_Y,
+	MAGE_GAMEPAD_BUTTON_VALUES_LEFT_BUMPER,
+	MAGE_GAMEPAD_BUTTON_VALUES_RIGHT_BUMPER,
+	MAGE_GAMEPAD_BUTTON_VALUES_BACK,
+	MAGE_GAMEPAD_BUTTON_VALUES_START,
+	MAGE_GAMEPAD_BUTTON_VALUES_GUIDE,
+	MAGE_GAMEPAD_BUTTON_VALUES_LEFT_THUMB,
+	MAGE_GAMEPAD_BUTTON_VALUES_RIGHT_THUMB,
+	MAGE_GAMEPAD_BUTTON_VALUES_DIRECTIONAL_PAD_UP,
+	MAGE_GAMEPAD_BUTTON_VALUES_DIRECTIONAL_PAD_RIGHT,
+	MAGE_GAMEPAD_BUTTON_VALUES_DIRECTIONAL_PAD_DOWN,
+	MAGE_GAMEPAD_BUTTON_VALUES_DIRECTIONAL_PAD_LEFT,
+} mageGamepadButtonValues;
+
+/* 
+	For developers using ps2 < bindings having the macros set to the correspondant xbox values, testing needed 
+*/
+
+#define MAGE_GAMEPAD_BUTTON_VALUES_PLAYSTATION_X 			MAGE_GAMEPAD_BUTTON_VALUES_A
+#define MAGE_GAMEPAD_BUTTON_VALUES_PLAYSTATION_CIRCLE 		MAGE_GAMEPAD_BUTTON_VALUES_B
+#define MAGE_GAMEPAD_BUTTON_VALUES_PLAYSTATION_TRIANGLE 	MAGE_GAMEPAD_BUTTON_VALUES_Y
+#define MAGE_GAMEPAD_BUTTON_VALUES_PLAYSTATION_SQUARE 		MAGE_GAMEPAD_BUTTON_VALUES_X
+
+struct mageJoystickInfo
 {
 	union
 	{
 		uint32_t Data;
 		struct
 		{
+			uint8_t Present;
+			uint8_t Gamepad;
+			uint16_t Index;
+		};
+	};
+};
+
+struct mageUserInputCallbacks
+{
+	mageKeyBoardInputCallback				KeyBoardPress;
+	mageMouseInputCallback					MouseButtonPress;
+};
+
+struct mageUserInputInquirerSetupInfo
+{
+	mageKeyboardSetupFlags 					*KeyboardFlags;
+	mageMouseSetupFlags						*MouseFlags;
+	mageMouseCursorSetupFlags				*CursorFlags;
+	mageExternalInputSetupFlags				*ExternalInputFlags;
+	uint32_t								KeyboardFlagsCount;
+	uint32_t								MouseFlagsCount;
+	uint32_t								CursorFlagsCount;
+	uint32_t								ExtenalInputFlagsCount;
+	struct mageUserInputCallbacks 			*Callbacks;
+};
+
+struct mageKeyBoardState
+{
+	union
+	{
+		uint16_t Data;
+		struct
+		{
 			uint8_t KeyCode;
 			uint8_t KeyState;
-			uint8_t CurrentFrame;
 		};
 	};
 };
@@ -640,11 +702,10 @@ extern MAGE_API void mageUserInputInquirerSetup(
 	struct mageUserInputInquirerSetupInfo *info
 );
 
-extern MAGE_API void mageKeyboardInquireKeyboardState(
+extern MAGE_API void mageUserInputInquireKeyboardState(
 	struct mageWindow *window,
 	struct mageKeyBoardState *states
 );
-
 
 /* 
     ECS systems

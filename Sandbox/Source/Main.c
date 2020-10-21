@@ -31,12 +31,14 @@ MAGE_ENTRY_POINT()
 
     struct mageUserInputInquirerSetupInfo inputSetup;
     memset(&inputSetup, 0, sizeof(struct mageUserInputInquirerSetupInfo));
-    inputSetup.CursorFlags                      = (mageMouseCursorSetupFlags[]) { MAGE_MOUSE_CURSOR_SETUP_FLAGS_ENABLED };
+    inputSetup.CursorFlags                      = (mageMouseCursorSetupFlags[]) { MAGE_MOUSE_CURSOR_SETUP_FLAGS_HIDDEN };
     inputSetup.CursorFlagsCount                 = 1;
     inputSetup.MouseFlags                       = (mageMouseSetupFlags[]) { MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION };
     inputSetup.MouseFlagsCount                  = 1;
     inputSetup.KeyboardFlags                    = NULL;
     inputSetup.KeyboardFlagsCount               = 0;
+    inputSetup.ExternalInputFlags               = (mageExternalInputSetupFlags[]) { MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_GAMEPAD };
+    inputSetup.ExtenalInputFlagsCount           = 1;
 
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
@@ -68,7 +70,7 @@ MAGE_ENTRY_POINT()
         { .Vertex = { .X = -0.5f, .Y =  0.5f },   .Color = { .X = 0.0f, .Y = 0.0f, .Z = 1.0f}, .TextureLocation = { .X = 0.0f, .Y = 1.0f } }
     
     };
-    
+
     struct mageRenderableCreateInfo info;
     memset(&info, 0, sizeof(struct mageRenderableCreateInfo));
     info.Verticies          = verticies1;
@@ -108,17 +110,15 @@ MAGE_ENTRY_POINT()
     m.Buffer                        = &b;
     m.Reference                     = &re;
 
-    mageVulkanMemoryAllocateHeap(&heap, &i);
-    mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    // mageVulkanMemoryAllocateHeap(&heap, &i);
+    // mageVulkanMemoryBufferMapToBlock(&heap, &m);
 
     m.Buffer                        = &bb;
     m.Reference                     = &rb;
-    mageVulkanMemoryBufferMapToBlock(&heap, &m);
-
-
-    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
-    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
-    mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
+    // mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    // mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
+    // mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
+    // mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
