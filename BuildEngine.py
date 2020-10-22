@@ -98,13 +98,12 @@ def Main():
 
 
     config              = arguments[0]
-    platform            = arguments[1]
-    targets             = arguments[2]
-    generator           = arguments[3]
-    compiler            = arguments[4]
-    monoCompiler        = arguments[5]
-    renderer            = arguments[6]
-    audioBackend        = arguments[7] 
+    generator           = arguments[1]
+    compiler            = arguments[2]
+    monoCompiler        = arguments[3]
+    renderer            = arguments[4]
+    audioBackend        = arguments[5] 
+    platform            = arguments[6]
     
     targetSwitcher = {
         "all":          "all",
@@ -129,8 +128,7 @@ def Main():
     LogMessage("Build options: \
                 \n\tConfig -> %s \
                 \n\tPlatform -> %s \
-                \n\tTargets -> %s \
-                \n\tGenerator -> %s" % (config, platform, targets, generator))
+                \n\tGenerator -> %s" % (config, platform, generator))
 
     LogMessage("Calling premake")
     premakeString = "%s --fatal --verbose --file=PremakeCore.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler, generatorSwitcher[generator])
@@ -150,7 +148,7 @@ def Main():
 
     if generator == "makefile":
         LogMessage("Using makefile as build system, calling make")
-        makeString = "make config=%s %s" % (config, targetSwitcher[targets])
+        makeString = "make config=%s" % (config)
         CallSingleCommand(makeString, makeString, makeString)
 
         if generatedMono:

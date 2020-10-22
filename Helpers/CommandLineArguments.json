@@ -1,7 +1,6 @@
 {
     "BuildEngine.py": {
         "--config": [ "debug", "release" ],
-        "--targets=": [ "all", "sandbox", "engine", "externals", "sandbox-c#" ],
         "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
         "--c-compiler=": [ "clang", "gcc", "mingw" ],
         "--mono-compiler=": [ "none", "mono", "dot-net" ],
