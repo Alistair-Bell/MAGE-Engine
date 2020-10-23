@@ -43,13 +43,8 @@ mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCre
 	
 	MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 	
-	glfwSetInputMode(window->Context, GLFW_STICKY_KEYS, GLFW_TRUE);
-
-	glfwSetInputMode(window->Context, GLFW_STICKY_MOUSE_BUTTONS, GLFW_TRUE);
-
 	MAGE_MEMORY_FREE(image);
 	return MAGE_RESULT_SUCCESS;
-
 }
 void mageWindowDestroy(struct mageWindow *window)
 {	
