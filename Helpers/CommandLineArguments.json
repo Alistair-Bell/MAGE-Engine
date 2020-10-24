@@ -1,11 +1,11 @@
 {
     "BuildEngine.py": {
-        "--config": [ "debug", "release" ],
+        "--config=": [ "debug", "release" ],
         "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
         "--c-compiler=": [ "clang", "gcc", "mingw" ],
-        "--mono-compiler=": [ "none", "mono", "dot-net" ],
         "--renderer=": [ "vulkan", "gles" ],
-        "--audio-driver=": [ "pulse" ]
+        "--audio-driver=": [ "pulse" ],
+        "--tests=": [ "none", "all" ]
     },
     "BuildShaders.py": {
         "--optimisation=": [ "speed", "size", "none" ]

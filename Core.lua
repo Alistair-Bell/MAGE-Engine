@@ -25,14 +25,14 @@ newoption
 }
 newoption
 {
-    trigger     = "scripting-language",
-    value       = "API",
-    description = "Choose a particular scripting language",
+    trigger     = "tests",
+    value       = "build",
+    description = "Build unit tests for the engine",
     default     = "none",
     allowed     = {
-        { "none", "Disables scripting" },
-        { "mono", "Mono C# 6 <" },
-    }
+        { "none", "Disables building tests" },
+        { "all", "Builds all unit tests" },
+    },
 }
 
 -- Table of libraries that should be linked againsed
@@ -56,13 +56,20 @@ ConfigurationFiles  = {}
 ConfigurationFiles["vulkan"]    = "Mage/Source/Vulkan/**.*"
 ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
-ConfigurationFiles["mono"]      = "Mage/Source/Mono/*.cs"
 
 PlatformDefines     = {}
 PlatformDefines["windows"]      = "MAGE_PLATFORM_WINDOWS"
 PlatformDefines["linux"]        = "MAGE_PLATFORM_LINUX"
 PlatformDefines["macosx"]       = "MAGE_PLATFORM_MAC_OS"
 
+ClientLinks =
+{
+    "MageEngine",
+    "GLFW",
+    "stb-image",
+    ConfigurationLinks[_OPTIONS["renderer"]],
+    ConfigurationLinks[_OPTIONS["audio-backend"]],
+}
 
 workspace "Mage"
     architecture "x64"
@@ -83,6 +90,12 @@ if _OPTIONS["renderer"] == "gles" then
 end
 include "Mage/Externals/stb-image"
 include "Mage/Externals/glfw3"
+
+group "Tests"
+if _OPTIONS["tests"] == "all" then
+    -- Include the tests to build
+    include "Tests"
+end
 
 -- Engine Project
 project "MageEngine"
@@ -167,11 +180,7 @@ project "Sandbox"
 
     links
     {
-        "MageEngine",
-        "GLFW",
-        "stb-image",
-        ConfigurationLinks[_OPTIONS["renderer"]],
-        ConfigurationLinks[_OPTIONS["audio-backend"]],
+        ClientLinks
     }
     
     filter "system:linux"

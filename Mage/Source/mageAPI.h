@@ -642,6 +642,14 @@ typedef enum MAGE_GAMEPAD_BUTTON_VALUES_ENUM
 	MAGE_GAMEPAD_BUTTON_VALUES_DIRECTIONAL_PAD_LEFT,
 } mageGamepadButtonValues;
 
+typedef uint8_t mageGamepadButton;
+
+typedef enum MAGE_GAMEPAD_AXIS_ENUM
+{
+	MAGE_GAMEPAD_AXIS_LEFT_TRIGGER		= 4,
+	MAGE_GAMEPAD_AXIS_LEFT_RIGHT		= 5,
+} mageGamepadAxis;
+
 typedef enum MAGE_KEYCODE_ENUM
 {
 	MAGE_KEYCODE_A,
@@ -677,8 +685,8 @@ typedef enum MAGE_KEYCODE_ENUM
 	MAGE_KEYCODE_MINUS,
 	MAGE_KEYCODE_PERIOD,
 	MAGE_KEYCODE_SLASH,
-	MAGE_KEYCODE_SEMI_COLON,
 	MAGE_KEYCODE_EQUAL,
+	MAGE_KEYCODE_SEMI_COLON,
 
 	MAGE_KEYCODE_LEFT_BRACKET,
 	MAGE_KEYCODE_BACKSLASH,
@@ -805,6 +813,8 @@ struct mageUserInputInquirerSetupInfo
 	uint32_t								MouseFlagsCount;
 	uint32_t								CursorFlagsCount;
 	uint32_t								ExtenalInputFlagsCount;
+	uint8_t									*PrimaryJoystickIndex;
+	uint8_t									*PrimaryGamepadIndex;
 	struct mageUserInputCallbacks 			*Callbacks;
 };
 
@@ -829,6 +839,11 @@ extern MAGE_API void mageUserInputInquirerSetup(
 extern MAGE_API struct mageKeyState mageUserInputInquireKey(
 	struct mageWindow *window,
 	mageKeyCode code
+);
+
+extern uint8_t mageUserInputGamepadGetButtonState(
+	const uint8_t gamepadIndex,
+	const mageGamepadButton button
 );
 
 /* 

@@ -13,6 +13,7 @@
 #define GLFW_INCLUDE_NONE
 #define MAGE_GLFW
 #include "../Externals/glfw3/include/GLFW/glfw3.h"
+#include "../Externals/glfw3/include/GLFW/glfw3native.h"
 
 
 #if defined (MAGE_PLATFORM_LINUX)

@@ -28,6 +28,9 @@ MAGE_ENTRY_POINT()
     SandboxApplication = malloc(sizeof(struct mageApplication));
 #if 1
     CreateShaders();    
+    
+    uint8_t gamepadIndex;
+
 
     struct mageUserInputInquirerSetupInfo inputSetup;
     memset(&inputSetup, 0, sizeof(struct mageUserInputInquirerSetupInfo));
@@ -35,10 +38,11 @@ MAGE_ENTRY_POINT()
     inputSetup.CursorFlagsCount                 = 1;
     inputSetup.MouseFlags                       = (mageMouseSetupFlags[]) { MAGE_MOUSE_SETUP_FLAGS_RAW_MOTION };
     inputSetup.MouseFlagsCount                  = 1;
-    inputSetup.KeyboardFlags                    = NULL;
-    inputSetup.KeyboardFlagsCount               = 0;
+    inputSetup.KeyboardFlags                    = (mageKeyboardSetupFlags[]) { MAGE_KEYBOARD_SETUP_FLAGS_ENABLE_STICKY };
+    inputSetup.KeyboardFlagsCount               = 1;
     inputSetup.ExternalInputFlags               = (mageExternalInputSetupFlags[]) { MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_GAMEPAD };
     inputSetup.ExtenalInputFlagsCount           = 1;
+    inputSetup.PrimaryGamepadIndex              = &gamepadIndex;
 
     struct mageApplicationCreateInfo applicationCreateInfo;
     memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
@@ -87,6 +91,7 @@ MAGE_ENTRY_POINT()
     VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
 
+#if 0
     struct mageVulkanMemoryHeapCreateInfo i;
     memset(&i, 0, sizeof(struct mageVulkanMemoryHeapCreateInfo));
     i.AllocationSize                = 1024 * 64;
@@ -110,19 +115,25 @@ MAGE_ENTRY_POINT()
     m.Buffer                        = &b;
     m.Reference                     = &re;
 
-    // mageVulkanMemoryAllocateHeap(&heap, &i);
-    // mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    mageVulkanMemoryAllocateHeap(&heap, &i);
+    mageVulkanMemoryBufferMapToBlock(&heap, &m);
 
     m.Buffer                        = &bb;
     m.Reference                     = &rb;
-    // mageVulkanMemoryBufferMapToBlock(&heap, &m);
-    // mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
-    // mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
-    // mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
+    mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
+    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
+    mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
+#endif
 
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
+        if (mageUserInputGamepadGetButtonState(gamepadIndex, MAGE_GAMEPAD_BUTTON_VALUES_A) == GLFW_PRESS)
+        {
+            SANDBOX_LOG_CORE_WARNING("Pressed a\n", NULL);
+        }
+        
         glfwPollEvents();
     }
     vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
@@ -132,12 +143,12 @@ MAGE_ENTRY_POINT()
 #endif
 #if 0
     struct mageScene s;
-    struct mageSceneCreateInfo i;
-    i.ComponentLimit                = 10;
-    i.EntityLimit                   = 10;
-    i.SceneTag                      = "Hello World";
-    i.RegisterDefaultComponents     = MAGE_FALSE;
-    mageSceneCreate(&s, &i);
+    struct mageSceneCreateInfo si;
+    si.ComponentLimit                = 10;
+    si.EntityLimit                   = 10;
+    si.SceneTag                      = "Hello World";
+    si.RegisterDefaultComponents     = MAGE_FALSE;
+    mageSceneCreate(&s, &si);
     uint32_t transform              = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageTransform, TransformConstructer, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
     uint32_t vector3                = MAGE_ECS_REGISTER_COMPONENT(&s, struct mageVector3, NULL, NULL, MAGE_ECS_COMPONENT_REGISTERING_MODE_OPTIONAL);
     
@@ -153,9 +164,10 @@ MAGE_ENTRY_POINT()
     struct mageComponentHandle h1 = MAGE_ECS_BIND_NEW_COMPONENT_BY_ID_TO_ENTITIES(&s, transform, &t, &e, 1);
     
     struct mageTransform trf = MAGE_ECS_GET_COMPONENT_BY_HANDLE(&s, struct mageTransform, h1, e);
-    
-
     MAGE_ECS_REGISTER_SYSTEM(&s, System, MAGE_ECS_SYSTEM_TYPE_UPDATE, MAGE_ECS_SYSTEM_THREAD_PRIORITY_NONE, 1, struct mageTransform);
+    
+    mageSceneEntityDestroy(&s, e);
+
 
     mageSceneTick(&s);
     mageSceneDestroy(&s);

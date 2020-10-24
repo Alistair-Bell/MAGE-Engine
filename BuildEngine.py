@@ -58,6 +58,11 @@ def CallSingleCommand(win32 = "", linux = "", darwin = ""):
     foo = Command(win32, linux, darwin)
     foo.CallCommand()
 
+def CallMake():
+    command = "make"
+    make = Command(command, command, command)
+    make.CallCommand()
+
 def Main():
 
     arguments = []
@@ -100,18 +105,11 @@ def Main():
     config              = arguments[0]
     generator           = arguments[1]
     compiler            = arguments[2]
-    monoCompiler        = arguments[3]
-    renderer            = arguments[4]
-    audioBackend        = arguments[5] 
+    renderer            = arguments[3]
+    audioBackend        = arguments[4]
+    buildTests          = arguments[5]
     platform            = arguments[6]
-    
-    targetSwitcher = {
-        "all":          "all",
-        "sandbox":      "Sandbox",
-        "engine":       "MageEngine",
-        "externals":    "GLFW stb-image",
-        "sandbox-c#":   "SandboxSharp",
-    }
+
     generatorSwitcher = {
         "vsproject":        "vs2019",
         "xcode":            "xcode",
@@ -124,38 +122,18 @@ def Main():
         "darwin":           "macosx",
     }
 
-
     LogMessage("Build options: \
                 \n\tConfig -> %s \
                 \n\tPlatform -> %s \
                 \n\tGenerator -> %s" % (config, platform, generator))
 
     LogMessage("Calling premake")
-    premakeString = "%s --fatal --verbose --file=PremakeCore.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler, generatorSwitcher[generator])
-    
-    generatedMono = False
-    if monoCompiler != "none":
-        # build c# project
-        LogMessage("Building for c# scripting, native c is still allowed, supported platforms %s" % (GetSupportedBuildPlatforms()))
-        premakeMonoString = "%s --fatal --verbose --file=SandboxSharp/PremakeSharp.lua --dotnet=%s %s" % (locations[GetPlatform()], monoCompiler, generatorSwitcher[generator])
-        bar = Command(premakeMonoString, premakeMonoString, premakeMonoString)
-        bar.CallCommand()
-        generatedMono = True
-
+    premakeString = "%s --file=Core.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler, generatorSwitcher[generator])
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     
-
     if generator == "makefile":
-        LogMessage("Using makefile as build system, calling make")
-        makeString = "make config=%s" % (config)
-        CallSingleCommand(makeString, makeString, makeString)
-
-        if generatedMono:
-            os.chdir("SandboxSharp")
-            makeString = "make config=%s" % (config)
-            CallSingleCommand(makeString, makeString, makeString)
-            os.chdir(GetWorkingDirectory())
+        CallMake()
 
 if __name__ == '__main__':
     if DisplayStartingInfo():

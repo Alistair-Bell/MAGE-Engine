@@ -84,12 +84,16 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
         {
             MAGE_LOG_CORE_INFORM("Found joystick %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST);
             joystickCount++;
+            if (foundJoystick != MAGE_TRUE && info->PrimaryJoystickIndex != NULL)
+                *info->PrimaryJoystickIndex = i;
             foundJoystick = MAGE_TRUE;
         }
         else if (joys[i].Present && joys[i].Gamepad == MAGE_TRUE)
         {
             MAGE_LOG_CORE_INFORM("Found gamepad %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST);
             gamePadCount++;
+            if (foundGamePad != MAGE_TRUE && info->PrimaryGamepadIndex != NULL)
+                *info->PrimaryGamepadIndex = i;
             foundGamePad = MAGE_TRUE;
         }
     }
@@ -236,4 +240,10 @@ inline int32_t mageToGLFWKey(mageKeyCode code)
 struct mageKeyState mageUserInputInquireKey(struct mageWindow *window, mageKeyCode code)
 {
     return (struct mageKeyState) { .KeyCode = (uint8_t)code, .KeyState = (uint8_t)glfwGetKey(window->Context, mageToGLFWKey(code)) };
+}
+uint8_t mageUserInputGamepadGetButtonState(const uint8_t gamepadIndex, const mageGamepadButton button)
+{
+    GLFWgamepadstate state;
+    glfwGetGamepadState(gamepadIndex, &state);
+    return state.buttons[(int32_t)button];
 }

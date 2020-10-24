@@ -27,12 +27,12 @@ ShaderExtensions = {
     "Fragment": [ "frag" ],
     "Compute": [ "comp" ],
 }
+
 RuntimeGeneratedCommandLineOptions = {
     "--shaders=": [],
 }
 CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", __file__, RuntimeGeneratedCommandLineOptions) 
 
-CompilerOptmisations = [ "none", "speed", "size" ]
 
 def GetShaders(path):
     files = []

@@ -131,7 +131,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         LogMessage("No arguments specified")
         if helpInfo != None:
             helpInfo()
-        return returnValues
+        return []
     
     requiredKeys = list(searchingDictionary.keys())
     # removing the uneccesary command line arguments
@@ -174,13 +174,12 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
 
     # Removing any possible duplicates
     returnValues = list(dict.fromkeys(returnValues))
-    
     # sorting by key
 
     sortedList = [None] * len(returnValues)
-
+    
     for returnIndex in range(0, len(returnValues)):
-        keys = [*searchingDictionary.keys()]         
+        keys = [*searchingDictionary.keys()]
         for keyIndex in range(0, len(keys)):
             if returnValues[returnIndex] in searchingDictionary[keys[keyIndex]]:
                 sortedList[keyIndex] = returnValues[returnIndex]
