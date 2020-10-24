@@ -1,6 +1,6 @@
 #include <mageAPI.h>
 
-#define SORT_NAME sort_algorithms
+#define SORT_NAME memory_sort_algorithms
 #define SORT_TYPE uint32_t
 #include "../../Externals/sort/sort.h"
 
@@ -211,7 +211,7 @@ void mageVulkanMemoryBufferUnmapBufferToBlock(struct mageVulkanMemoryHeap *heap,
     
     vkDestroyBuffer(info->Device, *info->Reference->Buffer, NULL);
     /* TODO check performance on different algorithms, where sourced quick > heap > in place merge sort */
-    sort_algorithms_quick_sort(heap->Offsets, MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS + 1);
+    memory_sort_algorithms_quick_sort(heap->Offsets, MAGE_VULKAN_MEMORY_MAX_OFFSET_COUNTS + 1);
 }
 
 void mageVulkanMemoryFreeMemory(VkDevice device, struct mageVulkanMemoryHeap *heap)
