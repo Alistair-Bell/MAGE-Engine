@@ -1,6 +1,6 @@
 from json import load
 import os, sys, json, time, platform
-from os import POSIX_FADV_SEQUENTIAL
+from os import POSIX_FADV_SEQUENTIAL, confstr
 
 from Utility import *
 
@@ -58,8 +58,8 @@ def CallSingleCommand(win32 = "", linux = "", darwin = ""):
     foo = Command(win32, linux, darwin)
     foo.CallCommand()
 
-def CallMake():
-    command = "make"
+def CallMake(config):
+    command = "make all config=%s" % (config)
     make = Command(command, command, command)
     make.CallCommand()
 
@@ -128,12 +128,12 @@ def Main():
                 \n\tGenerator -> %s" % (config, platform, generator))
 
     LogMessage("Calling premake")
-    premakeString = "%s --file=Core.lua --os=%s --renderer=%s --audio-backend=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, compiler, generatorSwitcher[generator])
+    premakeString = "%s --file=Core.lua --os=%s --renderer=%s --audio-backend=%s --tests=%s --cc=%s %s" % (locations[GetPlatform()], platformSwitcher[platform], renderer, audioBackend, buildTests, compiler, generatorSwitcher[generator])
     foo = Command(premakeString, premakeString, premakeString)
     foo.CallCommand() 
     
     if generator == "makefile":
-        CallMake()
+        CallMake(config)
 
 if __name__ == '__main__':
     if DisplayStartingInfo():
