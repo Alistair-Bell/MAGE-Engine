@@ -58,9 +58,9 @@ ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
 
 PlatformDefines     = {}
-PlatformDefines["windows"]      = "MAGE_PLATFORM_WINDOWS"
-PlatformDefines["linux"]        = "MAGE_PLATFORM_LINUX"
-PlatformDefines["macosx"]       = "MAGE_PLATFORM_MAC_OS"
+PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" }
+PlatformDefines["linux"]        = { "MAGE_PLATFORM_LINUX", "GLFW_EXPOSE_NATIVE_X11" }
+PlatformDefines["macosx"]       = { "MAGE_PLATFORM_MAC_OS", "GLFW_EXPOSE_NATIVE_COCOA" }
 
 ClientLinks =
 {
@@ -91,10 +91,10 @@ end
 include "Mage/Externals/stb-image"
 include "Mage/Externals/glfw3"
 
-group "Tests"
 if _OPTIONS["tests"] == "all" then
     -- Include the tests to build
-    include "Tests"
+    group "Tests"
+    --include "Tests/Tests.lua" TODO Add unit tests
 end
 
 -- Engine Project
