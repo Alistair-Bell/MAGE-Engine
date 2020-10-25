@@ -82,7 +82,7 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
         /* Joystick has been found */
         if (joys[i].Present && joys[i].Gamepad == MAGE_FALSE)
         {
-            MAGE_LOG_CORE_INFORM("Found joystick %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST);
+            MAGE_LOG_CORE_INFORM("Found joystick %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST - 1);
             joystickCount++;
             if (foundJoystick != MAGE_TRUE && info->PrimaryJoystickIndex != NULL)
                 *info->PrimaryJoystickIndex = i;
@@ -90,7 +90,7 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
         }
         else if (joys[i].Present && joys[i].Gamepad == MAGE_TRUE)
         {
-            MAGE_LOG_CORE_INFORM("Found gamepad %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST);
+            MAGE_LOG_CORE_INFORM("Found gamepad %s residing at port %d of %d\n", glfwGetJoystickName(i), i, GLFW_JOYSTICK_LAST - 1);
             gamePadCount++;
             if (foundGamePad != MAGE_TRUE && info->PrimaryGamepadIndex != NULL)
                 *info->PrimaryGamepadIndex = i;
@@ -99,7 +99,7 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
     }
     MAGE_LOG_CORE_INFORM("External input sources report: [Joysticks %d] [Gamepads %d]\n", joystickCount, gamePadCount);
 
-    for (i = 1; i < info->ExtenalInputFlagsCount; i++)
+    for (i = 0; i < info->ExtenalInputFlagsCount; i++)
     {
         if (info->ExternalInputFlags[i] == MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_JOYSTICK) 
         {
