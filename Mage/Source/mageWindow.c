@@ -1,45 +1,28 @@
 #include "mageAPI.h"
 
-mageResult mageWindowCreate(struct mageWindow *window, struct mageApplicationCreateInfo *info)
+mageResult mageWindowCreate(struct mageWindow *window, struct mageWindowCreateInfo *info)
 {
-	if (info->WindowIcon == NULL)
-    {
-        info->WindowIcon = "Mage/Resources/Textures/MTEC/Logo.png";
-    }
-	
-	window->Height  = info->Height;
-	window->Width   = info->Width;
-	window->Title   = info->Name;
-	window->Running = 1;
-	
-	MAGE_LOG_CORE_INFORM("Using GLFW as window mode\n", NULL);
+	if (info->Icon == NULL)
+        info->Icon = "Mage/Resources/Textures/Vulkan/Vulkan_LogoBug_48px_Nov17.png";
 		
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
 	GLFWmonitor *monitor = NULL;
-	if (info->FixedResolution) { glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); }
 	if (info->Fullscreen) { monitor = glfwGetPrimaryMonitor(); }
 
-	window->Context = glfwCreateWindow(window->Width, window->Height, window->Title, monitor, NULL);
+	window->Context = glfwCreateWindow(info->Width, info->Height, info->Title, monitor, NULL);
+	MAGE_ASSERT_MESSAGE(window->Context != NULL, "Failed to create glfw window\n", NULL);
 
-	GLFWimage localIcon;
 	uint8_t data;
 	int32_t width, height, channels;
-    uint8_t *image = stbi_load(info->WindowIcon, &width, &height, &channels, STBI_rgb_alpha);
+    uint8_t *image = stbi_load(info->Icon, &width, &height, &channels, STBI_rgb_alpha);
 
-
-	localIcon.width = width;
-	localIcon.height = height;
-	localIcon.pixels = image;
-	glfwSetWindowIcon(window->Context, 1, &localIcon);
-	
-	if (window->Context == NULL)
-	{
-		glfwTerminate();
-		MAGE_LOG_CORE_FATAL_ERROR("GLFW context has failed to create\n", NULL);
-		return MAGE_RESULT_CONTEXT_CREATION_FAILED;
-	}
+	GLFWimage icon;
+	icon.width 		= width;
+	icon.height 	= height;
+	icon.pixels 	= image;
+	glfwSetWindowIcon(window->Context, 1, &icon);
 	
 	MAGE_LOG_CORE_INFORM("GLFW context created\n", NULL);
 	

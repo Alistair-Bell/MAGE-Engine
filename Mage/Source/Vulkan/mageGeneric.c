@@ -222,13 +222,13 @@ mageResult mageGetSwapChainSupport(struct mageSwapChainSupportDetails *swapChain
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice, surface, &swapChainSupport->Capabilities);
     
     if (capabilities.currentExtent.width != UINT32_MAX) 
-    {   
         extent = swapChainSupport->Capabilities.currentExtent;
-    }
     else
     {
-        extent.width = window->Width;
-        extent.height = window->Height;
+        int32_t w, h;
+        glfwGetWindowSize(window->Context, &w, &h);
+        extent.width    = (uint32_t)w;
+        extent.height   = (uint32_t)h;
     }
 
     mageSwapChainSupportInitialise(swapChainSupport, capabilities, formats, formatCount, presents, presentCount, extent);

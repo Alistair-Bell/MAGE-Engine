@@ -241,7 +241,7 @@ struct mageKeyState mageUserInputInquireKey(struct mageWindow *window, mageKeyCo
 {
     return (struct mageKeyState) { .KeyCode = (uint8_t)code, .KeyState = (uint8_t)glfwGetKey(window->Context, mageToGLFWKey(code)) };
 }
-uint8_t mageUserInputGamepadGetButtonState(const uint8_t gamepadIndex, const mageGamepadButton button)
+uint8_t mageUserInputInquireGamepadButtonState(const uint8_t gamepadIndex, const mageGamepadButton button)
 {
     GLFWgamepadstate state;
     glfwGetGamepadState(gamepadIndex, &state);

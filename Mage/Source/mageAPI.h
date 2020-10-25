@@ -841,7 +841,7 @@ extern MAGE_API struct mageKeyState mageUserInputInquireKey(
 	mageKeyCode code
 );
 
-extern uint8_t mageUserInputGamepadGetButtonState(
+extern uint8_t mageUserInputInquireGamepadButtonState(
 	const uint8_t gamepadIndex,
 	const mageGamepadButton button
 );
@@ -1596,13 +1596,8 @@ struct mageRendererCreateInfo
 extern MAGE_API mageResult mageRendererCreate(
 	struct mageRenderer *renderer, 
 	struct mageWindow *window, 
-	struct mageRendererCreateInfo *props
+	struct mageApplicationCreateInfo *props
 );	
-extern MAGE_API void mageRendererResize(
-	struct mageRenderer *renderer, 
-	struct mageWindow *window,
-	struct mageRendererCreateInfo *rendererProps
-);
 extern MAGE_API void mageRendererDrawRenderables(
 	struct mageRenderer *renderer,
 	struct mageRenderable **renderables,
@@ -1693,18 +1688,23 @@ extern MAGE_API void mageAudioDriverDestroy(
 	Window
 */
 
+struct mageWindowCreateInfo
+{
+	uint16_t 								Width;
+	uint16_t 								Height;
+	uint8_t									Fullscreen;
+	const char 								*Title;
+	const char 								*Icon;
+};
+
 struct mageWindow
 {
-	int32_t 								Width;
-	int32_t 								Height;
-	uint32_t 								Running;	
-	const char 							   	*Title;
 	GLFWwindow 							   	*Context;
 };
 
 extern MAGE_API mageResult mageWindowCreate(
 	struct mageWindow *window, 
-	struct mageApplicationCreateInfo *createInfo
+	struct mageWindowCreateInfo *info
 );
 extern MAGE_API void mageWindowDestroy(
 	struct mageWindow *window
@@ -1716,13 +1716,9 @@ extern MAGE_API void mageWindowDestroy(
 
 struct mageApplicationCreateInfo
 {
-	uint16_t 								Width;
-	uint16_t 								Height;
-	uint8_t									Fullscreen;
-	uint8_t									FixedResolution;
-	char 						   			*Name;
-	const char 								*WindowIcon;
 	struct mageUserInputInquirerSetupInfo	*InputSetup;
+	struct mageRendererCreateInfo			*RendererSetup;
+	struct mageWindowCreateInfo				*WindowSetup;
 };
 struct mageApplication
 {
@@ -1734,8 +1730,7 @@ struct mageApplication
 /* Application */
 extern MAGE_API mageResult mageApplicationCreate(
 	struct mageApplication *application, 
-	struct mageApplicationCreateInfo *applicationInfo, 
-	struct mageRendererCreateInfo *rendererInfo
+	struct mageApplicationCreateInfo *info
 );
 extern MAGE_API void mageApplicationDestroy(
 	struct mageApplication *application

@@ -29,8 +29,7 @@ MAGE_ENTRY_POINT()
 #if 1
     CreateShaders();    
     
-    uint8_t gamepadIndex;
-
+    uint8_t gamepadIndex, joystickIndex;
 
     struct mageUserInputInquirerSetupInfo inputSetup;
     memset(&inputSetup, 0, sizeof(struct mageUserInputInquirerSetupInfo));
@@ -43,28 +42,30 @@ MAGE_ENTRY_POINT()
     inputSetup.ExternalInputFlags               = (mageExternalInputSetupFlags[]) { MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_GAMEPAD };
     inputSetup.ExtenalInputFlagsCount           = 1;
     inputSetup.PrimaryGamepadIndex              = &gamepadIndex;
+    inputSetup.PrimaryJoystickIndex             = &joystickIndex;
 
-    struct mageApplicationCreateInfo applicationCreateInfo;
-    memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
-
-    applicationCreateInfo.FixedResolution        = MAGE_TRUE;
-    applicationCreateInfo.Fullscreen             = MAGE_FALSE;
-    applicationCreateInfo.Width                  = 1920;
-    applicationCreateInfo.Height                 = 1080;
-    applicationCreateInfo.Name                   = "Sandbox Application";
-    applicationCreateInfo.WindowIcon             = "Mage/Resources/Textures/Vulkan/Vulkan_500px_Dec16.jpg";
-    applicationCreateInfo.InputSetup             = &inputSetup;
-
+    struct mageWindowCreateInfo windowCreateInfo;
+    memset(&windowCreateInfo, 0, sizeof(struct mageWindowCreateInfo));
+    windowCreateInfo.Fullscreen                 = MAGE_FALSE;
+    windowCreateInfo.Width                      = 1920;
+    windowCreateInfo.Height                     = 1080;
+    windowCreateInfo.Icon                       = NULL;
+    windowCreateInfo.Title                      = "SandboxApplication";
 
     struct mageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(struct mageRendererCreateInfo));
-
     rendererCreateInfo.PipelineShaders          = shaders;
     rendererCreateInfo.ShaderCount              = sizeof(shaders) / sizeof(struct mageShader);
     rendererCreateInfo.TextureTransparency      = MAGE_TRUE;
     rendererCreateInfo.BackgroundColor          = (struct mageVector4) { .Values[0] = 0.0f, .Values[1] = 0.0f, .Values[2] = 0.0f, .Values[3] = 1.0f };
+
+    struct mageApplicationCreateInfo applicationCreateInfo;
+    memset(&applicationCreateInfo, 0, sizeof(struct mageApplicationCreateInfo));
+    applicationCreateInfo.RendererSetup          = &rendererCreateInfo;
+    applicationCreateInfo.WindowSetup            = &windowCreateInfo;
+    applicationCreateInfo.InputSetup             = &inputSetup;
     
-    mageApplicationCreate(SandboxApplication, &applicationCreateInfo, &rendererCreateInfo);
+    mageApplicationCreate(SandboxApplication, &applicationCreateInfo);
 
     struct mageVertex verticies1[] = 
     {
@@ -86,12 +87,12 @@ MAGE_ENTRY_POINT()
 
     struct mageRenderable *r[] = { &renderable };
 
+#if 0
     struct mageVulkanMemoryHeap heap;
     
     VkBuffer b, bb;
     uint64_t data[] = { 1, 2, 3, 4, 5, 6 };
-
-#if 0
+    
     struct mageVulkanMemoryHeapCreateInfo i;
     memset(&i, 0, sizeof(struct mageVulkanMemoryHeapCreateInfo));
     i.AllocationSize                = 1024 * 64;
@@ -129,16 +130,19 @@ MAGE_ENTRY_POINT()
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
-        if (mageUserInputGamepadGetButtonState(gamepadIndex, MAGE_GAMEPAD_BUTTON_VALUES_A) == GLFW_PRESS)
-        {
-            SANDBOX_LOG_CORE_WARNING("Pressed a\n", NULL);
-        }
-        
+        if (mageUserInputInquireGamepadButtonState(gamepadIndex, MAGE_GAMEPAD_BUTTON_VALUES_B) == MAGE_KEY_MODE_PRESSED)
+            goto End;
         glfwPollEvents();
     }
-    vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
-    mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
-    mageApplicationDestroy(SandboxApplication);
+
+    End:
+    {
+        vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
+        mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
+        mageApplicationDestroy(SandboxApplication);
+    }
+
+
 
 #endif
 #if 0
