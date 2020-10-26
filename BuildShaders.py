@@ -107,7 +107,7 @@ def Main():
     if arguments == []:
         return
     
-    optimisation = arguments[1]
+    optimisation = arguments[0]
 
 
     glslValidator = ""
@@ -143,7 +143,7 @@ def Main():
 
     # Getting files
     
-    files = GetShaders(arguments[0])
+    files = GetShaders(arguments[1])
     if files is not []:
         shaderFiles += files
 

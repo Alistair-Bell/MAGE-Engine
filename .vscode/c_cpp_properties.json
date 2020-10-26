@@ -18,6 +18,21 @@
             ],
             "cStandard": "c89",
             "intelliSenseMode": "clang-x64"
+        },
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/Mage/Source"
+            ],
+            "defines": [
+                "MAGE_DEBUG",
+                "MAGE_PLATFORM_WINDOWS",
+                "MAGE_CORE",
+                "SANDBOX_DEBUG",
+                "MAGE_ASSERTS",
+                "MAGE_VULKAN_BACKEND"
+            ]
         }
     ],
     "version": 4
