@@ -60,8 +60,8 @@ def LogMessage(message, mode = LogModes["Inform"]):
         print("%s" % (message))
 
 def LogReset():
-    if not GetPlatform() == "win32":
-        print(LogModes["Reset"], end = '')
+    #if not GetPlatform() == "win32":
+    print(LogModes["Reset"], end = '')
 
 def HandleUserInput(message, choices):
     answer = ""
@@ -124,7 +124,7 @@ def GenerateDefaultArguments(dictionary):
 
 # The default uses the key: value[0]
 def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
-    returnValues = []
+    returnValues = [None] * len([*searchingDictionary])
 
     # No arguments specified
     if len(rawArguments) < 1:

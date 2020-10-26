@@ -21,6 +21,7 @@ newoption
     default     = "pulse",
     allowed     = {
         { "pulse", "Pulse Audio 13.99.1" },
+		{ "none", "No audio backend" },
     }
 }
 newoption
@@ -35,10 +36,10 @@ newoption
     },
 }
 
--- Table of libraries that should be linked againsed
+-- Table of libraries that should be linked with
 ConfigurationLinks = {}
 -- Renderers
-ConfigurationLinks["vulkan"]        = "vulkan"
+ConfigurationLinks["vulkan"]        = "C:/VulkanSDK/1.2.131.1/Lib/vulkan-1"
 ConfigurationLinks["gles"]          = "glad"
 -- Audio
 ConfigurationLinks["pulse"]         = "pulse"
@@ -58,15 +59,19 @@ ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
 
 PlatformDefines     = {}
-PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" }
+PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" } 
 PlatformDefines["linux"]        = { "MAGE_PLATFORM_LINUX", "GLFW_EXPOSE_NATIVE_X11" }
 PlatformDefines["macosx"]       = { "MAGE_PLATFORM_MAC_OS", "GLFW_EXPOSE_NATIVE_COCOA" }
+
+PlatformLinks       = {}
+PlatformLinks["windows"]        = { "gdi32" }
 
 ClientLinks =
 {
     "MageEngine",
     "GLFW",
     "stb-image",
+    PlatformLinks[_OPTIONS["os"]],
     ConfigurationLinks[_OPTIONS["renderer"]],
     ConfigurationLinks[_OPTIONS["audio-backend"]],
 }
@@ -117,7 +122,6 @@ project "MageEngine"
         "Mage/Source/ECS/*.c",
         ConfigurationFiles[_OPTIONS["renderer"]],
         ConfigurationFiles[_OPTIONS["audio-backend"]],
-        ConfigurationFiles[_OPTIONS["scripting-language"]]   
     }
     defines
     {
@@ -138,9 +142,9 @@ project "MageEngine"
         "FatalLinkWarnings",
     }
 
-filter "system:linux"
     pchheader "Mage/Source/mageAPI.h"
     pchsource "Mage/Source/mageAPI.c"
+filter "system:linux"
 
     files
     {

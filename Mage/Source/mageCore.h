@@ -28,11 +28,14 @@
 	#include <TargetConditionals.h>
 
 #elif defined(MAGE_PLATFORM_WINDOWS) 
+	
 	/* Including the native windows API */
 	#include <Windows.h>
 	#if defined (near)
 		#undef near
-	#elif defined (far)
+	#endif
+	
+	#if defined (far)
 		#undef far
 	#endif
 #endif
@@ -54,7 +57,6 @@
 #if defined (MAGE_PULSE_AUDIO_BACKEND)
 	#include <pulse/pulseaudio.h>
 #endif
-
 
 /* C standard includes */
 #include <assert.h>

@@ -4,7 +4,7 @@
         "--generator=": [ "vsproject", "xcode", "makefile", "codelite" ],
         "--c-compiler=": [ "clang", "gcc", "mingw" ],
         "--renderer=": [ "vulkan", "gles" ],
-        "--audio-driver=": [ "pulse" ],
+        "--audio-driver=": [ "none", "pulse" ],
         "--tests=": [ "none", "all" ]
     },
     "BuildShaders.py": {

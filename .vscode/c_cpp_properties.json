@@ -32,7 +32,8 @@
                 "SANDBOX_DEBUG",
                 "MAGE_ASSERTS",
                 "MAGE_VULKAN_BACKEND"
-            ]
+            ],
+            "intelliSenseMode": "clang-x64"
         }
     ],
     "version": 4

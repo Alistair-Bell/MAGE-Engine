@@ -70,7 +70,8 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
 
     uint8_t foundJoystick   = MAGE_FALSE;
     uint8_t foundGamePad    = MAGE_FALSE;
-    uint8_t gamePadCount, joystickCount;
+    uint8_t gamePadCount  = 0;
+    uint8_t joystickCount = 0;
 
     /* Searching for all available joysticks at ports 0 -> 15 */
     for (i = 0; i < GLFW_JOYSTICK_LAST; i++)

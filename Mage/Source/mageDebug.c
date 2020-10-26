@@ -56,7 +56,9 @@ void mageLogMessage(const mageLogUser user, const mageLogMode severity, const ch
     default:
         break;
     }
+#if !defined (MAGE_PLATFORM_WINDOWS)
     printf("%s", colors[severity]);
+#endif
 
     time(&Logger.Timer);
     Logger.Time = localtime(&Logger.Timer);
@@ -92,6 +94,8 @@ void mageLogEnd()
 
     #if defined (MAGE_DEBUG)
         fclose(Logger.DebugFile);
+    #endif
+    #if !defined (MAGE_PLATFORM_WINDOWS)
         printf("%s", "\x1b[0m");
     #endif
 }
