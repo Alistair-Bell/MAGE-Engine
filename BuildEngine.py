@@ -1,6 +1,5 @@
 from json import load
 import os, sys, json, time, platform
-from os import POSIX_FADV_SEQUENTIAL, confstr
 
 from Utility import *
 
@@ -91,7 +90,7 @@ def Main():
 
     locations = {
         "linux": "./Externals/Linux/premake5",
-        "win32": "Externals/Windows/premake5.exe",
+        "win32": "CALL Externals\\Windows\\premake5.exe",
         # Currently the macos binary is not being distributed by us, todo by version <= 1.0.0
         "darwin": None,
     } 
