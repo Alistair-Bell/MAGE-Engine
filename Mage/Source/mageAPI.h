@@ -536,6 +536,7 @@ typedef void        *mageThread;
 	#define MAGE_THREAD_RETURN_TYPE DWORD WINAPI
 #else
 	typedef void 		*(*mageThreadJobCallback)(void *);	
+	#define MAGE_THREAD_RETURN_TYPE void *
 #endif
 
 

@@ -58,9 +58,9 @@ void mageThreadTerminate(mageThread thread)
 {
     struct mageThreadType native = mageGetNative(thread);
 
-    MAGE_LOG_CORE_INFORM("Terminating Win32 thread of id %lu\n", native.ThreadID);
+    MAGE_LOG_CORE_INFORM("Terminating Win32 thread of id %lu\n, thread may have not completed", native.ThreadID);
     DWORD result = TerminateThread(native.NativeThread, THREAD_TERMINATE);
-    MAGE_ASSERT_MESSAGE(result == 0, "Unable to terminate thread, Win32 error %lu\n", GetLastError());
+    MAGE_ASSERT_MESSAGE(result == 0, "Unable to terminate thread, Win32 error %lu, thread may have not completed\n", GetLastError());
     CloseHandle(native.NativeThread);
     
     /* Copy back*/
