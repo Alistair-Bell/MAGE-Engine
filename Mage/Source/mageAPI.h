@@ -530,17 +530,37 @@ extern MAGE_API void mageOrthographicCameraSetProjection(
 */
 
 typedef void        *mageThread;
-typedef void 		*(*mageThreadJobCallback)(void *);
 
-extern MAGE_API void *mageThreadCreate(
+#if defined (MAGE_PLATFORM_WINDOWS)
+	typedef DWORD (*mageThreadJobCallback)(void *);
+	#define MAGE_THREAD_RETURN_TYPE DWORD WINAPI
+#else
+	typedef void 		*(*mageThreadJobCallback)(void *);	
+#endif
+
+
+typedef enum MAGE_THREAD_BEGIN_INFO_FLAGS_ENUM
+{
+	MAGE_THREAD_BEGIN_INFO_FLAGS_IMMEDIATE = 0,
+	MAGE_THREAD_BEGIN_INFO_FLAGS_SUSPEND   = 4
+} mageThreadBeginInfoFlags;
+
+struct mageThreadBeginInfo
+{
+	mageThreadJobCallback 		Job;
+	void 						*SubmitData;
+	mageThreadBeginInfoFlags 	ThreadFlags;
+};
+
+
+extern MAGE_API mageThread mageThreadCreate(
 	void
 );
 extern MAGE_API void mageThreadBegin(
 	mageThread thread,
-	mageThreadJobCallback callback,
-	void *data
+	struct mageThreadBeginInfo *info
 );
-extern MAGE_API uint32_t mageThreadGetID(
+extern MAGE_API uint64_t mageThreadGetID(
 	const mageThread thread
 );
 extern MAGE_API void mageThreadEnd(
