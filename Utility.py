@@ -194,22 +194,21 @@ def DisplayStartingInfo():
 
     # Needs some cleaning up
     if GetPlatform() is not "win32":
-        print("\x1b[91m    __  ___                    ______            _           \n",  end = '')
-        print("\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n",  end = '')
-        print("\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n",  end = '')
-        print("\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n",  end = '')
-        print("\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n",  end = '')
+        print("\x1b[91m    __  ___                    ______            _           ")
+        print("\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  ")
+        print("\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ ")
+        print("\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ ")
+        print("\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  ")
         print("\x1b[94m             /____/                    /____/                ")
         
     else:
-        print("    __  ___                    ______            _           \n", end = '')
-        print("   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n", end = '')
-        print("  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n", end = '')
-        print(" / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n", end = '')
-        print("/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n", end = '')
+        print("    __  ___                    ______            _           ")
+        print("   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  ")
+        print("  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ ")
+        print(" / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ ")
+        print("/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  ")
         print("             /____/                    /____/                ")
 
-    print("\n")
     if GetPlatform() not in GetSupportedBuildPlatforms():
         LogMessage("Host platform %s not currently supported! see supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
         return False
