@@ -191,26 +191,25 @@ def DisplayStartingInfo():
     clearScreen = Command("CLS", "clear", "clear")
     clearScreen.CallCommand()
 
+
+    # Needs some cleaning up
     if GetPlatform() is not "win32":
-        asciiText = " \
-\x1b[91m    __  ___                    ______            _           \n \
-\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
-\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
-\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
-\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
-\x1b[94m             /____/                    /____/                "
+        print("\x1b[91m    __  ___                    ______            _           \n",  end = '')
+        print("\x1b[92m   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n",  end = '')
+        print("\x1b[94m  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n",  end = '')
+        print("\x1b[91m / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n",  end = '')
+        print("\x1b[92m/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n",  end = '')
+        print("\x1b[94m             /____/                    /____/                ")
         
     else:
-        asciiText = " \
-            __  ___                    ______            _           \n \
-           /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n \
-          / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n \
-         / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n \
-        /_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n \
-                     /____/                    /____/                "
+        print("    __  ___                    ______            _           \n", end = '')
+        print("   /  |/  ____ _____ ____     / ________  ____ _(_____  ___  \n", end = '')
+        print("  / /|_/ / __ `/ __ `/ _ \   / __/ / __ \/ __ `/ / __ \/ _ \ \n", end = '')
+        print(" / /  / / /_/ / /_/ /  __/  / /___/ / / / /_/ / / / / /  __/ \n", end = '')
+        print("/_/  /_/\__,_/\__, /\___/  /_____/_/ /_/\__, /_/_/ /_/\___/  \n", end = '')
+        print("             /____/                    /____/                ")
 
-    LogMessage("%s\n" % asciiText)
-    
+    print("\n")
     if GetPlatform() not in GetSupportedBuildPlatforms():
         LogMessage("Host platform %s not currently supported! see supported platforms %s" % (GetPlatform(), GetSupportedBuildPlatforms()), LogModes["Fatal Error"])
         return False
