@@ -41,7 +41,6 @@ def Main():
         for x, y in fileData.items():
             assetsToUnzip.update(y)
 
-    print(assetsToUnzip)
     for x, y in assetsToUnzip.items():
         UnzipFile(x, y)
 
