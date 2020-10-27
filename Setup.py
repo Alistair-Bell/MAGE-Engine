@@ -28,30 +28,20 @@ def GetBinaryLocation(question, mode=LogModes["Inform"]):
 
 def Main():
 
-    # Allowing the use of the shell scripts for the engine 
-    # if (GetPlatform() == "linux"):
-    #     linuxScriptPath = "./Scripts/Linux"
-    #     linuxScripts = GetFilesInDirectory(linuxScriptPath, ".sh")
-    #     command = Command(windowsCommand = None, linuxCommand = None, macCommand = None)
-    #     if linuxScripts is not []:
-    #         LogMessage("Allowing shell scripts to be run %s" % (linuxScripts), LogModes["Inform"])
-    #         for x in linuxScripts:
-    #             command.UpdateCommand("chmod +x %s" % (x), "linux")
-    #             command.CallCommand()
-    
     # Making logs directory
     directoriesToCreate = [ "Logs", "Config" ]
     for x in directoriesToCreate:
         if not CheckExistence(x):
             CreateDirectory(x)
 
+    assetsToUnzip = {}
     # Unziping assets 
-    assetsToUnzip = {
-        "Mage/Resources/Shaders.zip": "Mage/Resources/",
-        "Mage/Resources/Textures.zip": "Mage/Resources/", 
-        "Sandbox/Resources/Textures.zip": "Sandbox/Resources/",
-         
-    }
+    with open("Helpers/AssetPaths.json", "r") as f:
+        fileData = json.loads(f.read())
+        for x, y in fileData.items():
+            assetsToUnzip.update(y)
+
+    print(assetsToUnzip)
     for x, y in assetsToUnzip.items():
         UnzipFile(x, y)
 

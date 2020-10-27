@@ -1,0 +1,9 @@
+{
+    "Mage": {
+        "Mage/Resources/Shaders.zip": "Mage/Resources/",
+        "Mage/Resources/Textures.zip": "Mage/Resources/"
+    },
+    "Sandbox": {
+        "Sandbox/Resources/Textures.zip": "Sandbox/Resources/"
+    }
+}
