@@ -1,4 +1,3 @@
-
 BuildTargetPath = "Build/Binaries/%{prj.name}-%{cfg.buildcfg}"
 BuildObjectPath = "Build/Objects/%{prj.name}-%{cfg.buildcfg}"
 
@@ -20,8 +19,8 @@ newoption
     description = "Choose a particular audio backend",
     default     = "pulse",
     allowed     = {
+        { "none", "No audio backend" },
         { "pulse", "Pulse Audio 13.99.1" },
-		{ "none", "No audio backend" },
     }
 }
 newoption
@@ -36,10 +35,10 @@ newoption
     },
 }
 
--- Table of libraries that should be linked with
+-- Table of libraries that should be linked againsed
 ConfigurationLinks = {}
 -- Renderers
-ConfigurationLinks["vulkan"]        = "C:/VulkanSDK/1.2.131.1/Lib/vulkan-1"
+ConfigurationLinks["vulkan"]        = "vulkan"
 ConfigurationLinks["gles"]          = "glad"
 -- Audio
 ConfigurationLinks["pulse"]         = "pulse"
@@ -59,21 +58,26 @@ ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
 ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
 
 PlatformDefines     = {}
-PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" } 
+PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" }
 PlatformDefines["linux"]        = { "MAGE_PLATFORM_LINUX", "GLFW_EXPOSE_NATIVE_X11" }
 PlatformDefines["macosx"]       = { "MAGE_PLATFORM_MAC_OS", "GLFW_EXPOSE_NATIVE_COCOA" }
 
 PlatformLinks       = {}
 PlatformLinks["windows"]        = { "gdi32" }
 
+PlatformFiles       = {}
+PlatformFiles["windows"]     = "Mage/Source/Windows/**.*"
+PlatformFiles["linux"]       = "Mage/Source/Linux/**.*"
+PlatformFiles["macosx"]      = "Mage/Source/MacOS/**.*"
+
 ClientLinks =
 {
     "MageEngine",
     "GLFW",
     "stb-image",
-    PlatformLinks[_OPTIONS["os"]],
     ConfigurationLinks[_OPTIONS["renderer"]],
     ConfigurationLinks[_OPTIONS["audio-backend"]],
+    PlatformLinks[_OPTIONS["os"]]
 }
 
 workspace "Mage"
@@ -111,6 +115,9 @@ project "MageEngine"
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)
 
+    pchheader "Mage/Source/mageAPI.h"
+    pchsource "Mage/Source/mageAPI.c"
+
     files
     {
         -- Files all systems use 
@@ -120,6 +127,7 @@ project "MageEngine"
         "Mage/Source/Maths/*.c",
         "Mage/Source/ECS/*.h",
         "Mage/Source/ECS/*.c",
+        PlatformFiles[_OPTIONS["os"]],
         ConfigurationFiles[_OPTIONS["renderer"]],
         ConfigurationFiles[_OPTIONS["audio-backend"]],
     }
@@ -142,16 +150,6 @@ project "MageEngine"
         "FatalLinkWarnings",
     }
 
-    pchheader "Mage/Source/mageAPI.h"
-    pchsource "Mage/Source/mageAPI.c"
-filter "system:linux"
-
-    files
-    {
-        "Mage/Source/Linux/*.h",
-        "Mage/Source/Linux/*.c",
-    }
-    
 filter "configurations:Debug"
     defines "MAGE_DEBUG"
     runtime "Debug"
