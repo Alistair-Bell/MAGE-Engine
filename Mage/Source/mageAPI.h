@@ -529,16 +529,25 @@ extern MAGE_API void mageOrthographicCameraSetProjection(
     Threading
 */
 
-typedef void        *mageThread;
-
 #if defined (MAGE_PLATFORM_WINDOWS)
-	typedef DWORD (*mageThreadJobCallback)(void *);
 	#define MAGE_THREAD_RETURN_TYPE DWORD WINAPI
+	typedef DWORD (*mageThreadJobCallback)(void *);
 #else
-	typedef void 		*(*mageThreadJobCallback)(void *);	
 	#define MAGE_THREAD_RETURN_TYPE void *
+	typedef void 		*(*mageThreadJobCallback)(void *);	
+
+	struct mageThread
+	{
+		pthread_t		Native;
+	};
+
 #endif
 
+/* Currently empty but can be expanded */
+struct mageThreadCreateInfo
+{
+	void 			*Empty; /* Some compilers may complain about empty structures */
+};
 
 typedef enum MAGE_THREAD_BEGIN_INFO_FLAGS_ENUM
 {
@@ -554,21 +563,22 @@ struct mageThreadBeginInfo
 };
 
 
-extern MAGE_API mageThread mageThreadCreate(
-	void
+extern MAGE_API void mageThreadCreate(
+	struct mageThread *thread,
+	struct mageThreadCreateInfo *info
 );
 extern MAGE_API void mageThreadBegin(
-	mageThread thread,
+	struct mageThread *thread,
 	struct mageThreadBeginInfo *info
 );
 extern MAGE_API uint64_t mageThreadGetID(
-	const mageThread thread
+	const struct mageThread *thread
 );
 extern MAGE_API void mageThreadEnd(
-	mageThread thread
+	struct mageThread *thread
 );
 extern MAGE_API void mageThreadTerminate(
-	mageThread thread
+	struct mageThread *thread
 );
 
 /* 
@@ -975,7 +985,7 @@ struct mageSystemTable
 	uint32_t								ComponentCount;
 	mageSystemCallback						MethodCallback;
 	mageSystemType							Type;
-	mageThread								ThreadHandle;
+	struct mageThread						*ThreadHandle;
 	uint32_t 								*ComponentIDs;
 };
 struct mageSystemPackage

@@ -2,12 +2,6 @@
 
 #if defined (MAGE_PLATFORM_LINUX)
 
-struct mageThreadType
-{
-    pthread_t       NativeThread;
-    uint32_t        Active;
-};
-
 static uint8_t mageThreadHandle(int32_t error)
 {
     if (error)
@@ -18,43 +12,31 @@ static uint8_t mageThreadHandle(int32_t error)
     return 1;
 }
 
-mageThread mageThreadCreate()
+void mageThreadCreate(struct mageThread *thread, struct mageThreadCreateInfo *info)
 {
-   return MAGE_MEMORY_ALLOCATE(sizeof(struct mageThreadType));
+   memset(thread, 0, sizeof(struct mageThread));
 }
-void mageThreadBegin(mageThread thread, struct mageThreadBeginInfo *info)
+void mageThreadBegin(struct mageThread *thread, struct mageThreadBeginInfo *info)
 {
-    struct mageThreadType type = (*(struct mageThreadType *)thread);
     /* Creating thread */
-    
-    MAGE_LOG_CORE_INFORM("Created pthread of id %lu\n", type.NativeThread);
-    type.Active = mageThreadHandle(pthread_create(&type.NativeThread, NULL, info->Job, info->SubmitData));
-    memcpy(thread, &type, sizeof(struct mageThreadType));
+    mageThreadHandle(pthread_create(&thread->Native, NULL, info->Job, info->SubmitData));
+    MAGE_LOG_CORE_INFORM("Created pthread of id %lu\n", thread->Native);
 }
-uint64_t mageThreadGetID(const mageThread thread)
+uint64_t mageThreadGetID(const struct mageThread *thread)
 {
-    return (uint64_t)pthread_self();
+    return (uint64_t)thread->Native;
 }
-void mageThreadEnd(mageThread thread)
+void mageThreadEnd(struct mageThread *thread)
 {   
     MAGE_ASSERT(thread != NULL);
-    struct mageThreadType type = (*(struct mageThreadType *)thread);
-    if (!type.Active) return;
-
     uint8_t result;
-    MAGE_LOG_CORE_INFORM("Ending pthread thread of id %lu\n", type.NativeThread);
-    mageThreadHandle(pthread_join(type.NativeThread, (void **)&result));
-    
-    memcpy(thread, &type, sizeof(struct mageThreadType));
+    MAGE_LOG_CORE_INFORM("Ending pthread thread of id %lu\n", thread->Native);
+    mageThreadHandle(pthread_join(thread->Native, (void **)&result));
 }
-void mageThreadTerminate(mageThread thread)
+void mageThreadTerminate(struct mageThread *thread)
 {
-    struct mageThreadType type = (*(struct mageThreadType *)thread);
-    
-    MAGE_LOG_CORE_WARNING("Terminating pthread of id %lu, thread may have not completed\n", type.NativeThread);
-    pthread_cancel(type.NativeThread);
-    
-    memcpy(thread, &type, sizeof(struct mageThreadType));    
+    MAGE_LOG_CORE_WARNING("Terminating pthread of id %lu, thread may have not completed\n", thread->Native);
+    pthread_cancel(thread->Native);
 }
 
 #endif

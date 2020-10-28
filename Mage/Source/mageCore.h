@@ -69,6 +69,7 @@
 #include <math.h>
 #include <time.h>
 
+#include "../Externals/libogg/include/ogg/ogg.h"
 #include "../Externals/stb-image/src/stb_image.h"
 
 

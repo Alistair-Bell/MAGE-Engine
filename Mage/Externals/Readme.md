@@ -40,7 +40,7 @@ These libraries help power the Mage Engine and I am thankful for the authors of 
 - Sourced from `https://glad.dav1d.de/` (alternative `https://github.com/Dav1dde/glad`)
 
 # libogg
-- Maintained under the BSD-3-Clause
+- Maintained under the `BSD-3-Clause`
 - Changes
   - Removed cmake, doc, m4, macosx and win32 directories
   - Removed aclocal.m4, CMakeLists.txt, compile, config.guess, config.sub, configure, configure.ac, depcomp, install-sh, libogg.spec, libogg.spec.in, ltmain.sh, Makefile.am, Makefile.in, missing, ogg.m4, ogg.pc.in andogg-uninstalled.pc.in files from root
@@ -48,5 +48,5 @@ These libraries help power the Mage Engine and I am thankful for the authors of 
 - Added premake5 build support
   - Added ogg_types defining the ogg integer types
   - Changed include directories to local includes rather than system wide
-- Version 1.3.4
-- Sourced from https://www.xiph.org/ogg/
+- Version `1.3.4`
+- Sourced from `https://www.xiph.org/ogg/`

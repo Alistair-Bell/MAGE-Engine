@@ -332,7 +332,10 @@ uint32_t mageSceneSystemRegister(struct mageScene *scene, const mageSystemCallba
             table.ThreadHandle      = NULL;
             break;
         case MAGE_ECS_SYSTEM_THREAD_PRIORITY_FORCE:
-            table.ThreadHandle      = mageThreadCreate();
+            table.ThreadHandle = MAGE_MEMORY_ALLOCATE(sizeof(struct mageThread));
+            struct mageThreadCreateInfo i;
+            memset(&i, 0, sizeof(struct mageThreadCreateInfo));
+            mageThreadCreate(table.ThreadHandle, &i);
             break;
         default:
             MAGE_LOG_CORE_ERROR("Unknown thread priority!, multithreaded disabled\n", NULL);
