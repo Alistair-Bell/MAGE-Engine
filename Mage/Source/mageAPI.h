@@ -1679,27 +1679,37 @@ extern MAGE_API void mageRenderableQuadDestroy(
 	Audio driver
 */
 
-enum MAGE_AUDIO_DRIVER_FLAGS_ENUM
-{
-	MAGE_AUDIO_DRIVER_FLAGS_READY = 0x01
-} mageAudioDriverFlags;
-
-#if defined (MAGE_PULSE_AUDIO_BACKEND)
+#if defined (MAGE_OPENAL_BACKEND)
 
 struct mageAudioDriver
 {
-	pa_mainloop			*MainLoop;
-	pa_context			*Context;
+	const char		*OuputDevice;
+	ALCdevice		*Device;
+	ALCcontext		*Context;
 };
 
 #endif
 
+
+
+struct mageAudioDriverCreateInfo
+{
+
+};
+struct mageAudioDriverPlayInfo
+{
+	double				Seconds;
+	uint32_t			Frequency;
+	uint8_t				Threaded;
+};
+
 extern MAGE_API mageResult mageAudioDriverCreate(
 	struct mageAudioDriver *driver,
-	void *userData
+	struct mageAudioDriverCreateInfo *info
 );
-extern MAGE_API void mageAudioDriverDetectChannels(
-	struct mageAudioDriver *driver
+extern MAGE_API void mageAudioDriverPlay(
+	struct mageAudioDriver *driver,
+	struct mageAudioDriverPlayInfo *info
 );
 extern MAGE_API void mageAudioDriverDestroy(
 	struct mageAudioDriver *driver

@@ -54,8 +54,9 @@
 	#define MAGE_API 
 #endif
 
-#if defined (MAGE_PULSE_AUDIO_BACKEND)
-	#include <pulse/pulseaudio.h>
+#if defined (MAGE_OPENAL_BACKEND)
+	#include <AL/al.h>
+	#include <AL/alc.h>
 #endif
 
 /* C standard includes */

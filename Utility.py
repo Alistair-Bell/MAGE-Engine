@@ -124,8 +124,7 @@ def GenerateDefaultArguments(dictionary):
 
 # The default uses the key: value[0]
 def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
-    returnValues = [None] * len([*searchingDictionary])
-
+    returnValues = []
     # No arguments specified
     if len(rawArguments) < 1:
         LogMessage("No arguments specified")
@@ -173,7 +172,6 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         returnValues.append(value)
 
     # Removing any possible duplicates
-    returnValues = list(dict.fromkeys(returnValues))
     # sorting by key
 
     sortedList = [None] * len(returnValues)

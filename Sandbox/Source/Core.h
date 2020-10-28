@@ -2,7 +2,7 @@
 #define SANDBOX_HEADER
 
 #define MAGE_VULKAN_BACKEND
-#define MAGE_PULSE_AUDIO_BACKEND
+#define MAGE_OPENAL_BACKEND
 #include <mageAPI.h>
 
 #if defined (SANDBOX_DEBUG)

@@ -109,6 +109,7 @@ def Main():
     buildTests          = arguments[5]
     platform            = arguments[6]
 
+
     generatorSwitcher = {
         "vsproject":        "vs2019",
         "xcode":            "xcode",

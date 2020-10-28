@@ -17,10 +17,10 @@ newoption
     trigger     = "audio-backend",
     value       = "API",
     description = "Choose a particular audio backend",
-    default     = "pulse",
+    default     = "none",
     allowed     = {
         { "none", "No audio backend" },
-        { "pulse", "Pulse Audio 13.99.1" },
+        { "openal", "OpenAL version 1.1" },
     }
 }
 newoption
@@ -30,7 +30,7 @@ newoption
     description = "Build unit tests for the engine",
     default     = "none",
     allowed     = {
-        { "none", "Disables building tests" },
+        { "no-tests", "Disables building tests" },
         { "all", "Builds all unit tests" },
     },
 }
@@ -41,7 +41,7 @@ ConfigurationLinks = {}
 ConfigurationLinks["vulkan"]        = "vulkan"
 ConfigurationLinks["gles"]          = "glad"
 -- Audio
-ConfigurationLinks["pulse"]         = "pulse"
+ConfigurationLinks["openal"]        = "openal"
 
 -- Table of macros that should be defined
 ConfigurationDefines = {}
@@ -49,13 +49,13 @@ ConfigurationDefines = {}
 ConfigurationDefines["vulkan"]  = "MAGE_VULKAN_BACKEND"
 ConfigurationDefines["gles"]    = "MAGE_GLES_BACKEND"
 -- Audio
-ConfigurationDefines["pulse"]   = "MAGE_PULSE_AUDIO_BACKEND"
+ConfigurationDefines["openal"]   = "MAGE_OPENAL_BACKEND"
 
 -- Table of files to include
 ConfigurationFiles  = {}
 ConfigurationFiles["vulkan"]    = "Mage/Source/Vulkan/**.*"
 ConfigurationFiles["gles"]      = "Mage/Source/OpenGL/**.*"
-ConfigurationFiles["pulse"]     = "Mage/Source/Pulse-Audio/**.*"
+ConfigurationFiles["openal"]    = "Mage/Source/OpenAL/**.*"
 
 PlatformDefines     = {}
 PlatformDefines["windows"]      = { "MAGE_PLATFORM_WINDOWS", "GLFW_EXPOSE_NATIVE_WIN32" }
@@ -73,6 +73,7 @@ PlatformFiles["macosx"]      = "Mage/Source/MacOS/**.*"
 ClientLinks =
 {
     "MageEngine",
+    "libogg",
     "GLFW",
     "stb-image",
     ConfigurationLinks[_OPTIONS["renderer"]],
@@ -99,6 +100,7 @@ if _OPTIONS["renderer"] == "gles" then
 end
 include "Mage/Externals/stb-image"
 include "Mage/Externals/glfw3"
+include "Mage/Externals/libogg"
 
 if _OPTIONS["tests"] == "all" then
     -- Include the tests to build

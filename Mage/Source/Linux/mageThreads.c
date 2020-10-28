@@ -29,7 +29,6 @@ void mageThreadBegin(mageThread thread, struct mageThreadBeginInfo *info)
     
     MAGE_LOG_CORE_INFORM("Created pthread of id %lu\n", type.NativeThread);
     type.Active = mageThreadHandle(pthread_create(&type.NativeThread, NULL, info->Job, info->SubmitData));
-    MAGE_ASSERT(type.Active != MAGE_TRUE);
     memcpy(thread, &type, sizeof(struct mageThreadType));
 }
 uint64_t mageThreadGetID(const mageThread thread)

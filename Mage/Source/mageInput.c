@@ -62,8 +62,6 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
 
 
     input_sort_algorithms_quick_sort(info->ExternalInputFlags, info->ExtenalInputFlagsCount);
-    if (0 < info->ExtenalInputFlagsCount && info->ExternalInputFlags[0] == MAGE_EXTERNAL_INPUT_SETUP_FLAGS_NONE)
-        goto callbacks; /* Goto is not evil, people just use it wrong */
 
     struct mageJoystickInfo joys[GLFW_JOYSTICK_LAST];
     memset(joys, 0, sizeof(joys));
@@ -100,6 +98,9 @@ void mageUserInputInquirerSetup(struct mageWindow *window, struct mageUserInputI
     }
     MAGE_LOG_CORE_INFORM("External input sources report: [Joysticks %d] [Gamepads %d]\n", joystickCount, gamePadCount);
 
+    if (0 < info->ExtenalInputFlagsCount && info->ExternalInputFlags[0] == MAGE_EXTERNAL_INPUT_SETUP_FLAGS_NONE)
+        goto callbacks; /* Goto is not evil, people just use it wrong */
+    
     for (i = 0; i < info->ExtenalInputFlagsCount; i++)
     {
         if (info->ExternalInputFlags[i] == MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_JOYSTICK) 
