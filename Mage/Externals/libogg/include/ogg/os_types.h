@@ -149,7 +149,7 @@
 
 #else
 
-#  include "ogg/ogg_types.h"
+#  include "ogg_types.h"
 
 #endif
 

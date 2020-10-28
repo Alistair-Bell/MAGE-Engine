@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include "../include/ogg/ogg.h"
+#include "../include/ogg/os_types.h"
 
 #define BUFFER_INCREMENT 256
 

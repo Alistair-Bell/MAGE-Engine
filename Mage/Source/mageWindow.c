@@ -17,6 +17,7 @@ mageResult mageWindowCreate(struct mageWindow *window, struct mageWindowCreateIn
 	uint8_t data;
 	int32_t width, height, channels;
     uint8_t *image = stbi_load(info->Icon, &width, &height, &channels, STBI_rgb_alpha);
+	MAGE_ASSERT_MESSAGE(image != NULL, "Unable to load icon from file, check present\n", NULL);
 
 	GLFWimage icon;
 	icon.width 		= width;

@@ -24,6 +24,7 @@
 #include <limits.h>
 #include <string.h>
 #include "../include/ogg/ogg.h"
+#include "../include/ogg/os_types.h"
 
 /* A complete description of Ogg framing exists in docs/framing.html */
 
@@ -122,7 +123,7 @@ static void _ogg_crc_init(){
 }
 #endif
 
-#include "crctable.h"
+#include "../include/ogg/crctable.h"
 
 /* init the encode/decode logical stream state */
 
