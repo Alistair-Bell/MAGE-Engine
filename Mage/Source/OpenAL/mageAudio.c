@@ -4,12 +4,6 @@
 
 inline MAGE_THREAD_RETURN_TYPE mageAudioDriverThreadedPlay(void *data);
 
-struct mageAudioDriverThreadedData
-{
-    struct mageAudioDriver          Driver;
-    struct mageAudioDriverPlayInfo  PlayInfo;
-};
-
 mageResult mageAudioDriverCreate(struct mageAudioDriver *driver, struct mageAudioDriverCreateInfo *info)
 {
     MAGE_ASSERT(driver != NULL);
@@ -31,18 +25,55 @@ mageResult mageAudioDriverCreate(struct mageAudioDriver *driver, struct mageAudi
 
     return MAGE_RESULT_SUCCESS;
 }
+void mageAudioDriverPlayLoadSource(struct mageAudioDriver *driver, struct mageAudioDriverSoundSourceLoadInfo *info, struct mageAudioDriverPlayInfo *playInfo)
+{
+    MAGE_ASSERT(driver != NULL);
+    MAGE_ASSERT(info != NULL);
+    MAGE_ASSERT(playInfo != NULL);
+
+    int32_t *data;
+    uint32_t dataSize;
+    uint32_t sampleRate;
+    uint32_t format;
+    uint64_t samplesDecoded;
+
+    switch (info->Flags)
+    {
+        case MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_FORMAT_WAV:
+        {
+            drwav wav;
+            MAGE_ASSERT(drwav_init_file(&wav, info->Source, NULL) != MAGE_FALSE);
+            
+            dataSize = wav.totalPCMFrameCount * wav.channels * sizeof(int32_t);
+            data = MAGE_MEMORY_ALLOCATE(dataSize);
+            samplesDecoded = drwav_read_pcm_frames_s32(&wav, wav.totalPCMFrameCount, data);
+            
+            sampleRate = wav.sampleRate;
+            
+            playInfo->Length = (float)samplesDecoded / wav.sampleRate;
+            drwav_uninit(&wav);
+            break;
+        }
+        default:
+            MAGE_ASSERT_MESSAGE(MAGE_TRUE == MAGE_TRUE, "Only wav files currently supported, watch out for support in later commits\n", NULL);
+    }
+    
+    alGenBuffers(1, &playInfo->BufferHandle);
+    alBufferData(playInfo->BufferHandle, AL_FORMAT_STEREO16, data, dataSize, sampleRate);
+
+    alGenSources(1, &playInfo->SourceHandle);
+    alSourcei(playInfo->SourceHandle, AL_BUFFER, playInfo->BufferHandle);
+
+    MAGE_LOG_CORE_INFORM("Creating audio clip from file %s, duration %f seconds\n", info->Source, playInfo->Length);
+    MAGE_MEMORY_FREE(data);
+}
 void mageAudioDriverPlay(struct mageAudioDriver *driver, struct mageAudioDriverPlayInfo *info)
 {
     MAGE_ASSERT(driver != NULL);
     MAGE_ASSERT(info != NULL);
 
-    struct mageAudioDriverThreadedData submitData;
-    memset(&submitData, 0, sizeof(struct mageAudioDriverThreadedData));
-    submitData.Driver     = *driver;
-    submitData.PlayInfo   = *info;
-    
 
-    if (info->Threaded == MAGE_TRUE)
+    if (info->Flags & MAGE_AUDIO_DRIVER_PLAY_FLAGS_NEW_THREAD)
     {
         struct mageThread t;
         struct mageThreadCreateInfo i;
@@ -52,51 +83,29 @@ void mageAudioDriverPlay(struct mageAudioDriver *driver, struct mageAudioDriverP
         struct mageThreadBeginInfo begin;
         memset(&begin, 0, sizeof(struct mageThreadBeginInfo));
         begin.Job = mageAudioDriverThreadedPlay;
-        begin.SubmitData    = &submitData;
+        begin.SubmitData    = info;
         begin.ThreadFlags   = MAGE_THREAD_BEGIN_INFO_FLAGS_IMMEDIATE;
+
+        MAGE_LOG_CORE_INFORM("Playing audio clip on new thread\n", NULL);
         mageThreadBegin(&t, &begin);
     }
     else
     {
-        mageAudioDriverThreadedPlay(&submitData);
+        mageAudioDriverThreadedPlay(info);
     }    
 }
 void *mageAudioDriverThreadedPlay(void *data)
 {
-    struct mageAudioDriverThreadedData raw = MAGE_VOID_POINTER_CAST(data, struct mageAudioDriverThreadedData);
-    uint32_t frequency = raw.PlayInfo.Frequency;
-    double seconds = raw.PlayInfo.Seconds;
+    struct mageAudioDriverPlayInfo raw = MAGE_VOID_POINTER_CAST(data, struct mageAudioDriverPlayInfo);
     
-    uint32_t sampleRate = 22050;
-    size_t bufferSize = seconds * sampleRate;
-    int16_t *samples = MAGE_MEMORY_ARRAY_ALLOCATE(bufferSize, sizeof(int16_t));
-
-    uint32_t i;
-    for (i = 0; i < bufferSize; i++)
-    {
-        samples[i] = 32760 * sin((2.f * MAGE_PI * frequency) / sampleRate * i);
-    }
-
-    uint32_t buffer;
-    alGenBuffers(1, &buffer);
-    alBufferData(buffer, AL_FORMAT_MONO16, samples, bufferSize, sampleRate);
-
-    uint32_t source;
-    alGenSources(1, &source);
-    
-    alSourcei(source, AL_BUFFER, buffer);
-    alSourcePlay(source);
-    
-    ALint state;
-    alGetSourcei(source, AL_SOURCE_STATE, &state);
-
-    while (state == AL_PLAYING)
-        alGetSourcei(source, AL_SOURCE_STATE, &state);
-
-    alDeleteSources(1, &source);
-    alDeleteBuffers(1, &buffer);
-    free(samples);
+    alSourcePlay(raw.SourceHandle);
     return (MAGE_THREAD_RETURN_TYPE) 0;
+}
+void mageAudioDriverPlayDestroy(struct mageAudioDriver *driver, struct mageAudioDriverPlayInfo *info)
+{
+    MAGE_LOG_CORE_INFORM("Destroying audio clip with duration of %f seconds\n", info->Length);
+    alDeleteSources(1, &info->SourceHandle);
+    alDeleteBuffers(1, &info->BufferHandle);
 }
 void mageAudioDriverDestroy(struct mageAudioDriver *driver)
 {

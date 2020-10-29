@@ -4,12 +4,12 @@ static void mageDefaultConstructer(void *data, const uint64_t size)
 {
 
 }
-static void mageDefaultDeconstructer(void *data)
+static void mageDefaultDeconstructor(void *data)
 {
     
 }
 
-uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *component, const uint32_t dataSize, mageComponentConstructer constructer, mageComponentDeconstructer deconstructer, const mageComponentRegisteringMode mode)
+uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *component, const uint32_t dataSize, mageComponentConstructer constructer, mageComponentDeconstructor deconstructor, const mageComponentRegisteringMode mode)
 {
     MAGE_ASSERT(scene != NULL);
     uint64_t tableIndex = scene->TableCount;
@@ -18,9 +18,9 @@ uint32_t mageSceneRegisterComponent(struct mageScene *scene, const char *compone
     table.ByteSize          = dataSize;
 
     if (constructer == NULL)    constructer = mageDefaultConstructer;
-    if (deconstructer == NULL)  deconstructer = mageDefaultDeconstructer;
+    if (deconstructor == NULL)  deconstructor = mageDefaultDeconstructor;
     table.Constructer       = constructer;
-    table.Deconstructer     = deconstructer;
+    table.Deconstructor     = deconstructor;
     table.StoredCount       = 0;
     table.Stored            = MAGE_MEMORY_ARRAY_ALLOCATE(0, sizeof(struct mageComponent));
     table.Identifier        = component;
@@ -46,7 +46,7 @@ void mageSceneComponentTableFree(struct mageComponentTable *table)
     mageQueueDestroy(&table->IndexQueues);
     for (i = 0; i < table->StoredCount; i++)
     {
-        table->Deconstructer(table->Stored[i].Data);
+        table->Deconstructor(table->Stored[i].Data);
         MAGE_MEMORY_FREE(table->Stored[i].Data);
     }
     MAGE_MEMORY_FREE(table->Stored);

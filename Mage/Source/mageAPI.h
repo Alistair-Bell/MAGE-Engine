@@ -558,8 +558,8 @@ typedef enum MAGE_THREAD_BEGIN_INFO_FLAGS_ENUM
 struct mageThreadBeginInfo
 {
 	mageThreadJobCallback 		Job;
-	void 						*SubmitData;
 	mageThreadBeginInfoFlags 	ThreadFlags;
+	void 						*SubmitData;
 };
 
 
@@ -883,15 +883,15 @@ extern uint8_t mageUserInputInquireGamepadButtonState(
 
 typedef void 		*(*mageSystemCallback)(void *);
 typedef void		(*mageComponentConstructer)(void *, const uint64_t);
-typedef void		(*mageComponentDeconstructer)(void *);
+typedef void		(*mageComponentDeconstructor)(void *);
 typedef             uint64_t mageEntity;
 
 
 #define MAGE_SYSTEM_SUCCESS ((void *)1)
 #define MAGE_SYSTEM_FAILURE ((void *)0)
 
-#define MAGE_ECS_REGISTER_COMPONENT(scene, component, constructer, deconstructer, mode) \
-	mageSceneRegisterComponent(scene, #component, sizeof(component), constructer, deconstructer, mode)
+#define MAGE_ECS_REGISTER_COMPONENT(scene, component, constructer, deconstructor, mode) \
+	mageSceneRegisterComponent(scene, #component, sizeof(component), constructer, deconstructor, mode)
 
 #define MAGE_ECS_BIND_NEW_COMPONENT_BY_TAG_TO_ENTITIES(scene, component, value, entities, count) \
 	mageSceneComponentFromTagBindEntities(scene, #component, value, entities, count)
@@ -973,7 +973,7 @@ struct mageComponentTable
 	struct mageQueue						IndexQueues;
 	struct mageComponent					*Stored;
 	mageComponentConstructer				Constructer;
-	mageComponentDeconstructer				Deconstructer;
+	mageComponentDeconstructor				Deconstructor;
 	uint32_t								ID;
 	uint32_t								StoredCount;
 	uint32_t								ByteSize;
@@ -1015,7 +1015,7 @@ extern MAGE_API uint32_t mageSceneRegisterComponent(
 	const char *component,
 	const uint32_t dataSize,
 	mageComponentConstructer constructer,
-	mageComponentDeconstructer deconstructer,
+	mageComponentDeconstructor deconstructor,
 	const mageComponentRegisteringMode mode
 );
 extern MAGE_API mageEntity mageSceneEntityCreate(
@@ -1700,24 +1700,54 @@ struct mageAudioDriver
 
 #endif
 
+typedef enum MAGE_AUDIO_DRIVER_PLAY_FLAGS_ENUM
+{
+	MAGE_AUDIO_DRIVER_PLAY_FLAGS_NONE,
+	MAGE_AUDIO_DRIVER_PLAY_FLAGS_LOOP 				= 0b00000000000000000000000000000001,
+	MAGE_AUDIO_DRIVER_PLAY_FLAGS_NEW_THREAD 		= 0b00000000000000000000000000000010,
+} mageAudioDriverPlayFlags;
 
+typedef enum MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_ENUM
+{
+	MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_FORMAT_WAV,
+	MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_FORMAT_FLAC,
+	MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_FORMAT_MP3,
+} mageAudioDriverSoundSourceFlags;
 
 struct mageAudioDriverCreateInfo
 {
-
+	void 				*Empty; /* Some compilers may complain about the empty structure*/
+};
+struct mageAudioDriverSoundSourceLoadInfo
+{
+	const char 							*Source;
+	mageAudioDriverSoundSourceFlags 	Flags;
 };
 struct mageAudioDriverPlayInfo
 {
-	double				Seconds;
-	uint32_t			Frequency;
-	uint8_t				Threaded;
+	mageAudioDriverPlayFlags 	Flags;
+	uint32_t					BufferHandle;
+	uint32_t					SourceHandle;
+	float 						Length;
+	float						Pitch;
+	float						Gain;
+	float						Positions[3];
 };
 
 extern MAGE_API mageResult mageAudioDriverCreate(
 	struct mageAudioDriver *driver,
 	struct mageAudioDriverCreateInfo *info
 );
+extern MAGE_API void mageAudioDriverPlayLoadSource(
+	struct mageAudioDriver *driver,
+	struct mageAudioDriverSoundSourceLoadInfo *info,
+	struct mageAudioDriverPlayInfo *playInfo
+);
 extern MAGE_API void mageAudioDriverPlay(
+	struct mageAudioDriver *driver,
+	struct mageAudioDriverPlayInfo *info
+);
+extern MAGE_API void mageAudioDriverPlayDestroy(
 	struct mageAudioDriver *driver,
 	struct mageAudioDriverPlayInfo *info
 );

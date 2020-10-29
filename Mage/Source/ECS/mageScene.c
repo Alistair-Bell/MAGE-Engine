@@ -198,7 +198,7 @@ struct mageComponentHandle mageSceneComponentFromIDBindEntities(struct mageScene
     returnValue = mageComponentHandleGenerate(tableIndex, componentIndex);
     
     uint32_t i;
-    /* Coppy to entity handle */
+    /* Copy to entity handle */
     for (i = 0; i < count; i++)
     {
         mageUpdateEntityComponentHandle(scene, &returnValue, entities[i], 1);
@@ -368,7 +368,7 @@ void mageSceneEntityDestroy(struct mageScene *scene, mageEntity entity)
         if (component->SharedCount <= 1)
         {
             MAGE_LOG_CORE_INFORM("Destroying component %s, last attached to entity %lu\n", table->Identifier, entity);
-            table->Deconstructer(component->Data);
+            table->Deconstructor(component->Data);
             mageQueuePush(&table->IndexQueues, &handle.ComponentIndex);
             MAGE_MEMORY_FREE(component->Data);
             component->Data = NULL;

@@ -20,7 +20,7 @@ void mageThreadBegin(struct mageThread *thread, struct mageThreadBeginInfo *info
 {
     /* Creating thread */
     mageThreadHandle(pthread_create(&thread->Native, NULL, info->Job, info->SubmitData));
-    MAGE_LOG_CORE_INFORM("Created pthread of id %lu\n", thread->Native);
+    //MAGE_LOG_CORE_INFORM("Created pthread of id %lu\n", thread->Native);
 }
 uint64_t mageThreadGetID(const struct mageThread *thread)
 {
@@ -30,12 +30,12 @@ void mageThreadEnd(struct mageThread *thread)
 {   
     MAGE_ASSERT(thread != NULL);
     uint8_t result;
-    MAGE_LOG_CORE_INFORM("Ending pthread thread of id %lu\n", thread->Native);
+    //MAGE_LOG_CORE_INFORM("Ending pthread thread of id %lu\n", thread->Native);
     mageThreadHandle(pthread_join(thread->Native, (void **)&result));
 }
 void mageThreadTerminate(struct mageThread *thread)
 {
-    MAGE_LOG_CORE_WARNING("Terminating pthread of id %lu, thread may have not completed\n", thread->Native);
+    //MAGE_LOG_CORE_WARNING("Terminating pthread of id %lu, thread may have not completed\n", thread->Native);
     pthread_cancel(thread->Native);
 }
 

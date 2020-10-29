@@ -1,11 +1,13 @@
 #include "Core.h"
 
+
 #define SANDBOX_ENTITY_COUNT 5
 
 /* Application instance */
 static struct mageApplication   *SandboxApplication;
 static struct mageShader        shaders[2];
 static struct mageRenderable    renderable, renderable2;
+
 
 void CreateShaders()
 {
@@ -39,7 +41,7 @@ MAGE_ENTRY_POINT()
     inputSetup.MouseFlagsCount                  = 1;
     inputSetup.KeyboardFlags                    = (mageKeyboardSetupFlags[]) { MAGE_KEYBOARD_SETUP_FLAGS_ENABLE_STICKY };
     inputSetup.KeyboardFlagsCount               = 1;
-    inputSetup.ExternalInputFlags               = (mageExternalInputSetupFlags[]) { MAGE_EXTERNAL_INPUT_SETUP_REQUIRE_PRESENT_GAMEPAD };
+    inputSetup.ExternalInputFlags               = (mageExternalInputSetupFlags[]) { MAGE_EXTERNAL_INPUT_SETUP_FLAGS_NONE };
     inputSetup.ExtenalInputFlagsCount           = 1;
     inputSetup.PrimaryGamepadIndex              = &gamepadIndex;
     inputSetup.PrimaryJoystickIndex             = &joystickIndex;
@@ -67,6 +69,31 @@ MAGE_ENTRY_POINT()
     
     mageApplicationCreate(SandboxApplication, &applicationCreateInfo);
 
+    struct mageAudioDriver d;
+    struct mageAudioDriverPlayInfo pli;
+
+    AudioCreation:
+    {
+        struct mageAudioDriver d;
+        struct mageAudioDriverCreateInfo dci;
+        memset(&dci, 0, sizeof(struct mageAudioDriverCreateInfo));
+
+        mageAudioDriverCreate(&d, &dci);
+        struct mageAudioDriverSoundSourceLoadInfo ldi;
+        ldi.Flags  = MAGE_AUDIO_DRIVER_SOUND_SOURCE_FLAGS_FORMAT_WAV;
+        ldi.Source = "Mage/Resources/Audio/fight.wav";
+        
+        struct mageAudioDriverPlayInfo pli;
+        memset(&pli, 0, sizeof(struct mageAudioDriverPlayInfo));
+        mageAudioDriverPlayLoadSource(&d, &ldi, &pli);
+
+        pli.Flags = MAGE_AUDIO_DRIVER_PLAY_FLAGS_NEW_THREAD;
+        mageAudioDriverPlay(&d, &pli);
+    }
+
+
+    
+
     struct mageVertex verticies1[] = 
     {
         { .Vertex = { .X = -0.5f, .Y = -0.5f },   .Color = { .X = 1.0f, .Y = 0.0f, .Z = 0.0f}, .TextureLocation = { .X = 0.0f, .Y = 0.0f } },  
@@ -87,6 +114,7 @@ MAGE_ENTRY_POINT()
 
     struct mageRenderable *r[] = { &renderable };
 
+#endif
 #if 0
     struct mageVulkanMemoryHeap heap;
     
@@ -99,6 +127,7 @@ MAGE_ENTRY_POINT()
     i.AssociatedHeap                = 0;
     i.PhysicalDevice                = SandboxApplication->Renderer->PhysicalDevice;
     i.Device                        = SandboxApplication->Renderer->Device;
+    mageVulkanMemoryAllocateHeap(&heap, &i);
     
     struct mageVulkanMemoryBufferReference re, rb;
     
@@ -115,18 +144,20 @@ MAGE_ENTRY_POINT()
     m.DataSize                      = sizeof(data);
     m.Buffer                        = &b;
     m.Reference                     = &re;
-
-    mageVulkanMemoryAllocateHeap(&heap, &i);
     mageVulkanMemoryBufferMapToBlock(&heap, &m);
+    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
+
 
     m.Buffer                        = &bb;
     m.Reference                     = &rb;
     mageVulkanMemoryBufferMapToBlock(&heap, &m);
-    mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &re });
+    
+    
     mageVulkanMemoryBufferUnmapBufferToBlock(&heap, &(struct mageVulkanMemoryUnmapBufferInfo){ .Device = SandboxApplication->Renderer->Device, .PhysicalDevice = SandboxApplication->Renderer->PhysicalDevice, .Reference = &rb });
     mageVulkanMemoryFreeMemory(SandboxApplication->Renderer->Device, &heap);
 #endif
 
+#if 1
     while (!(glfwWindowShouldClose(SandboxApplication->Window->Context)))
     {
         mageRendererDrawRenderables(SandboxApplication->Renderer, r, 1);
@@ -138,13 +169,14 @@ MAGE_ENTRY_POINT()
     End:
     {
         vkDeviceWaitIdle(SandboxApplication->Renderer->Device);
+        mageAudioDriverPlayDestroy(&d, &pli);
         mageRenderableDestroy(&renderable, SandboxApplication->Renderer);
+        mageAudioDriverDestroy(&d);
         mageApplicationDestroy(SandboxApplication);
     }
-
-
-
 #endif
+
+
 #if 0
     struct mageScene s;
     struct mageSceneCreateInfo si;

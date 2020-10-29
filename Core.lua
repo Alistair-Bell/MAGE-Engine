@@ -75,6 +75,7 @@ ClientLinks =
     "MageEngine",
     "GLFW",
     "stb-image",
+    "dr_libs",
     ConfigurationLinks[_OPTIONS["renderer"]],
     ConfigurationLinks[_OPTIONS["audio-backend"]],
     PlatformLinks[_OPTIONS["os"]]
@@ -112,6 +113,7 @@ project "MageEngine"
     location "Mage"
     kind "StaticLib"
     language "C"
+    staticruntime "on"
     
     targetdir (BuildTargetPath)
     objdir (BuildObjectPath)

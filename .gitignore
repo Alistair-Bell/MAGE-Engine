@@ -20,6 +20,7 @@ vgcore*
 # Currently uncompressed directories
 Shaders/
 Textures/
+Audio/
 
 
 
