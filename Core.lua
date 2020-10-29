@@ -73,7 +73,6 @@ PlatformFiles["macosx"]      = "Mage/Source/MacOS/**.*"
 ClientLinks =
 {
     "MageEngine",
-    "libogg",
     "GLFW",
     "stb-image",
     ConfigurationLinks[_OPTIONS["renderer"]],
@@ -100,7 +99,7 @@ if _OPTIONS["renderer"] == "gles" then
 end
 include "Mage/Externals/stb-image"
 include "Mage/Externals/glfw3"
-include "Mage/Externals/libogg"
+include "Mage/Externals/dr_libs"
 
 if _OPTIONS["tests"] == "all" then
     -- Include the tests to build
