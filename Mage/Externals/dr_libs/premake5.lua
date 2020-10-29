@@ -1,17 +1,11 @@
-project "libogg"
+project "dr_libs"
     kind "StaticLib"
     language "C"
-    
+
     files
     {
-        "include/ogg/**.h",
-        "include/ogg/**.c",
         "src/**.h",
         "src/**.c"
-    }
-    includedirs
-    {
-        "include/ogg"
     }
 
     targetdir (BuildTargetPath)

@@ -24,7 +24,7 @@ These libraries help power the Mage Engine and I am thankful for the authors of 
 - Changes
   - Moved `stb_image.h` to src
   - Added `stb_image.c` for implimentation
-  - Added `premake5.lua` build system
+  - Added `premake5` build system
 - Version `2.26`
 - Sourced from `https://github.com/nothings/stb`
 
@@ -39,14 +39,12 @@ These libraries help power the Mage Engine and I am thankful for the authors of 
 - Maintained under the `MIT-License`
 - Sourced from `https://glad.dav1d.de/` (alternative `https://github.com/Dav1dde/glad`)
 
-# libogg
-- Maintained under the `BSD-3-Clause`
+# dr_libs
+- Maintained under the `Public Domain License`
 - Changes
-  - Removed cmake, doc, m4, macosx and win32 directories
-  - Removed aclocal.m4, CMakeLists.txt, compile, config.guess, config.sub, configure, configure.ac, depcomp, install-sh, libogg.spec, libogg.spec.in, ltmain.sh, Makefile.am, Makefile.in, missing, ogg.m4, ogg.pc.in andogg-uninstalled.pc.in files from root
-  - Removed include/Makefile.am, include/Makefile.in, include/ogg/Makefile.am, include/ogg/Makefile.in, include/config_types.h.in, src/Makefile.am and src/Makefile.in
-- Added premake5 build support
-  - Added ogg_types defining the ogg integer types
-  - Changed include directories to local includes rather than system wide
-- Version `1.3.4`
-- Sourced from `https://www.xiph.org/ogg/`
+  - Removed `.github`, `.old`, .`tests`, and `.wip` directories
+  - Removed `..gitignore`, `.gitmodules`
+  - Moved `*.h` to `src` directory
+  - Added `dr_implementations.c`
+  - Added `premake5` build system
+- Sourced from `https://github.com/mackron/dr_libs`
