@@ -69,8 +69,10 @@
 #include <math.h>
 #include <time.h>
 
-#include "../Externals/libogg/include/ogg/ogg.h"
 #include "../Externals/stb-image/src/stb_image.h"
+#include "../Externals/dr_libs/src/dr_flac.h"
+#include "../Externals/dr_libs/src/dr_wav.h"
+#include "../Externals/dr_libs/src/dr_mp3.h"
 
 
 
