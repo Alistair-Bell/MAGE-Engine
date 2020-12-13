@@ -13,7 +13,11 @@
     #include <X11/X.h>
 #endif
 
-#define MAGE_HANDLE_ERROR_MESSAGE(condition, execute) if ((condition)) { execute; return MageFalse; }
+#if MAGE_BUILD_DEBUG_MODE
+    #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute) if ((condition)) { execute; return MageFalse; }
+#else
+    #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute)
+#endif
 
 typedef void U0;
 typedef char I8;

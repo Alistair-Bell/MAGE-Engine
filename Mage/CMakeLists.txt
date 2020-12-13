@@ -11,6 +11,7 @@ set(LIBRARY_SOURCES
     Source/UnitTests.c
 
     Source/InputHandler.h
+    Source/InputHandler.c
 
     Source/EngineApplication.h
     Source/EngineApplication.c
@@ -21,8 +22,8 @@ message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")
 # platform specific code
 if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Linux/Window.c
-        Source/Linux/InputHandler.c
+        Source/Linux/LinuxWindow.c
+        Source/Linux/LinuxInputHandler.c
     )
 else()
     message(FATAL_ERROR "Platform ${PROJECT_BUILD_PLATFORM} has not been implimented or invalid!!")

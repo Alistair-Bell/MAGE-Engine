@@ -17,9 +17,9 @@ typedef struct MageApplicationWindowCreateInfo
 
 typedef enum MageInputHandlerEventListenFlags
 {
-    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD            = 0x00000001, /* Keyboard key inputs */
-    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE               = 0x00000002, /* Mouse clicks and positions */
-    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS       = 0x00000002, /* Window focus, refocus, closing, etc */
+    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD            = 0x1, /* Keyboard key inputs */
+    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE               = 0x2, /* Mouse clicks and positions */
+    MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS       = 0x4, /* Window focus, refocus, closing, etc */
     MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_ALL_FLAGS           = 0xFFFFFFFF, /* Will allow for all events */
 } MageInputHandlerEventListenFlags;
 

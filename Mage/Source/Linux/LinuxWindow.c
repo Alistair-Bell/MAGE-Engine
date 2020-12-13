@@ -29,7 +29,6 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         &(XSetWindowAttributes) { }
     );
 
-    XSelectInput(window->WindowDisplay, window->ContextWindow, ExposureMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask | StructureNotifyMask);
     XMapWindow(window->WindowDisplay, window->ContextWindow);
     return MageTrue;
 }

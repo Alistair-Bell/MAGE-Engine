@@ -4,10 +4,12 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 #include "Window.h"
+#include "InputHandler.h"
 
 typedef struct MageEngineApplication
 {
     MageApplicationWindow       *Window;
+    MageInputHandler            *InputHandler;
     U8                          Running;
 } MageEngineApplication;
 
