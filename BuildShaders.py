@@ -31,7 +31,8 @@ ShaderExtensions = {
 RuntimeGeneratedCommandLineOptions = {
     "--shaders=": [],
 }
-CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", __file__, RuntimeGeneratedCommandLineOptions) 
+
+CommandLineOptions = {} 
 
 
 def GetShaders(path):
@@ -57,7 +58,7 @@ def ValidateShader(shader, validator):
     finalCommand = "%s %s" % (validator, shader)
     command = Command(finalCommand, finalCommand, finalCommand)
     command.CallCommand()
-    LogMessage("Succesfully validated %s" % (shader))
+    LogMessage("Successfully validated %s" % (shader))
 
 def CompileShader(shader, optimisation, compiler):
     output = GenerateSpirvFileName(shader)
@@ -71,7 +72,7 @@ def CompileShader(shader, optimisation, compiler):
     LogMessage("Compiling %s outputing spirv binary as %s" % (shader, output))
     command = Command(finalCommand, finalCommand, finalCommand)
     command.CallCommand()
-    LogMessage("Succesfully compiled %s" % (shader))
+    LogMessage("Successfully compiled %s" % (shader))
 
 def HandleShader(shaders, optimisation, validator, compiler):
     for shader in shaders:
@@ -99,16 +100,16 @@ def ScriptHelp():
         i += 1
 
 def Main():
-    
+    CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", "BuildShaders.py", RuntimeGeneratedCommandLineOptions)
     CommandLineOptions["--shaders="] = GenerateShaderArguments()
-    
+
     arguments = ParseCommandLineArgument(sys.argv[1 : len(sys.argv)], CommandLineOptions, ScriptHelp)
     # checking if help was called
+    
     if arguments == []:
         return
     
     optimisation = arguments[0]
-
 
     glslValidator = ""
     glslCompiler  = ""
@@ -147,10 +148,10 @@ def Main():
     if files is not []:
         shaderFiles += files
 
-    LogMessage("Validating and building %s shaders with %s optmisation set" % (len(shaderFiles), optimisation))
+    LogMessage("Validating and building %s shaders with %s optimisation set" % (len(shaderFiles), optimisation))
 
     HandleShader(shaderFiles, optimisation, glslValidator, glslCompiler)
-
+    
     
 if __name__ == '__main__':
     if DisplayStartingInfo():

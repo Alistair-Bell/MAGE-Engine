@@ -133,7 +133,7 @@ def ParseCommandLineArgument(rawArguments, searchingDictionary, helpInfo=None):
         return []
     
     requiredKeys = list(searchingDictionary.keys())
-    # removing the uneccesary command line arguments
+    # removing the unnecessary command line arguments
     for raw in rawArguments:
         splitter = -1
         try:

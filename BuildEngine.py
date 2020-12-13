@@ -15,12 +15,12 @@ RuntimeGeneratedCommandLineOptions = {
     "--platform=": list(GetSupportedBuildPlatforms()),
 }
 
-CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", __file__, RuntimeGeneratedCommandLineOptions)
+CommandLineOptions = {}
 
 def ScriptHelp():
     LogMessage("Usage: %s:" % (__file__))
     LogMessage("Arguments presented may be in any order")
-    LogMessage("Some IDE environment may be incompatable with some specified tools!", LogModes["Warning"])
+    LogMessage("Some IDE environment may be incompatible with some specified tools!", LogModes["Warning"])
     i = 1
     for x, y in CommandLineOptions.items():
         LogMessage("\tArgument %s: prefix = %s, acceptable = %s" % (i, x, y))
@@ -47,10 +47,10 @@ def LoadConfigFile():
     data[0] = 1
     return data
 
-def UseCommandLineArguments():
+def UseCommandLineArguments(arguments):
     # By default the os will dump the file name of the program into args[0], stripping it from the parser
     parsing = sys.argv[1 : len(sys.argv)]
-    arguments = ParseCommandLineArgument(parsing, CommandLineOptions, ScriptHelp)
+    arguments = ParseCommandLineArgument(parsing, arguments, ScriptHelp)
     return arguments
 
 def CallSingleCommand(win32 = "", linux = "", darwin = ""):
@@ -63,12 +63,12 @@ def CallMake(config):
     make.CallCommand()
 
 def Main():
-
+    CommandLineOptions = LoadArgumentsFromJSON("Helpers/CommandLineArguments.json", "BuildEngine.py", RuntimeGeneratedCommandLineOptions)
     arguments = []
 
     if not CheckExistence(BuildScript):
         LogMessage("No build script present, only using command line arguments", LogModes["Inform"])
-        arguments = UseCommandLineArguments()
+        arguments = UseCommandLineArguments(CommandLineOptions)
     else:
         LogMessage("Build script present (%s), override command line arguments" % (BuildScript))
         choices = [ "y", "n" ]
@@ -80,7 +80,7 @@ def Main():
                 return
             arguments = result[1]
         else:
-            arguments = UseCommandLineArguments()
+            arguments = UseCommandLineArguments(CommandLineOptions)
 
     # checking if help was called
     if arguments == []:

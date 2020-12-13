@@ -58,7 +58,7 @@ def Main():
 
     
 
-    LogMessage("Succesfully setup the Mage Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
+    LogMessage("Successfully setup the Mage Engine environment!, if the locations specified were wrong or have changed edit Config/Locations.json", LogModes["Inform"])
 
 if __name__ == '__main__':
     if DisplayStartingInfo():
