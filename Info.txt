@@ -1,0 +1,11 @@
+MageEngine info:
+
+Native frameworks:
+    Windows:
+        Win32
+    Linux:
+        X11
+    Macos:
+        Cocoa
+
+
