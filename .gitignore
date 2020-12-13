@@ -1,0 +1,36 @@
+Build/
+Logs/*.*
+
+.vscode
+
+# Linux generated build files
+Makefile*
+
+# Windows generated build files
+*.vsproj
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
+# Macos generated build files
+*.pbxproj
+*.xcworkspacedata
+
+# Valgrind generated debug files
+vgcore*
+
+# Currently uncompressed directories
+Shaders/
+Textures/
+Audio/
+
+
+
+# User config folder
+Config*
+
+# Personal vscode config file
+.vscode/settings.json
+
+# Python created files
+*.pyc
