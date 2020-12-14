@@ -30,6 +30,16 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
     );
 
     XMapWindow(window->WindowDisplay, window->ContextWindow);
+    XGrabPointer(
+        window->WindowDisplay, 
+        window->ContextWindow,
+        MageTrue, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
+        GrabModeAsync,
+        GrabModeAsync,
+        window->ContextWindow,
+        window->ContextCursor,
+        CurrentTime
+    );
     return MageTrue;
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow *window)

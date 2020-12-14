@@ -6,6 +6,8 @@
 
 #if MAGE_BUILD_PLATFORM_LINUX
 
+/* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :| */
+
 typedef struct MageApplicationWindow
 {
     Display     *WindowDisplay;
@@ -13,6 +15,7 @@ typedef struct MageApplicationWindow
     Window      RootWindow;
     XEvent      PollingEvent;
     Colormap    ColorMap;
+    Cursor      ContextCursor;
 } MageApplicationWindow;
 
 #elif MAGE_BUILD_PLATFORM_WINDOWS

@@ -13,9 +13,9 @@ U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *ha
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD)
         xflags |= (KeyPressMask | KeyReleaseMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE)
-        xflags |= (ButtonPressMask | ButtonReleaseMask);
+        xflags |= (ButtonPressMask | ButtonReleaseMask | PointerMotionHintMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS)
-        xflags |= (EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ResizeRedirectMask);
+        xflags |= (EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ResizeRedirectMask | SubstructureNotifyMask);
     XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, xflags);
     return MageTrue;
 }

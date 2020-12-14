@@ -152,7 +152,9 @@ extern U8 MageInputHandlerDestroy(MageInputHandler *handler);
 
 /* Common to all frameworks */
 
-extern U8 MageInputHandlerInterrogateKeyState(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
-extern U8 MageInputHandlerInterrogateMouseButtonState(MageInputHandler *handler, const MageMouseButton button, const MageButtonState state);
+extern U8  MageInputHandlerInterrogateKeyState(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
+extern U8  MageInputHandlerInterrogateMouseButtonState(MageInputHandler *handler, const MageMouseButton button, const MageButtonState state);
+extern F32 MageInputHandlerInterrogateMousePositionX(MageInputHandler *handler);
+extern F32 MageInputHandlerInterrogateMousePositionY(MageInputHandler *handler);
 
 #endif

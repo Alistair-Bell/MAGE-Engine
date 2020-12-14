@@ -22,21 +22,29 @@ I32 main()
 
     MageEngineApplicationCreate(&engineCreateInfo, &engineContext);
 
-    XEvent *e = &engineContext.Window->PollingEvent;
+    MageApplicationWindow *w = engineContext.Window;
+    XEvent  *xe = &w->PollingEvent;
+    Display *xd = w->WindowDisplay;
+    Window  *xw = &w->ContextWindow;
+    I32 x, y, cx, cy;
+    U32 msk;
+    Window root;
     while (1)
     {
-        XNextEvent(engineContext.Window->WindowDisplay, e);
-    
-        if (e->type == KeyPress)
+        XNextEvent(xd, xe);
+        XQueryPointer(xd, (*xw), &root, &w->RootWindow, &x, &y, &cx, &cy, &msk);
+        printf("[%d %d][%d %d]\n", x, y, cx, cy);
+        switch (xe->type)
         {
-            printf("Log: X11 Keycode : %d\n", e->xkey.keycode);
-            break;   
+            case KeyPress: printf("Log: X11 Keycode : %d\n", xe->xkey.keycode); break;
         }
     }
 
-
-    MageEngineApplicationDestroy(&engineContext);
-    printf("Ran successfully\n");
+    end:
+    {
+        MageEngineApplicationDestroy(&engineContext);
+        printf("Ran successfully\n");
+    }
 
 
     return MageTrue;

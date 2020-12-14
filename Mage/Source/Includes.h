@@ -11,6 +11,7 @@
 #if MAGE_BUILD_PLATFORM_LINUX
     #include <X11/Xlib.h>
     #include <X11/X.h>
+    #include <X11/keysym.h>
 #endif
 
 #if MAGE_BUILD_DEBUG_MODE
