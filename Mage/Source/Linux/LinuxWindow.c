@@ -26,7 +26,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         InputOutput,
         CopyFromParent,
         0,
-        &(XSetWindowAttributes) { }
+        NULL
     );
 
     XMapWindow(window->WindowDisplay, window->ContextWindow);

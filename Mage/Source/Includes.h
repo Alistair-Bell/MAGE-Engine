@@ -8,10 +8,34 @@
 #include <math.h>
 #include <string.h>
 
+#ifndef NULL
+    #define NULL ((void *)0)
+#endif
+
+#ifndef MageTrue
+    #define MageTrue 1
+#endif
+
+#ifndef MageFalse
+    #define MageFalse 0
+#endif
+
 #if MAGE_BUILD_PLATFORM_LINUX
     #include <X11/Xlib.h>
     #include <X11/X.h>
     #include <X11/keysym.h>
+#elif MAGE_BUILD_PLATFORM_WINDOWS
+    #include <Windows.h>
+#endif
+
+#if MAGE_BUILD_RENDERER_VULKAN
+    #include <vulkan/vulkan.h>
+
+    #if MAGE_BUILD_PLATFORM_LINUX
+        #include <vulkan/vulkan_xlib.h>
+    #elif MAGE_BUILD_PLATFORM_WINDOWS
+        #include <vulkan/vulkan_win32.h>
+    #endif
 #endif
 
 #if MAGE_BUILD_DEBUG_MODE
@@ -32,8 +56,5 @@ typedef unsigned long U64;
 
 typedef float F32;
 typedef double F64;
-
-#define MageTrue 1
-#define MageFalse 0
 
 #endif
