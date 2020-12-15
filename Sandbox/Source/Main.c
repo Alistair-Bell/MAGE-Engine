@@ -36,7 +36,8 @@ I32 main()
         printf("[%d %d][%d %d]\n", x, y, cx, cy);
         switch (xe->type)
         {
-            case KeyPress: printf("Log: X11 Keycode : %d\n", xe->xkey.keycode); break;
+            case KeyPress: printf("Log: X11 Keycode : %d\n", xe->xkey.keycode); goto end;
+            case MotionNotify: printf("Motion\n");
         }
     }
 

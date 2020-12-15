@@ -9,14 +9,15 @@ U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *ha
 
     /* See flags https://tronche.com/gui/x/xlib/events/mask.html */
 
-    I64 xflags = 0;
+    I64 eventMask = 0;
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD)
-        xflags |= (KeyPressMask | KeyReleaseMask);
+        eventMask |= (KeyPressMask | KeyReleaseMask); printf("Here1\n");
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE)
-        xflags |= (ButtonPressMask | ButtonReleaseMask | PointerMotionHintMask);
+        eventMask |= (ButtonPressMask | ButtonReleaseMask | PointerMotionHintMask | PointerMotionMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS)
-        xflags |= (EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ResizeRedirectMask | SubstructureNotifyMask);
-    XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, xflags);
+        eventMask |= (EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ResizeRedirectMask | SubstructureNotifyMask);
+    
+    XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
     return MageTrue;
 }
 U8 MageInputHandlerPollEvents(MageInputHandler *handler)
@@ -24,16 +25,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler)
     
     return MageTrue;
 }
-U8 MageInputHandlerInterrogateKeyState(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state)
-{
 
-    return MageTrue;
-}
-U8 MageInputHandlerInterrogateMouseButtonState(MageInputHandler *handler, const MageMouseButton button, const MageButtonState state)
-{
-
-    return MageTrue;
-}
 U8 MageInputHandlerDestroy(MageInputHandler *handler)
 {
 
