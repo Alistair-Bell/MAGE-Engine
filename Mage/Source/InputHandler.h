@@ -147,7 +147,9 @@ typedef struct MageInputHandler
 /* Following implimented by native window frameworks */
 
 extern U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *handler);
-extern U8 MageInputHandlerPollEvents(MageInputHandler *handler);
+extern U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window);
+extern U8 MageInputHandlerUpdateKeyStatus(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
+extern U8 MageInputHandlerUpdateMouseButtonStatus(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
 extern U8 MageInputHandlerDestroy(MageInputHandler *handler);
 
 /* Common to all frameworks */

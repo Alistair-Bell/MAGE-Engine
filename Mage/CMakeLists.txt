@@ -29,6 +29,13 @@ else()
     message(FATAL_ERROR "Platform ${PROJECT_BUILD_PLATFORM} has not been implimented or invalid!!")
 endif()
 
+if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
+    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
+        Source/Vulkan/VulkanRenderer.h
+        Source/Vulkan/VulkanRenderer.c
+    )
+endif()
+
+
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
 MageEngineAddDefinesAndFlagsToBinary(${PROJECT_NAME})
-set_target_properties(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE C)

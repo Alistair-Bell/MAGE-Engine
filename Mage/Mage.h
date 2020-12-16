@@ -7,5 +7,10 @@
 #include "Source/UnitTests.h"
 #include "Source/InputHandler.h"
 #include "Source/EngineApplication.h"
+#include "Source/Renderer.h"
+
+#ifdef MAGE_BUILD_RENDERER_VULKAN
+    #include "Source/Vulkan/VulkanRenderer.h"
+#endif
 
 #endif

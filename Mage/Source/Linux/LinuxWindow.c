@@ -30,6 +30,8 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
     );
 
     XMapWindow(window->WindowDisplay, window->ContextWindow);
+    XStoreName(window->WindowDisplay, window->ContextWindow, info->Title);
+
     XGrabPointer(
         window->WindowDisplay, 
         window->ContextWindow,

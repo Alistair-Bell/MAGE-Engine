@@ -5,6 +5,7 @@ project("MageEngine")
 
 option(PROJECT_BUILD_PLATFORM "Engine build platform target" "Windows")
 option(PROJECT_BUILD_UNIT_TESTS "Build engine unit tests" On)
+option(PROJECT_BUILD_RENDERER_MODE "Engine renderer backend API" "Vulkan")
 
 set(PACKAGE_NAME "${PROJECT_NAME}")
 set(PACKAGE_TARNAME "mage-enigne")
@@ -19,11 +20,13 @@ else()
 endif(MSVC)
 
 function(MageEngineAddDefinesAndFlagsToBinary binary)
+    
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_LINUX=1)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_WINDOWS=1)
     endif()
+
     if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         target_compile_options(${binary} PUBLIC "-g")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=1)
@@ -31,22 +34,32 @@ function(MageEngineAddDefinesAndFlagsToBinary binary)
         target_compile_options(${binary} PUBLIC "-O2")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
     endif()
-    target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN)
+
+    if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
+        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
+    else()
+        Message(FATAL_ERROR "Engine renderer backend not implimented")
+    endif()
+
 endfunction(MageEngineAddDefinesAndFlagsToBinary binary)
 
 function(MageEngineLinkPlatformLibrariesToBinary binary)
+
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_link_libraries(${binary} X11)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
     endif()
+    
 endfunction(MageEngineLinkPlatformLibrariesToBinary)
 
 function(MageEngineAddUnitTests binary source)
+
     add_executable(${binary} ${source})
     target_link_libraries(${binary} MageSDK)
     add_test(NAME ${binary} COMMAND ${binary})
     MageEngineLinkPlatformLibrariesToBinary(${binary})
     MageEngineAddDefinesAndFlagsToBinary(${binary})
+
 endfunction(MageEngineAddUnitTests binary source)
 
 
