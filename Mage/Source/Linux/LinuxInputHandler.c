@@ -23,8 +23,7 @@ U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *ha
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS)
         eventMask |= (SubstructureNotifyMask | FocusChangeMask | ExposureMask);
     
-    U64 i = XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
-    printf("%d\n", i);
+    XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
     return MageTrue;
 }
 U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window)
@@ -32,8 +31,8 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
     XEvent *e = &window->PollingEvent;
     while (XPending(window->WindowDisplay))
     {
-        printf("here\n");
         XNextEvent(window->WindowDisplay, e);
+        printf("Inform: Event id %d\n", e->type);
         switch (e->type)
         {
             case Expose:
@@ -69,9 +68,8 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
                 printf("Inform: Terminating window\n");
                 return MageFalse;
             }
-
         }
-    }    
+    }
     return MageTrue;
 }
 

@@ -41,6 +41,10 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         window->ContextCursor,
         CurrentTime
     );
+
+    Atom windowDelete = XInternAtom(window->WindowDisplay, "WM_DELETE_WINDOW", MageTrue);
+    XSetWMProtocols(window->WindowDisplay, window->ContextWindow, &windowDelete, MageTrue);
+
     return MageTrue;
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow *window)
