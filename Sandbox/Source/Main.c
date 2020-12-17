@@ -22,6 +22,7 @@ I32 main()
 
     MageEngineApplicationCreate(&engineCreateInfo, &engineContext);
 
+#if 0
     MageApplicationWindow *w = engineContext.Window;
     XEvent  *xe = &w->PollingEvent;
     Display *xd = w->WindowDisplay;
@@ -38,6 +39,9 @@ I32 main()
             case KeyPress: printf("Log: X11 Keycode : %d\n", xe->xkey.keycode); goto end;
         }
     }
+#endif
+
+    while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)) { }
 
     end:
     {

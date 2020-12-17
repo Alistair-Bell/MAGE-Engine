@@ -19,11 +19,12 @@ U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *ha
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD)
         eventMask |= (KeyPressMask | KeyReleaseMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE)
-        eventMask |= (ButtonPressMask | ButtonReleaseMask | PointerMotionHintMask | PointerMotionMask);
+        eventMask |= (ButtonPressMask | ButtonReleaseMask | PointerMotionMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS)
-        eventMask |= (EnterWindowMask | LeaveWindowMask | VisibilityChangeMask | ResizeRedirectMask | SubstructureNotifyMask | ExposureMask | FocusChangeMask);
+        eventMask |= (SubstructureNotifyMask | FocusChangeMask | ExposureMask);
     
-    XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
+    U64 i = XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
+    printf("%d\n", i);
     return MageTrue;
 }
 U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window)
@@ -31,6 +32,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
     XEvent *e = &window->PollingEvent;
     while (XPending(window->WindowDisplay))
     {
+        printf("here\n");
         XNextEvent(window->WindowDisplay, e);
         switch (e->type)
         {
@@ -59,6 +61,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
             }
             case MotionNotify:
             {
+                printf("[%d:%d]\n", e->xmotion.x, e->xmotion.y);
                 break;
             }
             case ClientMessage:

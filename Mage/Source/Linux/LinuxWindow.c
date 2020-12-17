@@ -2,7 +2,6 @@
 #include "../CreateStructures.h"
 #include "../Includes.h"
 
-
 U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window)
 {
     MAGE_HANDLE_ERROR_MESSAGE(info == NULL || window == NULL, printf("Error: Any passed parameters are NULL!\n"))

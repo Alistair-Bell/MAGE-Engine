@@ -12,8 +12,10 @@ U8 MageEngineApplicationCreate(MageEngineApplicationCreateInfo *info, MageEngine
     
     info->InputEventHandlerCreateInfo.ApplicationWindow = engine->Window;
     currentResult = MageInputHandlerCreate(&info->InputEventHandlerCreateInfo, engine->InputHandler);
+    MAGE_HANDLE_ERROR_MESSAGE(!currentResult, printf("Error: Failed to create engine\n")); /* macros are wacky */
+    
 
-    printf("Log: Created engine\n");
+    printf("Inform: Created engine\n");
     return currentResult;
 }
 U8 MageEngineApplicationDestroy(MageEngineApplication *engine)
