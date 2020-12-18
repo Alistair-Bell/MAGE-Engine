@@ -16,7 +16,7 @@ set(PACKAGE_LICENSE "GNU General Public License, version 3")
 if (MSVC)
     add_compile_options()
 else()
-    add_compile_options("-Werror" "-std=c99")
+    add_compile_options("-Wall" "-std=c99")
 endif(MSVC)
 
 function(MageEngineAddDefinesAndFlagsToBinary binary)
@@ -48,6 +48,11 @@ function(MageEngineLinkPlatformLibrariesToBinary binary)
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_link_libraries(${binary} X11)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
+    
+    endif()
+
+    if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
+        target_link_libraries(${binary} vulkan)
     endif()
     
 endfunction(MageEngineLinkPlatformLibrariesToBinary)

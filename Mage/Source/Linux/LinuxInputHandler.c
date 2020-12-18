@@ -32,7 +32,6 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
     while (XPending(window->WindowDisplay))
     {
         XNextEvent(window->WindowDisplay, e);
-        printf("Inform: Event id %d\n", e->type);
         switch (e->type)
         {
             case Expose:
@@ -60,7 +59,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
             }
             case MotionNotify:
             {
-                printf("[%d:%d]\n", e->xmotion.x, e->xmotion.y);
+                printf("Inform: [%d:%d]\n", e->xmotion.x, e->xmotion.y);
                 break;
             }
             case ClientMessage:

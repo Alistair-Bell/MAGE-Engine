@@ -5,11 +5,17 @@
 #include "CreateStructures.h"
 #include "Window.h"
 #include "InputHandler.h"
+#include "Renderer.h"
+
+#if MAGE_BUILD_RENDERER_VULKAN
+    #include "Vulkan/VulkanRenderer.h"
+#endif
 
 typedef struct MageEngineApplication
 {
     MageApplicationWindow       *Window;
     MageInputHandler            *InputHandler;
+    MageRenderer                *Renderer;
     U8                          Running;
 } MageEngineApplication;
 
