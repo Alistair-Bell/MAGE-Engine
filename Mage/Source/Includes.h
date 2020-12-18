@@ -32,8 +32,10 @@
     #include <vulkan/vulkan.h>
 
     #if MAGE_BUILD_PLATFORM_LINUX
+        #define VK_USE_PLATFORM_XLIB_KHR
         #include <vulkan/vulkan_xlib.h>
     #elif MAGE_BUILD_PLATFORM_WINDOWS
+        #define VK_USE_PLATFORM_WIN32_KHR
         #include <vulkan/vulkan_win32.h>
     #endif
 #endif
