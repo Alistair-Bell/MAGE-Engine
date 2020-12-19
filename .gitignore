@@ -11,6 +11,8 @@ Makefile*
 *.sln
 *.vcxproj
 *.vcxproj.filters
+*.vs
+*.user
 
 # Macos generated build files
 *.pbxproj

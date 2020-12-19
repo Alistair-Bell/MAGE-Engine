@@ -20,7 +20,7 @@
     #define MageFalse 0
 #endif
 
-#if MAGE_BUILD_PLATFORM_LINUX
+#if MAGE_BUILD_PLATFORM_LINUX == 1
     #include <X11/Xlib.h>
     #include <X11/X.h>
     #include <X11/keysym.h>
@@ -43,7 +43,7 @@
 #if MAGE_BUILD_DEBUG_MODE
     #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute) if ((condition)) { execute; return MageFalse; }
 #else
-    #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute)
+    #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute) if ((condition)) { return MageFalse; }
 #endif
 
 typedef void U0;

@@ -8,12 +8,12 @@ typedef struct MageRenderer MageRenderer;
 
 typedef struct MageApplicationWindowCreateInfo
 {
-    U16         Width;
-    U16         Height;
-    I16         SpawnOffsetX;
-    I16         SpawnOffsetY;
-    U8          Resisable;
-    const char *Title; /* If created with the engine wrapper then it is automatically assigned as the ProgramName*/
+    U16                                Width;
+    U16                                Height;
+    I16                                SpawnOffsetX;
+    I16                                SpawnOffsetY;
+    U8                                 Resisable;
+    const char                        *Title; /* If created with the engine wrapper then it is automatically assigned as the ProgramName */
 } MageApplicationWindowCreateInfo;
 
 typedef enum MageInputHandlerEventListenFlags

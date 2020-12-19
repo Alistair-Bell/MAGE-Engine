@@ -6,6 +6,7 @@ set(LIBRARY_SOURCES
     Source/Includes.h
     Source/CreateStructures.h
     Source/Window.h
+    Source/Renderer.h
 
     Source/UnitTests.h
     Source/UnitTests.c
@@ -25,8 +26,11 @@ if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         Source/Linux/LinuxWindow.c
         Source/Linux/LinuxInputHandler.c
     )
-else()
-    message(FATAL_ERROR "Platform ${PROJECT_BUILD_PLATFORM} has not been implimented or invalid!!")
+elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
+	set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
+		Source/Windows/WindowsWindow.c
+		Source/Windows/WindowsInputHandler.c
+	)
 endif()
 
 if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
@@ -38,3 +42,4 @@ endif()
 
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
 MageEngineAddDefinesAndFlagsToBinary(${PROJECT_NAME})
+MageEngineLinkPlatformLibrariesToBinary(${PROJECT_NAME})

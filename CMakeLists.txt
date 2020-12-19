@@ -23,17 +23,23 @@ else()
     add_compile_options("-Wall" "-std=c99")
 endif(MSVC)
 
+if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
+	find_package(Vulkan)
+endif()
+
 function(MageEngineAddDefinesAndFlagsToBinary binary)
     
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_LINUX=1)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
-        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_WINDOWS=1)
+		target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_WINDOWS=1)
     endif()
 
-    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         target_compile_options(${binary} PUBLIC "-g")
-        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=1)
+    if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+		if (NOT MSVC)
+			target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=1)
+		endif()
     else()
         target_compile_options(${binary} PUBLIC "-O2")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
@@ -56,15 +62,16 @@ function(MageEngineLinkPlatformLibrariesToBinary binary)
     endif()
 
     if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-        target_link_libraries(${binary} vulkan)
+        target_link_libraries(${binary} Vulkan::Vulkan)
+		target_include_directories(${binary} PUBLIC ${Vulkan_INCLUDE_DIRS})
     endif()
     
 endfunction(MageEngineLinkPlatformLibrariesToBinary)
 
 function(MageEngineAddUnitTests binary source)
-
+    
     add_executable(${binary} ${source})
-    target_link_libraries(${binary} MageSDK)
+	target_link_libraries(${binary} MageSDK)
     add_test(NAME ${binary} COMMAND ${binary})
     MageEngineLinkPlatformLibrariesToBinary(${binary})
     MageEngineAddDefinesAndFlagsToBinary(${binary})

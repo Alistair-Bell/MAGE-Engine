@@ -6,7 +6,7 @@
 
 #if MAGE_BUILD_PLATFORM_LINUX
 
-/* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :| */
+/* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :|*/
 
 typedef struct MageApplicationWindow
 {
@@ -20,12 +20,19 @@ typedef struct MageApplicationWindow
 
 #elif MAGE_BUILD_PLATFORM_WINDOWS
 
+typedef struct MageApplicationWindow
+{
+    HINSTANCE   Instance;
+    HWND        NativeWindow;
+    WNDCLASSEX  NativeWindowClass;
+} MageApplicationWindow;
+
 #else
-    #error "Platform not implimented"
+    #error Platform has not been implimented!
 #endif
 
 
-extern U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window);
-extern U8 MageApplicationWindowDestroy(MageApplicationWindow *window);
+extern U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplicationWindow* window);
+extern U8 MageApplicationWindowDestroy(MageApplicationWindow* window);
 
 #endif
