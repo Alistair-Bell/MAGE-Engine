@@ -36,6 +36,5 @@ if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
     )
 endif()
 
-
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
 MageEngineAddDefinesAndFlagsToBinary(${PROJECT_NAME})

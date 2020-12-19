@@ -27,8 +27,11 @@ U8 MageEngineApplicationCreate(MageEngineApplicationCreateInfo *info, MageEngine
 }
 U8 MageEngineApplicationDestroy(MageEngineApplication *engine)
 {
+    MageInputHandlerDestroy(engine->InputHandler);
+    MageRendererDestroy(engine->Renderer);
     MageApplicationWindowDestroy(engine->Window);
     free(engine->Window);
     free(engine->InputHandler);
+    free(engine->Renderer);
     return MageTrue;
 }

@@ -7,6 +7,10 @@ option(PROJECT_BUILD_PLATFORM "Engine build platform target" "Windows")
 option(PROJECT_BUILD_UNIT_TESTS "Build engine unit tests" On)
 option(PROJECT_BUILD_RENDERER_MODE "Engine renderer backend API" "Vulkan")
 
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 1)
+set(PROJECT_VERSION_PATCH 0)
+
 set(PACKAGE_NAME "${PROJECT_NAME}")
 set(PACKAGE_TARNAME "mage-enigne")
 set(PACKAGE_VERSION "${PROJECT_VERSION}")
