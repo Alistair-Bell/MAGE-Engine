@@ -26,6 +26,7 @@
     #include <X11/keysym.h>
 #elif MAGE_BUILD_PLATFORM_WINDOWS
     #include <Windows.h>
+    #include <windowsx.h>
 #endif
 
 #if MAGE_BUILD_RENDERER_VULKAN

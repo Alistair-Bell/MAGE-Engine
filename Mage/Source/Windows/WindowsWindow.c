@@ -1,23 +1,7 @@
 #include "../Includes.h"
 #include "../Window.h"
+#include "../InputHandler.h"
 
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	switch (message)
-	{
-		case WM_DESTROY:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-		case WM_CLOSE:
-		{
-			PostQuitMessage(0);
-			return 0;
-		}
-	}
-	return DefWindowProc(hWnd, message, wParam, lParam);
-}
 
 U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplicationWindow* window)
 {
@@ -40,7 +24,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 	ZeroMemory(&window->NativeWindowClass, sizeof(WNDCLASSEX));
 	window->NativeWindowClass.cbSize        = sizeof(window->NativeWindowClass);
 	window->NativeWindowClass.style         = CS_HREDRAW | CS_VREDRAW;
-	window->NativeWindowClass.lpfnWndProc   = WindowProc;
+	window->NativeWindowClass.lpfnWndProc   = MageInputHandlerWindowsEventListener;
 	window->NativeWindowClass.hInstance	    = window->Instance;
 	window->NativeWindowClass.hIcon		    = LoadIcon(NULL, IDI_APPLICATION);
 	window->NativeWindowClass.hCursor       = LoadCursor(NULL, IDC_ARROW);
@@ -52,9 +36,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 	MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Error: Failed to register win32 class!\n"));
 
 	if (info->Resisable)
-	{
 		dwStyle |= WS_THICKFRAME;
-	}
 	
 	window->NativeWindow = CreateWindowEx(
 		windowStyle, 
