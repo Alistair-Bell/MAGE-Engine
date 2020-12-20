@@ -11,8 +11,7 @@ I32 main()
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
     windowCreateInfo.Height             = 1080;
     windowCreateInfo.Width              = 1920;
-    windowCreateInfo.Resisable          = MageFalse;
-    windowCreateInfo.FullScreen         = MageTrue;
+    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE | MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING;
     
     MageInputHandlerCreateInfo inputCreateInfo;
     memset(&inputCreateInfo, 0, sizeof(MageInputHandlerCreateInfo));
@@ -27,6 +26,8 @@ I32 main()
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
     
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
+    MageApplicationWindowSetTitle(engineContext.Window, "New Name Was Set");
+
     while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
     MageEngineApplicationDestroy(&engineContext);
 

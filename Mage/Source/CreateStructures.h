@@ -6,14 +6,19 @@
 typedef struct MageApplicationWindow MageApplicationWindow;
 typedef struct MageRenderer MageRenderer;
 
+typedef enum MageApplicationWindowCreateFlags
+{
+    MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING = 0x01,
+    MAGE_APPLICATION_WINDOW_CREATE_FLAGS_FULLSCREEN     = 0x02,
+    MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE    = 0x04,
+} MageApplicationWindowCreateFlags;
 typedef struct MageApplicationWindowCreateInfo
 {
     U16                                Width;
     U16                                Height;
     I16                                SpawnOffsetX;
     I16                                SpawnOffsetY;
-    U8                                 Resisable;
-    U8                                 FullScreen;
+    MageApplicationWindowCreateFlags   Flags;
     const char                        *Title; /* If created with the engine wrapper then it is automatically assigned as the ProgramName */
 } MageApplicationWindowCreateInfo;
 

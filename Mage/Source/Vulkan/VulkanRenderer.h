@@ -14,7 +14,8 @@ typedef struct MageRendererOverseer
 
 typedef struct MageRendererSurface
 {
-    VkSurfaceKHR            Surface;
+    VkSurfaceKHR             Surface;
+    VkSurfaceCapabilitiesKHR Capabilities;
 } MageRendererSurface;
 
 typedef struct MageRendererPhysicalDeviceQueueFamilies /* Queue has 4 silent letters, the english language is a wacky language */
@@ -38,12 +39,18 @@ typedef struct MageRendererQueues
     VkQueue                 PresentQueue;
 } MageRendererQueues;
 
+typedef struct MageRendererSwapChain
+{
+    VkSwapchainKHR          PrimarySwapchain;
+} MageRendererSwapChain;
+
 typedef struct MageRenderer
 {
     MageRendererOverseer        Overseer;
     MageRendererSurface         Surface;
     MageRendererPhysicalDevice  Device;
     MageRendererQueues          QueueHandles;
+    MageRendererSwapChain       SwapChain;
 } MageRenderer;
 
 
@@ -55,6 +62,7 @@ extern U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRe
 
 extern U64 MageVulkanRendererRatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer, VkPhysicalDevice device);
 extern U8  MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPhysicalDevice device, MageRendererPhysicalDeviceQueueFamilies *families);
+extern U8  MageVulkanRendererFindPhysicalDeviceExtensions(VkPhysicalDevice device, const char *deviceExtensions[], const U32 count);
 
 extern U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
 extern U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);

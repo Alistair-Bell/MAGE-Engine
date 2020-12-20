@@ -11,16 +11,17 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 
 	/* Using primary screen */
 
-	if (info->SpawnOffsetX == 0)
-		info->SpawnOffsetX = (GetSystemMetrics(SM_CXSCREEN) - info->Width) / 2;
-	if (info->SpawnOffsetY == 0)
+	if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE)
+	{
+		info->SpawnOffsetX = (GetSystemMetrics(SM_CXSCREEN) - info->Width)  / 2;
 		info->SpawnOffsetY = (GetSystemMetrics(SM_CYSCREEN) - info->Height) / 2;
+	}
 
 	/* Todo, allow user customisation */
 	DWORD dwExStyle   = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	DWORD dwStyle     = WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
 
-	if (info->FullScreen)
+	if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_FULLSCREEN)
 	{
 		dwExStyle = 0;
 		dwStyle   = WS_VISIBLE | WS_POPUP;
@@ -32,8 +33,8 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		U8 result = GetMonitorInfo(mainMonitor, &monitorInfo);
 		MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Failed to query Win32 monitor info\n"));
 		printf("Inform: Creating fullscreen Win32 application using primary monitor, dimensions [%d:%d]\n", monitorInfo.rcMonitor.right, monitorInfo.rcMonitor.bottom);
-		info->Width        = monitorInfo.rcMonitor.right;
-		info->Height       = monitorInfo.rcMonitor.bottom;
+		info->Width        = (U16)monitorInfo.rcMonitor.right;
+		info->Height       = (U16)monitorInfo.rcMonitor.bottom;
 		info->SpawnOffsetX = 0;
 		info->SpawnOffsetY = 0;
 	}
@@ -52,7 +53,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 	ATOM result = RegisterClassEx(&window->NativeWindowClass);
 	MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Error: Failed to register Win32 class!\n"));
 
-	if (info->Resisable)
+	if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING)
 		dwStyle |= WS_THICKFRAME;
 	
 	window->NativeWindow = CreateWindowEx(
@@ -72,6 +73,10 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 
 	printf("Inform: Created Win32 window\n");
 	return MageTrue;
+}
+U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName)
+{
+	return SetWindowText(window->NativeWindow, TEXT(newName));
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow* window)
 {

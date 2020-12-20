@@ -4,7 +4,6 @@
 static const char *MageRequiredExtensions[] = 
 {
     VK_KHR_SURFACE_EXTENSION_NAME,
-    
     #if MAGE_BUILD_PLATFORM_LINUX
         VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
     #elif MAGE_BUILD_PLATFORM_WINDOWS
@@ -15,6 +14,7 @@ static const char *MageRequiredExtensions[] =
         VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
     #endif
 };
+
 
 typedef U8 (*MageVulkanCreateCallback)(MageRendererCreateInfo *, MageRenderer *);
 
@@ -121,6 +121,16 @@ U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *
 
     return result == VK_SUCCESS;
 }
+U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer)
+{
+    VkSwapchainCreateInfoKHR swapchainInfo;
+    memset(&swapchainInfo, 0, sizeof(VkSwapchainCreateInfoKHR));
+    swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+
+
+    //vkCreateSwapchainKHR(renderer->Device.LogicalDevice, &swapchainInfo, NULL, &renderer->SwapChain.PrimarySwapchain);
+    return MageTrue;
+}
 
 U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
@@ -134,7 +144,8 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
             MageVulkanRendererCreateDebugLayers,
         #endif
         MageVulkanRendererCreateSurface,
-        MageVulkanRendererCreatePhysicalDevice
+        MageVulkanRendererCreatePhysicalDevice,
+        MageVulkanRendererCreateSwapChain
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -160,6 +171,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     #endif
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyDevice(renderer->Device.LogicalDevice, NULL);
+    //vkDestroySwapchainKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);
     return MageTrue;
 }

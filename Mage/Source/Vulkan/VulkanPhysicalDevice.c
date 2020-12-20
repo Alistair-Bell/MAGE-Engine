@@ -1,5 +1,38 @@
 #include "VulkanRenderer.h"
 
+static const char *MageRequiredDeviceExtensions[] = 
+{
+    VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+};
+
+U8 MageVulkanRendererFindPhysicalDeviceExtensions(VkPhysicalDevice device, const char *deviceExtensions[], const U32 count)
+{
+    U32 extensionCount;
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, NULL);
+    if (extensionCount < count)
+        return MageFalse;
+    VkExtensionProperties *extensions = calloc(extensionCount, sizeof(VkExtensionProperties));
+    vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, extensions);
+    
+    U32 i, j;
+    U32 foundCount = 0;
+    for (i = 0; i < count; i++)
+    {
+        const char *current = deviceExtensions[i];
+        for (j = 0; j < extensionCount; i++)
+        {
+            if (strcmp(current, extensions[j].extensionName))
+            {
+                foundCount++;
+                break;
+            }
+        }
+    }
+
+
+    free(extensions);
+    return (foundCount == count);
+}
 U64 MageVulkanRendererRatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer, VkPhysicalDevice device)
 {
     U64 score = 0;
@@ -126,15 +159,21 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
     queueCreateInfo.queueCount          = 1;
     queueCreateInfo.pQueuePriorities    = (F32[]) { 1.0f };
     
+    U32 reqCount = sizeof(MageRequiredDeviceExtensions) / sizeof(const char *);
+
+    U8 result = MageVulkanRendererFindPhysicalDeviceExtensions(rd->GPU, MageRequiredDeviceExtensions, reqCount);
+    MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Error: Unable to find required device extensions\n"));
 
     VkDeviceCreateInfo deviceCreateInfo;
     memset(&deviceCreateInfo, 0, sizeof(VkDeviceCreateInfo));
     deviceCreateInfo.sType                       = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.pQueueCreateInfos           = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount        = 1;
+    deviceCreateInfo.ppEnabledExtensionNames     = MageRequiredDeviceExtensions;
+    deviceCreateInfo.enabledExtensionCount       = reqCount;
     
-    VkResult result = vkCreateDevice(renderer->Device.GPU, &deviceCreateInfo, NULL, &renderer->Device.LogicalDevice);
+    VkResult createResult = vkCreateDevice(renderer->Device.GPU, &deviceCreateInfo, NULL, &renderer->Device.LogicalDevice);
 
     vkGetDeviceQueue(rd->LogicalDevice, renderer->Device.QueueFamilies.GraphicsFamilyIndex, 0, &renderer->QueueHandles.GraphicsQueue);
-    return result == VK_SUCCESS;
+    return createResult == VK_SUCCESS;
 }

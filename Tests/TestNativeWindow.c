@@ -7,7 +7,7 @@ static U8 TestNativeWindowCreate(U0 *data)
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
     windowCreateInfo.Title          = "Native Window";
-    windowCreateInfo.Resisable      = 0;
+    windowCreateInfo.Flags          = 0;
     windowCreateInfo.Width          = 1920;
     windowCreateInfo.Height         = 1080;
     U8 result = MageApplicationWindowCreate(&windowCreateInfo, &window);
