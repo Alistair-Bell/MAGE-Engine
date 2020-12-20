@@ -137,6 +137,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
         MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
     #endif
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
+    vkDestroyDevice(renderer->Device.LogicalDevice, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);
     return MageTrue;
 }

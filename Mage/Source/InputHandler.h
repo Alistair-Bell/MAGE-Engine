@@ -11,6 +11,7 @@
 typedef enum MageKeyboardKey
 {
     MAGE_KEYBOARD_KEY_A = 0,
+	MAGE_KEYBOARD_KEY_B,
     MAGE_KEYBOARD_KEY_C,
     MAGE_KEYBOARD_KEY_D,
     MAGE_KEYBOARD_KEY_E,
@@ -30,6 +31,7 @@ typedef enum MageKeyboardKey
     MAGE_KEYBOARD_KEY_S,
     MAGE_KEYBOARD_KEY_T,
     MAGE_KEYBOARD_KEY_U,
+	MAGE_KEYBOARD_KEY_V,
     MAGE_KEYBOARD_KEY_W,
     MAGE_KEYBOARD_KEY_X,
     MAGE_KEYBOARD_KEY_Y,
@@ -45,8 +47,8 @@ typedef enum MageKeyboardKey
 	MAGE_KEYBOARD_KEY_SEMI_COLON,
 
     MAGE_KEYBOARD_KEY_LEFT_BRACKET,
-	MAGE_KEYBOARD_KEY_BACKSLASH,
 	MAGE_KEYBOARD_KEY_RIGHT_BRACKET,
+	MAGE_KEYBOARD_KEY_BACKSLASH,
 	MAGE_KEYBOARD_KEY_GRAVE_ACCENT,
 	MAGE_KEYBOARD_KEY_ESCAPE,
 	MAGE_KEYBOARD_KEY_ENTER,
@@ -67,6 +69,10 @@ typedef enum MageKeyboardKey
 	MAGE_KEYBOARD_KEY_NUM_LOCK,
 	MAGE_KEYBOARD_KEY_PRINT_SCREEN,
 	MAGE_KEYBOARD_KEY_PAUSE,
+	MAGE_KEYBOARD_KEY_ADD,
+	MAGE_KEYBOARD_KEY_SUBTRACT,
+	MAGE_KEYBOARD_KEY_MULTIPLY,
+	MAGE_KEYBOARD_KEY_DIVIDE,
 
     MAGE_KEYBOARD_KEY_1,
     MAGE_KEYBOARD_KEY_2,
@@ -118,14 +124,16 @@ typedef enum MageKeyboardKey
 	MAGE_KEYBOARD_KEY_RIGHT_SHIFT,
 	MAGE_KEYBOARD_KEY_RIGHT_CONTROL,
 	MAGE_KEYBOARD_KEY_RIGHT_ALT,
-	MAGE_KEYBOARD_KEY_RIGHT_SUPER
+	MAGE_KEYBOARD_KEY_RIGHT_SUPER,
+	MAGE_KEYBOARD_KEY_UNDEFINED
 } MageKeyboardKey;
 
 typedef enum MageMouseButton
 {
     MAGE_MOUSE_BUTTON_LEFT = 0,
     MAGE_MOUSE_BUTTON_RIGHT,
-    MAGE_MOUSE_BUTTON_MIDDLE /* Clicking down on mouse wheel */
+    MAGE_MOUSE_BUTTON_MIDDLE, /* Clicking down on mouse wheel */
+	MAGE_MOUSE_BUTTON_UNDEFINED
 } MageMouseButton;
 
 typedef enum MageButtonState
@@ -135,14 +143,22 @@ typedef enum MageButtonState
     MAGE_BUTTON_STATE_RELEASE = 0x04
 } MageButtonState;
 
+typedef enum MageKeyboardStatusFlags
+{
+	MAGE_KEYBOARD_STATUS_FLAGS_CAPS_LOCK_MODE = 0x01,
+	MAGE_KEYBOARD_STATUS_FLAGS_NUM_LOCK_MODE  = 0x02,
+	MAGE_KEYBOARD_STATUS_SCROLL_LOCK          = 0x04
+} MageKeyboardStatusFlags;
+
 typedef struct MageInputHandler
 {
-    U8              MouseStates[MAGE_MOUSE_STATE_COUNT];
-    U8              KeyboardStates[MAGE_KEYBOARD_STATE_COUNT];
-	U8				MouseFocused;
-    I32             MouseWheelPosition;
-    U32             MousePositionX;
-    U32             MousePositionY;
+	MageKeyboardStatusFlags StatusFlags;
+    U8                      MouseStates[MAGE_MOUSE_STATE_COUNT];
+    U8                      KeyboardStates[MAGE_KEYBOARD_STATE_COUNT];
+	U8				        MouseFocused;
+    I32                     MouseWheelPosition;
+    U32                     MousePositionX;
+    U32                     MousePositionY;
 } MageInputHandler;
 
 /* Following implimented by native window frameworks */
@@ -152,6 +168,7 @@ extern U8 MageInputHandlerPollEvents(MageInputHandler* handler, MageApplicationW
 extern U8 MageInputHandlerDestroy(MageInputHandler* handler);
 
 extern MageKeyboardKey MageInputHandlerTranslateKeyCodes(MageInputHandler *handler, const U64 code);
+extern MageMouseButton MageInputHandlerTranslateMouseCode(MageInputHandler *handler, const U64 code);
 
 #if MAGE_BUILD_PLATFORM_WINDOWS
 	extern LRESULT CALLBACK MageInputHandlerWindowsEventListener(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
