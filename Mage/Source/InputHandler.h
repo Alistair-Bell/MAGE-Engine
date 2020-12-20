@@ -167,8 +167,8 @@ extern U8 MageInputHandlerCreate(MageInputHandlerCreateInfo* info, MageInputHand
 extern U8 MageInputHandlerPollEvents(MageInputHandler* handler, MageApplicationWindow* window);
 extern U8 MageInputHandlerDestroy(MageInputHandler* handler);
 
-extern MageKeyboardKey MageInputHandlerTranslateKeyCodes(MageInputHandler *handler, const U64 code);
-extern MageMouseButton MageInputHandlerTranslateMouseCode(MageInputHandler *handler, const U64 code);
+extern MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code);
+extern MageMouseButton MageInputHandlerTranslateMouseCode(const U64 code);
 
 #if MAGE_BUILD_PLATFORM_WINDOWS
 	extern LRESULT CALLBACK MageInputHandlerWindowsEventListener(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

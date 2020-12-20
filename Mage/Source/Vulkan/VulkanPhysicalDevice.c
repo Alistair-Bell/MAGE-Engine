@@ -91,7 +91,7 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
         }
         case 1:
         {
-            MageVulkanRendererRatePhysicalDevice(info, renderer, devices[0]);
+            scores[0] = MageVulkanRendererRatePhysicalDevice(info, renderer, devices[0]);
             goto settingDesiredDevice;
             break;
         }
@@ -104,10 +104,10 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
             leadingIndex = i;
     }
 
+    MageRendererPhysicalDevice *rd = &renderer->Device;
     settingDesiredDevice:
     {
         MAGE_HANDLE_ERROR_MESSAGE(scores[leadingIndex] == 0, printf("Error: Unable to find suitable vulkan device with desired features!\n"));
-        MageRendererPhysicalDevice *rd = &renderer->Device;
         rd->GPU = devices[leadingIndex];
         vkGetPhysicalDeviceProperties(rd->GPU, &rd->Properties);
         vkGetPhysicalDeviceMemoryProperties(rd->GPU, &rd->MemoryProperties);
@@ -133,11 +133,8 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
     deviceCreateInfo.pQueueCreateInfos           = &queueCreateInfo;
     deviceCreateInfo.queueCreateInfoCount        = 1;
     
-    #if MAGE_BUILD_DEBUG_MODE
-        deviceCreateInfo.ppEnabledLayerNames = (const char *[]) { "VK_LAYER_KHRONOS_validation" };
-        deviceCreateInfo.enabledLayerCount   = 1;
-    #endif
-
     VkResult result = vkCreateDevice(renderer->Device.GPU, &deviceCreateInfo, NULL, &renderer->Device.LogicalDevice);
+
+    vkGetDeviceQueue(rd->LogicalDevice, renderer->Device.QueueFamilies.GraphicsFamilyIndex, 0, &renderer->QueueHandles.GraphicsQueue);
     return result == VK_SUCCESS;
 }
