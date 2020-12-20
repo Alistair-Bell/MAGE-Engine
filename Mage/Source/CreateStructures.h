@@ -36,31 +36,15 @@ typedef struct MageInputHandlerCreateInfo
     MageApplicationWindow                       *ApplicationWindow; /* If created with the engine wrapper then it is automatically assigned */
 } MageInputHandlerCreateInfo;
 
-typedef enum MageRendererSurfaceFlags
-{
-    MAGE_RENDERER_SURFACE_FLAGS_USE_NATIVE_WINDOW_SIZE      = 0x01, /* Takes dimensions from active window */
-    MAGE_RENDERER_SURFACE_FLAGS_VIEWPORT_ENABLE_OFFSET      = 0x02, /* Allow for the offsetting of the viewport */
-} MageRendererSurfaceFlags;
-
 typedef struct MageRendererResizeHandleInfo
 {
     U16         Width;
     U16         Height;
 } MageRendererResizeHandleInfo;
 
-typedef struct MageRendererSurfaceCreateInfo
-{
-    U32                                         SurfaceWidth;
-    U32                                         SurfaceHeight;
-    U32                                         ViewportOffsetX;
-    U32                                         ViewportOffsetY;
-    MageRendererSurfaceFlags                    Flags;
-} MageRendererSurfaceCreateInfo;
-
 typedef struct MageRendererCreateInfo
 {
     MageApplicationWindow                       *Window;  /* If created with the engine wrapper then it is automatically assigned */
-    MageRendererSurfaceCreateInfo               SurfaceCreateInfo;
 } MageRendererCreateInfo;
 
 typedef struct MageEngineApplicationCreateInfo

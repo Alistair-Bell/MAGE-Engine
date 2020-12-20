@@ -2,19 +2,6 @@
 
 typedef U8 (*MageVulkanCreateCallback)(MageRendererCreateInfo *, MageRenderer *);
 
-static const char *MageRequiredInstanceExtensions[] = 
-{
-    #if MAGE_BUILD_PLATFORM_LINUX
-        VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
-        VK_KHR_SURFACE_EXTENSION_NAME,
-    #elif MAGE_BUILD_PLATFORM_WINDOWS
-        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
-    #endif
-    #if MAGE_BUILD_DEBUG_MODE
-        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
-    #endif
-};
-
 static U0 MageVulkanRendererDestroyValidationLayers(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 {
     PFN_vkDestroyDebugUtilsMessengerEXT function = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
@@ -61,8 +48,8 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
     memset(&instanceInfo, 0, sizeof(VkInstanceCreateInfo));
     instanceInfo.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.pApplicationInfo        = &applicationInfo;
-    instanceInfo.enabledExtensionCount   = sizeof(MageRequiredInstanceExtensions) / sizeof(const char *);
-    instanceInfo.ppEnabledExtensionNames = MageRequiredInstanceExtensions;
+    instanceInfo.enabledExtensionCount   = sizeof(MageVulkanRendererRequiredExtensions) / sizeof(const char *);
+    instanceInfo.ppEnabledExtensionNames = MageVulkanRendererRequiredExtensions;
 
     #if MAGE_BUILD_DEBUG_MODE
         VkDebugUtilsMessengerCreateInfoEXT data;
@@ -74,7 +61,6 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
 
     
     VkResult result = vkCreateInstance(&instanceInfo, NULL, &renderer->Overseer.Instance);
-    MAGE_HANDLE_ERROR_MESSAGE(result != VK_SUCCESS, printf("Error: Failed to create vulkan instance. Error code %d\n", (I32)result));
     return result == VK_SUCCESS;
 }
 U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer)
@@ -125,7 +111,8 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         #if MAGE_BUILD_DEBUG_MODE
             MageVulkanRendererCreateDebugLayers,
         #endif
-        MageVulkanRendererCreateSurface
+        MageVulkanRendererCreateSurface,
+        MageVulkanRendererCreatePhysicalDevice
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -134,7 +121,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
     for (i = 0; i < count; i++)
     {
         VkResult current = methods[i](info, renderer);
-        MAGE_HANDLE_ERROR_MESSAGE(!current, printf("Error: Failed to create renderer\n"));
+        MAGE_HANDLE_ERROR_MESSAGE(!current, printf("Error: Failed to create renderer, passed %lu of %lu operations\n", i, count));
     }
     printf("Inform: Renderer has been created, passed %lu of %lu operations\n", i, count);
     return MageTrue;

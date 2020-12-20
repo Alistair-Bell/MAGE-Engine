@@ -37,6 +37,8 @@ if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
         Source/Vulkan/VulkanRenderer.h
         Source/Vulkan/VulkanRenderer.c
+	Source/Vulkan/VulkanPhysicalDevice.c
+	Source/Vulkan/VulkanLoader.c
     )
 endif()
 

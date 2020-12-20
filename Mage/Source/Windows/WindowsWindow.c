@@ -33,7 +33,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 	window->NativeWindowClass.hIcon         = LoadIcon(NULL, IDI_WINLOGO);
 	
 	ATOM result = RegisterClassEx(&window->NativeWindowClass);
-	MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Error: Failed to register win32 class!\n"));
+	MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Error: Failed to register Win32 class!\n"));
 
 	if (info->Resisable)
 		dwStyle |= WS_THICKFRAME;
@@ -53,7 +53,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		NULL
 	);
 
-	printf("Inform: Created Win32 windows\n");
+	printf("Inform: Created Win32 window\n");
 	return MageTrue;
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow* window)

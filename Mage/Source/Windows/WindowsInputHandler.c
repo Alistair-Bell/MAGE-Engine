@@ -3,7 +3,7 @@
 
 static MageInputHandler *StaticHandler;
 
-U8 MageInputHandlerCreate(MageInputHandlerCreateInfo* info, MageInputHandler* handler)
+U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *handler)
 { 
 	memset(handler, 0, sizeof(MageInputHandler));
 	StaticHandler = handler;
@@ -48,12 +48,12 @@ LRESULT CALLBACK MageInputHandlerWindowsEventListener(HWND hWnd, UINT uMsg, WPAR
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
-U8 MageInputHandlerPollEvents(MageInputHandler* handler, MageApplicationWindow* window)
+U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window)
 {
 	MSG message;
 	while (MageTrue)
 	{
-		while(PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
+		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&message);
 

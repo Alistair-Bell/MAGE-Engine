@@ -3,13 +3,9 @@
 I32 main()
 {
     MageEngineApplication engineContext;
-
-    MageRendererSurfaceCreateInfo surfaceCreateInfo;
-    surfaceCreateInfo.Flags = MAGE_RENDERER_SURFACE_FLAGS_USE_NATIVE_WINDOW_SIZE;
-    
+   
     MageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(MageRendererCreateInfo));
-    rendererCreateInfo.SurfaceCreateInfo = surfaceCreateInfo;
        
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
@@ -28,15 +24,11 @@ I32 main()
     engineCreateInfo.ApplicationWindowCreateInfo = windowCreateInfo;
     engineCreateInfo.InputEventHandlerCreateInfo = inputCreateInfo;
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
- 
-    MageEngineApplicationCreate(&engineCreateInfo, &engineContext);
-    while(MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
+    
+    if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
+    while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
+    MageEngineApplicationDestroy(&engineContext);
 
-    end:
-    {
-        MageEngineApplicationDestroy(&engineContext);
-        printf("Inform: Ran successfully\n");
-        return MageTrue;
-
-    }
+    printf("Inform: Ran successfully\n");
+    return MageTrue;
 }
