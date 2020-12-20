@@ -1,6 +1,6 @@
 #include <Mage.h>
 
-int main()
+I32 main()
 {
     MageEngineApplication engineContext;
 
@@ -30,22 +30,9 @@ int main()
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
  
     MageEngineApplicationCreate(&engineCreateInfo, &engineContext);
-    
-    MSG msg;
+    while(MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
 
-	while (MageTrue)
-	{
-		while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-
-			DispatchMessage(&msg);
-		}
-
-		if (msg.message == WM_QUIT) goto end;
-	}
-
-	end:
+    end:
     {
         MageEngineApplicationDestroy(&engineContext);
         printf("Inform: Ran successfully\n");

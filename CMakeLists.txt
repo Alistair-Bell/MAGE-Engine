@@ -24,7 +24,7 @@ else()
 endif(MSVC)
 
 if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-	find_package(Vulkan)
+    find_package(Vulkan)
 endif()
 
 function(MageEngineAddDefinesAndFlagsToBinary binary)

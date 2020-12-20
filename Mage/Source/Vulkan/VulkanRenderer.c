@@ -42,7 +42,8 @@ static U0 MageVulkanRendererFillValidationLayerCreateInfo(VkDebugUtilsMessengerC
 
 VKAPI_ATTR VkBool32 VKAPI_CALL MageVulkanValidationLayersCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, U0 *pUserData)
 {
-    if (messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT && messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
+    // messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT && 
+    if (messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
         printf("Warning: Vulkan validation layer message: %s\n", pCallbackData->pMessage);
     return VK_SUCCESS;
 }
@@ -84,6 +85,34 @@ U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRendere
 
     return result == VK_SUCCESS;
 }
+U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *renderer)
+{
+    VkResult result;
+
+#if MAGE_BUILD_PLATFORMS_WINDOWS
+
+    VkWin32SurfaceCreateInfoKHR win32SurfaceInfo;
+    memset(&win32SurfaceInfo, 0, sizeof(VkWin32SurfaceCreateInfoKHR));
+    win32SurfaceInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    win32SurfaceInfo.flags     = 0;
+    win32SurfaceInfo.hinstance = info->Window->Instance;
+    win32SurfaceInfo.hwnd      = info->Window->NativeWindow;
+    result = vkCreateWin32SurfaceKHR(renderer->Overseer.Instance, &win32SurfaceInfo, NULL, &renderer->Surface.Surface);
+
+#elif MAGE_BUILD_PLATFORM_LINUX
+    
+    VkXlibSurfaceCreateInfoKHR xlibSurfaceInfo;
+    memset(&xlibSurfaceInfo, 0, sizeof(VkXlibSurfaceCreateInfoKHR));
+    xlibSurfaceInfo.sType   = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    xlibSurfaceInfo.flags   = 0;
+    xlibSurfaceInfo.window  = info->Window->ContextWindow;
+    xlibSurfaceInfo.dpy     = info->Window->WindowDisplay;
+    result = vkCreateXlibSurfaceKHR(renderer->Overseer.Instance, &xlibSurfaceInfo, NULL, &renderer->Surface.Surface);
+
+#endif
+
+    return result == VK_SUCCESS;
+}
 
 U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
@@ -96,6 +125,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         #if MAGE_BUILD_DEBUG_MODE
             MageVulkanRendererCreateDebugLayers,
         #endif
+        MageVulkanRendererCreateSurface
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -115,9 +145,11 @@ U8 MageRendererHandleWindowResize(MageRenderer *renderer)
 }
 U8 MageRendererDestroy(MageRenderer *renderer)
 {
+
     #if MAGE_BUILD_DEBUG_MODE
         MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
     #endif
+    vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);
     return MageTrue;
 }

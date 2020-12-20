@@ -3,6 +3,7 @@
 
 #include "../Includes.h"
 #include "../CreateStructures.h"
+#include "../Window.h"
 
 typedef struct MageRendererOverseer
 {
@@ -11,9 +12,15 @@ typedef struct MageRendererOverseer
     VkDebugUtilsMessengerEXT DebugMessenger;
 } MageRendererOverseer;
 
+typedef struct MageRendererSurface
+{
+    VkSurfaceKHR            Surface;
+} MageRendererSurface;
+
 typedef struct MageRenderer
 {
     MageRendererOverseer Overseer;
+    MageRendererSurface  Surface;
 } MageRenderer;
 
 extern U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer);

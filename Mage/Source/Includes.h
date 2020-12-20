@@ -2,10 +2,10 @@
 #define INCLUDES_H
 
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifndef NULL
@@ -20,7 +20,7 @@
     #define MageFalse 0
 #endif
 
-#if MAGE_BUILD_PLATFORM_LINUX == 1
+#if MAGE_BUILD_PLATFORM_LINUX
     #include <X11/Xlib.h>
     #include <X11/X.h>
     #include <X11/keysym.h>
