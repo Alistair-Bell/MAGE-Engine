@@ -17,9 +17,26 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		info->SpawnOffsetY = (GetSystemMetrics(SM_CYSCREEN) - info->Height) / 2;
 
 	/* Todo, allow user customisation */
-	DWORD windowStyle = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
+	DWORD dwExStyle   = WS_EX_APPWINDOW | WS_EX_WINDOWEDGE;
 	DWORD dwStyle     = WS_CAPTION | WS_SYSMENU | WS_VISIBLE;
 
+	if (info->FullScreen)
+	{
+		dwExStyle = 0;
+		dwStyle   = WS_VISIBLE | WS_POPUP;
+		HMONITOR mainMonitor = MonitorFromWindow(window->NativeWindow, MONITOR_DEFAULTTONEAREST);
+		MONITORINFO monitorInfo;
+		ZeroMemory(&monitorInfo, sizeof(MONITORINFO));
+		monitorInfo.cbSize = sizeof(MONITORINFO);
+
+		U8 result = GetMonitorInfo(mainMonitor, &monitorInfo);
+		MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Failed to query Win32 monitor info\n"));
+		printf("Inform: Creating fullscreen Win32 application using primary monitor, dimensions [%d:%d]\n", monitorInfo.rcMonitor.right, monitorInfo.rcMonitor.bottom);
+		info->Width        = monitorInfo.rcMonitor.right;
+		info->Height       = monitorInfo.rcMonitor.bottom;
+		info->SpawnOffsetX = 0;
+		info->SpawnOffsetY = 0;
+	}
 
 	ZeroMemory(&window->NativeWindowClass, sizeof(WNDCLASSEX));
 	window->NativeWindowClass.cbSize        = sizeof(window->NativeWindowClass);
@@ -39,7 +56,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		dwStyle |= WS_THICKFRAME;
 	
 	window->NativeWindow = CreateWindowEx(
-		windowStyle, 
+		dwExStyle , 
 		TEXT("MainWindow"),
 		TEXT(info->Title), 
 		dwStyle, 

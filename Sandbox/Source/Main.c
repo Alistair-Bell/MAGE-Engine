@@ -12,6 +12,7 @@ I32 main()
     windowCreateInfo.Height             = 1080;
     windowCreateInfo.Width              = 1920;
     windowCreateInfo.Resisable          = MageFalse;
+    windowCreateInfo.FullScreen         = MageTrue;
     
     MageInputHandlerCreateInfo inputCreateInfo;
     memset(&inputCreateInfo, 0, sizeof(MageInputHandlerCreateInfo));

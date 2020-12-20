@@ -13,6 +13,7 @@ typedef struct MageApplicationWindowCreateInfo
     I16                                SpawnOffsetX;
     I16                                SpawnOffsetY;
     U8                                 Resisable;
+    U8                                 FullScreen;
     const char                        *Title; /* If created with the engine wrapper then it is automatically assigned as the ProgramName */
 } MageApplicationWindowCreateInfo;
 
