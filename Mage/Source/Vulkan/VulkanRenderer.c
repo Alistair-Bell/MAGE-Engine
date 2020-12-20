@@ -1,5 +1,21 @@
 #include "VulkanRenderer.h"
 
+
+static const char *MageRequiredExtensions[] = 
+{
+    VK_KHR_SURFACE_EXTENSION_NAME,
+    
+    #if MAGE_BUILD_PLATFORM_LINUX
+        VK_KHR_XLIB_SURFACE_EXTENSION_NAME,
+    #elif MAGE_BUILD_PLATFORM_WINDOWS
+        VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
+    #endif
+    
+    #if MAGE_BUILD_DEBUG_MODE
+        VK_EXT_DEBUG_UTILS_EXTENSION_NAME,
+    #endif
+};
+
 typedef U8 (*MageVulkanCreateCallback)(MageRendererCreateInfo *, MageRenderer *);
 
 static U0 MageVulkanRendererDestroyValidationLayers(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
@@ -37,7 +53,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MageVulkanValidationLayersCallback(VkDebugUtilsMe
 
 U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
-    U8 foundExtensions = MageVulkanRendererValidateExtensionsPresent(MageVulkanRendererRequiredExtensions, sizeof(MageVulkanRendererRequiredExtensions) / sizeof(const char *));
+    U8 foundExtensions = MageVulkanRendererValidateExtensionsPresent(MageRequiredExtensions, sizeof(MageRequiredExtensions) / sizeof(const char *));
     MAGE_HANDLE_ERROR_MESSAGE(!foundExtensions, printf("Error: Vulkan loader: Unable to find all the required instance extensions!\n"));
     U8 foundLayers     = MageVulkanRendererValidateLayersPresent((const char *[]) { "VK_LAYER_KHRONOS_validation" }, 1);
      MAGE_HANDLE_ERROR_MESSAGE(!foundExtensions, printf("Error: Vulkan loader: Unable to find all the required instance layers!\n"));
@@ -53,8 +69,8 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
     memset(&instanceInfo, 0, sizeof(VkInstanceCreateInfo));
     instanceInfo.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceInfo.pApplicationInfo        = &applicationInfo;
-    instanceInfo.enabledExtensionCount   = sizeof(MageVulkanRendererRequiredExtensions) / sizeof(const char *);
-    instanceInfo.ppEnabledExtensionNames = MageVulkanRendererRequiredExtensions;
+    instanceInfo.enabledExtensionCount   = sizeof(MageRequiredExtensions) / sizeof(const char *);
+    instanceInfo.ppEnabledExtensionNames = MageRequiredExtensions;
 
 
     #if MAGE_BUILD_DEBUG_MODE
@@ -132,7 +148,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
     printf("Inform: Renderer has been created, passed %lu of %lu operations\n", i, count);
     return MageTrue;
 }
-U8 MageRendererHandleWindowResize(MageRenderer *renderer)
+U8 MageRendererHandleWindowResize(MageRendererResizeHandleInfo *info, MageRenderer *renderer)
 {
     return MageTrue;
 }
