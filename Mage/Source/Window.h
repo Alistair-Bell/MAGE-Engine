@@ -20,6 +20,8 @@ typedef struct MageApplicationWindow
 
 #elif MAGE_BUILD_PLATFORM_WINDOWS
 
+/* The one time I can commend Microsoft is for not having the most generic names for types! Thanks :| */
+
 typedef struct MageApplicationWindow
 {
     HINSTANCE   Instance;
