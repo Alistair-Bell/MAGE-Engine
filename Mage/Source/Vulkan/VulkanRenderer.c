@@ -89,7 +89,7 @@ U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *
 {
     VkResult result;
 
-#if MAGE_BUILD_PLATFORMS_WINDOWS
+#if MAGE_BUILD_PLATFORM_WINDOWS
 
     VkWin32SurfaceCreateInfoKHR win32SurfaceInfo;
     memset(&win32SurfaceInfo, 0, sizeof(VkWin32SurfaceCreateInfoKHR));

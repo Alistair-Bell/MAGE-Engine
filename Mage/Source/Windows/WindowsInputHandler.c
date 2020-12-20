@@ -61,7 +61,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler* handler, MageApplicationWindow* 
 		}
 		if (message.message == WM_QUIT) break;
 	}
-	return MageTrue;
+	return MageFalse;
 }
 MageKeyboardKey MageInputHandlerTranslateKeyCodes(MageInputHandler *handler, const U64 code)
 {
