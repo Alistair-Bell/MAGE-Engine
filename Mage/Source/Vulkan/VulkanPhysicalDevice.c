@@ -70,6 +70,7 @@ U8 MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPh
 }
 U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
+    MageRendererPhysicalDevice *rd = &renderer->Device;
     U32 count, i;
     U64 leadingIndex = 0;
     vkEnumeratePhysicalDevices(renderer->Overseer.Instance, &count, NULL);
@@ -104,7 +105,6 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
             leadingIndex = i;
     }
 
-    MageRendererPhysicalDevice *rd = &renderer->Device;
     settingDesiredDevice:
     {
         MAGE_HANDLE_ERROR_MESSAGE(scores[leadingIndex] == 0, printf("Error: Unable to find suitable vulkan device with desired features!\n"));

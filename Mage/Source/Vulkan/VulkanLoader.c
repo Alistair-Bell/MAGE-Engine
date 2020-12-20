@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U64 count)
+U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count)
 {
 	U32 rawCount = 0;
 
@@ -34,7 +34,7 @@ U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const 
 	free(properties);
 	return (foundCount == count);
 }
-U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U64 count)
+U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count)
 {
 	U32 rawCount;
 	vkEnumerateInstanceLayerProperties(&rawCount, 0);
