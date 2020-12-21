@@ -46,18 +46,48 @@ U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer 
 
     VkSurfaceFormatKHR chosenFormat;
     VkPresentModeKHR   chosePresentMode;
+    VkExtent2D         chosenExtent = MageVulkanRendererSurfaceHandleExtent(info, &sss, renderer);
     currentResult = MageVulkanRendererSurfacePickCorrectFormats(renderer, &sss, &chosenFormat, &chosePresentMode);
 
+    U32 imageCount = sss.Capabilities.minImageCount + 1;
+    /* 0 means there is no max image count */
+    if (sss.Capabilities.maxImageCount == 0)
+        imageCount = sss.Capabilities.maxImageCount;
+
+    U32 graphicIndex = renderer->Device.QueueFamilies.GraphicsFamilyIndex;
+    U32 presentIndex = renderer->Device.QueueFamilies.PresentFamilyIndex;
 
     VkSwapchainCreateInfoKHR swapchainInfo;
     memset(&swapchainInfo, 0, sizeof(VkSwapchainCreateInfoKHR));
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    swapchainInfo.surface           = renderer->Surface.Surface;
+    swapchainInfo.minImageCount     = imageCount;
+    swapchainInfo.imageFormat       = chosenFormat.format;
+    swapchainInfo.imageExtent       = chosenExtent;
+    swapchainInfo.imageArrayLayers  = 1;
+    swapchainInfo.imageUsage        = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    swapchainInfo.oldSwapchain      = VK_NULL_HANDLE;
+    swapchainInfo.preTransform      = sss.Capabilities.currentTransform;
+    swapchainInfo.compositeAlpha    = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    swapchainInfo.clipped           = MageTrue;
+    swapchainInfo.presentMode       = chosePresentMode;
 
-
-    //vkCreateSwapchainKHR(renderer->Device.LogicalDevice, &swapchainInfo, NULL, &renderer->SwapChain.PrimarySwapchain);
+    if (graphicIndex != presentIndex)
+    {
+        swapchainInfo.imageSharingMode      = VK_SHARING_MODE_CONCURRENT;
+        swapchainInfo.queueFamilyIndexCount = 2;
+        swapchainInfo.pQueueFamilyIndices   = (U32[]) { graphicIndex, presentIndex };
+    }
+    else
+    {
+        swapchainInfo.imageSharingMode      = VK_SHARING_MODE_EXCLUSIVE;
+        swapchainInfo.queueFamilyIndexCount = 0;
+        swapchainInfo.pQueueFamilyIndices   = NULL;
+    }
     
+    VkResult swapResult = vkCreateSwapchainKHR(renderer->Device.LogicalDevice, &swapchainInfo, NULL, &renderer->SwapChain.PrimarySwapchain) == VK_TRUE;
     MageVulkanRendererSurfaceSwapchainSupportDestroy(&sss);
-    return MageTrue;
+    return swapResult == VK_SUCCESS;
 }
 U8 MageVulkanRendererSurfaceSwapchainSupportDestroy(MageRendererSurfaceSwapchainSupport *info)
 {

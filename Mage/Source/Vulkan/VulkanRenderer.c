@@ -131,9 +131,9 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     #if MAGE_BUILD_DEBUG_MODE
         MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
     #endif
+    vkDestroySwapchainKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, NULL);
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyDevice(renderer->Device.LogicalDevice, NULL);
-    //vkDestroySwapchainKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);
     return MageTrue;
 }

@@ -36,6 +36,8 @@ typedef struct MageApplicationWindow
 
 extern U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window);
 extern U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName);
+extern U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height);
+extern U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height);
 extern U8 MageApplicationWindowDestroy(MageApplicationWindow* window);
 
 #endif

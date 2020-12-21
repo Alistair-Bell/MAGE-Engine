@@ -28,3 +28,18 @@ U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *
 
     return result == VK_SUCCESS;
 }
+VkExtent2D MageVulkanRendererSurfaceHandleExtent(MageRendererCreateInfo *info, MageRendererSurfaceSwapchainSupport *surfaceSupport, MageRenderer *renderer)
+{
+    VkExtent2D extent;
+    memset(&extent, 0, sizeof(VkExtent2D));
+
+    if (surfaceSupport->Capabilities.currentExtent.width == 0xFFFFFFFF)
+        return surfaceSupport->Capabilities.currentExtent;
+
+    U32 w, h;
+    MageApplicationWindowGetFramebufferDimensions(info->Window, &w, &h);
+    extent.width  = max(surfaceSupport->Capabilities.minImageExtent.width,  min(surfaceSupport->Capabilities.maxImageExtent.width, w));
+    extent.height = max(surfaceSupport->Capabilities.minImageExtent.height, min(surfaceSupport->Capabilities.maxImageExtent.height, h));
+
+    return extent;
+}

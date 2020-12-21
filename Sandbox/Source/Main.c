@@ -9,9 +9,9 @@ I32 main()
        
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
-    windowCreateInfo.Height             = 1080;
     windowCreateInfo.Width              = 1920;
-    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE | MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING;
+    windowCreateInfo.Height             = 1080;
+    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE;
     
     MageInputHandlerCreateInfo inputCreateInfo;
     memset(&inputCreateInfo, 0, sizeof(MageInputHandlerCreateInfo));

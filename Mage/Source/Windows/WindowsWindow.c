@@ -78,6 +78,18 @@ U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newN
 {
 	return SetWindowText(window->NativeWindow, TEXT(newName));
 }
+U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+{
+	RECT r;
+	U8 result = GetWindowRect(window->NativeWindow, &r);
+	*height = r.bottom - r.top;
+	*width  = r.right  - r.left;
+	return (U8)result;
+}
+U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+{
+	return MageApplicationWindowGetDimensions(window, width, height);
+}
 U8 MageApplicationWindowDestroy(MageApplicationWindow* window)
 {
 	DestroyWindow(window->NativeWindow);
