@@ -4,10 +4,11 @@ U8 MageUnitTestRunTests(MageUnitTestCreateInfo *tests, const U64 count, MageUnit
 {
     MAGE_HANDLE_ERROR_MESSAGE(tests == NULL || runtime == NULL, printf("Error: Any passed parameters are NULL!\n"));
     MAGE_HANDLE_ERROR_MESSAGE(count <= 0, printf("Error: No tests specified\n"));
+    memset(runtime, 0, sizeof(MageUnitTestRuntimeInfo));
 
     U64 i;
     printf("Running %lu tests\n", count);
-    
+
     for (i = 0; i < count; i++)
     {
         MageUnitTestCreateInfo *current = &tests[i];
@@ -15,7 +16,7 @@ U8 MageUnitTestRunTests(MageUnitTestCreateInfo *tests, const U64 count, MageUnit
 
         if (testResult != current->ExpectedResult)
         {
-            printf("%s has failed\n%s", current->TestName, current->FailMessage);
+            printf("%s has failed\n%s\n", current->TestName, current->FailMessage);
             if (current->Assertions)
                 assert(testResult != current->ExpectedResult);
             runtime->FailCount++;

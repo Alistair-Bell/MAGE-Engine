@@ -27,10 +27,5 @@ I32 main()
     tests[0].Callback               = TestNativeWindowCreate;
 
     MageUnitTestRuntimeInfo runtimeInfo;
-    memset(&runtimeInfo, 0, sizeof(MageUnitTestRuntimeInfo));
-
-    
     return (MageUnitTestRunTests(tests, sizeof(tests) / sizeof(MageUnitTestCreateInfo), &runtimeInfo));
-
-    return 0;
 }
