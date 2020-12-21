@@ -77,6 +77,18 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
     }
     return MageTrue;
 }
+U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+{
+    XWindowAttributes a;
+    XGetWindowAttributes(window->WindowDisplay, window->ContextWindow, &a);
+    *width  = a.width;
+    *height = a.height;
+    return MageTrue;
+}
+U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+{
+    return MageApplicationWindowGetDimensions(window, width, height);
+}
 
 U8 MageInputHandlerDestroy(MageInputHandler *handler)
 {

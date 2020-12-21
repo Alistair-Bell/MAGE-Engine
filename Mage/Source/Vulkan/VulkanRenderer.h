@@ -4,6 +4,7 @@
 #include "../Includes.h"
 #include "../CreateStructures.h"
 #include "../Window.h"
+#include "../Maths.h"
 
 typedef struct MageRendererOverseer
 {

@@ -49,10 +49,10 @@ U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer 
     VkExtent2D         chosenExtent = MageVulkanRendererSurfaceHandleExtent(info, &sss, renderer);
     currentResult = MageVulkanRendererSurfacePickCorrectFormats(renderer, &sss, &chosenFormat, &chosePresentMode);
 
-    U32 imageCount = sss.Capabilities.minImageCount + 1;
+    U32 minCount = sss.Capabilities.minImageCount + 1;
     /* 0 means there is no max image count */
-    if (sss.Capabilities.maxImageCount == 0)
-        imageCount = sss.Capabilities.maxImageCount;
+    if (sss.Capabilities.maxImageCount > 0 && minCount > sss.Capabilities.maxImageCount)
+        minCount = sss.Capabilities.maxImageCount;
 
     U32 graphicIndex = renderer->Device.QueueFamilies.GraphicsFamilyIndex;
     U32 presentIndex = renderer->Device.QueueFamilies.PresentFamilyIndex;
@@ -61,7 +61,7 @@ U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer 
     memset(&swapchainInfo, 0, sizeof(VkSwapchainCreateInfoKHR));
     swapchainInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
     swapchainInfo.surface           = renderer->Surface.Surface;
-    swapchainInfo.minImageCount     = imageCount;
+    swapchainInfo.minImageCount     = minCount;
     swapchainInfo.imageFormat       = chosenFormat.format;
     swapchainInfo.imageExtent       = chosenExtent;
     swapchainInfo.imageArrayLayers  = 1;
