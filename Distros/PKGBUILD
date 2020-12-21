@@ -1,0 +1,34 @@
+pkgname='MageEngine'
+pkgver=1
+pkgrel=1
+pkgdesc='A vulkan game engine'
+arch=('x86_64')
+url='https://github.com/Alistair-Bell/MageEngine'
+license=('GPL3')
+depends=('gcc')
+makedepends=('cmake' 'git' 'shaderc' 'vulkan-headers' 'vulkan-validation-layers' 'libx11')
+# checkdepends=()
+# optdepends=()
+provides=('package')
+# conflicts=()
+# replaces=()
+# backup=()
+# options=()
+# install=
+# changelog=
+source=('MageEngine::git://github.com/Alistair-Bell/MageEngine.git')
+# noextract=()
+md5sums=('SKIP')
+
+build() {
+	cmake -B Build \
+        -S '$pkgname' \
+        -DCMAKE_BUILD_TYPE='None' \
+        -DPROJECT_BUILD_PLATFORM='Linux' \
+        -DCMAKE_BUILD_TYPE='Release' \
+        -Wno-dev
+    make -C Build
+}
+package() {
+    echo 'Build mage-enigne'
+}
