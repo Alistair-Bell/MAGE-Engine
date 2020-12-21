@@ -5,7 +5,6 @@ project("MageEngine")
 
 option(PROJECT_BUILD_PLATFORM "Engine build platform target" "Windows")
 option(PROJECT_BUILD_UNIT_TESTS "Build engine unit tests" On)
-option(PROJECT_BUILD_RENDERER_MODE "Engine renderer backend API" "Vulkan")
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
@@ -23,9 +22,7 @@ else()
     add_compile_options("-Wall" "-std=c99")
 endif(MSVC)
 
-if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-    find_package(Vulkan)
-endif()
+find_package(Vulkan)
 
 function(MageEngineAddDefinesAndFlagsToBinary binary)
     
@@ -43,12 +40,8 @@ function(MageEngineAddDefinesAndFlagsToBinary binary)
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
     endif()
 
-    if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
-    else()
-        Message(FATAL_ERROR "Engine renderer backend not implimented")
-    endif()
-
+    target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
+    
 endfunction(MageEngineAddDefinesAndFlagsToBinary binary)
 
 function(MageEngineLinkPlatformLibrariesToBinary binary)
@@ -59,10 +52,8 @@ function(MageEngineLinkPlatformLibrariesToBinary binary)
     
     endif()
 
-    if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-        target_link_libraries(${binary} Vulkan::Vulkan)
-		target_include_directories(${binary} PUBLIC ${Vulkan_INCLUDE_DIRS})
-    endif()
+    target_link_libraries(${binary} Vulkan::Vulkan)
+    target_include_directories(${binary} PUBLIC ${Vulkan_INCLUDE_DIRS})
     
 endfunction(MageEngineLinkPlatformLibrariesToBinary)
 

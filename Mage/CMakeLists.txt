@@ -16,6 +16,11 @@ set(LIBRARY_SOURCES
 
     Source/EngineApplication.h
     Source/EngineApplication.c
+    
+    Source/Vulkan/VulkanRenderer.h
+    Source/Vulkan/VulkanRenderer.c
+	Source/Vulkan/VulkanPhysicalDevice.c
+	Source/Vulkan/VulkanLoader.c
 )
 
 message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")
@@ -31,15 +36,6 @@ elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 		Source/Windows/WindowsWindow.c
 		Source/Windows/WindowsInputHandler.c
 	)
-endif()
-
-if (PROJECT_BUILD_RENDERER_MODE STREQUAL "Vulkan")
-    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Vulkan/VulkanRenderer.h
-        Source/Vulkan/VulkanRenderer.c
-	Source/Vulkan/VulkanPhysicalDevice.c
-	Source/Vulkan/VulkanLoader.c
-    )
 endif()
 
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
