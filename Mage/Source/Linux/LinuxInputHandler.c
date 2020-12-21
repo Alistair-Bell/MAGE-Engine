@@ -15,14 +15,20 @@ U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *ha
 
     /* See flags https://tronche.com/gui/x/xlib/events/mask.html */
 
+    MageApplicationWindow *w = info->ApplicationWindow;
+
     I64 eventMask = 0;
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_KEYBOARD)
         eventMask |= (KeyPressMask | KeyReleaseMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_MOUSE)
         eventMask |= (ButtonPressMask | ButtonReleaseMask | PointerMotionMask);
     if (info->InputFlags & MAGE_INPUT_HANDLER_EVENT_LISTEN_FLAGS_WINDOW_EVENTS)
+    {
         eventMask |= (SubstructureNotifyMask | FocusChangeMask | ExposureMask);
-    
+        Atom windowDelete = XInternAtom(w->WindowDisplay, "WM_DELETE_WINDOW", MageTrue);
+        XSetWMProtocols(w->WindowDisplay, w->ContextWindow, &windowDelete, MageTrue);
+    }
+
     XSelectInput(info->ApplicationWindow->WindowDisplay, info->ApplicationWindow->ContextWindow, eventMask);
     return MageTrue;
 }

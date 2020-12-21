@@ -75,7 +75,7 @@ U8 MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPh
     for (i = 0; i < familyCount; i++)
     {
         VkQueueFamilyProperties *current = &properties[i];
-        if (properties->queueFlags & VK_QUEUE_GRAPHICS_BIT)
+        if (current->queueFlags & VK_QUEUE_GRAPHICS_BIT)
         {
             families->GraphicsFamilyIndex = i;
             graphicsFound = MageTrue;

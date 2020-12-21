@@ -7,7 +7,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 {
 	MAGE_HANDLE_ERROR_MESSAGE(info == NULL || window == NULL, printf("Error: Any passed parameters are NULL!\n"));
 	
-	ZeroMemory(window, sizeof(MageApplicationWindow));
+	SecureZeroMemory(window, sizeof(MageApplicationWindow));
 
 	/* Using primary screen */
 
@@ -27,7 +27,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		dwStyle   = WS_VISIBLE | WS_POPUP;
 		HMONITOR mainMonitor = MonitorFromWindow(window->NativeWindow, MONITOR_DEFAULTTONEAREST);
 		MONITORINFO monitorInfo;
-		ZeroMemory(&monitorInfo, sizeof(MONITORINFO));
+		SecureZeroMemory(&monitorInfo, sizeof(MONITORINFO));
 		monitorInfo.cbSize = sizeof(MONITORINFO);
 
 		U8 result = GetMonitorInfo(mainMonitor, &monitorInfo);
@@ -39,7 +39,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		info->SpawnOffsetY = 0;
 	}
 
-	ZeroMemory(&window->NativeWindowClass, sizeof(WNDCLASSEX));
+	SecureZeroMemory(&window->NativeWindowClass, sizeof(WNDCLASSEX));
 	window->NativeWindowClass.cbSize        = sizeof(window->NativeWindowClass);
 	window->NativeWindowClass.style         = CS_HREDRAW | CS_VREDRAW;
 	window->NativeWindowClass.lpfnWndProc   = MageInputHandlerWindowsEventListener;

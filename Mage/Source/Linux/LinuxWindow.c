@@ -42,10 +42,12 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         CurrentTime
     );
 
-    Atom windowDelete = XInternAtom(window->WindowDisplay, "WM_DELETE_WINDOW", MageTrue);
-    XSetWMProtocols(window->WindowDisplay, window->ContextWindow, &windowDelete, MageTrue);
 
     return MageTrue;
+}
+U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName)
+{
+    return XStoreName(window->WindowDisplay, window->ContextWindow, newName);
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow *window)
 {
