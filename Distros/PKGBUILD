@@ -22,7 +22,7 @@ md5sums=('SKIP')
 
 build() {
 	cmake -B Build \
-        -S '$pkgname' \
+        -S 'MageEngine' \
         -DCMAKE_BUILD_TYPE='None' \
         -DPROJECT_BUILD_PLATFORM='Linux' \
         -DCMAKE_BUILD_TYPE='Release' \

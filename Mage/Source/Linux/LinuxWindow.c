@@ -13,6 +13,20 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
     
     MAGE_HANDLE_ERROR_MESSAGE(window->WindowDisplay == NULL, printf("Error: Failed to open X11 window display\n"));
 
+    XSetWindowAttributes attributes;
+    memset(&attributes, 0, sizeof(XSetWindowAttributes));
+
+    if (!(info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING))
+        attributes.override_redirect = MageTrue; 
+
+    if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE)
+    {
+        XWindowAttributes dimensions;
+        XGetWindowAttributes(window->WindowDisplay, window->RootWindow, &dimensions);
+        info->SpawnOffsetX = (dimensions.width- info->Width)  / 2;
+        info->SpawnOffsetY = (dimensions.height- info->Height) / 2;
+    }
+
     window->ContextWindow = XCreateWindow(
         window->WindowDisplay,
         window->RootWindow,
@@ -24,8 +38,8 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         0,
         InputOutput,
         CopyFromParent,
-        0,
-        NULL
+        CWOverrideRedirect,
+        &attributes
     );
 
     XMapWindow(window->WindowDisplay, window->ContextWindow);
