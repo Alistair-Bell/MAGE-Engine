@@ -17,6 +17,9 @@ set(LIBRARY_SOURCES
     Source/EngineApplication.h
     Source/EngineApplication.c
     
+    Source/Maths.h
+    Source/Maths/MathsGeneric.c
+
     Source/Vulkan/VulkanPhysicalDevice.c
     Source/Vulkan/VulkanSurface.c
     Source/Vulkan/VulkanSwapChain.c
