@@ -1,7 +1,5 @@
-Build/
-Logs/*.*
-
-.vscode
+# Build files
+Build*
 
 # Linux generated build files
 Makefile*
@@ -21,18 +19,12 @@ Makefile*
 # Valgrind generated debug files
 vgcore*
 
-# Currently uncompressed directories
-Shaders/
-Textures/
-Audio/
+# My stuff
+compile_commands.json # see the GenerateCompileCommands.json
 
+# Compiled shaders
+.sprv
 
-
-# User config folder
-Config*
-
-# Personal vscode config file
-.vscode/settings.json
-
-# Python created files
-*.pyc
+# autocomplete files
+.cache
+compile_commands*
