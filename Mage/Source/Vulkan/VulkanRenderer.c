@@ -107,7 +107,8 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         #endif
         MageVulkanRendererCreateSurface,
         MageVulkanRendererCreatePhysicalDevice,
-        MageVulkanRendererCreateSwapChain
+        MageVulkanRendererCreateSwapChain,
+        MageVulkanRendererCreateSwapChainImages,
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -132,6 +133,17 @@ U8 MageRendererDestroy(MageRenderer *renderer)
         MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
     #endif
     vkDestroySwapchainKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, NULL);
+
+    U32 i;
+    for (i = 0; i < renderer->SwapChain.ImagesCount; i++)
+    {
+        vkDestroyImageView(renderer->Device.LogicalDevice, renderer->SwapChain.ImageViews[i], NULL);
+    }
+
+    free(renderer->SwapChain.Images);
+    free(renderer->SwapChain.ImageViews);
+
+
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyDevice(renderer->Device.LogicalDevice, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);

@@ -9,7 +9,6 @@
 typedef struct MageRendererOverseer
 {
     VkInstance               Instance;
-    VkDevice                 PrimaryDevice;
     VkDebugUtilsMessengerEXT DebugMessenger;
 } MageRendererOverseer;
 
@@ -50,7 +49,11 @@ typedef struct MageRendererQueues
 
 typedef struct MageRendererSwapChain
 {
+    VkFormat                PrimaryFormat;
     VkSwapchainKHR          PrimarySwapchain;
+    VkImage                 *Images;
+    VkImageView             *ImageViews;
+    U32                     ImagesCount;
 } MageRendererSwapChain;
 
 typedef struct MageRenderer
@@ -77,6 +80,9 @@ extern U8 MageVulkanRendererSurfaceSwapchainSupportDestroy(MageRendererSurfaceSw
 extern VkExtent2D MageVulkanRendererSurfaceHandleExtent(MageRendererCreateInfo *info, MageRendererSurfaceSwapchainSupport *surfaceSupport, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
+
 extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 
 extern U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);

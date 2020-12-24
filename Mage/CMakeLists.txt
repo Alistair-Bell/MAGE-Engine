@@ -16,7 +16,10 @@ set(LIBRARY_SOURCES
 
     Source/EngineApplication.h
     Source/EngineApplication.c
-    
+   
+    Source/FileSystem.h
+    Source/FileSystem.c
+
     Source/Maths.h
     Source/Maths/MathsGeneric.c
 
@@ -26,6 +29,8 @@ set(LIBRARY_SOURCES
 	Source/Vulkan/VulkanLoader.c
     Source/Vulkan/VulkanRenderer.h
     Source/Vulkan/VulkanRenderer.c
+    Source/Vulkan/VulkanShaders.h
+    Source/Vulkan/VulkanShaders.c
 )
 
 message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")

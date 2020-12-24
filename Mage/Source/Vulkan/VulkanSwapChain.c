@@ -86,8 +86,50 @@ U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer 
     }
     
     VkResult swapResult = vkCreateSwapchainKHR(renderer->Device.LogicalDevice, &swapchainInfo, NULL, &renderer->SwapChain.PrimarySwapchain) == VK_TRUE;
+    renderer->SwapChain.PrimaryFormat = chosenFormat.format;
     MageVulkanRendererSurfaceSwapchainSupportDestroy(&sss);
     return swapResult == VK_SUCCESS;
+}
+U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer)
+{
+    vkGetSwapchainImagesKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, &renderer->SwapChain.ImagesCount, NULL);
+    MAGE_HANDLE_ERROR_MESSAGE(renderer->SwapChain.ImagesCount <= 0, printf("Error: Unable to find any swapchain images for primary swapchain\n"));
+    renderer->SwapChain.Images     = calloc(renderer->SwapChain.ImagesCount, sizeof(VkImage));
+    renderer->SwapChain.ImageViews = calloc(renderer->SwapChain.ImagesCount, sizeof(VkImageView));
+    vkGetSwapchainImagesKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, &renderer->SwapChain.ImagesCount, renderer->SwapChain.Images);
+    return MageTrue;
+}
+U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer)
+{
+    MageVulkanRendererGetSwapChainImages(info, renderer);
+
+    U32 i;
+    for (i = 0; i < renderer->SwapChain.ImagesCount; i++)
+    {
+        VkImageViewCreateInfo viewInfo;
+        memset(&viewInfo, 0, sizeof(VkImageViewCreateInfo));
+        viewInfo.sType                            = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        viewInfo.image                            = renderer->SwapChain.Images[i];
+        viewInfo.viewType                         = VK_IMAGE_VIEW_TYPE_2D;
+        viewInfo.format                           = renderer->SwapChain.PrimaryFormat;
+        viewInfo.components.r                     = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.b                     = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.g                     = VK_COMPONENT_SWIZZLE_IDENTITY;
+        viewInfo.components.a                     = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+        viewInfo.subresourceRange.aspectMask      = VK_IMAGE_ASPECT_COLOR_BIT;
+        viewInfo.subresourceRange.baseMipLevel    = 0;
+        viewInfo.subresourceRange.baseArrayLayer  = 0;
+        viewInfo.subresourceRange.levelCount      = 1;
+        viewInfo.subresourceRange.layerCount      = 1;
+
+
+
+        VkResult r = vkCreateImageView(renderer->Device.LogicalDevice, &viewInfo, NULL, &renderer->SwapChain.ImageViews[i]);
+        MAGE_HANDLE_ERROR_MESSAGE(r != VK_SUCCESS, );
+    }
+
+    return MageTrue;
 }
 U8 MageVulkanRendererSurfaceSwapchainSupportDestroy(MageRendererSurfaceSwapchainSupport *info)
 {

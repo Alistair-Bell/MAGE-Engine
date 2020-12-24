@@ -61,4 +61,8 @@ typedef struct MageEngineApplicationCreateInfo
     MageRendererCreateInfo                      RendererCreateInfo;
 } MageEngineApplicationCreateInfo;
 
+typedef struct MageFileSystemCreateInfo
+{
+} MageFileSystemCreateInfo;
+
 #endif

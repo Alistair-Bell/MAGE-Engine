@@ -13,7 +13,7 @@ U8 MageVulkanRendererFindPhysicalDeviceExtensions(VkPhysicalDevice device, const
         return MageFalse;
     VkExtensionProperties *extensions = calloc(extensionCount, sizeof(VkExtensionProperties));
     vkEnumerateDeviceExtensionProperties(device, NULL, &extensionCount, extensions);
-    
+ 
     U32 i, j;
     U32 foundCount = 0;
     for (i = 0; i < count; i++)
