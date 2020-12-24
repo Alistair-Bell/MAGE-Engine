@@ -31,10 +31,11 @@ function(MageEngineAddDefinesAndFlagsToBinary binary)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 		target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_WINDOWS=1)
     endif()
+    
+    target_compile_options(${binary} PUBLIC "-g")
 
-        target_compile_options(${binary} PUBLIC "-g")
     if (${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-	target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=1)
+	    target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=1)
     else()
         target_compile_options(${binary} PUBLIC "-O2")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
