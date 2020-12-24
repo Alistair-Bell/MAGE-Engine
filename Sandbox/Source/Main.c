@@ -2,16 +2,45 @@
 
 I32 main()
 {
+    MageFileSystem system;
+
+    MageFileSystemCreateInfo ci;
+    memset(&ci, 0, sizeof(MageFileSystemCreateInfo));
+
+    MageFileSystemMountInfo mi;
+    U32 index = 0;
+    memset(&mi, 0, sizeof(MageFileSystemMountInfo));
+    mi.MountIndex = &index;
+    mi.MountPoint = "SharedResources";
+
+    MageFileSystemReadInfo ri;
+    memset(&ri, 0, sizeof(MageFileSystemCreateInfo));
+    ri.FilePath = "Shaders/Colored/Fragment.frag";
+    ri.MountPointIndex = index;
+    ri.SearchOverride  = MageTrue;
+    ri.StreamSize = 0;
+    ri.StreamReallocatable = MageFalse;
+    ri.StreamData = NULL;
+
+
+    MageFileSystemCreate(&ci, &system);
+    MageFileSystemMountDirectory(&system, &mi);
+    MageFileSystemReadMountedDirectory(&system, &ri);
+    MageFileSystemUnmountDirectory(&system, "SharedResources");
+    MageFileSystemDestory(&system);
+
+
+
     MageEngineApplication engineContext;
    
     MageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(MageRendererCreateInfo));
-       
+
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
     windowCreateInfo.Width              = 1920;
     windowCreateInfo.Height             = 1080;
-    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_FULLSCREEN;
+    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING;
     
     MageInputHandlerCreateInfo inputCreateInfo;
     memset(&inputCreateInfo, 0, sizeof(MageInputHandlerCreateInfo));
@@ -24,9 +53,8 @@ I32 main()
     engineCreateInfo.ApplicationWindowCreateInfo = windowCreateInfo;
     engineCreateInfo.InputEventHandlerCreateInfo = inputCreateInfo;
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
-    
+
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
-    MageApplicationWindowSetTitle(engineContext.Window, "New Name Was Set");
 
     while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
     MageEngineApplicationDestroy(&engineContext);

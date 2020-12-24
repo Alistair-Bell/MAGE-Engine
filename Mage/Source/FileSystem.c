@@ -7,32 +7,35 @@ U8 MageFileSystemCreate(MageFileSystemCreateInfo *info, MageFileSystem *system)
     system->NextIndex = UINT32_MAX;
     return MageTrue;
 }
-U8 MageFileSystemMountDirectory(MageFileSystem *system, const char *mountPoint, U32 *mountIndex)
+U8 MageFileSystemMountDirectory(MageFileSystem *system, MageFileSystemMountInfo *info)
 {
     U32 cnt = system->MountCount;
     system->MountCount++;
     if (system->NextIndex != UINT32_MAX)
     {
-        system->Mounted[system->NextIndex] = mountPoint;
-        *mountIndex = system->NextIndex;
+        system->Mounted[system->NextIndex] = info->MountPoint;
+        if (info->MountIndex != NULL)
+            *info->MountIndex = system->NextIndex;
         system->NextIndex = UINT32_MAX;
         return MageTrue;
     }
     system->Mounted = realloc(system->Mounted, sizeof(const char *) * cnt + 1);
-    system->Mounted[cnt] = mountPoint;
-    *mountIndex = cnt;
+    system->Mounted[cnt] = info->MountPoint;
+    if (info->MountIndex != NULL)
+        *info->MountIndex = cnt;
     return MageTrue;
 }
-U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, const char *file, const U8 searchOverride, const U32 overrideIndex)
+U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemReadInfo *info)
 {    
     FILE *f;
     char buffer[255];
     memset(buffer, 0, sizeof(buffer));
 
-    if (searchOverride)
+    if (info->SearchOverride)
     {
+        U32 overrideIndex = info->MountPointIndex;
         MAGE_HANDLE_ERROR_MESSAGE(system->MountCount < overrideIndex, printf("Error: Filesystem has too little mounted for valid override index, %d mounted\n", system->MountCount));
-        sprintf(buffer, "%s/%s", system->Mounted[overrideIndex], file);
+        sprintf(buffer, "%s/%s", system->Mounted[overrideIndex], info->FilePath);
         f = fopen(buffer, "r");
         MAGE_HANDLE_ERROR_MESSAGE(f == NULL, printf("Error: Filesystem was unable to open virtual file %s\n", buffer));
     }
@@ -40,7 +43,7 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, const char *file, 
     U32 i, foundFile = MageFalse;
     for (i = 0; i < system->MountCount; i++)
     {
-        sprintf(buffer, "%s/%s", system->Mounted[i], file);
+        sprintf(buffer, "%s/%s", system->Mounted[i], info->FilePath);
         f = fopen(buffer, "r");
         if (f != NULL)
         {
@@ -48,7 +51,7 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, const char *file, 
             break;
         }
     }
-    MAGE_HANDLE_ERROR_MESSAGE(!foundFile, printf("Error: Unable to find requested [%s] file in filesystem\n", file));
+    MAGE_HANDLE_ERROR_MESSAGE(!foundFile, printf("Error: Unable to find requested [%s] file in filesystem\n", info->FilePath));
     
 
     return MageTrue;

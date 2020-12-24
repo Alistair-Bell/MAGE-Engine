@@ -21,6 +21,7 @@ vgcore*
 
 # My stuff
 compile_commands.json # see the GenerateCompileCommands.json
+.vscode # old vscode files
 
 # Compiled shaders
 .sprv

@@ -4,6 +4,22 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 
+typedef struct MageFileSystemMountInfo
+{
+    const char  *MountPoint;
+    U32         *MountIndex;
+} MageFileSystemMountInfo;
+
+typedef struct MageFileSystemReadInfo
+{
+    U8          SearchOverride;
+    U8          StreamReallocatable;
+    U32         MountPointIndex;
+    U64         StreamSize;
+    char        *StreamData;
+    const char  *FilePath;
+} MageFileSystemReadInfo;
+
 typedef struct MageFileSystem
 {
     const char **Mounted;
@@ -12,8 +28,8 @@ typedef struct MageFileSystem
 } MageFileSystem;
 
 extern U8 MageFileSystemCreate(MageFileSystemCreateInfo *info, MageFileSystem *system);
-extern U8 MageFileSystemMountDirectory(MageFileSystem *system, const char *mountPoint, U32 *mountIndex);
-extern U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, const char *file, const U8 searchOverride, const U32 overrideIndex);
+extern U8 MageFileSystemMountDirectory(MageFileSystem *system, MageFileSystemMountInfo *info);
+extern U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemReadInfo *info);
 extern U8 MageFileSystemUnmountDirectory(MageFileSystem *system, const char *mountPoint);
 extern U8 MageFileSystemDestory(MageFileSystem *system);
 
