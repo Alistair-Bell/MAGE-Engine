@@ -63,6 +63,7 @@ typedef struct MageEngineApplicationCreateInfo
 
 typedef struct MageFileSystemCreateInfo
 {
+    U0 *TempData; /* This is a junk parameter, some compilers don't like empty fields */
 } MageFileSystemCreateInfo;
 
 #endif

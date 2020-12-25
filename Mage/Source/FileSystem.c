@@ -50,7 +50,6 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemRead
             foundFile = MageTrue;
             break;
         }
-        fclose(f);
     }
 
     MAGE_HANDLE_ERROR_MESSAGE(!foundFile, printf("Error: Unable to find requested [%s] file in filesystem\n", info->FilePath));
@@ -60,7 +59,6 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemRead
     if (info->StreamReallocatable)
         info->StreamData = realloc(info->StreamData, (info->StreamSize + 1));
 
-    memset(info->StreamData, 0, info->StreamSize + 1);
     fseek(f, 0, SEEK_SET);
     fread(info->StreamData, 1, info->StreamSize, f);
     fclose(f);

@@ -17,7 +17,7 @@ set(PACKAGE_STRING "${PROJECT_NAME} ${PROJECT_VERSION}")
 set(PACKAGE_LICENSE "GNU General Public License, version 3")
 
 if (MSVC)
-    add_compile_options()
+    add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 else()
     add_compile_options("-Wall" "-std=c99")
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -44,7 +44,7 @@ function(MageEngineAddDefinesAndFlagsToBinary binary)
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
     endif()
 
-    target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
+	target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
     
 endfunction(MageEngineAddDefinesAndFlagsToBinary binary)
 
