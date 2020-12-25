@@ -2,7 +2,6 @@
 
 I32 main()
 {
-    /*
     MageFileSystem system;
 
     MageFileSystemCreateInfo ci;
@@ -19,17 +18,16 @@ I32 main()
     ri.FilePath = "Shaders/Colored/Fragment.frag";
     ri.MountPointIndex = index;
     ri.SearchOverride  = MageTrue;
-    ri.StreamSize = 0;
-    ri.StreamReallocatable = MageTrue;
-    char *d = malloc(sizeof(char));
-    ri.StreamData = d;
 
     MageFileSystemCreate(&ci, &system);
     MageFileSystemMountDirectory(&system, &mi);
     MageFileSystemReadMountedDirectory(&system, &ri);
+
+    printf("%s\n", ri.StreamData);
+
+
     MageFileSystemUnmountDirectory(&system, "SharedResources");
     MageFileSystemDestory(&system);
-    */
 
     MageEngineApplication engineContext;
    

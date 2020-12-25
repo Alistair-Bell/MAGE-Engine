@@ -13,19 +13,13 @@ static U8 TestFileSystemLoadDataFromMounted(U0 *data)
     MageFileSystemMountDirectory(&f, &mi);
     printf("Inform: Mounted directory Mage, searching for Mage.h [Mage/Mage.h]\n");
 
-
-    char *d = malloc(sizeof(char) * 1);
-
     MageFileSystemReadInfo ri;
     memset(&ri, 0, sizeof(MageFileSystemReadInfo));
     ri.FilePath = "Mage.h";
     ri.SearchOverride = MageTrue;
     ri.MountPointIndex = index;
-    ri.StreamData = d;
-    ri.StreamReallocatable = MageTrue;
 
     U8 r = MageFileSystemReadMountedDirectory(&f, &ri);
-    free(d);
     return r;
 }
 

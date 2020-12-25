@@ -13,7 +13,6 @@ typedef struct MageFileSystemMountInfo
 typedef struct MageFileSystemReadInfo
 {
     U8          SearchOverride;
-    U8          StreamReallocatable;
     U32         MountPointIndex;
     U64         StreamSize;
     char        *StreamData;

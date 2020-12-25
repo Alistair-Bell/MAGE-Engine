@@ -87,7 +87,7 @@ U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newN
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow *window)
 {
-    XCloseDisplay(window->WindowDisplay);
     XDestroyWindow(window->WindowDisplay, window->ContextWindow);
+    XCloseDisplay(window->WindowDisplay);
     return MageTrue;
 }
