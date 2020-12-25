@@ -50,10 +50,20 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemRead
             foundFile = MageTrue;
             break;
         }
+        fclose(f);
     }
-    MAGE_HANDLE_ERROR_MESSAGE(!foundFile, printf("Error: Unable to find requested [%s] file in filesystem\n", info->FilePath));
-    
 
+    MAGE_HANDLE_ERROR_MESSAGE(!foundFile, printf("Error: Unable to find requested [%s] file in filesystem\n", info->FilePath));
+    MAGE_HANDLE_ERROR_MESSAGE(info->StreamReallocatable == MageFalse && info->StreamSize <= 0, printf("Error: Passed stream is not reallocatable and has no bufferlenght\n"));
+    fseek(f, 0, SEEK_END); 
+    info->StreamSize = ftell(f);
+    if (info->StreamReallocatable)
+        info->StreamData = realloc(info->StreamData, (info->StreamSize + 1));
+
+    memset(info->StreamData, 0, info->StreamSize + 1);
+    fseek(f, 0, SEEK_SET);
+    fread(info->StreamData, 1, info->StreamSize, f);
+    fclose(f);
     return MageTrue;
 }
 U8 MageFileSystemUnmountDirectory(MageFileSystem *system, const char *mountPoint)

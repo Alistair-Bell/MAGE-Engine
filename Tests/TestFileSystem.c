@@ -23,8 +23,6 @@ static U8 TestFileSystemLoadDataFromMounted(U0 *data)
     ri.MountPointIndex = index;
     ri.StreamData = d;
     ri.StreamReallocatable = MageTrue;
-    ri.StreamSize = 1;
-
 
     U8 r = MageFileSystemReadMountedDirectory(&f, &ri);
     free(d);

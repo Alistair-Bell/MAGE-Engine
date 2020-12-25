@@ -2,6 +2,7 @@
 
 I32 main()
 {
+    /*
     MageFileSystem system;
 
     MageFileSystemCreateInfo ci;
@@ -19,17 +20,16 @@ I32 main()
     ri.MountPointIndex = index;
     ri.SearchOverride  = MageTrue;
     ri.StreamSize = 0;
-    ri.StreamReallocatable = MageFalse;
-    ri.StreamData = NULL;
-
+    ri.StreamReallocatable = MageTrue;
+    char *d = malloc(sizeof(char));
+    ri.StreamData = d;
 
     MageFileSystemCreate(&ci, &system);
     MageFileSystemMountDirectory(&system, &mi);
     MageFileSystemReadMountedDirectory(&system, &ri);
     MageFileSystemUnmountDirectory(&system, "SharedResources");
     MageFileSystemDestory(&system);
-
-
+    */
 
     MageEngineApplication engineContext;
    

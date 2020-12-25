@@ -19,7 +19,7 @@ set(PACKAGE_LICENSE "GNU General Public License, version 3")
 if (MSVC)
     add_compile_options()
 else()
-    add_compile_options("-Wall" "-std=c99")
+    add_compile_options("-Wall" "-std=c99" "-Werror")
 endif(MSVC)
 
 find_package(Vulkan)
