@@ -20,6 +20,9 @@ set(LIBRARY_SOURCES
     Source/FileSystem.h
     Source/FileSystem.c
 
+    Source/Assets/AssetsLoader.h
+    Source/Assets/AssetsLoader.c
+
     Source/Maths.h
     Source/Maths/MathsGeneric.c
 

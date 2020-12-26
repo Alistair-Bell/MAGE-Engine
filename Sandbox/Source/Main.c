@@ -22,12 +22,11 @@ I32 main()
     MageFileSystemCreate(&ci, &system);
     MageFileSystemMountDirectory(&system, &mi);
     MageFileSystemReadMountedDirectory(&system, &ri);
-
-    printf("%s\n", ri.StreamData);
-
-
     MageFileSystemUnmountDirectory(&system, "SharedResources");
     MageFileSystemDestory(&system);
+    
+    free(ri.StreamData);
+
 
     MageEngineApplication engineContext;
    

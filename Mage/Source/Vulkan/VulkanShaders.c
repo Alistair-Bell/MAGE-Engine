@@ -20,6 +20,7 @@ U8 MageVulkanShaderCreate(MageVulkanShaderCreateInfo *info, MageVulkanShader *sh
     createInfo.codeSize =   ri.StreamSize * sizeof(U32);
 
     VkResult shaderCreateResult = vkCreateShaderModule(info->DesiredDevice, &createInfo, NULL, &shader->RawModule);
+    free(ri.StreamData);
     return (shaderCreateResult == VK_SUCCESS);
 }
 VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageVulkanShaderType type)
