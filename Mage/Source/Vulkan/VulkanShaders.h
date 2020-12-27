@@ -4,7 +4,6 @@
 #include "../Includes.h"
 #include "../FileSystem.h"
 #include "VulkanRenderer.h"
-#include <vulkan/vulkan_core.h>
 
 typedef enum MageVulkanShaderType
 {
@@ -20,14 +19,18 @@ typedef struct MageVulkanShader
 
 typedef struct MageVulkanShaderCreateInfo
 {
-    MageVulkanShaderType   Type;
-    MageFileSystem         MountedFileSystem;
-    const char             *ShaderFile;
-    VkDevice               DesiredDevice;
+    MageVulkanShaderType                Type;
+    VkDevice                            DesiredDevice;
+    VkPipelineShaderStageCreateInfo     PipelineStage;
+    MageFileSystem                      MountedFileSystem;
+    const char                          *ShaderFile;
+    const char                          *EntryPoint;
 } MageVulkanShaderCreateInfo;
+
 
 extern U8 MageVulkanShaderCreate(MageVulkanShaderCreateInfo *info, MageVulkanShader *shader);
 extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageVulkanShaderType type);
-extern U8 MageVulkanShaderDestroy(MageVulkanShader *shader);
+extern VkPipelineShaderStageCreateInfo MageVulkanShaderGeneratePipelineStage(MageVulkanShaderCreateInfo *info, VkShaderModule module);
+extern U8 MageVulkanShaderDestroy(VkDevice device, MageVulkanShader *shader);
 
 #endif

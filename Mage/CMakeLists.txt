@@ -34,6 +34,7 @@ set(LIBRARY_SOURCES
     Source/Vulkan/VulkanRenderer.c
     Source/Vulkan/VulkanShaders.h
     Source/Vulkan/VulkanShaders.c
+    Source/Vulkan/VulkanGraphicsPipeline.c
 )
 
 message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")

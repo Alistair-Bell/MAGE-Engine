@@ -109,6 +109,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         MageVulkanRendererCreatePhysicalDevice,
         MageVulkanRendererCreateSwapChain,
         MageVulkanRendererCreateSwapChainImages,
+        MageVulkanRendererCreateGraphicsPipeline,
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -143,6 +144,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     free(renderer->SwapChain.Images);
     free(renderer->SwapChain.ImageViews);
 
+    vkDestroyPipelineLayout(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipelineLayout, NULL);
 
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyDevice(renderer->Device.LogicalDevice, NULL);

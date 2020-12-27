@@ -49,12 +49,19 @@ typedef struct MageRendererQueues
 
 typedef struct MageRendererSwapChain
 {
+    VkExtent2D              CurrentExtent;
     VkFormat                PrimaryFormat;
     VkSwapchainKHR          PrimarySwapchain;
     VkImage                 *Images;
     VkImageView             *ImageViews;
     U32                     ImagesCount;
 } MageRendererSwapChain;
+
+typedef struct MageRendererPipeline
+{
+    VkPipeline              GraphicsPipeline;
+    VkPipelineLayout        GraphicsPipelineLayout;
+} MageRendererPipeline;
 
 typedef struct MageRenderer
 {
@@ -63,6 +70,7 @@ typedef struct MageRenderer
     MageRendererPhysicalDevice  Device;
     MageRendererQueues          QueueHandles;
     MageRendererSwapChain       SwapChain;
+    MageRendererPipeline        Pipeline;
 } MageRenderer;
 
 
@@ -82,6 +90,8 @@ extern VkExtent2D MageVulkanRendererSurfaceHandleExtent(MageRendererCreateInfo *
 extern U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
+
+extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 

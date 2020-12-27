@@ -87,6 +87,7 @@ U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer 
     
     VkResult swapResult = vkCreateSwapchainKHR(renderer->Device.LogicalDevice, &swapchainInfo, NULL, &renderer->SwapChain.PrimarySwapchain) == VK_TRUE;
     renderer->SwapChain.PrimaryFormat = chosenFormat.format;
+    renderer->SwapChain.CurrentExtent = chosenExtent;
     MageVulkanRendererSurfaceSwapchainSupportDestroy(&sss);
     return swapResult == VK_SUCCESS;
 }
