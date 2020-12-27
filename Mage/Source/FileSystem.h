@@ -27,8 +27,8 @@ typedef struct MageFileSystem
 } MageFileSystem;
 
 extern U8 MageFileSystemCreate(MageFileSystemCreateInfo *info, MageFileSystem *system);
-extern U8 MageFileSystemMountDirectory(MageFileSystem *system, MageFileSystemMountInfo *info);
-extern U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemReadInfo *info);
+extern U8 MageFileSystemMountDirectory(MageFileSystemMountInfo *info, MageFileSystem *system);
+extern U8 MageFileSystemReadMountedDirectory(MageFileSystemReadInfo *info, MageFileSystem *system);
 extern U8 MageFileSystemUnmountDirectory(MageFileSystem *system, const char *mountPoint);
 extern U8 MageFileSystemDestory(MageFileSystem *system);
 

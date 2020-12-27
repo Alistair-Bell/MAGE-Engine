@@ -1,6 +1,6 @@
 #include <Mage.h>
 
-I32 main()
+I32 main(I32 argc, const char **args)
 {
     MageFileSystem system;
 
@@ -20,14 +20,15 @@ I32 main()
     ri.SearchOverride  = MageTrue;
 
     MageFileSystemCreate(&ci, &system);
-    MageFileSystemMountDirectory(&system, &mi);
-    MageFileSystemReadMountedDirectory(&system, &ri);
+    MageFileSystemMountDirectory(&mi, &system);
+    if (MageFileSystemReadMountedDirectory(&ri, &system))
+    {
+        printf("%s\n", ri.StreamData);
+        free(ri.StreamData);
+    }
     MageFileSystemUnmountDirectory(&system, "SharedResources");
     MageFileSystemDestory(&system);
     
-    free(ri.StreamData);
-
-
     MageEngineApplication engineContext;
    
     MageRendererCreateInfo rendererCreateInfo;

@@ -32,7 +32,6 @@ set(LIBRARY_SOURCES
 	Source/Vulkan/VulkanLoader.c
     Source/Vulkan/VulkanRenderer.h
     Source/Vulkan/VulkanRenderer.c
-    Source/Vulkan/VulkanShaders.h
     Source/Vulkan/VulkanShaders.c
     Source/Vulkan/VulkanGraphicsPipeline.c
 )

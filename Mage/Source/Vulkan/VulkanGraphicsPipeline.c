@@ -1,5 +1,4 @@
 #include "VulkanRenderer.h"
-#include "VulkanShaders.h"
 
 U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
@@ -56,19 +55,27 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     multisamplingInfo.sampleShadingEnable           = MageFalse;
     multisamplingInfo.rasterizationSamples          = VK_SAMPLE_COUNT_1_BIT;
 
+    VkPipelineColorBlendAttachmentState colorblendAttachments;
+    memset(&colorblendAttachments, 0, sizeof(VkPipelineColorBlendAttachmentState));
+    colorblendAttachments.colorWriteMask            = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT; 
+    colorblendAttachments.blendEnable               = VK_FALSE;
+
+    VkPipelineColorBlendStateCreateInfo colorblendInfo;
+    memset(&colorblendInfo, 0, sizeof(VkPipelineColorBlendStateCreateInfo));
+    colorblendInfo.sType                            = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    colorblendInfo.logicOpEnable                    = VK_FALSE;
+    colorblendInfo.logicOp                          = VK_LOGIC_OP_COPY;
+    colorblendInfo.pAttachments                     = &colorblendAttachments;
+    colorblendInfo.attachmentCount                  = 1;
+    colorblendInfo.blendConstants[0]                = 0.0f;
+    colorblendInfo.blendConstants[1]                = 0.0f;
+    colorblendInfo.blendConstants[2]                = 0.0f;
+    colorblendInfo.blendConstants[3]                = 0.0f;
+
     VkPipelineLayoutCreateInfo layoutInfo;
     memset(&layoutInfo, 0, sizeof(VkPipelineLayoutCreateInfo));
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     VkResult r = vkCreatePipelineLayout(renderer->Device.LogicalDevice, &layoutInfo, NULL, &renderer->Pipeline.GraphicsPipelineLayout);
-    MAGE_HANDLE_ERROR_MESSAGE(r != VK_SUCCESS, );
-
-    VkGraphicsPipelineCreateInfo pipelineInfo;
-    memset(&pipelineInfo, 0, sizeof(VkGraphicsPipelineCreateInfo));
-
-
-    
-
-
-    return MageTrue;
+    return (r == VK_SUCCESS);
 }

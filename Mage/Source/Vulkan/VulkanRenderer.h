@@ -5,6 +5,7 @@
 #include "../CreateStructures.h"
 #include "../Window.h"
 #include "../Maths.h"
+#include "../FileSystem.h"
 
 typedef struct MageRendererOverseer
 {
@@ -73,6 +74,25 @@ typedef struct MageRenderer
     MageRendererPipeline        Pipeline;
 } MageRenderer;
 
+typedef enum MageShaderType
+{
+    MAGE_SHADER_TYPE_VERTEX,
+    MAGE_SHADER_TYPE_FRAGMENT,
+} MageShaderType;
+
+typedef struct MageShaderCreateInfo
+{
+   MageFileSystem                      MountedFileSystem;
+   MageFileSystemReadInfo              ReadInfo;
+   MageShaderType                      Type;
+   const char                          *EntryPoint;
+} MageShaderCreateInfo;
+
+typedef struct MageShader
+{
+    VkShaderModule   Module;
+    MageShaderType   Type;
+} MageShader;
 
 extern U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer);
 
@@ -90,6 +110,10 @@ extern VkExtent2D MageVulkanRendererSurfaceHandleExtent(MageRendererCreateInfo *
 extern U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
+
+extern U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer *renderer);
+extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type);
+extern U8 MageShaderDestroy(VkDevice device, MageShader *shader);
 
 extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
 

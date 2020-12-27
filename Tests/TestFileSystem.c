@@ -10,7 +10,7 @@ static U8 TestFileSystemLoadDataFromMounted(U0 *data)
     mi.MountIndex = &index;
     mi.MountPoint = "Mage";
 
-    MageFileSystemMountDirectory(&f, &mi);
+    MageFileSystemMountDirectory(&mi, &f);
     printf("Inform: Mounted directory Mage, searching for Mage.h [Mage/Mage.h]\n");
 
     MageFileSystemReadInfo ri;
@@ -19,7 +19,7 @@ static U8 TestFileSystemLoadDataFromMounted(U0 *data)
     ri.SearchOverride = MageTrue;
     ri.MountPointIndex = index;
 
-    U8 r = MageFileSystemReadMountedDirectory(&f, &ri);
+    U8 r = MageFileSystemReadMountedDirectory(&ri, &f);
     return r;
 }
 

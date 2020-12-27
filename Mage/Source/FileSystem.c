@@ -7,7 +7,7 @@ U8 MageFileSystemCreate(MageFileSystemCreateInfo *info, MageFileSystem *system)
     system->NextIndex = UINT32_MAX;
     return MageTrue;
 }
-U8 MageFileSystemMountDirectory(MageFileSystem *system, MageFileSystemMountInfo *info)
+U8 MageFileSystemMountDirectory(MageFileSystemMountInfo *info, MageFileSystem *system)
 {
     U32 cnt = system->MountCount;
     system->MountCount++;
@@ -25,7 +25,7 @@ U8 MageFileSystemMountDirectory(MageFileSystem *system, MageFileSystemMountInfo 
         *info->MountIndex = cnt;
     return MageTrue;
 }
-U8 MageFileSystemReadMountedDirectory(MageFileSystem *system, MageFileSystemReadInfo *info)
+U8 MageFileSystemReadMountedDirectory(MageFileSystemReadInfo *info, MageFileSystem *system)
 {    
     FILE *f;
     char buffer[255];
