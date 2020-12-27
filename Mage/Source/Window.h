@@ -4,6 +4,15 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 
+
+typedef struct MageApplicationWindowDimensions
+{
+    U32 Width;
+    U32 Height;
+    U32 PositionX;
+    U32 PositionY;
+} MageApplicationWindowDimensions;
+
 #if MAGE_BUILD_PLATFORM_LINUX
 
 /* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :|*/
@@ -33,11 +42,10 @@ typedef struct MageApplicationWindow
     #error Platform has not been implimented!
 #endif
 
-
 extern U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window);
 extern U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName);
-extern U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height);
-extern U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height);
+extern U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions);
+extern U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions);
 extern U8 MageApplicationWindowDestroy(MageApplicationWindow* window);
 
 #endif

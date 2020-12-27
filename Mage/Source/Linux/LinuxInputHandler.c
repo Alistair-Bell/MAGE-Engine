@@ -77,17 +77,19 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
     }
     return MageTrue;
 }
-U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
 {
     XWindowAttributes a;
     XGetWindowAttributes(window->WindowDisplay, window->ContextWindow, &a);
-    *width  = a.width;
-    *height = a.height;
+    dimensions->Width     = a.width;
+    dimensions->Height    = a.height;
+    dimensions->PositionX = a.x;
+    dimensions->PositionY = a.y;
     return MageTrue;
 }
-U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
 {
-    return MageApplicationWindowGetDimensions(window, width, height);
+    return MageApplicationWindowGetDimensions(window, dimensions);
 }
 
 U8 MageInputHandlerDestroy(MageInputHandler *handler)
