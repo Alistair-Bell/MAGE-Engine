@@ -130,10 +130,10 @@ typedef enum MageKeyboardKey
 
 typedef enum MageMouseButton
 {
-    MAGE_MOUSE_BUTTON_LEFT = 0,
-    MAGE_MOUSE_BUTTON_RIGHT,
-    MAGE_MOUSE_BUTTON_MIDDLE, /* Clicking down on mouse wheel */
-	MAGE_MOUSE_BUTTON_UNDEFINED
+	MAGE_MOUSE_BUTTON_UNDEFINED = 0,
+    MAGE_MOUSE_BUTTON_LEFT      = 1,
+    MAGE_MOUSE_BUTTON_MIDDLE    = 2, /* Clicking down on mouse wheel */
+    MAGE_MOUSE_BUTTON_RIGHT     = 3,
 } MageMouseButton;
 
 typedef enum MageButtonState
@@ -163,9 +163,9 @@ typedef struct MageInputHandler
 
 /* Following implimented by native window frameworks */
 
-extern U8 MageInputHandlerCreate(MageInputHandlerCreateInfo* info, MageInputHandler* handler);
-extern U8 MageInputHandlerPollEvents(MageInputHandler* handler, MageApplicationWindow* window);
-extern U8 MageInputHandlerDestroy(MageInputHandler* handler);
+extern U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *handler);
+extern U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window);
+extern U8 MageInputHandlerDestroy(MageInputHandler *handler);
 
 extern MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code);
 extern MageMouseButton MageInputHandlerTranslateMouseCode(const U64 code);
@@ -176,11 +176,11 @@ extern MageMouseButton MageInputHandlerTranslateMouseCode(const U64 code);
 
 /* Common to all frameworks */
 
-extern U8  MageInputHandlerUpdateKeyStatus(MageInputHandler* handler, const MageKeyboardKey key, const MageButtonState state);
-extern U8  MageInputHandlerUpdateMouseButtonStatus(MageInputHandler* handler, const MageKeyboardKey key, const MageButtonState state);
-extern U8  MageInputHandlerInterrogateKeyState(MageInputHandler* handler, const MageKeyboardKey key, const MageButtonState state);
-extern U8  MageInputHandlerInterrogateMouseButtonState(MageInputHandler* handler, const MageMouseButton button, const MageButtonState state);
-extern F32 MageInputHandlerInterrogateMousePositionX(MageInputHandler* handler);
-extern F32 MageInputHandlerInterrogateMousePositionY(MageInputHandler* handler);
+extern U8  MageInputHandlerUpdateKeyStatus(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
+extern U8  MageInputHandlerUpdateMouseButtonStatus(MageInputHandler *handler, const MageMouseButton button, const MageButtonState state);
+extern U8  MageInputHandlerInterrogateKeyState(MageInputHandler *handler, const MageKeyboardKey key, const MageButtonState state);
+extern U8  MageInputHandlerInterrogateMouseButtonState(MageInputHandler *handler, const MageMouseButton button, const MageButtonState state);
+extern F32 MageInputHandlerInterrogateMousePositionX(MageInputHandler *handler);
+extern F32 MageInputHandlerInterrogateMousePositionY(MageInputHandler *handler);
 
 #endif

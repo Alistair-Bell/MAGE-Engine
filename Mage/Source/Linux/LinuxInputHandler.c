@@ -57,7 +57,7 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
             }
             case ButtonPress:
             {
-                break;
+                
             }
             case ButtonRelease:
             {
@@ -65,7 +65,9 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
             }
             case MotionNotify:
             {
-                printf("Inform: [%d:%d]\n", e->xmotion.x, e->xmotion.y);
+                handler->MousePositionX = e->xmotion.x;
+                handler->MousePositionY = e->xmotion.y;
+                printf("Inform: [%d:%d]\n", (I32)handler->MousePositionX, (I32)handler->MousePositionY);
                 break;
             }
             case ClientMessage:

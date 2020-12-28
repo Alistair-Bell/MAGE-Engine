@@ -65,8 +65,6 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         XFlush(window->WindowDisplay);
     }
 
-
-
     XGrabPointer(
         window->WindowDisplay, 
         window->ContextWindow,
