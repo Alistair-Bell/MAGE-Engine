@@ -20,8 +20,8 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     /* TODO Allow for full user customisation of the renderer's internal configuration */
     MageShader *shaders = calloc(info->PipelineShaderCount, sizeof(MageShader));
     memset(shaders, 0, sizeof(MageShader) * info->PipelineShaderCount);
-    U8 r = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders);
-    MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Failed to create pipeline, shaders have failed\n"));
+    U8 loadResult = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders);
+    MAGE_HANDLE_ERROR_MESSAGE(!loadResult, printf("Error: Failed to create pipeline, shaders have failed\n"));
 
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
