@@ -2,37 +2,35 @@
 
 I32 main(I32 argc, const char **args)
 {
-    MageFileSystem system;
-
-    MageFileSystemCreateInfo ci;
-    memset(&ci, 0, sizeof(MageFileSystemCreateInfo));
-
-    MageFileSystemMountInfo mi;
-    U32 index = 0;
-    memset(&mi, 0, sizeof(MageFileSystemMountInfo));
-    mi.MountIndex = &index;
-    mi.MountPoint = "SharedResources";
-
-    MageFileSystemReadInfo ri;
-    memset(&ri, 0, sizeof(MageFileSystemCreateInfo));
-    ri.FilePath = "Shaders/Colored/Fragment.frag";
-    ri.MountPointIndex = index;
-    ri.SearchOverride  = MageTrue;
-
-    MageFileSystemCreate(&ci, &system);
-    MageFileSystemMountDirectory(&mi, &system);
-    if (MageFileSystemReadMountedDirectory(&ri, &system))
-    {
-        printf("%s\n", ri.StreamData);
-        free(ri.StreamData);
-    }
-    MageFileSystemUnmountDirectory(&system, "SharedResources");
-    MageFileSystemDestory(&system);
-    
     MageEngineApplication engineContext;
    
+    MageFileSystem system;
+    U32 mntPoint;
+    MageFileSystemCreate(&(MageFileSystemCreateInfo) {}, &system);
+
+    MageFileSystemMountInfo mountInfo;
+    mountInfo.MountPoint = "SharedResources/Shaders";
+    mountInfo.MountIndex = &mntPoint;
+    MageFileSystemMountDirectory(&mountInfo, &system);
+
+    MageShaderCreateInfo vertex;
+    memset(&vertex, 0, sizeof(MageShaderCreateInfo));
+    vertex.MountedFileSystem = system;
+    vertex.EntryPoint        = "main";
+    vertex.Type              = MAGE_SHADER_TYPE_VERTEX;
+    vertex.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Vertex.vert.sprv" };
+
+    MageShaderCreateInfo fragment;
+    memset(&fragment, 0, sizeof(MageShaderCreateInfo));
+    fragment.MountedFileSystem = system;
+    fragment.EntryPoint        = "main";
+    fragment.Type              = MAGE_SHADER_TYPE_VERTEX;
+    fragment.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Fragment.frag.sprv" };
+    
     MageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(MageRendererCreateInfo));
+    rendererCreateInfo.PipelineShaderCount = 2;
+    rendererCreateInfo.PipelineShadersInfo = (MageShaderCreateInfo[]) { fragment, vertex };
 
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
@@ -55,6 +53,8 @@ I32 main(I32 argc, const char **args)
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
 
     while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
+
+    MageFileSystemDestory(&system);
     MageEngineApplicationDestroy(&engineContext);
 
     printf("Inform: Ran successfully\n");

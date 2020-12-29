@@ -3,6 +3,7 @@
 
 #include "Includes.h"
 
+typedef struct MageShaderCreateInfo MageShaderCreateInfo;
 typedef struct MageApplicationWindow MageApplicationWindow;
 typedef struct MageRenderer MageRenderer;
 
@@ -51,6 +52,8 @@ typedef struct MageRendererResizeHandleInfo
 typedef struct MageRendererCreateInfo
 {
     MageApplicationWindow                       *Window;  /* If created with the engine wrapper then it is automatically assigned */
+    MageShaderCreateInfo                        *PipelineShadersInfo;
+    U32                                         PipelineShaderCount;
 } MageRendererCreateInfo;
 
 typedef struct MageEngineApplicationCreateInfo

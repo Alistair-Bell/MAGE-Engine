@@ -5,12 +5,15 @@ U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer
 {
     U8 r = MageFileSystemReadMountedDirectory(&info->ReadInfo, &info->MountedFileSystem);
     MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Cannot read file %s for creating a new shader\n", info->ReadInfo.FilePath));
-
+    MageFileSystemReadInfo *ri = &info->ReadInfo;
 
     VkShaderModuleCreateInfo moduleInfo;
     memset(&moduleInfo, 0, sizeof(VkShaderModuleCreateInfo));
     moduleInfo.sType          = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    return MageTrue;
+    moduleInfo.pCode          = (U32 *)ri->StreamData;
+    moduleInfo.codeSize       = ri->StreamSize * sizeof(U32);
+    VkResult createResult     = vkCreateShaderModule(renderer->Device.LogicalDevice, &moduleInfo, NULL, &shader->Module);
+    return createResult == VK_SUCCESS;
 }
 VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type)
 {
@@ -23,8 +26,9 @@ VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType 
     }
     return 0;
 }
-U8 MageShaderDestroy(VkDevice device, MageShader *shader)
+U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer)
 {
+    vkDestroyShaderModule(renderer->Device.LogicalDevice, shader->Module, NULL);
     return MageTrue;
 }
 

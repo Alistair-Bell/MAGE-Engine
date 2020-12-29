@@ -113,7 +113,7 @@ extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, 
 
 extern U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer *renderer);
 extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type);
-extern U8 MageShaderDestroy(VkDevice device, MageShader *shader);
+extern U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
 

@@ -1,8 +1,28 @@
 #include "VulkanRenderer.h"
 
+static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, MageShader *shaders)
+{
+    U32 i;
+    MAGE_HANDLE_ERROR_MESSAGE(info->PipelineShadersInfo == NULL, printf("Error: No shaders passed into the MageRendererCreateInfo\n"));
+    MAGE_HANDLE_ERROR_MESSAGE(info->PipelineShaderCount <= 0, printf("Error: Invalid shader count passed into the MageRendererCreateInfo, ->PipelineShaderCount <= 0\n")); 
+
+    for (i = 0; i < info->PipelineShaderCount; i++)
+    {
+        U8 r = MageShaderCreate(&info->PipelineShadersInfo[i], &shaders[i], renderer);
+        MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Cannot load pipeline shaders\n"));
+    }
+
+    return MageTrue;
+}
+
 U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     /* TODO Allow for full user customisation of the renderer's internal configuration */
+    MageShader *shaders = calloc(info->PipelineShaderCount, sizeof(MageShader));
+    memset(shaders, 0, sizeof(MageShader) * info->PipelineShaderCount);
+    U8 r = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders);
+    MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Failed to create pipeline, shaders have failed\n"));
+
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
     memset(&vertexInputInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
@@ -77,5 +97,12 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     VkResult r = vkCreatePipelineLayout(renderer->Device.LogicalDevice, &layoutInfo, NULL, &renderer->Pipeline.GraphicsPipelineLayout);
+    
+    VkGraphicsPipelineCreateInfo pipelineInfo;
+    memset(&pipelineInfo, 0, sizeof(VkGraphicsPipelineCreateInfo));
+    pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineInfo.pColorBlendState = &colorblendInfo;
+    pipelineInfo.pViewportState   = &viewportStateInfo;
+
     return (r == VK_SUCCESS);
 }
