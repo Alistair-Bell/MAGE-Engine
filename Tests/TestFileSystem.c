@@ -8,16 +8,17 @@ static U8 TestFileSystemLoadDataFromMounted(U0 *data)
     MageFileSystemMountInfo mi;
     memset(&mi, 0, sizeof(MageFileSystemMountInfo));
     mi.MountIndex = &index;
-    mi.MountPoint = "Mage";
+    mi.MountPoint = "../../Mage";
 
     MageFileSystemMountDirectory(&mi, &f);
     printf("Inform: Mounted directory Mage, searching for Mage.h [Mage/Mage.h]\n");
 
     MageFileSystemReadInfo ri;
     memset(&ri, 0, sizeof(MageFileSystemReadInfo));
-    ri.FilePath = "Mage.h";
-    ri.SearchOverride = MageTrue;
+    ri.FilePath        = "Mage.h";
+    ri.SearchOverride  = MageTrue;
     ri.MountPointIndex = index;
+    ri.ReadMode        = MAGE_FILE_SYSTEM_READ_MODE_RAW;
 
     U8 r = MageFileSystemReadMountedDirectory(&ri, &f);
     return r;
