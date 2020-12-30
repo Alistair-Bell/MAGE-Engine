@@ -10,7 +10,7 @@ U8 MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U
 
 	VkExtensionProperties *properties = calloc(rawCount, sizeof(VkExtensionProperties));
 	vkEnumerateInstanceExtensionProperties(NULL, &rawCount, properties);
-	
+
 	U32 foundCount = 0;
 	U32 i, j;
 

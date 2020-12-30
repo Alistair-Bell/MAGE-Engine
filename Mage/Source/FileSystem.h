@@ -4,6 +4,9 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 
+#define MAGE_FILE_SYSTEM_READ_MODE_RAW "r"
+#define MAGE_FILE_SYSTEM_READ_MODE_BINARY "rb"
+
 typedef struct MageFileSystemMountInfo
 {
     const char  *MountPoint;
@@ -12,11 +15,12 @@ typedef struct MageFileSystemMountInfo
 
 typedef struct MageFileSystemReadInfo
 {
-    U8          SearchOverride;
-    U32         MountPointIndex;
-    U64         StreamSize;
-    char        *StreamData;
-    const char  *FilePath;
+    U8                     SearchOverride;
+    U32                    MountPointIndex;
+    U64                    StreamSize;
+    char                   *StreamData;
+    const char             *FilePath;
+    const char             *ReadMode;
 } MageFileSystemReadInfo;
 
 typedef struct MageFileSystem

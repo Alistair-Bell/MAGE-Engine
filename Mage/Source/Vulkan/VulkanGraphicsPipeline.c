@@ -104,5 +104,10 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     pipelineInfo.pColorBlendState = &colorblendInfo;
     pipelineInfo.pViewportState   = &viewportStateInfo;
 
+    U32 i;
+    for (i = 0; i < info->PipelineShaderCount; i++)
+        MageShaderDestroy(&shaders[i], renderer);
+    free(shaders);
+
     return (r == VK_SUCCESS);
 }

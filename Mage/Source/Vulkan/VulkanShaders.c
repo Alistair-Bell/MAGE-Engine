@@ -11,7 +11,7 @@ U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer
     memset(&moduleInfo, 0, sizeof(VkShaderModuleCreateInfo));
     moduleInfo.sType          = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     moduleInfo.pCode          = (U32 *)ri->StreamData;
-    moduleInfo.codeSize       = ri->StreamSize * sizeof(U32);
+    moduleInfo.codeSize       = ri->StreamSize;
     VkResult createResult     = vkCreateShaderModule(renderer->Device.LogicalDevice, &moduleInfo, NULL, &shader->Module);
     return createResult == VK_SUCCESS;
 }

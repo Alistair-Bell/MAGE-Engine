@@ -26,7 +26,8 @@ U8 MageFileSystemMountDirectory(MageFileSystemMountInfo *info, MageFileSystem *s
     return MageTrue;
 }
 U8 MageFileSystemReadMountedDirectory(MageFileSystemReadInfo *info, MageFileSystem *system)
-{    
+{   
+    MAGE_HANDLE_ERROR_MESSAGE(info->ReadMode == NULL, printf("Error: Read mode cannot be NULL"));
     FILE *f;
     char buffer[255];
     memset(buffer, 0, sizeof(buffer));
@@ -44,7 +45,7 @@ U8 MageFileSystemReadMountedDirectory(MageFileSystemReadInfo *info, MageFileSyst
     for (i = 0; i < system->MountCount; i++)
     {
         sprintf(buffer, "%s/%s", system->Mounted[i], info->FilePath);
-        f = fopen(buffer, "r");
+        f = fopen(buffer, info->ReadMode);
         if (f != NULL)
         {
             foundFile = MageTrue;

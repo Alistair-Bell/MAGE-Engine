@@ -26,15 +26,15 @@ I32 main(I32 argc, const char **args)
     vertex.MountedFileSystem = system;
     vertex.EntryPoint        = "main";
     vertex.Type              = MAGE_SHADER_TYPE_VERTEX;
-    vertex.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Vertex.vert.sprv" };
+    vertex.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Vertex.vert.sprv", .ReadMode = MAGE_FILE_SYSTEM_READ_MODE_BINARY };
 
     MageShaderCreateInfo fragment;
     memset(&fragment, 0, sizeof(MageShaderCreateInfo));
     fragment.MountedFileSystem = system;
     fragment.EntryPoint        = "main";
     fragment.Type              = MAGE_SHADER_TYPE_VERTEX;
-    fragment.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Fragment.frag.sprv" };
-    
+    fragment.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Fragment.frag.sprv", .ReadMode = MAGE_FILE_SYSTEM_READ_MODE_BINARY };
+
     MageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(MageRendererCreateInfo));
     rendererCreateInfo.PipelineShaderCount = 2;
