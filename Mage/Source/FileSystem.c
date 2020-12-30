@@ -74,7 +74,6 @@ U8 MageFileSystemUnmountDirectory(MageFileSystem *system, const char *mountPoint
     }
     
     MAGE_HANDLE_ERROR_MESSAGE(0 == 0, printf("Error: Unable to find mounted directory of %s in filesystem\n", mountPoint));
-    
 
     unmount:
     {
@@ -87,7 +86,6 @@ U8 MageFileSystemUnmountDirectory(MageFileSystem *system, const char *mountPoint
 }
 U8 MageFileSystemDestory(MageFileSystem *system)
 {
-    
     free(system->Mounted);
     return MageTrue;
 }

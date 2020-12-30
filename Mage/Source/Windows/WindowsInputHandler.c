@@ -26,7 +26,7 @@ LRESULT CALLBACK MageInputHandlerWindowsEventListener(HWND hWnd, UINT uMsg, WPAR
 		case WM_MOUSEWHEEL:
 		{
 			StaticHandler->MouseWheelPosition = (I32)GET_WHEEL_DELTA_WPARAM(wParam);
-			return MageFalse;
+			return MageTrue;
 		}
 		case WM_MOUSELEAVE:
 		{

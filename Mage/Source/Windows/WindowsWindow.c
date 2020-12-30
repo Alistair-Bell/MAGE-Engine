@@ -70,7 +70,6 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 		window->Instance,
 		NULL
 	);
-
 	printf("Inform: Created Win32 window\n");
 	return MageTrue;
 }
@@ -78,17 +77,19 @@ U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newN
 {
 	return SetWindowText(window->NativeWindow, TEXT(newName));
 }
-U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
 {
 	RECT r;
-	U8 result = GetWindowRect(window->NativeWindow, &r);
-	*height = r.bottom - r.top;
-	*width  = r.right  - r.left;
-	return (U8)result;
+	GetWindowRect(window->NativeWindow, &r);
+	SecureZeroMemory(dimensions, sizeof(MageApplicationWindowDimensions));
+	dimensions->Width   = r.right - r.left;
+	dimensions->Height  = r.bottom - r.top;
+	printf("Inform: [Left %d] [Right %d] [Top %d] [Bottom %d]\n", r.left, r.right, r.top, r.bottom);
+	printf("Inform: %d %d\n", dimensions->Width / 2, dimensions->Height / 2);
 }
-U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, U32 *width, U32 *height)
+U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
 {
-	return MageApplicationWindowGetDimensions(window, width, height);
+	return MageApplicationWindowGetDimensions(window, dimensions);
 }
 U8 MageApplicationWindowDestroy(MageApplicationWindow* window)
 {

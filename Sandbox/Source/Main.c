@@ -1,16 +1,24 @@
 #include <Mage.h>
 
+#if MAGE_BUILD_PLATFORM_WINDOWS
+    const char *mntPoint = "../../SharedResources/Shaders";
+#else
+    const char *mntPoint = "SharedResources/Shaders";
+#endif
+
 I32 main(I32 argc, const char **args)
 {
     MageEngineApplication engineContext;
    
     MageFileSystem system;
-    U32 mntPoint;
-    MageFileSystemCreate(&(MageFileSystemCreateInfo) {}, &system);
-
+    U32 mntIndex;
+    MageFileSystemCreateInfo fileCreateInfo;
+    memset(&fileCreateInfo, 0, sizeof(MageFileSystemCreateInfo));
+    MageFileSystemCreate(&fileCreateInfo, &system);
+   
     MageFileSystemMountInfo mountInfo;
-    mountInfo.MountPoint = "SharedResources/Shaders";
-    mountInfo.MountIndex = &mntPoint;
+    mountInfo.MountPoint = mntPoint;
+    mountInfo.MountIndex = &mntIndex;
     MageFileSystemMountDirectory(&mountInfo, &system);
 
     MageShaderCreateInfo vertex;
@@ -34,9 +42,9 @@ I32 main(I32 argc, const char **args)
 
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
-    windowCreateInfo.Width              = 1920;
-    windowCreateInfo.Height             = 1080;
-    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING;
+    windowCreateInfo.Width              = 1080;
+    windowCreateInfo.Height             = 720;
+    windowCreateInfo.Flags              = MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING | MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE;
     
     MageInputHandlerCreateInfo inputCreateInfo;
     memset(&inputCreateInfo, 0, sizeof(MageInputHandlerCreateInfo));
@@ -52,10 +60,12 @@ I32 main(I32 argc, const char **args)
 
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
 
+    MageApplicationWindowDimensions d;
+    MageApplicationWindowGetDimensions(engineContext.Window, &d);
     while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
 
-    MageFileSystemDestory(&system);
     MageEngineApplicationDestroy(&engineContext);
+    //MageFileSystemDestory(&system);
 
     printf("Inform: Ran successfully\n");
     return MageTrue;
