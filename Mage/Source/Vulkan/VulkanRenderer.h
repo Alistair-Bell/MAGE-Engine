@@ -62,6 +62,7 @@ typedef struct MageRendererPipeline
 {
     VkPipeline              GraphicsPipeline;
     VkPipelineLayout        GraphicsPipelineLayout;
+    VkRenderPass            RenderPass;
 } MageRendererPipeline;
 
 typedef struct MageRenderer
@@ -116,6 +117,7 @@ extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShad
 extern U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererCreateRenderPass(MageRendererCreateInfo *info, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 

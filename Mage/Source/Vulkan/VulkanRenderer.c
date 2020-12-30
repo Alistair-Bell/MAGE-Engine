@@ -105,10 +105,12 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         #if MAGE_BUILD_DEBUG_MODE
             MageVulkanRendererCreateDebugLayers,
         #endif
+        
         MageVulkanRendererCreateSurface,
         MageVulkanRendererCreatePhysicalDevice,
         MageVulkanRendererCreateSwapChain,
         MageVulkanRendererCreateSwapChainImages,
+        MageVulkanRendererCreateRenderPass,
         MageVulkanRendererCreateGraphicsPipeline,
     };
 
@@ -145,7 +147,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     free(renderer->SwapChain.ImageViews);
 
     vkDestroyPipelineLayout(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipelineLayout, NULL);
-
+    vkDestroyRenderPass(renderer->Device.LogicalDevice, renderer->Pipeline.RenderPass, NULL);
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);
     vkDestroyDevice(renderer->Device.LogicalDevice, NULL);
     vkDestroyInstance(renderer->Overseer.Instance, NULL);

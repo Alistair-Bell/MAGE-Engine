@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, MageShader *shaders)
+static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, VkShaderModule *shaders)
 {
     U32 i;
     MAGE_HANDLE_ERROR_MESSAGE(info->PipelineShadersInfo == NULL, printf("Error: No shaders passed into the MageRendererCreateInfo\n"));
@@ -8,8 +8,10 @@ static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreate
 
     for (i = 0; i < info->PipelineShaderCount; i++)
     {
-        U8 r = MageShaderCreate(&info->PipelineShadersInfo[i], &shaders[i], renderer);
+        MageShader s;
+        U8 r = MageShaderCreate(&info->PipelineShadersInfo[i], &s, renderer);
         MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Cannot load pipeline shaders\n"));
+        shaders[i] = s.Module;
     }
 
     return MageTrue;
@@ -18,8 +20,8 @@ static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreate
 U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     /* TODO Allow for full user customisation of the renderer's internal configuration */
-    MageShader *shaders = calloc(info->PipelineShaderCount, sizeof(MageShader));
-    memset(shaders, 0, sizeof(MageShader) * info->PipelineShaderCount);
+    VkShaderModule *shaders = calloc(info->PipelineShaderCount, sizeof(VkShaderModule));
+    memset(shaders, 0, sizeof(VkShaderModule) * info->PipelineShaderCount);
     U8 loadResult = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders);
     MAGE_HANDLE_ERROR_MESSAGE(!loadResult, printf("Error: Failed to create pipeline, shaders have failed\n"));
 
@@ -106,8 +108,6 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
 
     U32 i;
     for (i = 0; i < info->PipelineShaderCount; i++)
-        MageShaderDestroy(&shaders[i], renderer);
-    free(shaders);
-
+        vkDestroyShaderModule(renderer->Device.LogicalDevice, shaders[i], NULL);
     return (r == VK_SUCCESS);
 }
