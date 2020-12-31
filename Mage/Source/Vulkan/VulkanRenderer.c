@@ -146,6 +146,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     free(renderer->SwapChain.Images);
     free(renderer->SwapChain.ImageViews);
 
+    vkDestroyPipeline(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipeline, NULL);
     vkDestroyPipelineLayout(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipelineLayout, NULL);
     vkDestroyRenderPass(renderer->Device.LogicalDevice, renderer->Pipeline.RenderPass, NULL);
     vkDestroySurfaceKHR(renderer->Overseer.Instance, renderer->Surface.Surface, NULL);

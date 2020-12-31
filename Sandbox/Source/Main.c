@@ -32,7 +32,7 @@ I32 main(I32 argc, const char **args)
     memset(&fragment, 0, sizeof(MageShaderCreateInfo));
     fragment.MountedFileSystem = system;
     fragment.EntryPoint        = "main";
-    fragment.Type              = MAGE_SHADER_TYPE_VERTEX;
+    fragment.Type              = MAGE_SHADER_TYPE_FRAGMENT;
     fragment.ReadInfo          = (MageFileSystemReadInfo) { .FilePath = "HardCoded/Fragment.frag.sprv", .ReadMode = MAGE_FILE_SYSTEM_READ_MODE_BINARY };
 
     MageRendererCreateInfo rendererCreateInfo;

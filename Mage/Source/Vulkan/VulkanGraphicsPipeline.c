@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, VkShaderModule *shaders)
+static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, VkShaderModule *shaders, VkPipelineShaderStageCreateInfo *stages) 
 {
     U32 i;
     MAGE_HANDLE_ERROR_MESSAGE(info->PipelineShadersInfo == NULL, printf("Error: No shaders passed into the MageRendererCreateInfo\n"));
@@ -12,6 +12,7 @@ static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreate
         U8 r = MageShaderCreate(&info->PipelineShadersInfo[i], &s, renderer);
         MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Cannot load pipeline shaders\n"));
         shaders[i] = s.Module;
+        stages[i]  = MageVulkanShaderCreatePipelineStage(&info->PipelineShadersInfo[i], &s);
     }
 
     return MageTrue;
@@ -20,12 +21,15 @@ static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreate
 U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     /* TODO Allow for full user customisation of the renderer's internal configuration */
-    VkShaderModule *shaders = calloc(info->PipelineShaderCount, sizeof(VkShaderModule));
+    VkShaderModule *shaders                 = calloc(info->PipelineShaderCount, sizeof(VkShaderModule));
+    VkPipelineShaderStageCreateInfo *stages = calloc(info->PipelineShaderCount, sizeof(VkPipelineShaderStageCreateInfo));
+
     memset(shaders, 0, sizeof(VkShaderModule) * info->PipelineShaderCount);
-    U8 loadResult = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders);
+    memset(stages, 0, sizeof(VkPipelineShaderStageCreateInfo) * info->PipelineShaderCount);
+    
+    U8 loadResult = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders, stages);
     MAGE_HANDLE_ERROR_MESSAGE(!loadResult, printf("Error: Failed to create pipeline, shaders have failed\n"));
-
-
+    
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
     memset(&vertexInputInfo, 0, sizeof(VkPipelineVertexInputStateCreateInfo));
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -58,7 +62,7 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     viewportStateInfo.pViewports         = &viewport;
     viewportStateInfo.viewportCount      = 1;
     viewportStateInfo.pScissors          = &scissor;
-    viewportStateInfo.viewportCount      = 1;
+    viewportStateInfo.scissorCount       = 1;
 
     VkPipelineRasterizationStateCreateInfo rasterizationInfo;
     memset(&rasterizationInfo, 0, sizeof(VkPipelineRasterizationStateCreateInfo));
@@ -99,15 +103,30 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     layoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
     VkResult r = vkCreatePipelineLayout(renderer->Device.LogicalDevice, &layoutInfo, NULL, &renderer->Pipeline.GraphicsPipelineLayout);
-    
+    MAGE_HANDLE_ERROR_MESSAGE(r != VK_SUCCESS, ); 
+
     VkGraphicsPipelineCreateInfo pipelineInfo;
     memset(&pipelineInfo, 0, sizeof(VkGraphicsPipelineCreateInfo));
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipelineInfo.pColorBlendState = &colorblendInfo;
-    pipelineInfo.pViewportState   = &viewportStateInfo;
+    pipelineInfo.pVertexInputState   = &vertexInputInfo;
+    pipelineInfo.pInputAssemblyState = &inputAssemblyInfo;
+    pipelineInfo.pColorBlendState    = &colorblendInfo;
+    pipelineInfo.pViewportState      = &viewportStateInfo;
+    pipelineInfo.pMultisampleState   = &multisamplingInfo;
+    pipelineInfo.pRasterizationState = &rasterizationInfo;
+    pipelineInfo.layout              = renderer->Pipeline.GraphicsPipelineLayout;
+    pipelineInfo.pStages             = stages;
+    pipelineInfo.stageCount          = info->PipelineShaderCount;
+    pipelineInfo.subpass             = 0; /* subpass index */
+    pipelineInfo.renderPass          = renderer->Pipeline.RenderPass;
+
+    r = vkCreateGraphicsPipelines(renderer->Device.LogicalDevice, VK_NULL_HANDLE, 1, &pipelineInfo, NULL, &renderer->Pipeline.GraphicsPipeline);
 
     U32 i;
     for (i = 0; i < info->PipelineShaderCount; i++)
         vkDestroyShaderModule(renderer->Device.LogicalDevice, shaders[i], NULL);
+
+    free(stages);
+    free(shaders);
     return (r == VK_SUCCESS);
 }

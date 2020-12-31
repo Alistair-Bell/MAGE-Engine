@@ -93,6 +93,7 @@ typedef struct MageShader
 {
     VkShaderModule   Module;
     MageShaderType   Type;
+    const char       *EntryPoint;
 } MageShader;
 
 extern U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer);
@@ -114,6 +115,7 @@ extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, 
 
 extern U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer *renderer);
 extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type);
+extern VkPipelineShaderStageCreateInfo MageVulkanShaderCreatePipelineStage(MageShaderCreateInfo *info, MageShader *shader);
 extern U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);

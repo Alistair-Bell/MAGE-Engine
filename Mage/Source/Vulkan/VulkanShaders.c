@@ -13,7 +13,19 @@ U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer
     moduleInfo.pCode          = (U32 *)ri->StreamData;
     moduleInfo.codeSize       = ri->StreamSize;
     VkResult createResult     = vkCreateShaderModule(renderer->Device.LogicalDevice, &moduleInfo, NULL, &shader->Module);
+    
+    shader->Type        = info->Type;
     return createResult == VK_SUCCESS;
+}
+VkPipelineShaderStageCreateInfo MageVulkanShaderCreatePipelineStage(MageShaderCreateInfo *info, MageShader *shader)
+{
+    VkPipelineShaderStageCreateInfo stageInfo;
+    memset(&stageInfo, 0, sizeof(VkPipelineShaderStageCreateInfo));
+    stageInfo.sType        = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    stageInfo.stage        = MageVulkanShaderAbstractToNativeType(shader->Type);
+    stageInfo.module       = shader->Module;
+    stageInfo.pName        = info->EntryPoint; 
+    return stageInfo;
 }
 VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type)
 {
