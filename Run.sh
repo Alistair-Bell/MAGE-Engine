@@ -1,21 +1,38 @@
 #!/bin/bash
-clear
 
-if [ "$#" -le 0 ]; then
-    buildMode=Debug # automaticly use debug
-else
-    buildMode=$1
+function StoreInLocation()
+{
+    path=$1/MageEngine
+    if [ -d $path ]; then
+        echo "Directory already exists, just copying files"
+    else
+        echo "Making MageEngine directory in $1 (directory empty), copying required resource files"
+        mkdir $path
+    fi
+
+}
+
+clear
+# Compilation of a series of scripts for the lazy amoung us
+echo "MageEngine automated build system for minimal effort"
+
+echo "Building all the required shaders"
+./Scripts/BuildShaders.sh
+
+# Calls cmake then make, assumes using make build system as this is linux afterall
+echo "Generating project build files"
+./Scripts/GenerateAndCompile.sh Debug
+
+# Creates compile_commands.json for coc
+echo "Generating intelisense files for development"
+./Scripts/GenerateCompileCommands.sh
+
+# Copies all needed resources to a set directory if the user desires, default choice
+installResourceDir=(~/.local/MageEngine)
+echo "Installing common resources to $installResourceDir"
+
+if [ ! -d $installResourceDir ]; then
+    mkdir $installResourceDir
 fi
 
-# Build all shaders using handy script
-echo "Building all shaders!"
-./SharedResources/Shaders/BuildShaders.sh
-
-# Call cmake
-cmake -B Build -D PROJECT_BUILD_PLATFORM=Linux -D CMAKE_BUILD_TYPE=$buildMode -D PROJECT_BUILD_UNIT_TESTS=On
-
-cd Build
-make
-make test
-cd ../
-./Build/Sandbox/Sandbox
+cp -r SharedResources $installResourceDir

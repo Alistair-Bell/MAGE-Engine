@@ -55,9 +55,12 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
 {
     U8 foundExtensions = MageVulkanRendererValidateExtensionsPresent(MageRequiredExtensions, sizeof(MageRequiredExtensions) / sizeof(const char *));
     MAGE_HANDLE_ERROR_MESSAGE(!foundExtensions, printf("Error: Vulkan loader: Unable to find all the required instance extensions!\n"));
-    U8 foundLayers     = MageVulkanRendererValidateLayersPresent((const char *[]) { "VK_LAYER_KHRONOS_validation" }, 1);
-    MAGE_HANDLE_ERROR_MESSAGE(!foundLayers, printf("Error: Vulkan loader: Unable to find all the required instance layers!\n"));
-
+    
+    #if MAGE_BUILD_DEBUG_MODE
+        U8 foundLayers     = MageVulkanRendererValidateLayersPresent((const char *[]) { "VK_LAYER_KHRONOS_validation" }, 1);
+        MAGE_HANDLE_ERROR_MESSAGE(!foundLayers, printf("Error: Vulkan loader: Unable to find all the required instance layers!\n"));
+    #endif
+    
     VkApplicationInfo applicationInfo;
     memset(&applicationInfo, 0, sizeof(VkApplicationInfo));
     applicationInfo.sType               = VK_STRUCTURE_TYPE_APPLICATION_INFO;
