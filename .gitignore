@@ -1,27 +1,11 @@
 # Build files
 Build*
 
-# Linux generated build files
-Makefile*
-
-# Windows generated build files
-*.vsproj
-*.sln
-*.vcxproj
-*.vcxproj.filters
-*.vs
-*.user
-
-# Macos generated build files
-*.pbxproj
-*.xcworkspacedata
-
 # Valgrind generated debug files
 vgcore*
 
 # My stuff
-compile_commands.json # see the GenerateCompileCommands.json
-.vscode # old vscode files
+compile_commands.json # see the Scripts/GenerateCompileCommands.sh
 
 # Compiled shaders
 *.sprv
