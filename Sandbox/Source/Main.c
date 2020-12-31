@@ -59,13 +59,10 @@ I32 main(I32 argc, const char **args)
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
 
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
-
-    MageApplicationWindowDimensions d;
-    MageApplicationWindowGetDimensions(engineContext.Window, &d);
     while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
 
     MageEngineApplicationDestroy(&engineContext);
-    //MageFileSystemDestory(&system);
+    MageFileSystemDestory(&system);
 
     printf("Inform: Ran successfully\n");
     return MageTrue;

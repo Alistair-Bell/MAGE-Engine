@@ -76,7 +76,6 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         CurrentTime
     );
 
-
     return MageTrue;
 }
 U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName)

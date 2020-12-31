@@ -65,6 +65,20 @@ typedef struct MageRendererPipeline
     VkRenderPass            RenderPass;
 } MageRendererPipeline;
 
+typedef struct MageRendererFrameBuffer
+{
+    VkFramebuffer *Buffers;
+    U32            Count;
+} MageRendererFrameBuffer;
+
+typedef struct MageRendererCommandBuffers
+{
+    VkCommandPool   Pool;
+    U32             ResidentCount; 
+    VkCommandBuffer *Residents;
+
+} MageRendererCommandBuffers;
+
 typedef struct MageRenderer
 {
     MageRendererOverseer        Overseer;
@@ -72,7 +86,9 @@ typedef struct MageRenderer
     MageRendererPhysicalDevice  Device;
     MageRendererQueues          QueueHandles;
     MageRendererSwapChain       SwapChain;
+    MageRendererFrameBuffer     FrameBuffer;
     MageRendererPipeline        Pipeline;
+    MageRendererCommandBuffers  CommandRecorders;
 } MageRenderer;
 
 typedef enum MageShaderType
@@ -121,8 +137,11 @@ extern U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer);
 extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererCreateRenderPass(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererCreateFrameBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
 
+extern U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
+
+extern U8  MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
 extern U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);
 
