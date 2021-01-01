@@ -104,7 +104,8 @@ U8 MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPh
 U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     MageRendererPhysicalDevice *rd = &renderer->Device;
-    U32 count, i;
+    U32 count = 0;
+    U32 i;
     U64 leadingIndex = 0;
     vkEnumeratePhysicalDevices(renderer->Overseer.Instance, &count, NULL);
     
