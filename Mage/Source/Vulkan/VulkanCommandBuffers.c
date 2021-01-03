@@ -20,7 +20,5 @@ U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRend
     
     r = vkAllocateCommandBuffers(renderer->Device.LogicalDevice, &allocInfo, renderer->CommandRecorders.Residents);
     MAGE_HANDLE_ERROR_MESSAGE(r != VK_SUCCESS, printf("Error: Unable to allocate %d command buffers to primary pool\n", count));
-
-
     return MageTrue;
 }

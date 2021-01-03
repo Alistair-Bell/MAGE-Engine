@@ -24,6 +24,7 @@
     #include <X11/Xlib.h>
     #include <X11/X.h>
     #include <X11/keysym.h>
+    #include <unistd.h>
 #elif MAGE_BUILD_PLATFORM_WINDOWS
     #include <Windows.h>
     #include <windowsx.h>
