@@ -176,5 +176,6 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
     VkResult createResult = vkCreateDevice(renderer->Device.GPU, &deviceCreateInfo, NULL, &renderer->Device.LogicalDevice);
 
     vkGetDeviceQueue(rd->LogicalDevice, renderer->Device.QueueFamilies.GraphicsFamilyIndex, 0, &renderer->QueueHandles.GraphicsQueue);
+    vkGetDeviceQueue(rd->LogicalDevice, renderer->Device.QueueFamilies.PresentFamilyIndex, 0, &renderer->QueueHandles.PresentQueue);
     return createResult == VK_SUCCESS;
 }

@@ -6,12 +6,20 @@
     const char *mntPoint = "SharedResources/Shaders";
 #endif
 
+static U8 Loop(MageEngineApplication *application)
+{
+    U8 r = MageInputHandlerPollEvents(application->InputHandler, application->Window);
+    MageRendererPresentRecorded(application->Renderer);
+    return r ;
+}
+
 I32 main(I32 argc, const char **args)
 {
     MageEngineApplication engineContext;
-   
+    
     MageFileSystem system;
     U32 mntIndex;
+   
     MageFileSystemCreateInfo fileCreateInfo;
     memset(&fileCreateInfo, 0, sizeof(MageFileSystemCreateInfo));
     MageFileSystemCreate(&fileCreateInfo, &system);
@@ -37,8 +45,9 @@ I32 main(I32 argc, const char **args)
 
     MageRendererCreateInfo rendererCreateInfo;
     memset(&rendererCreateInfo, 0, sizeof(MageRendererCreateInfo));
-    rendererCreateInfo.PipelineShaderCount = 2;
-    rendererCreateInfo.PipelineShadersInfo = (MageShaderCreateInfo[]) { fragment, vertex };
+    rendererCreateInfo.PipelineShadersInfo   = (MageShaderCreateInfo[]) { fragment, vertex };
+    rendererCreateInfo.PipelineShaderCount   = 2;
+    rendererCreateInfo.ConcurrentThreadCount = 2; /* Active frames to render */
 
     MageApplicationWindowCreateInfo windowCreateInfo;
     memset(&windowCreateInfo, 0, sizeof(MageApplicationWindowCreateInfo));
@@ -59,7 +68,12 @@ I32 main(I32 argc, const char **args)
     engineCreateInfo.RendererCreateInfo          = rendererCreateInfo;
 
     if (!MageEngineApplicationCreate(&engineCreateInfo, &engineContext)) return MageFalse;
-    while (MageInputHandlerPollEvents(engineContext.InputHandler, engineContext.Window)); 
+    
+    U32 i;
+    for (i = 0; i < engineContext.Renderer->CommandRecorders.ResidentCount; i++)
+        MageRendererRecordHardCoded(engineContext.Renderer, i);
+
+    while (Loop(&engineContext)); 
 
     MageEngineApplicationDestroy(&engineContext);
     MageFileSystemDestory(&system);

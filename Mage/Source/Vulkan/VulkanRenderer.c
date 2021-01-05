@@ -117,6 +117,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         MageVulkanRendererCreateGraphicsPipeline,
         MageVulkanRendererCreateFrameBuffers,
         MageVulkanRendererCreateCommandBuffers,
+        MageVulkanRendererCreateSyncronisation,
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -127,6 +128,13 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         VkResult current = methods[i](info, renderer);
         MAGE_HANDLE_ERROR_MESSAGE(!current, printf("Error: Failed to create renderer, passed %lu of %lu operations\n", i, count));
     }
+    
+    VkClearColorValue *colorValue = &renderer->ClearValues.color;
+    colorValue->float32[0]  = 0.0f;
+    colorValue->float32[1]  = 0.0f;
+    colorValue->float32[2]  = 0.0f;
+    colorValue->float32[3]  = 1.0f;
+
     printf("Inform: Renderer has been created, passed %lu of %lu operations\n", i, count);
     return MageTrue;
 }
@@ -134,8 +142,89 @@ U8 MageRendererHandleWindowResize(MageRendererResizeHandleInfo *info, MageRender
 {
     return MageTrue;
 }
+U8 MageRendererRecordHardCoded(MageRenderer *renderer, U32 recorderIndex)
+{
+    VkCommandBufferBeginInfo beginInfo;
+    memset(&beginInfo, 0, sizeof(VkCommandBufferBeginInfo));
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    vkBeginCommandBuffer(renderer->CommandRecorders.Residents[recorderIndex], &beginInfo);
+
+    VkRenderPassBeginInfo renderPassInfo;
+    memset(&renderPassInfo, 0, sizeof(VkRenderPassBeginInfo));
+
+    renderPassInfo.sType             = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass        = renderer->Pipeline.RenderPass;
+    renderPassInfo.pClearValues      = &renderer->ClearValues;
+    renderPassInfo.clearValueCount   = 1;
+    renderPassInfo.renderArea.offset = (VkOffset2D) { .x = 0.0f, .y = 0.0f };
+    renderPassInfo.renderArea.extent = renderer->SwapChain.CurrentExtent;
+    renderPassInfo.framebuffer       = renderer->FrameBuffer.Buffers[recorderIndex];
+
+    VkSubpassDependency dependency;
+    memset(&dependency, 0, sizeof(VkSubpassDependency));
+    dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    dependency.dstSubpass = 0;
+
+    VkCommandBuffer c = renderer->CommandRecorders.Residents[recorderIndex];
+    vkCmdBeginRenderPass(c, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+        vkCmdBindPipeline(c, VK_PIPELINE_BIND_POINT_GRAPHICS, renderer->Pipeline.GraphicsPipeline);
+        vkCmdDraw(c, 3, 1, 0, 0);   
+    vkCmdEndRenderPass(c);
+
+    vkEndCommandBuffer(c);
+    return MageTrue;
+}
+U8 MageRendererPresentRecorded(MageRenderer *renderer)
+{
+    U32 imageIndex;
+    VkSemaphore *imageAvailable = &renderer->Syncronisation.AvailableSemaphores[renderer->ActiveIndex];
+    
+    vkWaitForFences(renderer->Device.LogicalDevice, 1, &renderer->Syncronisation.ActiveFences[renderer->ActiveIndex], VK_TRUE, UINT64_MAX);
+    vkAcquireNextImageKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, UINT64_MAX, (*imageAvailable), VK_NULL_HANDLE, &imageIndex); 
+
+    VkFence *imageFence = &renderer->Syncronisation.ImageFences[imageIndex];
+
+    /* Check if previous frame is using this image */
+    if ((*imageFence) != VK_NULL_HANDLE)
+        vkWaitForFences(renderer->Device.LogicalDevice, 1, imageFence, VK_TRUE, UINT64_MAX);
+
+    /* Mark as active */
+    *imageFence = renderer->Syncronisation.ActiveFences[renderer->ActiveIndex];
+
+    VkSemaphore *signal = &renderer->Syncronisation.FinishedSemaphores[renderer->ActiveIndex];
+
+    VkSubmitInfo submitInfo;
+    memset(&submitInfo, 0, sizeof(VkSubmitInfo));
+    submitInfo.sType                   = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pWaitDstStageMask       = (VkPipelineStageFlags[]) { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+    submitInfo.pWaitSemaphores         = imageAvailable;
+    submitInfo.waitSemaphoreCount      = 1;
+    submitInfo.pCommandBuffers         = &renderer->CommandRecorders.Residents[imageIndex];
+    submitInfo.commandBufferCount      = 1;
+    submitInfo.pSignalSemaphores       = signal;
+    submitInfo.signalSemaphoreCount    = 1;
+
+    vkResetFences(renderer->Device.LogicalDevice, 1, &renderer->Syncronisation.ActiveFences[renderer->ActiveIndex]);
+    VkResult r = vkQueueSubmit(renderer->QueueHandles.GraphicsQueue, 1, &submitInfo, (*imageFence)); 
+    MAGE_HANDLE_ERROR_MESSAGE(r != VK_SUCCESS, printf("Error: Unable to submit queue for rendering\n"));
+    
+    VkPresentInfoKHR presentInfo;
+    memset(&presentInfo, 0, sizeof(VkPresentInfoKHR));
+    presentInfo.sType              = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.pSwapchains        = &renderer->SwapChain.PrimarySwapchain;
+    presentInfo.swapchainCount     = 1;
+    presentInfo.pWaitSemaphores    = signal;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pImageIndices      = &imageIndex;
+
+    vkQueuePresentKHR(renderer->QueueHandles.PresentQueue, &presentInfo);
+    renderer->ActiveIndex = (renderer->ActiveIndex + 1) % renderer->Syncronisation.ThreadCount;
+    return MageTrue;
+}
 U8 MageRendererDestroy(MageRenderer *renderer)
 {
+    vkDeviceWaitIdle(renderer->Device.LogicalDevice); /* Wait for any operations to halt before destroying shit */
 
     #if MAGE_BUILD_DEBUG_MODE
         MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
@@ -148,7 +237,16 @@ U8 MageRendererDestroy(MageRenderer *renderer)
         vkDestroyImageView(renderer->Device.LogicalDevice, renderer->SwapChain.ImageViews[i], NULL);
         vkDestroyFramebuffer(renderer->Device.LogicalDevice, renderer->FrameBuffer.Buffers[i], NULL);
     }
+    for (i = 0; i < renderer->Syncronisation.ThreadCount; i++)
+    {
+        vkDestroySemaphore(renderer->Device.LogicalDevice, renderer->Syncronisation.AvailableSemaphores[i], NULL);
+        vkDestroySemaphore(renderer->Device.LogicalDevice, renderer->Syncronisation.FinishedSemaphores[i], NULL);
+        vkDestroyFence(renderer->Device.LogicalDevice, renderer->Syncronisation.ActiveFences[i], NULL);
+    }
 
+    free(renderer->Syncronisation.AvailableSemaphores);
+    free(renderer->Syncronisation.FinishedSemaphores);
+    free(renderer->Syncronisation.ActiveFences);
     free(renderer->SwapChain.Images);
     free(renderer->SwapChain.ImageViews);
     free(renderer->FrameBuffer.Buffers);

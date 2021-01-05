@@ -54,6 +54,7 @@ typedef struct MageRendererCreateInfo
     MageApplicationWindow                       *Window;  /* If created with the engine wrapper then it is automatically assigned */
     MageShaderCreateInfo                        *PipelineShadersInfo;
     U32                                         PipelineShaderCount;
+    U32                                         ConcurrentThreadCount;
 } MageRendererCreateInfo;
 
 typedef struct MageEngineApplicationCreateInfo

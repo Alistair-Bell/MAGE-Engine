@@ -125,12 +125,13 @@ U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *
             {
                 KeySym sym = XLookupKeysym(&e->xkey, 0);
                 handler->KeyboardStates[MageInputHandlerTranslateKeyCodes((U64)sym)] |= MAGE_BUTTON_STATE_PRESS; 
+                if (handler->KeyboardStates[MAGE_KEYBOARD_KEY_H] & MAGE_BUTTON_STATE_PRESS) return MageFalse;
                 break;
             }
             case KeyRelease:
             {
                 KeySym sym = XLookupKeysym(&e->xkey, 0);
-                handler->KeyboardStates[MageInputHandlerTranslateKeyCodes((U64)sym)] |= MAGE_BUTTON_STATE_RELEASE; 
+                handler->KeyboardStates[MageInputHandlerTranslateKeyCodes((U64)sym)] |= MAGE_BUTTON_STATE_RELEASE;
                 break;
             }
             case ButtonPress:

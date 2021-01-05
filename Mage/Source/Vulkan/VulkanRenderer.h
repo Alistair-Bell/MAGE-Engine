@@ -79,6 +79,16 @@ typedef struct MageRendererCommandBuffers
 
 } MageRendererCommandBuffers;
 
+typedef struct MageRendererSyncronisation
+{
+    VkSemaphore        *AvailableSemaphores;
+    VkSemaphore        *FinishedSemaphores;
+    VkFence            *ActiveFences;
+    VkFence            *ImageFences;
+    U32                ThreadCount;
+
+} MageRendererSyncronisation;
+
 typedef struct MageRenderer
 {
     MageRendererOverseer        Overseer;
@@ -89,6 +99,9 @@ typedef struct MageRenderer
     MageRendererFrameBuffer     FrameBuffer;
     MageRendererPipeline        Pipeline;
     MageRendererCommandBuffers  CommandRecorders;
+    MageRendererSyncronisation  Syncronisation;
+    VkClearValue                ClearValues;
+    U32                         ActiveIndex;
 } MageRenderer;
 
 typedef enum MageShaderType
@@ -114,7 +127,7 @@ typedef struct MageShader
 
 extern U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8  MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U64 MageVulkanRendererRatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer, VkPhysicalDevice device);
 extern U8  MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPhysicalDevice device, MageRendererPhysicalDeviceQueueFamilies *families);
 extern U8  MageVulkanRendererFindPhysicalDeviceExtensions(VkPhysicalDevice device, const char *deviceExtensions[], const U32 count);
@@ -141,6 +154,7 @@ extern U8 MageVulkanRendererCreateFrameBuffers(MageRendererCreateInfo *info, Mag
 
 extern U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
 
+extern U8  MageVulkanRendererCreateSyncronisation(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8  MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
 extern U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);

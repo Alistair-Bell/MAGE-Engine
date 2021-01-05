@@ -3,7 +3,9 @@
 U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     U32 count = renderer->FrameBuffer.Count;
-    renderer->CommandRecorders.Residents = calloc(count, sizeof(VkCommandBuffer));
+    renderer->CommandRecorders.ResidentCount = count;
+    renderer->CommandRecorders.Residents     = calloc(count, sizeof(VkCommandBuffer));
+    
 
     VkCommandPoolCreateInfo poolInfo;
     memset(&poolInfo, 0, sizeof(VkCommandPoolCreateInfo));
