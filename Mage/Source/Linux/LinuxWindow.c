@@ -19,15 +19,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
     if (!(info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING))
         attributes.override_redirect = MageTrue; 
 
-    if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE)
-    {
-        XWindowAttributes dimensions;
-        XGetWindowAttributes(window->WindowDisplay, window->RootWindow, &dimensions);
-        info->SpawnOffsetX = (dimensions.width- info->Width)  / 2;
-        info->SpawnOffsetY = (dimensions.height- info->Height) / 2;
-    }
-
-    window->ContextWindow = XCreateWindow(
+   window->ContextWindow = XCreateWindow(
         window->WindowDisplay,
         window->RootWindow,
         info->SpawnOffsetX,
@@ -63,6 +55,13 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         XMapWindow(window->WindowDisplay, window->ContextWindow);
         XSendEvent(window->WindowDisplay, DefaultRootWindow(window->WindowDisplay), MageFalse, SubstructureRedirectMask | SubstructureNotifyMask, &staging);
         XFlush(window->WindowDisplay);
+    }
+    
+    if (info->Flags & MAGE_APPLICATION_WINDOW_CREATE_FLAGS_AUTO_CENTRE)
+    {
+        U32 w = XDisplayWidth(window->WindowDisplay,  0);
+        U32 h = XDisplayHeight(window->WindowDisplay, 0);
+        XMoveWindow(window->WindowDisplay, window->ContextWindow, (w - info->Width) / 2, (h - info->Height) / 2);
     }
 
     XGrabPointer(
