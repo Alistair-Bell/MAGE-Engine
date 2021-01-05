@@ -37,6 +37,7 @@ set(LIBRARY_SOURCES
     Source/Vulkan/VulkanRenderPass.c
     Source/Vulkan/VulkanCommandBuffers.c
     Source/Vulkan/VulkanFrameBuffer.c
+    Source/Vulkan/VulkanSynchronisation.c
 )
 
 message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")
