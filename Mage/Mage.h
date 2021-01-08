@@ -9,6 +9,7 @@
 #include "Source/EngineApplication.h"
 #include "Source/FileSystem.h"
 #include "Source/Assets/AssetsLoader.h"
+#include "Source/Threading.h"
 #include "Source/Renderer.h"
 
 #ifdef MAGE_BUILD_RENDERER_VULKAN

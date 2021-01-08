@@ -12,6 +12,12 @@ function StoreInLocation()
 
 }
 
+if [ "$#" -le 0 ]; then
+    buidMode="Debug"
+else
+    buidMode=$1
+fi
+
 clear
 # Compilation of a series of scripts for the lazy amoung us
 echo "MageEngine automated build system for minimal effort"
@@ -21,11 +27,10 @@ echo "Building all the required shaders"
 
 # Calls cmake then make, assumes using make build system as this is linux afterall
 echo "Generating project build files"
-./Scripts/GenerateAndCompile.sh Debug
+./Scripts/GenerateAndCompile.sh $buidMode # Creates compile_commands.json for coc
 
-# Creates compile_commands.json for coc
 echo "Generating intelisense files for development"
-./Scripts/GenerateCompileCommands.sh
+./Scripts/GenerateCompileCommands.sh # Defaults to build mode debug, development should use debug environment
 
 # Copies all needed resources to a set directory if the user desires, default choice
 installResourceDir=(~/.local/MageEngine)

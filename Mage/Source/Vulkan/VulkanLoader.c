@@ -66,4 +66,3 @@ U8 MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count
 	free(properties);
 	return MageTrue;
 }
-

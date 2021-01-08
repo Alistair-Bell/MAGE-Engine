@@ -7,6 +7,17 @@ typedef struct MageShaderCreateInfo MageShaderCreateInfo;
 typedef struct MageApplicationWindow MageApplicationWindow;
 typedef struct MageRenderer MageRenderer;
 
+
+#if MAGE_BUILD_PLATFORM_LINUX
+    typedef U0 *(*MageThreadCallback)(U0 *);
+    #define MAGE_THREAD_RETURN_VALUE U0 *
+#elif MAGE_BUILD_PLATFORM_WINDOWS
+    typedef DWORD (*MageThreadCallback)(U8 *);
+    #define MAGE_THREAD_RETURN_VALUE DWORD
+#endif
+
+
+
 typedef enum MageApplicationWindowCreateFlags
 {
     MAGE_APPLICATION_WINDOW_CREATE_FLAGS_ALLOW_RESIZING = 0x01,
@@ -69,5 +80,11 @@ typedef struct MageFileSystemCreateInfo
 {
     U0 *TempData; /* This is a junk parameter, some compilers don't like empty fields */
 } MageFileSystemCreateInfo;
+
+typedef struct MageThreadCreateInfo
+{
+    MageThreadCallback   Callback; 
+    U0                   *CallbackData;
+} MageThreadCreateInfo; 
 
 #endif

@@ -26,6 +26,8 @@ set(LIBRARY_SOURCES
     Source/Maths.h
     Source/Maths/MathsGeneric.c
 
+    Source/Threading.h
+
     Source/Vulkan/VulkanPhysicalDevice.c
     Source/Vulkan/VulkanSurface.c
     Source/Vulkan/VulkanSwapChain.c
@@ -47,6 +49,7 @@ if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
         Source/Linux/LinuxWindow.c
         Source/Linux/LinuxInputHandler.c
+        Source/Linux/LinuxThreading.c
     )
 elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 	set(LIBRARY_SOURCES ${LIBRARY_SOURCES}

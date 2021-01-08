@@ -154,10 +154,10 @@ extern U8 MageVulkanRendererCreateFrameBuffers(MageRendererCreateInfo *info, Mag
 
 extern U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8  MageVulkanRendererCreateSyncronisation(MageRendererCreateInfo *info, MageRenderer *renderer);
-extern U8  MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
-extern U8  MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
-extern U8  MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);
+extern U8 MageVulkanRendererCreateSyncronisation(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
+extern U8 MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);
 
 extern VKAPI_ATTR VkBool32 VKAPI_CALL MageVulkanValidationLayersCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, U0 *pUserData);
 

@@ -83,8 +83,7 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
         instanceInfo.enabledLayerCount   = 1;
         instanceInfo.pNext               = (VkDebugUtilsMessengerCreateInfoEXT *)&data;
     #endif
-
-    
+ 
     VkResult result = vkCreateInstance(&instanceInfo, NULL, &renderer->Overseer.Instance);
     return result == VK_SUCCESS;
 }

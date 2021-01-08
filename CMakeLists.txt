@@ -52,6 +52,7 @@ function(MageEngineLinkPlatformLibrariesToBinary binary)
 
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_link_libraries(${binary} X11)
+        target_link_libraries(${binary} pthread)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
     
     endif()
