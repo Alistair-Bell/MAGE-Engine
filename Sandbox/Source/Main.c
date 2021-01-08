@@ -6,20 +6,13 @@
     const char *mntPoint = "SharedResources/Shaders";
 #endif
 
-static U8 Loop(MageEngineApplication *application)
-{
-    U8 r = MageInputHandlerPollEvents(application->InputHandler, application->Window);
-    MageRendererPresentRecorded(application->Renderer);
-    return r ;
-}
-
 I32 main(I32 argc, const char **args)
 {
     MageEngineApplication engineContext;
     
     MageFileSystem system;
     U32 mntIndex;
-   
+
     MageFileSystemCreateInfo fileCreateInfo;
     memset(&fileCreateInfo, 0, sizeof(MageFileSystemCreateInfo));
     MageFileSystemCreate(&fileCreateInfo, &system);
@@ -73,7 +66,7 @@ I32 main(I32 argc, const char **args)
     for (i = 0; i < engineContext.Renderer->CommandRecorders.ResidentCount; i++)
         MageRendererRecordHardCoded(engineContext.Renderer, i);
 
-    while (Loop(&engineContext)); 
+    MageEngineApplicationStart(&engineContext);
 
     MageEngineApplicationDestroy(&engineContext);
     MageFileSystemDestory(&system);

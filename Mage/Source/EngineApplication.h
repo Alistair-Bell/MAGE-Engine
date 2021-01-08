@@ -5,6 +5,7 @@
 #include "CreateStructures.h"
 #include "Window.h"
 #include "InputHandler.h"
+#include "Threading.h"
 #include "Renderer.h"
 
 #if MAGE_BUILD_RENDERER_VULKAN
@@ -20,6 +21,7 @@ typedef struct MageEngineApplication
 } MageEngineApplication;
 
 extern U8 MageEngineApplicationCreate(MageEngineApplicationCreateInfo *info, MageEngineApplication *engine);
+extern U8 MageEngineApplicationStart(MageEngineApplication *engine);
 extern U8 MageEngineApplicationDestroy(MageEngineApplication *engine);
 
 

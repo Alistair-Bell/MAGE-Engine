@@ -2,6 +2,18 @@
 
 #define MAGE_CHECK_PRINT_EXIT(condition) MAGE_HANDLE_ERROR_MESSAGE(condition, printf("Error: Failed to create engine\n"))
 
+static MAGE_THREAD_RETURN_VALUE FixedUpdateLoop(U0 *data) /* Runs at a locked framerate */
+{
+    MageEngineApplication *e = ((MageEngineApplication *)data);
+    MageApplicationWindow *w = e->Window;
+    MageInputHandler      *i = e->InputHandler;
+    while (e->Running)
+    {
+        e->Running = MageInputHandlerPollEvents(i, w); 
+    }
+    return MAGE_THREAD_RETURN_SUCCESS;
+}
+
 U8 MageEngineApplicationCreate(MageEngineApplicationCreateInfo *info, MageEngineApplication *engine)
 {
     memset(engine, 0, sizeof(MageEngineApplication));
@@ -22,8 +34,30 @@ U8 MageEngineApplicationCreate(MageEngineApplicationCreateInfo *info, MageEngine
     currentResult = MageRendererCreate(&info->RendererCreateInfo, engine->Renderer);
     MAGE_CHECK_PRINT_EXIT(!currentResult)
 
+    engine->Running = MageTrue;
+
     printf("Inform: Created engine\n");
     return currentResult;
+}
+U8 MageEngineApplicationStart(MageEngineApplication *engine)
+{
+    /* Fixed loop thread */
+    MageThread fixedThread;
+
+    MageThreadCreateInfo fixedThreadInfo;
+    memset(&fixedThreadInfo, 0, sizeof(MageThreadCreateInfo));
+    fixedThreadInfo.Callback       = FixedUpdateLoop;
+    fixedThreadInfo.CallbackData   = (U0 *)engine;
+
+    U8 result = MageThreadCreate(&fixedThreadInfo, &fixedThread);
+    MAGE_HANDLE_ERROR_MESSAGE(result != MageTrue, printf("Error: Failed to create fixed update loop thread\n"));
+    while (engine->Running)
+    {
+        MageRendererPresentRecorded(engine->Renderer);
+    }
+
+
+    return MageTrue;
 }
 U8 MageEngineApplicationDestroy(MageEngineApplication *engine)
 {
