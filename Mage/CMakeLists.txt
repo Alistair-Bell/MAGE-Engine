@@ -50,6 +50,7 @@ if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         Source/Linux/LinuxWindow.c
         Source/Linux/LinuxInputHandler.c
         Source/Linux/LinuxThreading.c
+        Source/Linux/LinuxFileSystem.c
     )
 elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 	set(LIBRARY_SOURCES ${LIBRARY_SOURCES}

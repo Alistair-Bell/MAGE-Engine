@@ -30,6 +30,9 @@ typedef struct MageFileSystem
     U32 MountCount;
 } MageFileSystem;
 
+extern U8 MageFileSystemGetUserHomeDirectroy(char *buffer, const U32 lenght); /* uses uid to get the home directory on linux, window it goes C:\Users\user\Documents  */
+extern U8 MageFileSystemSetWorkingDirectory(const char *directory);
+
 extern U8 MageFileSystemCreate(MageFileSystemCreateInfo *info, MageFileSystem *system);
 extern U8 MageFileSystemMountDirectory(MageFileSystemMountInfo *info, MageFileSystem *system);
 extern U8 MageFileSystemReadMountedDirectory(MageFileSystemReadInfo *info, MageFileSystem *system);

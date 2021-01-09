@@ -26,6 +26,7 @@
     #include <X11/keysym.h>
     #include <unistd.h>
     #include <pthread.h>
+    #include <pwd.h>
 #elif MAGE_BUILD_PLATFORM_WINDOWS
     #include <Windows.h>
     #include <windowsx.h>

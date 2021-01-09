@@ -7,18 +7,6 @@ static U8 MageInputHandleResize(MageInputHandler *handler, MageApplicationWindow
     return MageTrue;
 }
 
-/* 
-            mapKeys[0x61] = Key::A; mapKeys[0x62] = Key::B; mapKeys[0x63] = Key::C; mapKeys[0x64] = Key::D; mapKeys[0x65] = Key::E;
-			mapKeys[0x66] = Key::F; mapKeys[0x67] = Key::G; mapKeys[0x68] = Key::H; mapKeys[0x69] = Key::I; mapKeys[0x6A] = Key::J;
-			mapKeys[0x6B] = Key::K; mapKeys[0x6C] = Key::L; mapKeys[0x6D] = Key::M; mapKeys[0x6E] = Key::N; mapKeys[0x6F] = Key::O;
-			mapKeys[0x70] = Key::P; mapKeys[0x71] = Key::Q; mapKeys[0x72] = Key::R; mapKeys[0x73] = Key::S; mapKeys[0x74] = Key::T;
-			mapKeys[0x75] = Key::U; mapKeys[0x76] = Key::V; mapKeys[0x77] = Key::W; mapKeys[0x78] = Key::X; mapKeys[0x79] = Key::Y;
-			mapKeys[0x7A] = Key::Z;
-
-
-
-*/
-
 MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code)
 {
     switch (code)
@@ -58,7 +46,6 @@ MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code)
         case XK_BackSpace: return MAGE_KEYBOARD_KEY_BACKSPACE;
         case XK_Escape:    return MAGE_KEYBOARD_KEY_ESCAPE;
         case XK_Linefeed:  return MAGE_KEYBOARD_KEY_ENTER;
-
 
         case XK_F1:  return MAGE_KEYBOARD_KEY_F1;
         case XK_F2:  return MAGE_KEYBOARD_KEY_F2;

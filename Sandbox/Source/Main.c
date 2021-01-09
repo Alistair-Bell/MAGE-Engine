@@ -1,13 +1,20 @@
 #include <Mage.h>
 
-#if MAGE_BUILD_PLATFORM_WINDOWS
-    const char *mntPoint = "../../SharedResources/Shaders";
-#else
-    const char *mntPoint = "SharedResources/Shaders";
-#endif
+static U8 GetAssestsMountPoint(char *buffer, U32 len)
+{
+    char localBuffer[255];
+    U8 r = MageFileSystemGetUserHomeDirectroy(localBuffer, 255);
+    MAGE_HANDLE_ERROR_MESSAGE(!r, );
+
+    sprintf(buffer, "%s/.local/MageEngine/SharedResources/Shaders", localBuffer);
+    return r;
+}
 
 I32 main(I32 argc, const char **args)
 {
+    char buff[255];
+    GetAssestsMountPoint(buff, 255);
+
     MageEngineApplication engineContext;
     
     MageFileSystem system;
@@ -18,7 +25,7 @@ I32 main(I32 argc, const char **args)
     MageFileSystemCreate(&fileCreateInfo, &system);
    
     MageFileSystemMountInfo mountInfo;
-    mountInfo.MountPoint = mntPoint;
+    mountInfo.MountPoint = buff;
     mountInfo.MountIndex = &mntIndex;
     MageFileSystemMountDirectory(&mountInfo, &system);
 
