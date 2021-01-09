@@ -16,6 +16,7 @@ typedef struct MageEngineApplication
 {
     MageApplicationWindow       *Window;
     MageInputHandler            *InputHandler;
+    MageInputHandler            *PreviousInputHandler;
     MageRenderer                *Renderer;
     U8                          Running;
 } MageEngineApplication;

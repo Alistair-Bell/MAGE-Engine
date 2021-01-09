@@ -45,7 +45,6 @@ static U0 MageVulkanRendererFillValidationLayerCreateInfo(VkDebugUtilsMessengerC
 
 VKAPI_ATTR VkBool32 VKAPI_CALL MageVulkanValidationLayersCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT *pCallbackData, U0 *pUserData)
 {
-    // messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT && 
     if (messageSeverity != VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT)
         printf("Warning: Vulkan validation layer message: %s\n", pCallbackData->pMessage);
     return VK_SUCCESS;

@@ -4,7 +4,6 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 
-
 typedef struct MageApplicationWindowDimensions
 {
     U32 Width;
