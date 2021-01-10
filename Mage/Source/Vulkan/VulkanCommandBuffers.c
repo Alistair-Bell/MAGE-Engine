@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererCommandBuffersCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     U32 count = renderer->FrameBuffer.Count;
     renderer->CommandRecorders.ResidentCount = count;

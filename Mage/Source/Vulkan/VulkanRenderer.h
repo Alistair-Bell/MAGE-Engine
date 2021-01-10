@@ -38,7 +38,6 @@ typedef struct MageRendererPhysicalDevice
     VkDevice                                LogicalDevice;
     VkPhysicalDevice                        GPU;
     VkPhysicalDeviceProperties              Properties;
-    VkPhysicalDeviceMemoryProperties        MemoryProperties;
     MageRendererPhysicalDeviceQueueFamilies QueueFamilies;
 } MageRendererPhysicalDevice;
 
@@ -89,6 +88,22 @@ typedef struct MageRendererSyncronisation
 
 } MageRendererSyncronisation;
 
+typedef U32 MageVulkanMemoryBlockSections;
+
+typedef struct MageVulkanMemoryBlock
+{
+    MageVulkanMemoryBlockSections *Sections;
+    VkDeviceMemory                AssociatedMemory;
+    U32                           SectionCount;
+    U8                            Allocated;
+} MageVulkanMemoryBlock;
+
+typedef struct MageVulkanMemoryHeap
+{
+    U32                    BlockCount;
+    MageVulkanMemoryBlock  *Blocks;
+} MageVulkanMemoryHeap;
+
 typedef struct MageRenderer
 {
     MageRendererOverseer        Overseer;
@@ -100,7 +115,9 @@ typedef struct MageRenderer
     MageRendererPipeline        Pipeline;
     MageRendererCommandBuffers  CommandRecorders;
     MageRendererSyncronisation  Syncronisation;
+    MageVulkanMemoryHeap        *Heaps;
     VkClearValue                ClearValues;
+    U32                         HeapCount;
     U32                         ActiveIndex;
 } MageRenderer;
 
@@ -125,36 +142,39 @@ typedef struct MageShader
     const char       *EntryPoint;
 } MageShader;
 
-extern U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererInstanceCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8  MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8  MageVulkanRendererPhysicalDeviceCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U64 MageVulkanRendererRatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer, VkPhysicalDevice device);
 extern U8  MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPhysicalDevice device, MageRendererPhysicalDeviceQueueFamilies *families);
 extern U8  MageVulkanRendererFindPhysicalDeviceExtensions(VkPhysicalDevice device, const char *deviceExtensions[], const U32 count);
 
-extern U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *renderer);
+extern U8 MageVulkanRendererSurfaceCreate(MageRendererCreateInfo *info,  MageRenderer *renderer);
 extern U8 MageVulkanRendererSurfaceFindSwapchainSupport(MageRenderer *renderer, MageRendererSurfaceSwapchainSupport *info);
 extern U8 MageVulkanRendererSurfacePickCorrectFormats(MageRenderer *renderer, MageRendererSurfaceSwapchainSupport *info, VkSurfaceFormatKHR *format, VkPresentModeKHR *present);
 extern U8 MageVulkanRendererSurfaceSwapchainSupportDestroy(MageRendererSurfaceSwapchainSupport *info);
 extern VkExtent2D MageVulkanRendererSurfaceHandleExtent(MageRendererCreateInfo *info, MageRendererSurfaceSwapchainSupport *surfaceSupport, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererSwapChainCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
-extern U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererSwapChainImagesCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
 extern U8 MageShaderCreate(MageShaderCreateInfo *info, MageShader *shader, MageRenderer *renderer);
 extern VkShaderStageFlagBits MageVulkanShaderAbstractToNativeType(const MageShaderType type);
 extern VkPipelineShaderStageCreateInfo MageVulkanShaderCreatePipelineStage(MageShaderCreateInfo *info, MageShader *shader);
 extern U8 MageShaderDestroy(MageShader *shader, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer);
-extern U8 MageVulkanRendererCreateRenderPass(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererGraphicsPipelineCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererRenderPassCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateFrameBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererFrameBuffersCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateCommandBuffers(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererCommandBuffersCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
-extern U8 MageVulkanRendererCreateSyncronisation(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererHeapsCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererHeapsDestroy(MageRenderer *renderer);
+
+extern U8 MageVulkanRendererSyncronisationCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer);
 extern U8 MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U32 count);
 extern U8 MageVulkanRendererValidateLayersPresent(const char *layers[], const U32 count);

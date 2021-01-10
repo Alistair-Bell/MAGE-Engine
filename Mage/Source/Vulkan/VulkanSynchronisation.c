@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-U8 MageVulkanRendererCreateSyncronisation(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererSyncronisationCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     MAGE_HANDLE_ERROR_MESSAGE(info->ConcurrentThreadCount <= 0, printf("Error: Threadcount specified must be greater than 0\n"));
 

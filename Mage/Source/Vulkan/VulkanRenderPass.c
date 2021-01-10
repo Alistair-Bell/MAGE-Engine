@@ -18,7 +18,7 @@ static U32 MageVulkanRendererRenderPassGetColorAttachment(VkAttachmentDescriptio
     return UINT32_MAX;
 }
 
-U8 MageVulkanRendererCreateRenderPass(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererRenderPassCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     VkAttachmentDescription description;
     VkAttachmentReference   reference;

@@ -101,7 +101,7 @@ U8 MageVulkanRendererFindPhysicalDeviceQueueFamiles(MageRenderer *renderer, VkPh
         return (graphicsFound) && (presentFound);
     }
 }
-U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererPhysicalDeviceCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     MageRendererPhysicalDevice *rd = &renderer->Device;
     U32 count = 0;
@@ -144,7 +144,6 @@ U8 MageVulkanRendererCreatePhysicalDevice(MageRendererCreateInfo *info, MageRend
         MAGE_HANDLE_ERROR_MESSAGE(scores[leadingIndex] == 0, printf("Error: Unable to find suitable vulkan device with desired features!\n"));
         rd->GPU = devices[leadingIndex];
         vkGetPhysicalDeviceProperties(rd->GPU, &rd->Properties);
-        vkGetPhysicalDeviceMemoryProperties(rd->GPU, &rd->MemoryProperties);
         MageVulkanRendererFindPhysicalDeviceQueueFamiles(renderer, renderer->Device.GPU, &renderer->Device.QueueFamilies);
         printf("Inform: Selected %s as rendering GPU, ranked most suitable of %d GPU's\n", rd->Properties.deviceName, count);
     }

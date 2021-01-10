@@ -38,7 +38,7 @@ U8 MageVulkanRendererSurfaceFindSwapchainSupport(MageRenderer *renderer, MageRen
 
     return (info->FormatCount != 0 || info->PresentCount != 0);
 }
-U8 MageVulkanRendererCreateSwapChain(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererSwapChainCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     MageRendererSurfaceSwapchainSupport sss;
     U8 currentResult = MageVulkanRendererSurfaceFindSwapchainSupport(renderer, &sss);
@@ -100,7 +100,7 @@ U8 MageVulkanRendererGetSwapChainImages(MageRendererCreateInfo *info, MageRender
     vkGetSwapchainImagesKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, &renderer->SwapChain.ImagesCount, renderer->SwapChain.Images);
     return MageTrue;
 }
-U8 MageVulkanRendererCreateSwapChainImages(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererSwapChainImagesCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     MageVulkanRendererGetSwapChainImages(info, renderer);
 

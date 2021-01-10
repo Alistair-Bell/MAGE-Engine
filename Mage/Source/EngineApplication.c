@@ -37,17 +37,12 @@ static MAGE_THREAD_RETURN_VALUE FixedUpdateLoop(U0 *data) /* Runs at a locked fr
             cfk = &ch->MouseStates[i];
             if ((*pfk) & MAGE_MOUSE_BUTTON_LEFT && (*cfk) & MAGE_BUTTON_STATE_PRESS)
             {
-                *cfk &= ~MAGE_BUTTON_STATE_PRESS; /* Turn bit off */
+                *cfk = 0; /* Turn bit off */
                 *cfk |= MAGE_BUTTON_STATE_REPEAT;
                 printf("Inform: Mouse button repeated %d\n", i);
             }
             (*pfk) = (*cfk);
         }
-
-        /*
-        memset(ch->KeyboardStates, 0, sizeof(ch->KeyboardStates));
-        memset(ch->MouseStates, 0, sizeof(ch->MouseStates));
-        */
     }
     return MAGE_THREAD_RETURN_SUCCESS;
 }

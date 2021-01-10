@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-U8 MageVulkanRendererCreateFrameBuffers(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererFrameBuffersCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     U32 i;
     U32 count = renderer->SwapChain.ImagesCount;

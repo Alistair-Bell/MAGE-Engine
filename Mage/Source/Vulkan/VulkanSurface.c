@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-U8 MageVulkanRendererCreateSurface(MageRendererCreateInfo *info,  MageRenderer *renderer)
+U8 MageVulkanRendererSurfaceCreate(MageRendererCreateInfo *info,  MageRenderer *renderer)
 {
     VkResult result;
 

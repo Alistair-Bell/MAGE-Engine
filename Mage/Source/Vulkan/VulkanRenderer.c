@@ -18,13 +18,13 @@ static const char *MageRequiredExtensions[] =
 
 typedef U8 (*MageVulkanCreateCallback)(MageRendererCreateInfo *, MageRenderer *);
 
-static U0 MageVulkanRendererDestroyValidationLayers(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
+static U0 MageVulkanRendererValidationLayersDestroy(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator)
 {
     PFN_vkDestroyDebugUtilsMessengerEXT function = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (function != NULL)
         function(instance, debugMessenger, pAllocator);
 }
-static VkResult MageVulkanRendererHandleLayerCreation(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger)
+static VkResult MageVulkanRendererValidationLayerCreate(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT *pCreateInfo, const VkAllocationCallbacks *pAllocator, VkDebugUtilsMessengerEXT *pDebugMessenger)
 {
     PFN_vkCreateDebugUtilsMessengerEXT function = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     if (function != NULL)
@@ -50,7 +50,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL MageVulkanValidationLayersCallback(VkDebugUtilsMe
     return VK_SUCCESS;
 }
 
-U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererInstanceCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     U8 foundExtensions = MageVulkanRendererValidateExtensionsPresent(MageRequiredExtensions, sizeof(MageRequiredExtensions) / sizeof(const char *));
     MAGE_HANDLE_ERROR_MESSAGE(!foundExtensions, printf("Error: Vulkan loader: Unable to find all the required instance extensions!\n"));
@@ -86,11 +86,11 @@ U8 MageVulkanRendererCreateInstance(MageRendererCreateInfo *info, MageRenderer *
     VkResult result = vkCreateInstance(&instanceInfo, NULL, &renderer->Overseer.Instance);
     return result == VK_SUCCESS;
 }
-U8 MageVulkanRendererCreateDebugLayers(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererDebugLayersCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo;
     MageVulkanRendererFillValidationLayerCreateInfo(&messengerCreateInfo);
-    VkResult result = MageVulkanRendererHandleLayerCreation(renderer->Overseer.Instance, &messengerCreateInfo, NULL, &renderer->Overseer.DebugMessenger);
+    VkResult result = MageVulkanRendererValidationLayerCreate(renderer->Overseer.Instance, &messengerCreateInfo, NULL, &renderer->Overseer.DebugMessenger);
 
     return result == VK_SUCCESS;
 }
@@ -102,20 +102,21 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
     
     MageVulkanCreateCallback methods[] = 
     {
-        MageVulkanRendererCreateInstance,
+        MageVulkanRendererInstanceCreate,
         #if MAGE_BUILD_DEBUG_MODE
-            MageVulkanRendererCreateDebugLayers,
+            MageVulkanRendererDebugLayersCreate,
         #endif
         
-        MageVulkanRendererCreateSurface,
-        MageVulkanRendererCreatePhysicalDevice,
-        MageVulkanRendererCreateSwapChain,
-        MageVulkanRendererCreateSwapChainImages,
-        MageVulkanRendererCreateRenderPass,
-        MageVulkanRendererCreateGraphicsPipeline,
-        MageVulkanRendererCreateFrameBuffers,
-        MageVulkanRendererCreateCommandBuffers,
-        MageVulkanRendererCreateSyncronisation,
+        MageVulkanRendererSurfaceCreate, 
+        MageVulkanRendererPhysicalDeviceCreate,
+        MageVulkanRendererSwapChainCreate,
+        MageVulkanRendererSwapChainImagesCreate,
+        MageVulkanRendererRenderPassCreate,
+        MageVulkanRendererGraphicsPipelineCreate,
+        MageVulkanRendererFrameBuffersCreate,
+        MageVulkanRendererCommandBuffersCreate,
+        MageVulkanRendererSyncronisationCreate,
+        MageVulkanRendererHeapsCreate,
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -225,7 +226,7 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     vkDeviceWaitIdle(renderer->Device.LogicalDevice); /* Wait for any operations to halt before destroying shit */
 
     #if MAGE_BUILD_DEBUG_MODE
-        MageVulkanRendererDestroyValidationLayers(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
+        MageVulkanRendererValidationLayersDestroy(renderer->Overseer.Instance, renderer->Overseer.DebugMessenger, NULL);
     #endif
     vkDestroySwapchainKHR(renderer->Device.LogicalDevice, renderer->SwapChain.PrimarySwapchain, NULL);
 
@@ -249,6 +250,9 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     free(renderer->SwapChain.ImageViews);
     free(renderer->FrameBuffer.Buffers);
     free(renderer->CommandRecorders.Residents);
+
+    MageVulkanRendererHeapsDestroy(renderer); 
+    free(renderer->Heaps);
 
     vkDestroyCommandPool(renderer->Device.LogicalDevice, renderer->CommandRecorders.Pool, NULL);
     vkDestroyPipeline(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipeline, NULL);

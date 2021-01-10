@@ -1,6 +1,6 @@
 #include "VulkanRenderer.h"
 
-static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, VkShaderModule *shaders, VkPipelineShaderStageCreateInfo *stages) 
+static U8 MageVulkanRendererGraphicsPipelineCreateLoadShaders(MageRendererCreateInfo *info, MageRenderer *renderer, VkShaderModule *shaders, VkPipelineShaderStageCreateInfo *stages) 
 {
     U32 i;
     MAGE_HANDLE_ERROR_MESSAGE(info->PipelineShadersInfo == NULL, printf("Error: No shaders passed into the MageRendererCreateInfo\n"));
@@ -18,7 +18,7 @@ static U8 MageVulkanRendererCreateGraphicsPipelineLoadShaders(MageRendererCreate
     return MageTrue;
 }
 
-U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRenderer *renderer)
+U8 MageVulkanRendererGraphicsPipelineCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
 {
     /* TODO Allow for full user customisation of the renderer's internal configuration */
     VkShaderModule *shaders                 = calloc(info->PipelineShaderCount, sizeof(VkShaderModule));
@@ -27,7 +27,7 @@ U8 MageVulkanRendererCreateGraphicsPipeline(MageRendererCreateInfo *info, MageRe
     memset(shaders, 0, sizeof(VkShaderModule) * info->PipelineShaderCount);
     memset(stages, 0, sizeof(VkPipelineShaderStageCreateInfo) * info->PipelineShaderCount);
     
-    U8 loadResult = MageVulkanRendererCreateGraphicsPipelineLoadShaders(info, renderer, shaders, stages);
+    U8 loadResult = MageVulkanRendererGraphicsPipelineCreateLoadShaders(info, renderer, shaders, stages);
     MAGE_HANDLE_ERROR_MESSAGE(!loadResult, printf("Error: Failed to create pipeline, shaders have failed\n"));
     
     VkPipelineVertexInputStateCreateInfo vertexInputInfo;
