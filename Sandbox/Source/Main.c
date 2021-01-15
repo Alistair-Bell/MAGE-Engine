@@ -3,10 +3,11 @@
 static U8 GetAssestsMountPoint(char *buffer, U32 len)
 {
     char localBuffer[255];
-    U8 r = MageFileSystemGetUserHomeDirectroy(localBuffer, 255);
+    U8 r = MageFileSystemGetUserHomeDirectroy(localBuffer, 213);
     MAGE_HANDLE_ERROR_MESSAGE(!r, );
 
     sprintf(buffer, "%s/.local/MageEngine/SharedResources/Shaders", localBuffer);
+    printf("%lu\n", strlen(".local/MageEngine/SharedResources/Shaders"));
     return r;
 }
 

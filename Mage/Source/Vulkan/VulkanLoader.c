@@ -28,6 +28,10 @@ U8 MageVulkanRendererValidateExtensionsPresent(const char *extensions[], const U
 			}
 		}
 	}
+    for (i = 0; i < rawCount; i++)
+    {
+        printf("Inform: Extension %2d: %s\n", i + 1, properties[i].extensionName);
+    }
 	printf("Inform: Vulkan loader: found %d of the %d extensions requested\n", foundCount, count);
 
 	free(properties);

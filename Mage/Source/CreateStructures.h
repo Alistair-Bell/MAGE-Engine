@@ -16,7 +16,26 @@ typedef struct MageRenderer MageRenderer;
     #define MAGE_THREAD_RETURN_VALUE DWORD
 #endif
 
+typedef enum MageGraphicsBufferCreateInfoFlags
+{
+    MAGE_GRAPHICS_BUFFER_CREATE_INFO_FLAGS_STATIC, /* Likely to be the same all the time, not likely to change */
+    MAGE_GRAPHICS_BUFFER_CREATE_INFO_FLAGS_ADAPTABLE, /* Likely to change and be updated */
+} MageGraphicsBufferCreateInfoFlags;
 
+typedef enum MageGraphicsBufferCreateInfoType
+{
+    MAGE_GRAPHICS_BUFFER_CREATE_INFO_TYPE_VERTEX,
+    MAGE_GRAPHICS_BUFFER_CREATE_INFO_TYPE_INDEX,
+    MAGE_GRAPHICS_BUFFER_CREATE_INFO_TYPE_UNIFORM,
+} MageGraphicsBufferCreateInfoType;
+
+typedef struct MageGraphicsBufferCreateInfo
+{
+    MageGraphicsBufferCreateInfoFlags Flags;
+    MageGraphicsBufferCreateInfoType  Type;
+    U0                                *Data;
+    U64                               Size;
+}  MageGraphicsBufferCreateInfo;
 
 typedef enum MageApplicationWindowCreateFlags
 {

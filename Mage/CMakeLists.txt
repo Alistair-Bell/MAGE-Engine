@@ -27,6 +27,7 @@ set(LIBRARY_SOURCES
     Source/Maths/MathsGeneric.c
 
     Source/Threading.h
+    Source/GraphicsBuffer.h
 
     Source/Vulkan/VulkanPhysicalDevice.c
     Source/Vulkan/VulkanSurface.c
@@ -41,6 +42,7 @@ set(LIBRARY_SOURCES
     Source/Vulkan/VulkanFrameBuffer.c
     Source/Vulkan/VulkanSynchronisation.c
     Source/Vulkan/VulkanMemory.c
+    Source/Vulkan/VulkanBuffer.c
 )
 
 message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")

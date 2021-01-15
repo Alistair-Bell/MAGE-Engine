@@ -94,15 +94,24 @@ typedef struct MageVulkanMemoryBlock
 {
     MageVulkanMemoryBlockSections *Sections;
     VkDeviceMemory                AssociatedMemory;
-    U32                           SectionCount;
+    U32                           MaxSectionCount;
+    U32                           ActiveSectionCount; 
     U8                            Allocated;
 } MageVulkanMemoryBlock;
 
 typedef struct MageVulkanMemoryHeap
 {
-    U32                    BlockCount;
-    MageVulkanMemoryBlock  *Blocks;
+    VkMemoryPropertyFlagBits Flags;
+    U32                      HeapIndex;
+    U32                      BlockCount;
+    MageVulkanMemoryBlock    *Blocks;
 } MageVulkanMemoryHeap;
+
+typedef struct MageVulkanMemoryRequestInfo
+{
+    MageGraphicsBufferCreateInfo  *BufferInfo;
+    VkMemoryPropertyFlagBits      DesiredFlagBits;
+} MageVulkanMemoryRequestInfo; 
 
 typedef struct MageRenderer
 {
@@ -116,8 +125,10 @@ typedef struct MageRenderer
     MageRendererCommandBuffers  CommandRecorders;
     MageRendererSyncronisation  Syncronisation;
     MageVulkanMemoryHeap        *Heaps;
+    MageVulkanMemoryBlock       *NextBlock;
     VkClearValue                ClearValues;
     U32                         HeapCount;
+    U32                         NextBlockIndex;
     U32                         ActiveIndex;
 } MageRenderer;
 
@@ -172,6 +183,7 @@ extern U8 MageVulkanRendererFrameBuffersCreate(MageRendererCreateInfo *info, Mag
 extern U8 MageVulkanRendererCommandBuffersCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
 
 extern U8 MageVulkanRendererHeapsCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
+extern U8 MageVulkanRendererHeapsRequestMemory(MageRenderer *renderer, MageVulkanMemoryRequestInfo *requestInfo, VkDeviceMemory *sectionMemory, MageVulkanMemoryBlockSections *section);
 extern U8 MageVulkanRendererHeapsDestroy(MageRenderer *renderer);
 
 extern U8 MageVulkanRendererSyncronisationCreate(MageRendererCreateInfo *info, MageRenderer *renderer);
