@@ -20,7 +20,7 @@ U8 MageThreadEnd(MageThread *thread)
 }
 U8 MageThreadDestroy(MageThread *thread)
 {
-	WaitForMultipleObjects(1, &thread->Handle, TRUE, UINT64_MAX); /* Wait for the thread to end */
+	WaitForMultipleObjects(1, &thread->Handle, TRUE, UINT32_MAX); /* Wait for the thread to end */
 	DWORD r;
 	GetExitCodeThread(thread->Handle, &r);
 	CloseHandle(thread->Handle);

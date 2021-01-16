@@ -12,7 +12,7 @@ typedef struct MageRenderer MageRenderer;
     typedef U0 *(*MageThreadCallback)(U0 *);
     #define MAGE_THREAD_RETURN_VALUE U0 *
 #elif MAGE_BUILD_PLATFORM_WINDOWS
-    typedef DWORD (*MageThreadCallback)(U8 *);
+    typedef DWORD (*MageThreadCallback)(U0 *);
     #define MAGE_THREAD_RETURN_VALUE DWORD
 #endif
 

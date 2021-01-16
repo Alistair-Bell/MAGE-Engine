@@ -32,7 +32,7 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo* info, MageApplic
 
 		U8 result = GetMonitorInfo(mainMonitor, &monitorInfo);
 		MAGE_HANDLE_ERROR_MESSAGE(!result, printf("Failed to query Win32 monitor info\n"));
-		printf("Inform: Creating fullscreen Win32 application using primary monitor, dimensions [%d:%d]\n", monitorInfo.rcMonitor.right, monitorInfo.rcMonitor.bottom);
+		printf("Inform: Creating fullscreen Win32 application using primary monitor, dimensions [%ld:%ld]\n", monitorInfo.rcMonitor.right, monitorInfo.rcMonitor.bottom);
 		info->Width        = (U16)monitorInfo.rcMonitor.right;
 		info->Height       = (U16)monitorInfo.rcMonitor.bottom;
 		info->SpawnOffsetX = 0;
