@@ -9,9 +9,8 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
     XInitThreads();
 
     window->WindowDisplay = XOpenDisplay(NULL);
+    MAGE_HANDLE_ERROR_MESSAGE(window->WindowDisplay == NULL, printf("Error: Failed to open X11 display\n"));
     window->RootWindow = DefaultRootWindow(window->WindowDisplay);
-    
-    MAGE_HANDLE_ERROR_MESSAGE(window->WindowDisplay == NULL, printf("Error: Failed to open X11 window display\n"));
 
     XSetWindowAttributes attributes;
     memset(&attributes, 0, sizeof(XSetWindowAttributes));
