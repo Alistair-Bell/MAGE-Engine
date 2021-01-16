@@ -84,8 +84,7 @@ U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, MageApplica
 	SecureZeroMemory(dimensions, sizeof(MageApplicationWindowDimensions));
 	dimensions->Width   = r.right - r.left;
 	dimensions->Height  = r.bottom - r.top;
-	printf("Inform: [Left %d] [Right %d] [Top %d] [Bottom %d]\n", r.left, r.right, r.top, r.bottom);
-	printf("Inform: %d %d\n", dimensions->Width / 2, dimensions->Height / 2);
+	return MageTrue;
 }
 U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
 {

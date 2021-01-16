@@ -33,8 +33,8 @@ U8 MageVulkanRendererHeapsCreate(MageRendererCreateInfo *info, MageRenderer *ren
     {
         MageVulkanMemoryHeap *heap = &renderer->Heaps[i]; 
 
-        U64 memCount  = memoryProperties.memoryHeaps[i].size;
-        U32 blockCount = memCount / MAGE_MEMORY_CHUNK_SIZE;
+        U64 memCount  =  (U64)memoryProperties.memoryHeaps[i].size;
+        U32 blockCount = (U32)memCount / MAGE_MEMORY_CHUNK_SIZE;
        
         heap->BlockCount = blockCount;
         heap->Blocks     = calloc(blockCount, sizeof(MageVulkanMemoryBlock));
@@ -48,6 +48,7 @@ U8 MageVulkanRendererHeapsCreate(MageRendererCreateInfo *info, MageRenderer *ren
         for (j = 0; j < fowardAllocateCount; j++)
         {
             MageVulkanMemoryBlock *block = &heap->Blocks[j];
+            memset(block, 0, sizeof(MageVulkanMemoryBlock));
             U8 r = MageVulkanMemoryAllocate(renderer->Device.LogicalDevice, memoryProperties.memoryTypes[i].heapIndex, &block->AssociatedMemory, MAGE_MEMORY_CHUNK_SIZE);
             MAGE_HANDLE_ERROR_MESSAGE(!r, printf("Error: Unable to allocate memory, heap %d, requested size %lu\n", i, (U64)MAGE_MEMORY_CHUNK_SIZE));
             block->Allocated          = MageTrue;

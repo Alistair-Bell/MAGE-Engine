@@ -4,7 +4,7 @@
 #include "Includes.h"
 #include "CreateStructures.h"
 
-#ifdef MAGE_BUILD_PLATFORM_LINUX
+#if MAGE_BUILD_PLATFORM_LINUX
 
 typedef struct MageThread
 {
@@ -13,6 +13,17 @@ typedef struct MageThread
 
 #define MAGE_THREAD_RETURN_SUCCESS ((U0 *)MageTrue) 
 #define MAGE_THREAD_RETURN_FAILURE ((U0 *)MageFalse)
+
+#elif MAGE_BUILD_PLATFORM_WINDOWS
+    
+typedef struct MageThread
+{
+    DWORD       Identifier;
+    HANDLE      Handle;
+} MageThread;
+
+#define MAGE_THREAD_RETURN_SUCCESS (DWORD)0 /* Love it when 0 and 1 are flipped around */
+#define MAGE_THREAD_RETURN_FAILURE (DWORD)1 /* Love it when 0 and 1 are flipped around */
 
 #else
     #error "Threading system has not been inplimented"

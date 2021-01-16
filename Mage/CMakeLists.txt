@@ -59,6 +59,8 @@ elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 	set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
 		Source/Windows/WindowsWindow.c
 		Source/Windows/WindowsInputHandler.c
+		Source/Windows/WindowsThreading.c
+		Source/Windows/WindowsFileSystem.c
 	)
 endif()
 

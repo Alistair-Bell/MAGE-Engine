@@ -58,17 +58,12 @@ LRESULT CALLBACK MageInputHandlerWindowsEventListener(HWND hWnd, UINT uMsg, WPAR
 U8 MageInputHandlerPollEvents(MageInputHandler *handler, MageApplicationWindow *window)
 {
 	MSG message;
-	while (MageTrue)
+	while (GetMessage(&message, NULL, 0, 0) > 0)
 	{
-		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&message);
-
-			DispatchMessage(&message);
-		}
-		if (message.message == WM_QUIT) break;
+		TranslateMessage(&message);
+		DispatchMessage(&message);
 	}
-	return MageFalse;
+	return MageTrue;
 }
 MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code)
 {
