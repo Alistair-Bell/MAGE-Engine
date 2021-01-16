@@ -1,5 +1,4 @@
-#include "../Includes.h"
-#include "../InputHandler.h"
+#include "../../InputHandler.h"
 
 static U8 MageInputHandleResize(MageInputHandler *handler, MageApplicationWindow *window, const I16 width, const I16 height)
 {

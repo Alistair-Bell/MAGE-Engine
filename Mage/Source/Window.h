@@ -41,6 +41,10 @@ typedef struct MageApplicationWindow
     #error Platform has not been implimented!
 #endif
 
+#if MAGE_BUILD_RENDERER_VULKAN
+extern U8 MageApplicationWindowCreateVulkanSurface(MageApplicationWindow *window, VkInstance instance, VkSurfaceKHR *surface); 
+#endif
+
 extern U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window);
 extern U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName);
 extern U8 MageApplicationWindowGetDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions);

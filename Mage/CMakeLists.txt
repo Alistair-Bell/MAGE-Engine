@@ -50,8 +50,9 @@ message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")
 # platform specific code
 if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Linux/LinuxWindow.c
-        Source/Linux/LinuxInputHandler.c
+        Source/Linux/XLib/XLibInputHandler.c
+        Source/Linux/XLib/XLibWindow.c
+        Source/Linux/XLib/XLibSurface.c
         Source/Linux/LinuxThreading.c
         Source/Linux/LinuxFileSystem.c
     )
@@ -59,6 +60,7 @@ elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 	set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
 		Source/Windows/WindowsWindow.c
 		Source/Windows/WindowsInputHandler.c
+        Source/Windows/WindowsSurface.c
 		Source/Windows/WindowsThreading.c
 		Source/Windows/WindowsFileSystem.c
 	)

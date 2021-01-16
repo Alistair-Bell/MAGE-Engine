@@ -115,7 +115,7 @@ U8 MageRendererCreate(MageRendererCreateInfo *info, MageRenderer *renderer)
         MageVulkanRendererFrameBuffersCreate,
         MageVulkanRendererCommandBuffersCreate,
         MageVulkanRendererSyncronisationCreate,
-        MageVulkanRendererHeapsCreate,
+        /* MageVulkanRendererHeapsCreate, */
     };
 
     U64 count = sizeof(methods) / sizeof(MageVulkanCreateCallback);
@@ -250,8 +250,10 @@ U8 MageRendererDestroy(MageRenderer *renderer)
     free(renderer->FrameBuffer.Buffers);
     free(renderer->CommandRecorders.Residents);
 
+    /*
     MageVulkanRendererHeapsDestroy(renderer); 
     free(renderer->Heaps);
+    */
 
     vkDestroyCommandPool(renderer->Device.LogicalDevice, renderer->CommandRecorders.Pool, NULL);
     vkDestroyPipeline(renderer->Device.LogicalDevice, renderer->Pipeline.GraphicsPipeline, NULL);

@@ -1,6 +1,6 @@
-#include "../Window.h"
-#include "../CreateStructures.h"
-#include "../Includes.h"
+#include "../../Window.h"
+#include "../../CreateStructures.h"
+#include "../../Includes.h"
 
 U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window)
 {
