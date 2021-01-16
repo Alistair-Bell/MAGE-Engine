@@ -12,8 +12,6 @@ typedef struct MageApplicationWindowDimensions
     U32 PositionY;
 } MageApplicationWindowDimensions;
 
-#if MAGE_BUILD_PLATFORM_LINUX
-
 /* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :|*/
 
 #if MAGE_BUILD_XLIB
@@ -24,9 +22,9 @@ typedef struct MageApplicationWindow
     Window      ContextWindow;
     Window      RootWindow;
     XEvent      PollingEvent;
-} MageApplicationWindowXLib;
+} MageApplicationWindow;
 
-#endif
+#elif MAGE_BUILD_WAYLAND
 
 typedef struct MageApplicationWindow
 {
@@ -34,7 +32,9 @@ typedef struct MageApplicationWindow
     struct wl_surface    *Surface;
 } MageApplicationWindow;
 
-#elif MAGE_BUILD_PLATFORM_WINDOWS
+#endif
+
+#if MAGE_BUILD_PLATFORM_WINDOWS
 
 /* The one time I can commend Microsoft is for not having the most generic names for types! Thanks :| */
 
@@ -45,8 +45,6 @@ typedef struct MageApplicationWindow
     WNDCLASSEX  NativeWindowClass;
 } MageApplicationWindow;
 
-#else
-    #error Platform has not been implimented!
 #endif
 
 #if MAGE_BUILD_RENDERER_VULKAN

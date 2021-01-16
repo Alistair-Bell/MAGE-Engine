@@ -4,9 +4,13 @@
 static const char *MageRequiredExtensions[] = 
 {
     VK_KHR_SURFACE_EXTENSION_NAME,
-    #if MAGE_BUILD_PLATFORM_LINUX
+    #if MAGE_BUILD_WAYLAND
         VK_KHR_WAYLAND_SURFACE_EXTENSION_NAME,
-    #elif MAGE_BUILD_PLATFORM_WINDOWS
+    #elif MAGE_BUILD_XLIB
+        VK_KHR_XLIB_SURFACE_EXTENSION_NAME, 
+    #endif
+    
+    #if MAGE_BUILD_PLATFORM_WINDOWS
         VK_KHR_WIN32_SURFACE_EXTENSION_NAME,
     #endif
     
