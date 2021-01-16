@@ -5,6 +5,7 @@ project("MageEngine")
 
 option(PROJECT_BUILD_PLATFORM "Engine build platform target" "Windows")
 option(PROJECT_BUILD_UNIT_TESTS "Build engine unit tests" On)
+option(PROJECT_BUILD_LINUX_DISPLAY_BACKEND "Linux display server backend" "X11")
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
@@ -27,12 +28,22 @@ endif(MSVC)
 
 find_package(Vulkan)
 
-function(MageEngineAddDefinesAndFlagsToBinary binary)
-    
+function(MageEngineAddFlagsAndLink binary)
+
     if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_LINUX=1)
+        target_link_libraries(${binary} pthread)
     elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 		target_compile_definitions(${binary} PUBLIC MAGE_BUILD_PLATFORM_WINDOWS=1)
+    endif()
+
+    if (PROJECT_BUILD_LINUX_DISPLAY_BACKEND STREQUAL "X11")
+        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_XLIB=1)
+        target_link_libraries(${binary} X11)
+    else()
+        target_compile_definitions(${binary} PUBLIC MAGE_BUILD_WAYLAND=1)
+        target_link_libraries(${binary} wayland-client)
+        target_link_libraries(${binary} wayland-server)
     endif()
     
     target_compile_options(${binary} PUBLIC "-g")
@@ -44,32 +55,17 @@ function(MageEngineAddDefinesAndFlagsToBinary binary)
         target_compile_definitions(${binary} PUBLIC MAGE_BUILD_DEBUG_MODE=0)
     endif()
 
-	target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
-    
-endfunction(MageEngineAddDefinesAndFlagsToBinary binary)
-
-function(MageEngineLinkPlatformLibrariesToBinary binary)
-
-    if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
-        target_link_libraries(${binary} X11)
-        target_link_libraries(${binary} pthread)
-    elseif (PROJECT_BUILD_PLATFORM STREQUAL "Windows")
-    
-    endif()
-
-    target_link_libraries(${binary} Vulkan::Vulkan)
+	target_link_libraries(${binary} Vulkan::Vulkan)
     target_include_directories(${binary} PUBLIC ${Vulkan_INCLUDE_DIRS})
+    target_compile_definitions(${binary} PUBLIC MAGE_BUILD_RENDERER_VULKAN=1)
     
-endfunction(MageEngineLinkPlatformLibrariesToBinary)
+endfunction(MageEngineAddFlagsAndLink binary)
 
 function(MageEngineAddUnitTests binary source)
-    
     add_executable(${binary} ${source})
 	target_link_libraries(${binary} MageSDK)
     add_test(NAME ${binary} COMMAND ${binary})
-    MageEngineLinkPlatformLibrariesToBinary(${binary})
-    MageEngineAddDefinesAndFlagsToBinary(${binary})
-
+    MageEngineAddFlagsAndLink(${binary})
 endfunction(MageEngineAddUnitTests binary source)
 
 

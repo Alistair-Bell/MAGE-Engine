@@ -1,8 +1,6 @@
 #include "../../Window.h"
-#include "../../CreateStructures.h"
-#include "../../Includes.h"
 
-U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window)
+U8 MageLinuxApplicationWindowCreateXLib(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window)
 {
     MAGE_HANDLE_ERROR_MESSAGE(info == NULL || window == NULL, printf("Error: Any passed parameters are NULL!\n"))
     
@@ -62,18 +60,6 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
         U32 h = XDisplayHeight(window->WindowDisplay, 0);
         XMoveWindow(window->WindowDisplay, window->ContextWindow, (w - info->Width) / 2, (h - info->Height) / 2);
     }
-
-    XGrabPointer(
-        window->WindowDisplay, 
-        window->ContextWindow,
-        MageTrue, ButtonPressMask | ButtonReleaseMask | PointerMotionMask,
-        GrabModeAsync,
-        GrabModeAsync,
-        window->ContextWindow,
-        window->ContextCursor,
-        CurrentTime
-    );
-
     return MageTrue;
 }
 U8 MageApplicationWindowSetTitle(MageApplicationWindow *window, const char *newName)

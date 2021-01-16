@@ -20,29 +20,48 @@
     #define MageFalse 0
 #endif
 
+#if MAGE_BUILD_RENDERER_VULKAN
+    #include <vulkan/vulkan.h>
+#endif
+
+
 #if MAGE_BUILD_PLATFORM_LINUX
-    #include <X11/Xlib.h>
-    #include <X11/X.h>
-    #include <X11/keysym.h>
-    #include <unistd.h>
+   #include <unistd.h>
     #include <pthread.h>
     #include <pwd.h>
+
 #elif MAGE_BUILD_PLATFORM_WINDOWS
     #include <Windows.h>
     #include <windowsx.h>
-#endif
-
-#if MAGE_BUILD_RENDERER_VULKAN
-    #include <vulkan/vulkan.h>
-
-    #if MAGE_BUILD_PLATFORM_LINUX
-        #define VK_USE_PLATFORM_XLIB_KHR
-        #include <vulkan/vulkan_xlib.h>
-    #elif MAGE_BUILD_PLATFORM_WINDOWS
+    #if MAGE_BUILD_RENDERER_VULKAN
         #define VK_USE_PLATFORM_WIN32_KHR
         #include <vulkan/vulkan_win32.h>
     #endif
 #endif
+
+/* XLib specific libraries */
+#if MAGE_BUILD_XLIB
+    #include <X11/Xlib.h>
+    #include <X11/X.h>
+    #include <X11/keysym.h>
+    #if MAGE_BUILD_RENDERER_VULKAN
+        #define VK_USE_PLATFORM_XLIB_KHR
+        #include <vulkan/vulkan_xlib.h>
+    #endif
+#endif
+
+    /* Wayland specific libraries */
+#if MAGE_BUILD_WAYLAND
+    #include <wayland-server.h>
+    #include <wayland-client.h>
+    #include <wayland-util.h>
+    #if MAGE_BUILD_RENDERER_VULKAN
+        #define VK_USE_PLATFORM_WAYALND_KHR
+        #include <vulkan//vulkan_wayland.h>
+    #endif  
+#endif
+
+
 
 #if MAGE_BUILD_DEBUG_MODE
     #define MAGE_HANDLE_ERROR_MESSAGE(condition, execute) if ((condition)) { execute; return MageFalse; }

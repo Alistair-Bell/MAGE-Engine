@@ -16,14 +16,22 @@ typedef struct MageApplicationWindowDimensions
 
 /* Thanks XLib for using wonderful names such as Display and Window for predefined types without any prefix :|*/
 
+#if MAGE_BUILD_XLIB
+
 typedef struct MageApplicationWindow
 {
     Display     *WindowDisplay;
     Window      ContextWindow;
     Window      RootWindow;
     XEvent      PollingEvent;
-    Colormap    ColorMap;
-    Cursor      ContextCursor;
+} MageApplicationWindowXLib;
+
+#endif
+
+typedef struct MageApplicationWindow
+{
+    struct wl_display    *Display;
+    struct wl_surface    *Surface;
 } MageApplicationWindow;
 
 #elif MAGE_BUILD_PLATFORM_WINDOWS

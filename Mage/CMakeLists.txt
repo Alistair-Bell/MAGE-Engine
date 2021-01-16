@@ -50,9 +50,6 @@ message(STATUS "Building engine for ${PROJECT_BUILD_PLATFORM}")
 # platform specific code
 if (PROJECT_BUILD_PLATFORM STREQUAL "Linux")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Linux/XLib/XLibInputHandler.c
-        Source/Linux/XLib/XLibWindow.c
-        Source/Linux/XLib/XLibSurface.c
         Source/Linux/LinuxThreading.c
         Source/Linux/LinuxFileSystem.c
     )
@@ -66,6 +63,21 @@ elseif(PROJECT_BUILD_PLATFORM STREQUAL "Windows")
 	)
 endif()
 
+if (PROJECT_BUILD_LINUX_DISPLAY_BACKEND STREQUAL "X11")
+    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
+        Source/Linux/XLib/XLibWindow.c
+        Source/Linux/XLib/XLibSurface.c
+        Source/Linux/XLib/XLibInputHandler.c
+    )
+elseif (PROJECT_BUILD_LINUX_DISPLAY_BACKEND STREQUAL "Wayland")
+    set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
+        Source/Linux/Wayland/WaylandWindow.c
+        Source/Linux/Wayland/WaylandInputHandler.c
+        Source/Linux/Wayland/WaylandSurface.c
+    )
+endif()
+
+
 add_library(${PROJECT_NAME} STATIC ${LIBRARY_SOURCES})
-MageEngineAddDefinesAndFlagsToBinary(${PROJECT_NAME})
-MageEngineLinkPlatformLibrariesToBinary(${PROJECT_NAME})
+include_directories(Source)
+MageEngineAddFlagsAndLink(${PROJECT_NAME})
