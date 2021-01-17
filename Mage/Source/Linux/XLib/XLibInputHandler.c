@@ -115,9 +115,7 @@ MageKeyboardKey MageInputHandlerTranslateKeyCodes(const U64 code)
 
 U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *handler)
 {
-    MAGE_HANDLE_ERROR_MESSAGE(info == NULL || handler == NULL, printf("Error: Any passed parameters are NULL!\n"));
     memset(handler, 0, sizeof(MageInputHandler));
-    MAGE_HANDLE_ERROR_MESSAGE(info->ApplicationWindow == NULL, printf("Error: Passed application window is NULL!\n"));
 
     /* See flags https://tronche.com/gui/x/xlib/events/mask.html */
 

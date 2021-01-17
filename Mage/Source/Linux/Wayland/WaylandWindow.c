@@ -6,6 +6,11 @@ U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplic
 
     return MageTrue;
 }
+U8 MageApplicationWindowGetFramebufferDimensions(MageApplicationWindow *window, MageApplicationWindowDimensions *dimensions)
+{
+
+    return MageTrue;
+}
 U8 MageApplicationWindowDestroy(MageApplicationWindow *window)
 {
 

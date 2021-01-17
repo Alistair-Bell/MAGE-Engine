@@ -25,6 +25,7 @@ build() {
         -S 'MageEngine' \
         -DCMAKE_BUILD_TYPE='None' \
         -DPROJECT_BUILD_PLATFORM='Linux' \
+        -DPROJECT_BUILD_LINUX_DISPLAY_BACKEND='X11' \ 
         -DCMAKE_BUILD_TYPE='Release' \
         -DPROJECT_BUILD_UNIT_TESTS='Off' \
         -Wno-dev
