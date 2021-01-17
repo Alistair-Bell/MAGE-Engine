@@ -1,4 +1,4 @@
-#include "../../Window.h"
+#include "../Window.h"
 
 U8 MageApplicationWindowCreateVulkanSurface(MageApplicationWindow *window, VkInstance instance, VkSurfaceKHR *surface)
 {

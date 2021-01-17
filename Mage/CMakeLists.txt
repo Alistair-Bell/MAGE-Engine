@@ -65,15 +65,15 @@ endif()
 
 if (PROJECT_BUILD_LINUX_DISPLAY_BACKEND STREQUAL "X11")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Linux/XLib/XLibWindow.c
-        Source/Linux/XLib/XLibSurface.c
-        Source/Linux/XLib/XLibInputHandler.c
+        Source/XLib/XLibWindow.c
+        Source/XLib/XLibSurface.c
+        Source/XLib/XLibInputHandler.c
     )
 elseif (PROJECT_BUILD_LINUX_DISPLAY_BACKEND STREQUAL "Wayland")
     set(LIBRARY_SOURCES ${LIBRARY_SOURCES}
-        Source/Linux/Wayland/WaylandWindow.c
-        Source/Linux/Wayland/WaylandInputHandler.c
-        Source/Linux/Wayland/WaylandSurface.c
+        Source/Wayland/WaylandWindow.c
+        Source/Wayland/WaylandInputHandler.c
+        Source/Wayland/WaylandSurface.c
     )
 endif()
 

@@ -1,4 +1,4 @@
-#include <InputHandler.h>
+#include "../InputHandler.h"
 
 U8 MageInputHandlerCreate(MageInputHandlerCreateInfo *info, MageInputHandler *handler)
 {

@@ -1,4 +1,4 @@
-#include "../../Window.h"
+#include "../Window.h"
 
 U8 MageApplicationWindowCreate(MageApplicationWindowCreateInfo *info, MageApplicationWindow *window)
 {
