@@ -26,7 +26,7 @@ typedef struct MageThread
 #define MAGE_THREAD_RETURN_FAILURE (DWORD)1 /* Love it when 0 and 1 are flipped around */
 
 #else
-    #error "Threading system has not been inplimented"
+    #error "Threading system has not been implimented"
 #endif
 
 extern U8 MageThreadCreate(MageThreadCreateInfo *info, MageThread *thread); /* Creating the thread instantly starts the thread */

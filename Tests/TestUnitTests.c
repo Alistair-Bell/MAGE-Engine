@@ -1,4 +1,4 @@
-#include <Mage.h>
+#include "CommonResources.h"
 
 U8 UnitTestsModuleTestSucceed(U0 *data)
 {

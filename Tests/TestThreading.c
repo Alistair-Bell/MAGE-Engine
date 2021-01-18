@@ -1,4 +1,4 @@
-#include <Mage.h>
+#include "CommonResources.h"
 
 static MAGE_THREAD_RETURN_VALUE addition(U0 *data)
 {

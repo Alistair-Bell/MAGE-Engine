@@ -1,4 +1,4 @@
-#include <Mage.h>
+#include "CommonResources.h"
 
 static U8 TestFileSystemLoadDataFromMounted(U0 *data)
 {

@@ -28,8 +28,10 @@ typedef struct MageApplicationWindow
 
 typedef struct MageApplicationWindow
 {
-    struct wl_display    *Display;
-    struct wl_surface    *Surface;
+    struct wl_display       *Display;
+    struct wl_surface       *Surface;
+    struct wl_compositor    *Compositor;
+    struct wl_shell_surface *ShellSurface;
 } MageApplicationWindow;
 
 #endif

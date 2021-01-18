@@ -52,7 +52,6 @@
 
 /* Wayland specific libraries */
 #if MAGE_BUILD_WAYLAND
-	#error HEre
     #include <wayland-server.h>
     #include <wayland-client.h>
     #include <wayland-util.h>
