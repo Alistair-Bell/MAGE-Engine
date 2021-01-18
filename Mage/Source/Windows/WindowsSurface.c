@@ -3,7 +3,7 @@
 U8 MageApplicationWindowCreateVulkanSurface(MageApplicationWindow *window, VkInstance instance, VkSurfaceKHR *surface)
 {
     PFN_vkCreateWin32SurfaceKHR surfaceCreate = (PFN_vkCreateWin32SurfaceKHR)vkGetInstanceProcAddr(instance, "vkCreateWin32SurfaceKHR");
-    MAGE_HANDLE_ERROR_MESSAGE(surfaceCreate == NULL, printf("Error: Unable to find vkCreateWin32SurfaceKHR - check driver!\n"));
+    MAGE_HANDLE_ERROR_MESSAGE(surfaceCreate == NULL, printf("Error: Unable to load function vkCreateWin32SurfaceKHR - check driver!\n"));
 
     VkWin32SurfaceCreateInfoKHR surfaceInfo;
     memset(&surfaceInfo, 0, sizeof(VkWin32SurfaceCreateInfoKHR));
